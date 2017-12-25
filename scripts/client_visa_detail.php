@@ -1,0 +1,248 @@
+<?php
+require_once('../etc/const.php');
+require_once(__LIB_PATH.'Template.class.php');
+require_once(__LIB_PATH.'ClientAPI.class.php');
+require_once(__LIB_PATH.'GeicAPI.class.php');
+require_once(__LIB_PATH.'VisaAPI.class.php');
+
+$g_visa_status = array('active', 'grant', 'withdraw', 'refused', 'cancel agreement', 'agent stop', 'declined');
+
+# check valid user
+$user_id = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
+
+# get course id
+$visa_id   = isset($_REQUEST['vid'])? trim($_REQUEST['vid']) : 0;
+$client_id = isset($_REQUEST['cid'])? trim($_REQUEST['cid']) : 0;
+$sets['cateid'] = isset($_REQUEST['t_visa'])? trim($_REQUEST['t_visa']) : 0;
+$sets['subid']  = isset($_REQUEST['t_class'])? trim($_REQUEST['t_class']) : 0;
+$sets['vdate']   = isset($_REQUEST['t_first'])? (string)trim($_REQUEST['t_first']) : "0000-00-00";
+$sets['vdate']   = $sets['vdate'] == ""? "0000-00-00" : $sets['vdate'];
+$sets['status']  = isset($_REQUEST['t_status'])? trim($_REQUEST['t_status']) : "";
+$sets['body']    = isset($_REQUEST['t_body'])? trim($_REQUEST['t_body']) : 0;
+$sets['shore']   = isset($_REQUEST['t_shore'])? trim($_REQUEST['t_shore']) : 0; 
+$sets['auser']   = isset($_REQUEST['t_auser'])? (string)trim($_REQUEST['t_auser']) : 0;
+$sets['vuser']   = isset($_REQUEST['t_vuser'])? (string)trim($_REQUEST['t_vuser']) : 0;
+
+$o_c = new ClientAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
+$o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1); 
+$o_v = new VisaAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1); 
+
+//user grants
+$ugs = array();
+$user_grants = $o_g->get_user_grants($user_id);
+foreach ($g_user_grants as $item){
+	if (array_key_exists($item, $user_grants)) {
+		foreach ($g_user_ops as $key=>$op){
+			$ugs[$item][$key] = $o_g->check_user_grant($user_grants[$item], $op); 	
+		}		
+	}
+}
+
+$msg = "";
+#get visa dependants
+$dependants = $o_c->getDependantByVisa($visa_id);
+if(isset($_REQUEST['bt_name']) && stripos($_REQUEST['bt_name'], "CLOSE") !== false){
+	echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
+	exit;	
+}
+
+if (isset($_POST['bt_name']) && stripos($_POST['bt_name'], "SAVE") !== false){
+    $sets['epdate']   = isset($_REQUEST['t_epdate'])? (string)trim($_REQUEST['t_epdate']) : "0000-00-00";
+    $sets['epdate']   = $sets['epdate'] == ""? "0000-00-00" : $sets['epdate'];
+    
+    $sets['clientno'] = isset($_REQUEST['t_clientno'])? (string)trim($_REQUEST['t_clientno']) : "";
+    
+    $sets['file']    = isset($_REQUEST['t_file'])? (string)trim($_REQUEST['t_file']) : "";
+    $sets['offdt']  = isset($_REQUEST['t_offdt'])? (string)trim($_REQUEST['t_offdt']) : "";
+    $sets['fax']     = isset($_REQUEST['t_fax'])? (string)trim($_REQUEST['t_fax']) : "";
+    $sets['name']    = isset($_REQUEST['t_name'])? (string)trim($_REQUEST['t_name']) : "";
+    $sets['tel']     = isset($_REQUEST['t_tel'])? (string)trim($_REQUEST['t_tel']) : "";
+    $sets['note']    = isset($_REQUEST['t_note'])? (string)trim($_REQUEST['t_note']) : "";
+    
+
+    $sets['email']   = isset($_REQUEST['t_email'])? (string)trim($_REQUEST['t_email']) : "";
+	$sets['asco']    = isset($_REQUEST['t_asco'])? (string)trim($_REQUEST['t_asco']) : 0;
+    $sets['state']   = isset($_REQUEST['t_sponsor'])? (string)trim($_REQUEST['t_sponsor']) : 0;
+    $sets['key']     = isset($_REQUEST['t_key'])? iconv('utf-8', 'GBK', (string)trim($_REQUEST['t_key'])) : "";
+    $sets['note2']   = isset($_REQUEST['t_note2'])? iconv('utf-8', 'GBK', (string)trim($_REQUEST['t_note2'])) : "";
+    
+    $sets['adate']   = isset($_REQUEST['t_adate'])? (string)trim($_REQUEST['t_adate']) : "0000-00-00";
+    $sets['adate']   = $sets['adate'] == ""? "0000-00-00" : $sets['adate'];
+    
+    $sets['fee']   = isset($_REQUEST['t_fee'])? (int)trim($_REQUEST['t_fee']) : 0;
+	$sets['cfee']   = isset($_REQUEST['t_cfee'])? (int)trim($_REQUEST['t_cfee']) : 0;
+	$sets['ofee']   = isset($_REQUEST['t_ofee'])? (int)trim($_REQUEST['t_ofee']) : 0;
+    $sets['sfee']   = isset($_REQUEST['t_sfee'])? (int)trim($_REQUEST['t_sfee']) : 0;	
+
+    if($visa_id > 0){
+		//check payment
+        if (strtolower($sets['status']) == 'grant') {
+			if(!$o_c->checkVisaAmont($visa_id)){
+				$msg = "Unfinished Agreement!\\n\\nPlesas check payments";     		
+			}
+		}
+			
+		if($msg == ''){
+			$o_c->setApplyVisa($visa_id, $sets);
+		}		
+
+    }else{
+        $visa_id =  $o_c->addApplyVisa($user_id, $client_id, $sets);
+	}
+	
+	#get depantent expire date
+	$arr = array();
+	foreach ($dependants as $depid => $date){
+		$_id = "dep_" . $depid;
+		if (array_key_exists($_id, $_REQUEST) && $_REQUEST[$_id] != "" ) { //&& $_REQUEST[$_id] != "0000-00-00" 
+			$arr[$depid] = $_REQUEST[$_id];	
+		}	
+	}
+	$o_c->setDependantExpireDate($visa_id, $arr);
+	
+	
+	#set client user related
+	if($sets['auser'] > 0){
+		$o_c->addClientUserRs($client_id, $sets['auser'], __AGREEMENT_STAFF);
+	}
+	
+	if ($sets['vuser']) {
+		$o_c->addClientUserRs($client_id, $sets['vuser'], __VISA_PAPERWORK);
+	}
+
+    //auto new steps
+    if ($visa_id > 0 && $sets['adate'] > '0000-00-00') {
+        $o_c->autoVisaProcess($visa_id, 0, $o_v->getVisaItemArr($sets['cateid'], $sets['subid']));
+    }
+	
+    echo json_encode(array('msg'=>$msg == ""? "Save OK" : $msg, 'id'=>$visa_id));
+    exit;
+}elseif (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "DELETE"){
+	$o_c->delApplyVisaByID($visa_id);
+	echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
+	exit;	
+}
+
+# get user position
+$view_all = 0;
+if ($ugs['seeall']['v'] == 0){
+	$view_all = $user_id;
+}
+
+# get user
+$user_arr = $o_g->getUserNameArr();
+
+
+//# get dependant arr
+//$dep_arr = $o_c->getDependantArr($client_id);
+
+# set smarty tpl
+$o_tpl = new Template;
+$isExpireSet = 1;
+$visa_body = 0;
+$afee = 0;
+$cfee = 0;
+$ofee = 0;
+$sfee = 0;
+if($visa_id > 0){
+	$visa_arr = $o_c->getApplyVisa($client_id, $visa_id, $user_id);
+	if ($visa_id > 0 && $visa_arr[$visa_id]['atag'] == '' && ($visa_arr[$visa_id]['adate'] != '0000-00-00' || $visa_arr[$visa_id]['adate'] != '') && $visa_arr[$visa_id]['fee'] > 0) {
+		$agreement_id = date("Y") .'-'. $visa_id;
+		$o_c->setAgreementID($visa_id, $agreement_id);	
+	}
+		
+	$isExpireSet = ($visa_arr[$visa_id]['epdate'] == "" || $visa_arr[$visa_id]['epdate'] == '0000-00-00')? 1 : 0;
+	$o_tpl->assign('isExpireSet', $isExpireSet);
+	if ($sets['subid'] == 0){
+		$sets['cateid'] = $visa_arr[$visa_id]['cateid'];
+		$sets['subid']  = $visa_arr[$visa_id]['classid'];
+	}
+	$visa_arr[$visa_id]['body'] = isset($_REQUEST['t_body'])? $_REQUEST['t_body'] : $visa_arr[$visa_id]['body'];
+	$visa_body = isset($_REQUEST['t_body'])? $_REQUEST['t_body'] : $visa_arr[$visa_id]['body'];
+	$o_tpl->assign('dt_arr', $visa_arr[$visa_id]);
+
+	$afee = $visa_arr[$visa_id]['fee'];
+	$cfee = $visa_arr[$visa_id]['cfee'];	
+	$ofee = $visa_arr[$visa_id]['ofee'];
+	$sfee = $visa_arr[$visa_id]['sfee'];	
+}
+else{
+	$o_tpl->assign('isExpireSet', $isExpireSet);
+	$o_tpl->assign('dt_arr', $sets);
+	$afee = isset($sets['fee'])? $sets['fee'] : 0;
+	$cfee = isset($sets['cfee'])? $sets['cfee'] : 0;	
+	$ofee = isset($sets['ofee'])? $sets['ofee'] : 0;
+	$sfee = isset($sets['sfee'])? $sets['sfee'] : 0;
+}
+
+
+# get visa category
+$o_v = new VisaAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
+$cate_arr  = $o_v->getVisaNameArr();
+$class_arr = $o_v->getVisaClassArr($sets['cateid']);
+
+#set net amount
+if (isset($class_arr[$sets['subid']]) && stripos($class_arr[$sets['subid']], 'onshore') !== false) {
+	$o_tpl->assign('net_afee', round($afee/1.1, 2)); //.' (GST: 10%)'
+	$o_tpl->assign('net_ofee', round($ofee/1.1, 2));
+	$o_tpl->assign('net_sfee', round($sfee/1.1, 2));	
+	$o_tpl->assign('net_camount', round($cfee/1.1, 2));	
+	$o_tpl->assign('net_gst', 1);
+}
+else {
+	$o_tpl->assign('net_afee', $afee);
+	$o_tpl->assign('net_ofee', $ofee);
+	$o_tpl->assign('net_sfee', $sfee);	
+	$o_tpl->assign('net_camount', $cfee);		
+	$o_tpl->assign('net_gst', 0);	
+}
+
+
+//$o_tpl->assign('client_arr', $dep_arr);
+$o_tpl->assign('dependants', $dependants);
+$o_tpl->assign('cate_arr', $cate_arr);
+$o_tpl->assign('class_arr', $class_arr);
+$o_tpl->assign('user_arr', $user_arr);
+
+if ($visa_id > 0){
+	$o_tpl->assign('process_arr', $o_c->getVisaProcess($visa_id));
+}
+
+//show course
+if(array_key_exists($sets['cateid'], $cate_arr) 
+	&& strpos(strtolower($cate_arr[$sets['cateid']]), 'student') !== false 
+		&& $visa_arr[$visa_id]['vuser'] == $user_id && $visa_arr[$visa_id]['shore'] == 0){
+	$o_tpl->assign('showCourse', 1);
+}
+
+//show balance
+if ($visa_id > 0){
+	//$o_tpl->assign('visa_balance', $o_v->getVisaBalance($visa_id));	
+	$o_tpl->assign('account_arr', $o_c->getAccount($visa_id));
+}
+
+$o_tpl->assign('catid', $sets['cateid']);
+$isViewBody = strpos(strtoupper($o_v->getVisaName($sets['cateid'])), strtoupper("skill")) !== false? true : false;
+$o_tpl->assign('isViewBody', $isViewBody);
+$o_tpl->assign('subid', $sets['subid']);
+$isViewState = strpos(strtoupper($o_v->getSubclassName($sets['cateid'], $sets['subid'])), "495") !== false && $isViewBody? true : false;	
+$o_tpl->assign('isViewState', $isViewState);
+$o_tpl->assign('abodys', $o_v->getVisaBody());
+$o_tpl->assign('ascos', $o_v->getVisaAsco(0, isset($_REQUEST['t_body'])? $_REQUEST['t_body'] : $visa_body));
+$o_tpl->assign('sponsors', $o_v->getVisaSponsor());
+
+
+
+$o_tpl->assign('cid', $client_id);
+$o_tpl->assign('uid', $user_id);
+$o_tpl->assign('vid', $visa_id);
+$o_tpl->assign('itemtype', __FILE_VISA);
+$o_tpl->assign('client', $o_c->getOneClientInfo($client_id));
+$o_tpl->assign('msg', $msg);
+
+$o_tpl->assign('ugs', $ugs);
+global $g_visa_stauts;
+$o_tpl->assign('status', $g_visa_status);
+$o_tpl->display('client_visa_detail.tpl'); 
+
+?>

@@ -1,0 +1,22 @@
+1. (issue invoice), => commission list -> add:semster start please issue invoice ,  date, no  => commission list -> green
+2. (revceive comm) date, no, => commission list -> remove
+3. (sub, co-comm), notify sub-agent date => co-commission list -> add,  date => co-commission list -> green
+
+
+
+visa payment, profit = -GST, 3rd party (total received - 3rd party amount)
+
+
+staff performance, agreement signed -> grand visa clients + total number
+Home load commission received
+
+
+as, IP 识别
+
+
+visa expire date in 2 months
+
+
+apply new course in 2 months
+
+clinet only study , visa expaire date => todo => service 

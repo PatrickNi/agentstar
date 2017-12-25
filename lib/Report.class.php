@@ -1,0 +1,2203 @@
+<?php
+require_once('MysqlDB.class.php');
+
+class ReportAPI extends MysqlDB {
+
+    function ReportAPI($host, $user, $pswd, $database, $debug) {
+    	$this->MysqlDB($host, $user, $pswd, $database, $debug);
+    }
+    
+    
+    function getUrgentVisa($userid, $sort_list, $null_du=1, $page=1, $page_size=50){
+		$_arr = array();
+
+		$sql = "select SQL_CALC_FOUND_ROWS a.ID, concat(LName, ' ', FName) as ClientName, VisaName, ClassName, IF(a.ItemID > 0, Item, ExItem) as Item, DueDate, BeginDate, f.CID, CVID,
+		               if(((a.DueDate >= Date(NOW()) and a.DueDate < Date(NOW()) + INTERVAL 7 Day) or a.DueDate < Date(NOW()))and a.DueDate <> '0000-00-00',0,1) as isTodo,
+		               if(a.DueDate = '0000-00-00', '9999-99-99', a.DueDate) as sortdue 
+    				from client_visa_process a left join visa_rs_item c on(a.ItemID = c.ItemID) ,  client_visa  b, visa_category d,  visa_subclass e, client_info f   
+					where a.Done = 0 and a.CVID = b.ID and b.CID = f.CID and b.CateID = d.CateID and b.SubClassID = e.SubClassID ";
+		//((a.DueDate >= Date(NOW()) and a.DueDate < Date(NOW()) + INTERVAL 7 Day) or a.DueDate < Date(NOW()))and a.DueDate <> '0000-00-00' and	
+		if ($null_du)
+			$sql .= " AND a.DueDate <> '0000-00-00' ";	
+
+		if ($userid > 0){
+			$sql .= " AND b.VUserID = {$userid} "; //(b.AUserID = {$userid} or 
+		}
+
+		if ($sort_list != ''){
+	        $sql .= " Order by {$sort_list}";
+		}
+		else{
+            $sql .= " Order by sortdue asc, Name asc, Item desc";	
+		}
+		
+        //$sql .= " LIMIT ".($page - 1)*$page_size .", {$page_size} " 
+
+		$this->query($sql);
+		while ($this->fetch()){
+			$_arr[$this->ID]['name'] = $this->ClientName;
+			$_arr[$this->ID]['item']  = $this->Item;
+	        if (strpos(strtolower($_arr[$this->ID]['item']), 'lodged') !== FALSE){
+                $_arr[$this->ID]['islodge'] = 1;
+            }
+            else{
+                $_arr[$this->ID]['islodge'] = 0;
+            }
+			$_arr[$this->ID]['cate']  = $this->VisaName;
+			$_arr[$this->ID]['class'] = $this->ClassName;
+			$_arr[$this->ID]['begin'] = $this->BeginDate;
+			$_arr[$this->ID]['due']   = $this->DueDate;
+			$_arr[$this->ID]['clientid']= $this->CID;
+			$_arr[$this->ID]['visaid']  = $this->CVID;
+			$_arr[$this->ID]['isTodo']  = $this->isTodo;
+		}
+		return $_arr;
+	}        
+
+
+    function getUrgentLegal($userid, $sort_list, $null_du=1, $page=1, $page_size=50){
+        $_arr = array();
+
+        $sql = "select SQL_CALC_FOUND_ROWS a.ID, concat(LName, ' ', FName) as ClientName, d.Name AS VisaName, ClassName, IF(a.ItemID > 0, Item, ExItem) as Item, DueDate, BeginDate, f.CID, CVID,
+                       if(((a.DueDate >= Date(NOW()) and a.DueDate < Date(NOW()) + INTERVAL 7 Day) or a.DueDate < Date(NOW()))and a.DueDate <> '0000-00-00',0,1) as isTodo,
+                       if(a.DueDate = '0000-00-00', '9999-99-99', a.DueDate) as sortdue 
+                    from client_legal_process a left join legal_step c on(a.ItemID = c.ItemID) ,  client_legal  b, legal_category d,  legal_subclass e, client_info f   
+                    where a.Done = 0 and a.CVID = b.ID and b.CID = f.CID and b.CateID = d.CateID and b.SubClassID = e.SubClassID ";
+        //((a.DueDate >= Date(NOW()) and a.DueDate < Date(NOW()) + INTERVAL 7 Day) or a.DueDate < Date(NOW()))and a.DueDate <> '0000-00-00' and    
+        if ($null_du)
+            $sql .= " AND a.DueDate <> '0000-00-00' ";    
+
+        if ($userid > 0){
+            $sql .= " AND b.VUserID = {$userid} "; //(b.AUserID = {$userid} or 
+        }
+
+        if ($sort_list != ''){
+            $sql .= " Order by {$sort_list}";
+        }
+        else{
+            $sql .= " Order by sortdue asc, Name asc, Item desc";    
+        }
+        
+        $sql .= " LIMIT ".($page - 1)*$page_size .", {$page_size} "; 
+        //echo $sql;
+        $this->query($sql);
+        while ($this->fetch()){
+            $_arr[$this->ID]['name'] = $this->ClientName;
+            $_arr[$this->ID]['item']  = $this->Item;
+            if (strpos(strtolower($_arr[$this->ID]['item']), 'lodged') !== FALSE){
+                $_arr[$this->ID]['islodge'] = 1;
+            }
+            else{
+                $_arr[$this->ID]['islodge'] = 0;
+            }
+            $_arr[$this->ID]['cate']  = $this->VisaName;
+            $_arr[$this->ID]['class'] = $this->ClassName;
+            $_arr[$this->ID]['begin'] = $this->BeginDate;
+            $_arr[$this->ID]['due']   = $this->DueDate;
+            $_arr[$this->ID]['clientid']= $this->CID;
+            $_arr[$this->ID]['visaid']  = $this->CVID;
+            $_arr[$this->ID]['isTodo']  = $this->isTodo;
+        }
+        return $_arr;
+    }  
+	
+	function getUrgentCourse($userid, $sort_list, $only_course, $null_du = 1){
+		$_arr = array();
+    	$sql = "select a.ID, concat(LName, ' ', FName) as ClientName, Qual, Major, e.Name, DueDate, BeginDate, if(p.ID is not null, p.Process, ExItem) as ProcessName, f.CID, CCID,
+            if(((a.DueDate >= Date(NOW()) and a.DueDate < Date(NOW()) + INTERVAL 7 Day) or a.DueDate < Date(NOW()))and a.DueDate <> '0000-00-00',0,1) as isTodo,
+                if(a.DueDate = '0000-00-00', '9999-99-99', a.DueDate) as sortdue, if(p.ID > 0, p.ID, 0) AS ProcessID  
+    				from client_course_process a left join course_process p on (a.ProcessID = p.ID), client_course  b,  institute_qual c,  institute_major d, institute e, client_info f
+					where b.CID = f.CID and a.Done = 0 and a.CCID = b.ID and b.QualID = c.ID and b.MajorID = d.ID and b.IID = e.ID ";
+    	//a.DueDate >= Date(NOW()) and 
+		if ($userid > 0 && $only_course == 0){
+			$sql .= " AND f.CourseUser = {$userid}";
+		}
+		
+		if ($only_course == 1){
+		    $sql .= " AND f.ClientType like '%sutdy%' ";
+		}
+		
+		if ($null_du)
+			$sql .= " AND a.DueDate <> '0000-00-00' ";	
+
+	    if ($sort_list != ''){
+            $sql .= " Order by {$sort_list}";
+        }
+        else{
+            $sql .= " Order by sortdue asc, ClientName asc ";   
+        }
+		//echo $sql."<br>";
+		$this->query($sql);
+		
+		global $course_process_arr;
+		while ($this->fetch()){
+			$_arr[$this->ID]['name']  = $this->ClientName;
+			$_arr[$this->ID]['qual']   = $this->Qual;
+			$_arr[$this->ID]['major']  = $this->Major;
+			$_arr[$this->ID]['school'] = $this->Name;
+			$_arr[$this->ID]['begin']  = $this->BeginDate;
+			$_arr[$this->ID]['due']    = $this->DueDate;
+			$_arr[$this->ID]['item']   = $this->ProcessName;//($this->ProcessID > 0 && array_key_exists($this->ProcessID, $course_process_arr))? $course_process_arr[$this->ProcessID] : $this->ExItem;
+			$_arr[$this->ID]['clientid'] = $this->CID;
+			$_arr[$this->ID]['courseid'] = $this->CCID;
+            $_arr[$this->ID]['isTodo'] = $this->isTodo;
+            $_arr[$this->ID]['isColor'] = ($this->ProcessID == __C_RECEIVE_OFFER || $this->ProcessID == __C_PASS_OFFER || $this->ProcessID == __C_GET_COE || ($this->ProcessID == 0 && stripos($this->ProcessName, 'p:') === 0))? 1 : 0;
+		}
+		return $_arr;
+	}
+
+	function getUrgentInstitute($sort_list, $null_du = 1){
+		$_arr = array();
+		$sql = "select a.ID, a.Subject, a.BeginDate, a.DueDate, a.InstID, b.Name,
+            if(((a.DueDate >= Date(NOW()) and a.DueDate < Date(NOW()) + INTERVAL 7 Day) or a.DueDate < Date(NOW()))and a.DueDate <> '0000-00-00',0,1) as isTodo ,
+                 if(a.DueDate = '0000-00-00', '9999-99-99', a.DueDate) as sortdue
+		        from institute_process a, institute b
+				where a.Done = 0 and a.InstID = b.ID 
+				";
+		if ($null_du)
+			$sql .= " AND a.DueDate <> '0000-00-00' ";	
+
+	    if ($sort_list != ''){
+            $sql .= " Order by {$sort_list}";
+        }
+        else{
+            $sql .= " Order by sortdue desc, Name asc ";   
+        }
+        
+		$this->query($sql);		
+		while ($this->fetch()) {
+			$_arr[$this->ID]['school'] = $this->Name;
+			$_arr[$this->ID]['begin'] = $this->BeginDate;
+			$_arr[$this->ID]['due'] = $this->DueDate;
+			$_arr[$this->ID]['item'] = $this->Subject;
+			$_arr[$this->ID]['iid'] = $this->InstID;
+			$_arr[$this->ID]['isTodo'] = $this->isTodo;
+		}
+		return $_arr;
+	}
+	
+	function getUrgentAgent($sort_list, $form='sub', $null_du=1){
+
+		$_arr = array();
+		$sql = "select a.ID, a.Subject, a.BeginDate, a.DueDate, a.AgentID, b.Name,
+            if(((a.DueDate >= Date(NOW()) and a.DueDate < Date(NOW()) + INTERVAL 7 Day) or a.DueDate < Date(NOW()))and a.DueDate <> '0000-00-00',0,1) as isTodo ,
+                 if(a.DueDate = '0000-00-00', '9999-99-99', a.DueDate) as sortdue
+		        from agent_process a, agent b
+				where a.Done = 0 and a.AgentID = b.ID and b.Form = '{$form}'  
+				";
+		if ($null_du)
+			$sql .= " AND a.DueDate <> '0000-00-00' ";	
+
+
+        if ($sort_list != ''){
+            $sql .= " Order by {$sort_list}";
+        }
+        else{
+            $sql .= " Order by sortdue desc, Name asc ";   
+        }
+        		
+		
+		$this->query($sql);		
+		while ($this->fetch()) {
+			$_arr[$this->ID]['agent'] = $this->Name;
+			$_arr[$this->ID]['begin'] = $this->BeginDate;
+			$_arr[$this->ID]['due'] = $this->DueDate;
+			$_arr[$this->ID]['item'] = $this->Subject;
+			$_arr[$this->ID]['aid'] = $this->AgentID;
+			$_arr[$this->ID]['isTodo'] = $this->isTodo;
+		}
+		return $_arr;
+	}
+	
+	/*
+    function getUrgentService($userid, $sort_list, $null_du=1){
+		$_arr = array();
+    	$sql = "select a.ID, concat(LName, ' ', FName) as ClientName, a.Subject, DueDate, a.Date, a.CID, 
+            if(((a.DueDate >= Date(NOW()) and a.DueDate < Date(NOW()) + INTERVAL 7 Day) or a.DueDate < Date(NOW()))and a.DueDate <> '0000-00-00',0,1) as isTodo,
+                 if(a.DueDate = '0000-00-00', '9999-99-99', a.DueDate) as sortdue
+    				from client_service a, client_info b  
+					where a.Done = 0 and a.CID = b.CID and a.VisaCateID = 0 and VisaSubClassID = 0 ";
+		if ($userid > 0){
+			$sql .= " AND b.CourseUser = {$userid} ";
+		}
+
+		if ($null_du)
+			$sql .= " AND a.DueDate <> '0000-00-00' ";			
+
+        if ($sort_list != ''){
+            $sql .= " Order by {$sort_list}";
+        }
+        else
+            $sql .= " Order by sortdue desc, ClientName asc, Subject asc";   
+        }
+
+		$this->query($sql);
+		while ($this->fetch()){
+			$_arr[$this->ID]['name'] = $this->ClientName;
+			$_arr[$this->ID]['item']  = $this->Subject;
+			$_arr[$this->ID]['begin'] = $this->Date;
+			$_arr[$this->ID]['due']   = $this->DueDate;
+			$_arr[$this->ID]['clientid']   = $this->CID;
+			$_arr[$this->ID]['isTodo']   = $this->isTodo;
+		}
+		return $_arr;
+    }	
+	*/
+    function getTodoVisa($userid, $sort_key, $sort_ord){
+		$_arr = array();
+		$condition = "";
+		if ($userid > 0){
+			$condition = " AND b.VUserID = {$userid} "; //;(b.AUserID = {$userid} or 
+		}
+		
+        if ($sort_key != '' && $sort_ord != ''){
+            $sqlord = " Order by {$sort_key} {$sort_ord}";
+        }
+        else{
+            $sqlord = " Order by a.Duedate asc, Name asc, ItemID desc";   
+        }
+        		
+		$sql = array("SELECT a.ID, concat(LName, ' ', FName) as ClientName, VisaName, ClassName, Item, a.ItemID, DueDate, BeginDate, ExItem, f.CID, CVID 
+    			 	  FROM client_visa_process a left join visa_rs_item c on(a.ItemID = c.ItemID),  client_visa  b, visa_category d, visa_subclass e, client_info f    
+				      WHERE a.DueDate > Date(NOW()) + INTERVAL 7 Day {$condition} 
+				 		    and a.Done = 0 and a.CVID = b.ID and b.CID = f.CID and b.CateID = d.CateID and b.SubClassID = e.SubClassID
+				 	  {$sqlord}",
+					  "SELECT a.ID, concat(LName, ' ', FName) as ClientName, VisaName, ClassName, Item, a.ItemID, DueDate, BeginDate, ExItem, f.CID, CVID 
+    			 	   FROM client_visa_process a left join visa_rs_item c on(a.ItemID = c.ItemID),  client_visa  b, visa_category d, visa_subclass e, client_info f    
+				       WHERE (a.DueDate = '' or a.DueDate = '0000-00-00' ) {$condition} 
+				 		    and a.Done = 0 and a.CVID = b.ID and b.CID = f.CID and b.CateID = d.CateID and b.SubClassID = e.SubClassID"
+		             );
+		        
+		foreach($sql as $_sql){             
+			$this->query($_sql);
+			while ($this->fetch()){
+				$_arr[$this->ID]['name'] = $this->ClientName;
+				$_arr[$this->ID]['item']  = $this->ItemID > 0? $this->Item : $this->ExItem;
+				if (strpos(strtolower($_arr[$this->ID]['item']), 'lodged') !== FALSE){
+					$_arr[$this->ID]['islodge'] = 1;
+				}
+				else{
+					$_arr[$this->ID]['islodge'] = 0;
+				}
+				$_arr[$this->ID]['cate']  = $this->VisaName;
+				$_arr[$this->ID]['class'] = $this->ClassName;
+				$_arr[$this->ID]['begin'] = $this->BeginDate;
+				$_arr[$this->ID]['due']   = $this->DueDate;
+				$_arr[$this->ID]['clientid']= $this->CID;
+				$_arr[$this->ID]['visaid']  = $this->CVID;
+				$_arr[$this->ID]['isTodo']  = 1;
+			}
+		}
+		return $_arr;
+	}        
+
+	
+	function getTodoCourse($userid, $sort_key, $sort_ord){
+		$_arr = array();
+    	$condition = "";
+		if ($userid > 0){
+			$condition = " AND f.CourseUser = {$userid}";
+		}
+		
+	    if ($sort_key != '' && $sort_ord != ''){
+            $sqlord = " Order by {$sort_key} {$sort_ord}";
+        }
+        else{
+            $sqlord = " Order by a.DueDate asc, ClientName asc ";   
+        }
+		
+		$sql = array("SELECT a.ID, concat(LName, ' ', FName) as ClientName, Qual, Major, e.Name, DueDate, BeginDate, if(p.ID is not null, p.Process, ExItem) as ProcessName, f.CID, CCID 
+    				  FROM client_course_process a left join course_process p on (a.ProcessID = p.ID), client_course  b,  institute_qual c,  institute_major d, institute e, client_info f
+					  WHERE a.DueDate > Date(NOW()) + INTERVAL 7 Day {$condition} 
+					  		and b.CID = f.CID and a.Done = 0 and a.CCID = b.ID and b.QualID = c.ID and b.MajorID = d.ID and b.IID = e.ID 
+					  		{$sqlord}",
+					  "SELECT a.ID, concat(LName, ' ', FName) as ClientName, Qual, Major, e.Name, DueDate, BeginDate, if(p.ID is not null, p.Process, ExItem) as ProcessName, f.CID, CCID 
+    				  FROM client_course_process a left join course_process p on (a.ProcessID = p.ID), client_course  b,  institute_qual c,  institute_major d, institute e, client_info f
+					  WHERE (a.DueDate = '' or a.DueDate = '0000-00-00') {$condition} 
+					  		and b.CID = f.CID and a.Done = 0 and a.CCID = b.ID and b.QualID = c.ID and b.MajorID = d.ID and b.IID = e.ID 
+					  "
+					);
+		global $course_process_arr;		
+		foreach ($sql as $_sql){		
+			$this->query($_sql);
+			while ($this->fetch()){
+				$_arr[$this->ID]['name']  = $this->ClientName;
+				$_arr[$this->ID]['qual']   = $this->Qual;
+				$_arr[$this->ID]['major']  = $this->Major;
+				$_arr[$this->ID]['school'] = $this->Name;
+				$_arr[$this->ID]['begin']  = $this->BeginDate;
+				$_arr[$this->ID]['due']    = $this->DueDate;
+				$_arr[$this->ID]['item']   = $this->ProcessName;//($this->ProcessID > 0 && array_key_exists($this->ProcessID, $course_process_arr))? $course_process_arr[$this->ProcessID] : $this->ExItem;
+				$_arr[$this->ID]['clientid'] = $this->CID;
+				$_arr[$this->ID]['courseid'] = $this->CCID;
+				$_arr[$this->ID]['isTodo']  = 1;
+			}
+		}
+		return $_arr;
+	}
+	
+	function getTodoInstitute($sort_key, $sort_ord){
+		
+	    if ($sort_key != '' && $sort_ord != ''){
+            $sqlord = " Order by {$sort_key} {$sort_ord}";
+        }
+        else{
+            $sqlord = " Order by a.DueDate asc, Name asc ";   
+        }
+        
+		$_arr = array();
+		$sql = array("SELECT a.ID, a.Subject, a.BeginDate, a.DueDate, a.InstID, b.Name 
+					  FROM institute_process a, institute b 
+					  WHERE a.DueDate > Date(NOW()) + INTERVAL 7 Day and a.Done = 0 and a.InstID = b.ID 
+					  {$sqlord} ",
+					 "SELECT a.ID, a.Subject, a.BeginDate, a.DueDate, a.InstID, b.Name 
+					  FROM institute_process a, institute b 
+					  WHERE (a.DueDate = '' or a.DueDate = '0000-00-00') and a.Done = 0 and a.InstID = b.ID"
+					 ); 
+		foreach ($sql as $_sql){
+			$this->query($_sql);		
+			while ($this->fetch()) {
+				$_arr[$this->ID]['school'] = $this->Name;
+				$_arr[$this->ID]['begin'] = $this->BeginDate;
+				$_arr[$this->ID]['due'] = $this->DueDate;
+				$_arr[$this->ID]['item'] = $this->Subject;
+				$_arr[$this->ID]['iid'] = $this->InstID;
+				$_arr[$this->ID]['isTodo']  = 1;
+			}			
+		}
+
+		return $_arr;
+	}
+
+	
+	function getTodoAgent($sort_key, $sort_ord){
+		
+	    if ($sort_key != '' && $sort_ord != ''){
+            $sqlord = " Order by {$sort_key} {$sort_ord}";
+        }
+        else{
+            $sqlord = " Order by a.DueDate asc, Name asc ";   
+        }		
+		
+		$_arr = array();
+		$sql = array("SELECT a.ID, a.Subject, a.BeginDate, a.DueDate, a.AgentID, b.Name 
+					  FROM agent_process a, agent b 
+					  WHERE a.DueDate > Date(NOW()) + INTERVAL 7 Day and a.Done = 0 and a.AgentID = b.ID 
+					  {$sqlord} ",
+					 "SELECT a.ID, a.Subject, a.BeginDate, a.DueDate, a.AgentID, b.Name 
+					  FROM agent_process a, agent b 
+					  WHERE (a.DueDate = '' or a.DueDate = '0000-00-00') and a.Done = 0 and a.AgentID = b.ID 
+					  Order by a.DueDate asc, b.Name asc "// 
+					);
+		foreach ($sql as $_sql){
+			$this->query($_sql);		
+			while ($this->fetch()) {
+				$_arr[$this->ID]['agent'] = $this->Name;
+				$_arr[$this->ID]['begin'] = $this->BeginDate;
+				$_arr[$this->ID]['due'] = $this->DueDate;
+				$_arr[$this->ID]['item'] = $this->Subject;
+				$_arr[$this->ID]['aid'] = $this->AgentID;
+				$_arr[$this->ID]['isTodo']  = 1;
+			}		
+		}
+
+		return $_arr;
+	}
+	
+    function getTodoService($userid, $sort_key, $sort_ord){
+		$_arr = array();
+		$condition = "";
+		if ($userid > 0){
+			 $condition = " AND b.CourseUser = {$userid} ";
+		}		
+		
+        if ($sort_key != '' && $sort_ord != ''){
+            $sqlord = " Order by {$sort_key} {$sort_ord}";
+        }
+        else{
+            $sqlord = " Order by a.Duedate asc, ClientName asc, Subject asc";   
+        }
+        
+    	$sql = array("SELECT a.ID, concat(LName, ' ', FName) as ClientName, a.Subject, DueDate, a.Date, a.CID 
+    				  FROM client_service a, client_info b  
+					  WHERE a.DueDate > Date(NOW()) + INTERVAL 7 Day {$condition}
+					     and a.Done = 0 and a.CID = b.CID and a.VisaCateID = 0 and VisaSubClassID = 0 
+					     {$sqlord} ",
+					  "SELECT a.ID, concat(LName, ' ', FName) as ClientName, a.Subject, DueDate, a.Date, a.CID 
+    				  FROM client_service a, client_info b  
+					  WHERE (a.DueDate = '' or a.DueDate = '0000-00-00') {$condition}
+					     and a.Done = 0 and a.CID = b.CID and a.VisaCateID = 0 and VisaSubClassID = 0 
+					  ");
+		foreach ($sql as $_sql){
+			$this->query($_sql);
+			while ($this->fetch()){
+				$_arr[$this->ID]['name'] = $this->ClientName;
+				$_arr[$this->ID]['item']  = $this->Subject;
+				$_arr[$this->ID]['begin'] = $this->Date;
+				$_arr[$this->ID]['due']   = $this->DueDate;
+				$_arr[$this->ID]['clientid']   = $this->CID;
+				$_arr[$this->ID]['isTodo']  = 1;
+			}						        
+		}
+
+		return $_arr;
+	}        	
+	
+	function getVisaService($userid=0){
+		$_arr = array();
+		$sql = "select a.ID as VID, a.CID, a.ExpireDate as Epd, b.FName, b.LName, c.VisaName, d.ClassName, 0 as main from client_visa a left join visa_category c on(a.CateID = c.CateID) left join visa_subclass d on(a.SubClassID = d.SubClassID), client_info b where a.CID = b.CID and a.r_Status = 'active' and a.OnShore = 1 and (a.ADate <> '' and a.ADate <> '0000-00-00')";
+		if($userid > 0){
+			$sql .= " AND (a.AUserID = {$userid} or a.VUserID = {$userid}) ";
+		}
+		$sql .= "Union all select e.CVID as VID, e.DepID, e.ExpireDate as Epd, b.FName, b.LName, c.VisaName, d.ClassName, a.CID as main from client_visa a left join visa_category c on(a.CateID = c.CateID) left join visa_subclass d on(a.SubClassID = d.SubClassID) , client_visa_dep e, client_info b where e.DepID = b.CID and e.CVID = a.ID and a.r_Status = 'active' and (a.ADate <> '' and a.ADate <> '0000-00-00') ";
+		if($userid > 0){
+			$sql .= " AND (a.AUserID = {$userid} or a.VUserID = {$userid}) ";
+		}		
+		$sql .= " order by Epd asc ";
+		$this->query($sql);
+		$i=0;
+		while ($this->fetch()) {
+			$_arr[$i]['cid'] = $this->CID;
+			$_arr[$i]['vid'] = $this->VID;
+			$_arr[$i]['lname'] = $this->LName;
+			$_arr[$i]['fname'] = $this->FName;
+			$_arr[$i]['date']  = $this->Epd;
+			$_arr[$i]['category']  = $this->VisaName;
+			$_arr[$i]['subclass']  = $this->ClassName;
+			$_arr[$i]['main']  = $this->main;
+			$i++;
+		}
+		return $_arr;
+	}
+	
+	function getOtherService($userid=0){
+		$_arr = array();
+		$sql = "select a.ID, a.CID, a.DueDate, b.LName, b.FName, c.VisaName, d.ClassName from client_service a left join visa_category c on(c.CateID = a.VisaCateID) left join visa_subclass d on(d.SubClassID = a.VisaSubClassID ), client_info b where a.Done = 0 and a.VisaCateID > 0 and a.CID = b.CID and a.CID not in (select distinct DepID from client_visa_dep t1, client_visa t2 where t1.CVID = t2.ID and t2.r_Status = 'active')";
+		if($userid > 0){
+			$sql .= " AND b.CourseUser = {$userid} ";
+		}
+		$sql .= " order by a.DueDate asc ";
+		$this->query($sql);
+		while ($this->fetch()) {
+			$_arr[$this->ID]['cid'] = $this->CID;
+			$_arr[$this->ID]['lname'] = $this->LName;
+			$_arr[$this->ID]['fname'] = $this->FName;
+			$_arr[$this->ID]['date']  = $this->DueDate;
+			$_arr[$this->ID]['category']  = $this->VisaName;
+			$_arr[$this->ID]['subclass']  = $this->ClassName;
+		}
+		return $_arr;		
+	}
+
+	function getNumOfCourseClientByUser($fromDay, $toDay, $userid){
+		//$sql = "select Date_Format(CourseVisitDate, '%Y%u') as Week,  concat(LName, ' ', FName) as Name, a.CID, School, Qual from client_info a left join (select CID, School, Qual, max(t1.ID) from client_qual t1, school t2, course_qual t3 where t1.SchoolID = t2.ID and t1.QualID = t3.ID Group by t1.CID) b on(b.CID = a.CID) where CourseVisitDate != '0000-00-00' ";
+		$sql = "select Date_Format(CourseVisitDate, '%Y%u') as Week,  concat(LName, ' ', FName) as Name, t1.CID, t2.ID as CourseID, t2.ProcessID, t3.IsActive from client_info t1 left join (select a.ID as PID, b.CID, b.ID, a.ProcessID from client_course_process a, client_course b where a.ProcessID = ".__C_APPLY_OFFER." and a.CCID = b.ID AND a.Done = 1) t2 on (t1.CID = t2.CID) left join client_course t3 ON(t1.CID = t3.CID) WHERE 1 ";		
+		if ($userid > 0) {
+			$sql .= " AND CourseUser = {$userid} ";
+		}
+		if ($fromDay != "" && $toDay  != "") {
+			$sql .= " AND CourseVisitDate >= '{$fromDay}' and CourseVisitDate <= '{$toDay}' ";
+		}
+		$this->query($sql);
+		$_arr = array();
+		while ($this->fetch()) {
+			if ($this->ProcessID == __C_APPLY_OFFER) {
+				$_arr[$this->Week]['apo'][$this->CID] = 1;	
+			}
+			else {
+				$_arr[$this->Week]['apo'][$this->CID] = 0;
+			}
+			if (!isset($_arr[$this->Week]['num'][$this->CID])) {
+				$_arr[$this->Week]['num'][$this->CID] = 1;
+				$_arr[$this->Week]['refuse'][$this->CID] = $this->IsActive == 2? 1 : 0;				
+			}
+			else {
+				$_arr[$this->Week]['num'][$this->CID] += 1;
+				$_arr[$this->Week]['refuse'][$this->CID] += $this->IsActive == 2? 1 : 0;							
+			}
+
+			$_arr[$this->Week]['name'][$this->CID] = $this->Name;
+			$_arr[$this->Week]['cnt' ] = count($_arr[$this->Week]['name']);		
+		}
+
+		
+		return $_arr;		 
+	}
+	
+	function getAllOfCourseClientByUser($fromDay, $toDay, $userid){
+		//$sql = "select count(*) as cnt from client_info where CourseVisitDate != '0000-00-00' ";
+		//$sql = "select concat(LName, ' ', FName) as Name, a.CID, School, Qual from client_info a left join (select CID, School, Qual, max(t1.ID) from client_qual t1, school t2, course_qual t3 where t1.SchoolID = t2.ID and t1.QualID = t3.ID Group by t1.CID) b on(b.CID = a.CID) where CourseVisitDate != '0000-00-00' ";
+		$sql = "select concat(LName, ' ', FName) as Name, t1.CID, t2.ID as CourseID, t2.ProcessID, t3.IsActive from client_info t1 left join (select a.ID as PID, b.CID, b.ID, a.ProcessID, b.IsActive from client_course_process a, client_course b where a.ProcessID = ".__C_APPLY_OFFER." and a.CCID = b.ID AND a.Done = 1) t2 on (t1.CID = t2.CID) left join client_course t3 ON (t1.CID = t3.CID) WHERE 1 ";
+
+		if ($userid > 0) {
+			$sql .= " AND CourseUser = {$userid} ";
+		}
+		if ($fromDay != "" && $toDay  != "") {
+			$sql .= " AND CourseVisitDate >= '{$fromDay}' and CourseVisitDate <= '{$toDay}' ";
+		}		
+
+		$this->query($sql);
+		$_arr = array();
+		while ($this->fetch()) {
+			if ($this->ProcessID == __C_APPLY_OFFER) {
+				$_arr['all']['apo'][$this->CID] = 1;	
+			}
+			else {
+				$_arr['all']['apo'][$this->CID] = 0;
+			}
+			$_arr['all']['name'][$this->CID] = $this->Name;
+
+			if (!isset($_arr['all']['num'][$this->CID])) {
+				$_arr['all']['num'][$this->CID] = 1;
+				$_arr['all']['refuse'][$this->CID] = $this->IsActive == 2? 1 : 0;				
+			}
+			else {
+				$_arr['all']['num'][$this->CID] += 1;
+				$_arr['all']['refuse'][$this->CID] += $this->IsActive == 2? 1 : 0;							
+			}
+		}
+
+		$_arr['all']['cnt'] = isset($_arr['all'])? count($_arr['all']['name']) : 0;
+		return $_arr;		 
+	}
+		
+	function getNumOfCourseProcessByUser($fromDay, $toDay, $userid){	
+        $sql = "select Date_Format(BeginDate, '%Y%u') as Week, b.IsActive, b.ID, a.ProcessID, concat(LName, ' ', FName) as Name, d.Name as School, e.Qual, c.CID from client_course_process a, client_info c, client_course b left join institute d on(b.IID = d.ID) left join institute_qual e on(b.QualID = e.ID) where (a.ProcessID = ".__C_RECEIVE_OFFER." or a.ProcessID = ".__C_PASS_OFFER." or a.ProcessID = ".__C_GET_COE." or a.ProcessID = ".__C_PAY_TUITION_FEE.") and a.CCID = b.ID and b.CID = c.CID and a.Done = 1 ";
+   
+		if ($userid > 0) {
+			$sql .= " AND c.CourseUser = {$userid} ";
+		}else{
+			
+		}
+		if ($fromDay != "" && $toDay  != "") {
+			$sql .= " AND BeginDate >= '{$fromDay}' and BeginDate <= '{$toDay}' ";
+        }
+
+		$this->query($sql);
+		$_arr = array();
+		while ($this->fetch()) {
+			if ($this->ProcessID == __C_APPLY_OFFER) {
+                $_arr[$this->Week]['aponame'][$this->ID] = $this->Name. " (to ". $this->School ." : ". $this->Qual .")";	
+				$_arr[$this->Week]['apocid' ][$this->ID] = $this->CID;
+				$_arr[$this->Week]['reo'    ][$this->ID] = 0;	
+
+				isset($_arr[$this->Week]['apocnt'])? $_arr[$this->Week]['apocnt']++ : $_arr[$this->Week]['apocnt'] = 1; 
+            }
+            elseif ($this->ProcessID == __C_RECEIVE_OFFER){
+                $_arr[$this->Week]['reoname'][$this->ID] = $this->Name. " (to ". $this->School ." : ". $this->Qual .")";	
+				$_arr[$this->Week]['reocid' ][$this->ID] = $this->CID;
+				$_arr[$this->Week]['reo'    ][$this->ID] = 1;	
+				
+                $_arr[$this->Week]['reo_st' ][$this->ID] = $this->IsActive == 2? -1 : 0;	
+
+				isset($_arr[$this->Week]['reocnt'])? $_arr[$this->Week]['reocnt']++ : $_arr[$this->Week]['reocnt'] = 1;
+            }
+            elseif ($this->ProcessID == __C_GET_COE){
+                $_arr[$this->Week]['recname'][$this->ID] = $this->Name. " (to ". $this->School ." : ". $this->Qual .")";	
+				$_arr[$this->Week]['reccid' ][$this->ID] = $this->CID;	                
+				$_arr[$this->Week]['rec'    ][$this->ID] = 1;
+
+				isset($_arr[$this->Week]['reccnt'])? $_arr[$this->Week]['reccnt']++ : $_arr[$this->Week]['reccnt'] = 1; 
+            }
+            elseif($this->ProcessID == __C_PAY_TUITION_FEE && isset($_arr[$this->Week]['reo_st'][$this->ID]) && $_arr[$this->Week]['reo_st'][$this->ID] == 0) {
+                $_arr[$this->Week]['reo_st'][$this->ID] = 1;
+            }            
+        }		
+  
+		return $_arr;			
+	}
+	
+	
+	function getAllOfCourseProcessByUser($fromDay, $toDay, $userid){
+		$where = "";
+		if ($userid > 0) {
+			$where .= " AND c.CourseUser = {$userid} ";
+		}
+		
+		if ($fromDay != "" && $toDay  != "") {
+			$where .= " AND BeginDate >= '{$fromDay}' and BeginDate <= '{$toDay}' ";
+		}
+		//get apply offer
+		$sql = "select b.IsActive, b.ID, a.ProcessID, concat(LName, ' ', FName) as Name, d.Name as School, e.Qual, c.CID from client_course_process a, client_info c, client_course b left join institute d on(b.IID = d.ID) left join institute_qual e on(b.QualID = e.ID) where (a.ProcessID = ".__C_RECEIVE_OFFER." or a.ProcessID = ".__C_PASS_OFFER." or a.ProcessID = ".__C_GET_COE." or a.ProcessID = ".__C_PAY_TUITION_FEE.") and a.CCID = b.ID and b.CID = c.CID and a.Done = 1 ";
+        $this->query($sql.$where);
+
+		$_arr = array();
+		while ($this->fetch()) {
+			if ($this->ProcessID == __C_RECEIVE_OFFER) {
+                $_arr['all']['aponame'][$this->ID] = $this->Name. " (to ". $this->School ." : ". $this->Qual .")";	
+				$_arr['all']['apocid' ][$this->ID] = $this->CID;
+				$_arr['all']['reo'    ][$this->ID] = 0;	
+
+            }
+            elseif ($this->ProcessID == __C_PASS_OFFER){
+                $_arr['all']['reoname'][$this->ID] = $this->Name. " (to ". $this->School ." : ". $this->Qual .")";	
+				$_arr['all']['reocid' ][$this->ID] = $this->CID;
+				$_arr['all']['reo'    ][$this->ID] = 1;	
+				
+				$_arr['all']['reo_st' ][$this->ID] = $this->IsActive == 2? -1 : 0;	
+
+            }
+            elseif ($this->ProcessID == __C_GET_COE){
+                $_arr['all']['recname'][$this->ID] = $this->Name. " (to ". $this->School ." : ". $this->Qual .")";	
+				$_arr['all']['reccid' ][$this->ID] = $this->CID;	                
+				$_arr['all']['rec'    ][$this->ID] = 1;
+            }
+            elseif($this->ProcessID == __C_PAY_TUITION_FEE && isset($_arr['all']['reo_st'][$this->ID]) && $_arr['all']['reo_st'][$this->ID] == 0) {
+                $_arr['all']['reo_st'][$this->ID] = 1;
+            }
+		}
+
+		$_arr['all']['apocnt'] = isset($_arr['all']) && isset($_arr['all']['aponame']) ? count($_arr['all']['aponame']) : 0;
+		$_arr['all']['reocnt'] = isset($_arr['all']) && isset($_arr['all']['reoname']) ? count($_arr['all']['reoname']): 0;
+        $_arr['all']['reccnt'] = isset($_arr['all']) && isset($_arr['all']['recname']) ? count($_arr['all']['recname']): 0;
+		return $_arr;			
+	}
+
+	
+	function getAmountOfCourseCommByUser($fromDay, $toDay, $userid){
+
+		$_arr = array();
+		$sql = "SELECT  date_format(RedDate, '%Y%u') as wk,
+                        concat(LName, ' ', FName) as Name, 
+                        c.CID,
+                        a.ID,
+                        a.CCID,
+                        c.DOB,
+						IF(t1.BeginDate >= d.StartDate and d.StartDate <> '' and d.StartDate <> '0000-00-00', IF(CoComm > 0 OR Discount > 0, RComm-CoComm-Discount,RedComm-Discount), 0) as bonus,
+						IF(t1.BeginDate >= d.StartDate and d.StartDate <> '' and d.StartDate <> '0000-00-00', 0, 1) as nobonus
+                FROM client_course_sem a  
+                      left join client_course_process t1 on (a.CCID = t1.CCID AND t1.Done = 1 and t1.ProcessID = 5)
+                     , client_course b,client_info c, sys_user d
+                WHERE a.CCID = b.ID 
+                  AND b.CID = c.CID 
+                  AND c.CourseUser = d.ID
+                  AND RedDate >= '{$fromDay}' AND RedDate <= '{$toDay}' "; 
+	    if ($userid > 0) {
+            $sql .= " AND c.CourseUser = {$userid} ";
+        }
+        $sql .= " Order by wk, Name, a.SEM ";
+		$this->query($sql);
+        $i = 0;
+		while ($this->fetch()) {
+	  //  if($this->bonus == 0) continue;	
+            $_arr[$this->wk]['client'][$i] = $this->CID;
+            $_arr[$this->wk]['sem'   ][$i] = $this->ID;
+            $_arr[$this->wk]['course'][$i] = $this->CCID;
+			$_arr[$this->wk]['bonusname'][$i] = $this->Name;
+			$_arr[$this->wk]['bonuscomm'][$i] = number_format($this->bonus, '2', '.', ''); 
+			$_arr[$this->wk]['bonusfail'][$i] = $this->nobonus;
+            $_arr[$this->wk]['dob'      ][$i] = $this->DOB;
+            $_arr[$this->wk]['bonus'] = isset($_arr[$this->wk]['bonus'])? $_arr[$this->wk]['bonus'] : 0;
+            $_arr[$this->wk]['bonus'] += $this->bonus;
+            
+            $i++;
+        }
+		return $_arr;			
+	}
+	
+	
+	function getAllOfCourseCommByUser($fromDay, $toDay, $userid){
+		      $sql = "SELECT  date_format(RedDate, '%Y-%u') as wk,
+                        concat(LName, ' ', FName) as Name, 
+                        c.CID, a.ID, a.CCID,c.DOB,
+						IF(t1.BeginDate >= d.StartDate and d.StartDate <> '' and d.StartDate <> '0000-00-00', IF(CoComm > 0 OR Discount > 0, RComm-CoComm-Discount,RedComm-Discount), 0) as bonus,
+						IF(t1.BeginDate >= d.StartDate and d.StartDate <> '' and d.StartDate <> '0000-00-00', 0, 1) as nobonus
+                      FROM client_course_sem a
+                        left join client_course_process t1 on (a.CCID = t1.CCID AND t1.Done = 1 and t1.ProcessID = 5)
+		                    , client_course b,client_info c, sys_user d
+		               WHERE a.CCID = b.ID 
+		                  AND b.CID = c.CID 
+                          AND c.CourseUser = d.ID 
+                          AND RedDate >= '{$fromDay}' AND RedDate <= '{$toDay}'";
+                  
+		if ($userid > 0) {
+			$sql .= " AND c.CourseUser = {$userid} ";
+        }
+
+        $sql .= " Order by wk, Name, a.SEM ";
+		$this->query($sql);
+		$_arr = array();
+		$i = $rcomm = $bonus = 0;
+		while ($this->fetch()) {
+			//if($this->bonus == 0) continue;
+			$_arr['all']['bonusname'][$i] = $this->Name;//$this->Name." $ {$this->bonus}";
+			$_arr['all']['bonuscomm'][$i] = number_format($this->bonus, '2', '.', '');
+			$_arr['all']['bonusfail'][$i] = $this->nobonus;
+            $_arr['all']['dob'   ][$i] = $this->DOB;
+			$_arr['all']['client'][$i] = $this->CID;
+			$_arr['all']['sem'   ][$i] = $this->ID;
+			$_arr['all']['course'][$i] = $this->CCID;
+			$bonus += $this->bonus;
+			$i++;
+		}
+		$_arr['all']['bonus'] = $bonus;
+		return $_arr;			
+	}
+
+
+	function getAmountOfCoursePotCommByUser($fromDay, $toDay, $userid){
+
+		$_arr = array();
+		$sql = "SELECT  date_format(BeginDate, '%Y%u') as wk,
+                        concat(LName, ' ', FName) as Name, 
+                        c.CID,
+                        a.ID,
+                        a.CCID,
+                        c.DOB,
+						IF(t1.BeginDate >= d.StartDate and d.StartDate <> '' and d.StartDate <> '0000-00-00', IF(CoComm > 0 OR Discount > 0, RComm-CoComm-Discount,RComm-Discount), 0) as rcomm,
+						IF(t1.BeginDate >= d.StartDate and d.StartDate <> '' and d.StartDate <> '0000-00-00', 0, 1) as norcomm
+                FROM client_course_sem a  
+                      left join client_course_process t1 on (a.CCID = t1.CCID AND t1.Done = 1 and t1.ProcessID = 5)
+                     , client_course b,client_info c, sys_user d
+                WHERE a.CCID = b.ID 
+                  AND b.CID = c.CID 
+                  AND c.CourseUser = d.ID
+                  AND t1.BeginDate >= '{$fromDay}' AND t1.BeginDate <= '{$toDay}' "; 
+	    if ($userid > 0) {
+            $sql .= " AND c.CourseUser = {$userid} ";
+        }
+        $sql .= " Order by wk, Name, a.SEM ";
+        $this->query($sql);
+        $i = 0;
+		while ($this->fetch()) {
+	    //if($this->rcomm == 0) continue;	
+			$_arr[$this->wk]['name'  ][$i] = $this->Name;
+			$_arr[$this->wk]['comm'  ][$i] = number_format($this->rcomm, '2', '.', '');
+			$_arr[$this->wk]['commfail'][$i] = $this->norcomm;
+            $_arr[$this->wk]['dob'   ][$i] = $this->DOB;
+            $_arr[$this->wk]['client'][$i] = $this->CID;
+            $_arr[$this->wk]['sem'   ][$i] = $this->ID;
+            $_arr[$this->wk]['course'][$i] = $this->CCID;
+            if (isset($_arr[$this->wk]['rcomm'])) {
+                $_arr[$this->wk]['rcomm'] += $this->rcomm;
+            }
+            else {
+                $_arr[$this->wk]['rcomm'] = $this->rcomm;
+            }
+            $i++;
+        }
+		return $_arr;			
+    }
+    
+    function getAllOfCoursePotCommByUser($fromDay, $toDay, $userid){
+    			//concat(LName, ' ', FName) like 'sub-%',
+		      $sql = "SELECT  date_format(BeginDate, '%Y-%u') as wk,
+                        concat(LName, ' ', FName) as Name, 
+                        c.CID, a.ID, a.CCID, c.DOB,
+						IF(t1.BeginDate >= d.StartDate and d.StartDate <> '' and d.StartDate <> '0000-00-00', IF(CoComm > 0 OR Discount > 0, RComm-CoComm-Discount,RComm-Discount), 0) as rcomm,
+						IF(t1.BeginDate >= d.StartDate and d.StartDate <> '' and d.StartDate <> '0000-00-00', 0, 1) as norcomm
+                      FROM client_course_sem a
+                        left join client_course_process t1 on (a.CCID = t1.CCID AND t1.Done = 1 and t1.ProcessID = 5)
+		                    , client_course b,client_info c, sys_user d
+		               WHERE a.CCID = b.ID 
+		                  AND b.CID = c.CID 
+                          AND c.CourseUser = d.ID 
+                          AND t1.BeginDate >= '{$fromDay}' AND t1.BeginDate <= '{$toDay}'";
+                  
+		if ($userid > 0) {
+			$sql .= " AND c.CourseUser = {$userid} ";
+        }
+
+        $sql .= " Order by wk, Name, a.SEM ";
+		$this->query($sql);
+		$_arr = array();
+		$i = $rcomm = $bonus = 0;
+		while ($this->fetch()) {
+		//	if($this->rcomm == 0) continue;
+			$_arr['all']['name'  ][$i] = $this->Name;
+			$_arr['all']['comm'  ][$i] = number_format($this->rcomm, '2', '.', '');
+			$_arr['all']['commfail'][$i] = $this->norcomm; 			
+            $_arr['all']['dob'   ][$i] = $this->DOB;
+			$_arr['all']['client'][$i] = $this->CID;
+			$_arr['all']['sem'   ][$i] = $this->ID;
+			$_arr['all']['course'][$i] = $this->CCID;
+			$rcomm += $this->rcomm;
+			$i++;
+		}
+		$_arr['all']['rcomm'] = $rcomm;
+		return $_arr;			
+	}
+
+	function getNumOfAgreementByUser($fromDay, $toDay, $userid){
+		$sql = "select date_format(ADate, '%Y%u') as Week, concat(LName, ' ', FName) as Name, a.ID, b.CID, c.VisaName, d.ClassName, 
+				IF(`State` = 'active' and ADate > '0000-00-00', 1, 0) as sign
+				from client_visa a, client_info b, visa_category c, visa_subclass d 
+				where a.CID = b.CID and a.CateID = c.CateID and a.SubClassID = d.SubClassID ";
+		if ($userid > 0) {
+			$sql .= " AND AUserID = {$userid} ";
+		}
+		if ($fromDay != "" && $fromDay  != "0000-00-00") {
+			$sql .= " AND a.ADate >= '{$fromDay}'";
+		}
+	    if ($toDay != "" && $toDay  != "0000-00-00") {
+            $sql .= " And a.ADate <= '{$toDay}' ";
+        }		
+
+        $sql .= " GROUP BY a.ID ";
+		$this->query($sql);
+		$_arr = $visa = array();
+		while ($this->fetch()) {
+
+            if (!isset($_arr[$this->Week]) || !isset($_arr[$this->Week]['pcnt'])) {
+                $_arr[$this->Week]['pcnt' ] = 0;
+                $_arr[$this->Week]['sign1'] = 0;
+                $_arr[$this->Week]['sign0'] = 0;    
+                $_arr[$this->Week]['fee'  ] = 0;                
+            }
+
+            $_arr[$this->Week]['pcnt']++;
+
+            $_arr[$this->Week]['pname'][$_arr[$this->Week]['pcnt']] = $this->Name." ( {$this->VisaName} {$this->ClassName} )";
+            $_arr[$this->Week]['client'][$_arr[$this->Week]['pcnt']] = $this->CID;
+            $_arr[$this->Week]['visa'  ][$_arr[$this->Week]['pcnt']] = $this->ID;
+
+            if ($this->sign == 1) {
+                $visa[$this->ID]['client'][$this->Week][] = $_arr[$this->Week]['pcnt'];
+                $visa[$this->ID]['fee'] = 0;
+                $_arr[$this->Week]['fname' ][$_arr[$this->Week]['pcnt']] = $this->Name." ( {$this->VisaName} {$this->ClassName} )";
+            }
+		}
+
+        //calc payment
+        if (count($visa) > 0) {
+            $sql = "select a.ID, VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a left join client_payment b on(a.ID = b.AccountID) Where VisaID IN (".implode(',', array_keys($visa)).") AND ACC_TYPE = 'visa' Group by a.ID";
+            $this->query($sql);
+       
+            while ($this->fetch()){
+                //paperwork profit
+                $visa[$this->VisaID]['fee'] += ($this->GST == 1? $this->DueAmount/1.1 : $this->DueAmount) - ($this->GST_3RD == 1? $this->AMOUNT_3RD/1.1 : $this->AMOUNT_3RD);
+            }            
+                  
+            foreach ($visa as $vid => $v) {
+                if (isset($v['client'])) {
+                    foreach ($v['client'] as $w => $vv) {
+                        foreach ($vv as $i) {
+                            $_arr[$w]['fname'][$i] .= ' $'.$v['fee'];
+                            $_arr[$w]['fee'] += $v['fee'];
+
+                            $_arr[$w]['sign1']++;
+                            if ($v['fee'] == 0)
+                                $_arr[$w]['sign0']++;
+                        }
+                    }
+                }
+            }
+        
+            foreach($_arr as $w => $v){
+                $_arr[$w]['sign1'] -= $_arr[$w]['sign0'];
+            }   
+        }
+		return $_arr;		
+	}
+	
+	
+	
+    function getNumOfVisitByUser($fromDay, $toDay, $userid){
+        $sql = "select date_format(VisitDate, '%Y%u') as Week, concat(LName, ' ', FName) as Name, a.ID, b.CID, AFee, c.VisaName, d.ClassName, CFee,
+                IF(`State` = 'active' and ADate != '0000-00-00' and Adate != '', 1, 0) as sign, a.r_STATUS AS STATUS
+                from client_visa a, client_info b, visa_category c, visa_subclass d 
+                where a.CID = b.CID and a.CateID = c.CateID and a.SubClassID = d.SubClassID ";
+        if ($userid > 0) {
+            $sql .= " AND AUserID = {$userid} ";
+        }
+        if ($fromDay != "" && $fromDay  != "0000-00-00") {
+            $sql .= " AND a.VisitDate >= '{$fromDay}'";
+        }
+        if ($toDay != "" && $toDay  != "0000-00-00") {
+            $sql .= " And a.VisitDate <= '{$toDay}' ";
+        }       
+        $this->query($sql);
+        $_arr = array();
+        while ($this->fetch()) {
+            isset($_arr[$this->Week]['pcnt'])? $_arr[$this->Week]['pcnt']++ : $_arr[$this->Week]['pcnt'] = 1;
+            $_arr[$this->Week]['pname'  ][$_arr[$this->Week]['pcnt']] = $this->Name." ( {$this->VisaName} {$this->ClassName} )";
+            $_arr[$this->Week]['client' ][$_arr[$this->Week]['pcnt']] = $this->CID;  
+            $_arr[$this->Week]['visa'   ][$_arr[$this->Week]['pcnt']] = $this->ID;
+			$_arr[$this->Week]['sign'   ][$_arr[$this->Week]['pcnt']] = $this->sign == 1? 1 : 0;  
+			$_arr[$this->Week]['decline'][$_arr[$this->Week]['pcnt']] = stripos($this->STATUS, 'declined') !== false? 1 : 0;				             
+			
+			if (stripos($this->STATUS, 'client decline') !== false) {
+				$_arr[$this->Week]['decline'][$_arr[$this->Week]['pcnt']] = $this->ID;
+			}
+			
+			if (stripos($this->ClassName, 'onshore') !== false) {
+				$this->CFee = round($this->CFee/1.1, 2);
+			}
+
+			if (isset($_arr[$this->Week]['totalcfee']))			
+				$_arr[$this->Week]['totalcfee'] += $this->CFee;
+			else
+				$_arr[$this->Week]['totalcfee'] = $this->CFee;	
+
+            $_arr[$this->Week]['cfee'  ][$_arr[$this->Week]['pcnt']] = $this->CFee;	
+			            		
+        }
+        return $_arr;       
+    }
+    	
+	
+	function getAllOfAgreementByUser($fromDay, $toDay, $userid){
+		$sql = "select concat(LName, ' ', FName) as Name, a.ID, b.CID, c.VisaName, d.ClassName, IF(`State` = 'active' and ADate > '0000-00-00', 1, 0) as sign, AUserID, AFee 
+                from client_visa a, client_info b, visa_category c, visa_subclass d where a.CID = b.CID and a.CateID = c.CateID and a.SubClassID = d.SubClassID ";
+		if ($userid > 0) {
+			$sql .= " AND AUserID = {$userid} ";
+		}
+        if ($fromDay != "" && $fromDay  != "0000-00-00") {
+            $sql .= " AND a.ADate >= '{$fromDay}'";
+        }
+        if ($toDay != "" && $toDay  != "0000-00-00") {
+            $sql .= " And a.ADate <= '{$toDay}' ";
+        } 
+        $sql .= " GROUP BY a.ID ";  
+		$this->query($sql);
+		$_arr = $visa = array();
+		$i = $fee = $signed = $signed_0 = 0; 
+		while ($this->fetch()) {
+			$_arr['all']['pname'][$i] = $this->Name." ( {$this->VisaName} {$this->ClassName} )";
+			$_arr['all']['client'][$i] = $this->CID;
+            $_arr['all']['visa'  ][$i] = $this->ID;
+
+			if ($this->sign == 1) {
+                $visa[$this->ID]['client'][] = $i;
+                $visa[$this->ID]['fee'] = 0;
+				$_arr['all']['fname' ][$i] = $this->Name." ( {$this->VisaName} {$this->ClassName} )";
+                $_arr['all']['line' ][$i] = $this->Name."\t".$this->VisaName."\t".$this->ClassName."\t".$this->sign."\t".$this->AUserID."\t".$this->AFee;
+			}
+			$i++;			
+		}
+
+        //calc payment
+        if (count($visa) > 0) {
+            $sql = "select VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD from client_account a Where VisaID IN (".implode(',', array_keys($visa)).") AND ACC_TYPE = 'visa'";
+            $this->query($sql);   
+            while ($this->fetch()){
+                //paperwork profit
+                $visa[$this->VisaID]['fee'] += ($this->GST == 1? $this->DueAmount/1.1 : $this->DueAmount) - ($this->GST_3RD == 1? $this->AMOUNT_3RD/1.1 : $this->AMOUNT_3RD);
+            }
+
+            //echo "<pre>";
+            foreach ($visa as $vid => $v) {
+                if (isset($v['client'])) {
+                    foreach ($v['client'] as $i) {
+                        $_arr['all']['fname'][$i] .= ' $'.$v['fee'];
+                        //echo $_arr['all']['line'][$i] ."\t". $v['fee']."\n";
+                        $fee += $v['fee'];
+                        $signed++;
+                        if ($v['fee'] == 0)
+                            $signed_0++;
+                    }
+                }
+            }
+            //echo "</pre>";
+        }
+
+		$_arr['all']['pcnt'] = $i;
+		$_arr['all']['fee'] = $fee;
+		$_arr['all']['sign1'] = $signed-$signed_0;
+		$_arr['all']['sign0'] = $signed_0;
+		return $_arr;		
+	}
+
+	
+    function getAllOfVisitByUser($fromDay, $toDay, $userid){
+        $sql = "select concat(LName, ' ', FName) as Name, a.ID, b.CID, AFee, c.VisaName, d.ClassName, CFee,  
+                       IF(`State` = 'active' and ADate != '0000-00-00' and ADate != '', 1, 0) as sign, a.r_STATUS AS STATUS
+                from client_visa a, client_info b, visa_category c, visa_subclass d 
+                where a.CID = b.CID and a.CateID = c.CateID and a.SubClassID = d.SubClassID ";
+        if ($userid > 0) {
+            $sql .= " AND AUserID = {$userid} ";
+        }
+        if ($fromDay != "" && $fromDay  != "0000-00-00") {
+            $sql .= " AND a.VisitDate >= '{$fromDay}'";
+        }
+        if ($toDay != "" && $toDay  != "0000-00-00") {
+            $sql .= " And a.VisitDate <= '{$toDay}' ";
+        }   
+        $this->query($sql);
+        $_arr = array();
+        $i = $cfee = 0;
+		while ($this->fetch()) {
+			
+			if (stripos($this->ClassName, 'onshore') !== false) {
+				$this->CFee = round($this->CFee/1.1, 2);
+			}			
+
+			$cfee += $this->CFee;			
+            $_arr['all']['pname'][$i] = $this->Name." ( {$this->VisaName} {$this->ClassName} )";
+            $_arr['all']['client'][$i] = $this->CID;
+            $_arr['all']['visa'  ][$i] = $this->ID;
+			$_arr['all']['sign'  ][$i] = $this->sign == 1? 1 : 0;
+			$_arr['all']['cfee'  ][$i] = $this->CFee;			
+			$_arr['all']['decline'][$i] = stripos($this->STATUS, 'declined') !== false? 1 : 0;
+
+            $i++;
+        }
+		$_arr['all']['pcnt'] = $i;
+        $_arr['all']['totalcfee'] = $cfee;		
+        return $_arr;       
+    }	
+	
+	function getNumOfVisaProcByUser($fromDay, $toDay, $userid){
+		
+		$sql  = "select date_format(BeginDate, '%Y%u') as Week, if(b.Item is null, ExItem, b.Item) as Item, c.AFee, concat(LName, ' ', FName) as Name, d.CID, c.ID, c.r_Status 
+		          from client_visa_process a left join visa_rs_item b on (a.ItemID = b.ItemID), client_visa c, client_info d  
+		          where a.CVID  = c.ID and c.CID = d.CID and (b.Item not like '%assessment'  or b.Item is null) and a.Done = 1 ";
+		if ($userid > 0) {
+			$sql .= " AND c.VUserID = {$userid} ";
+		}
+		if ($fromDay != "" && $toDay  != "") {
+			$sql .= " AND a.BeginDate >= '{$fromDay}' and a.BeginDate <= '{$toDay}' ";
+		}
+		//$sql .= " GROUP BY b.ITEM, c.ID ";
+        //echo $sql;
+		$this->query($sql);
+		$_arr = array();
+        $visa = array();
+		while ($this->fetch()) {
+			//$comm = round($this->Fee_Recv - $this->Fee_Pay,2);	
+			if (preg_match('/^apply/i', $this->Item)) {
+				
+				if (!isset($_arr[$this->Week]) || !isset($_arr[$this->Week]['lcnt'])) {
+					$_arr[$this->Week]['lcnt' ] = 0;
+					$_arr[$this->Week]['lcnt1'] = 0;
+					$_arr[$this->Week]['lcnt0']	= 0;	
+                    $_arr[$this->Week]['lfee' ] = 0;
+                    $_arr[$this->Week]['lfee_paid' ] = 0;	
+                    $_arr[$this->Week]['lfee_free' ] = 0;			
+                
+                    $_arr[$this->Week]['lc_free'  ] = 0;
+                    $_arr[$this->Week]['lc_free_0'] = 0;
+                    $_arr[$this->Week]['lc_paid'  ] = 0;
+                    $_arr[$this->Week]['lc_paid_0'] = 0;    
+                }
+
+				$_arr[$this->Week]['lcnt']++;
+
+				$_arr[$this->Week]['lname'][$_arr[$this->Week]['lcnt']] = $this->Name;
+				$_arr[$this->Week]['lc'   ][$_arr[$this->Week]['lcnt']] = $this->CID;
+				$_arr[$this->Week]['lv'   ][$_arr[$this->Week]['lcnt']] = $this->ID;
+                $visa[$this->ID]['apply'][$this->Week][] = $_arr[$this->Week]['lcnt'];
+                $visa[$this->ID]['profit'] = 0; 
+                $visa[$this->ID]['has_agreement_fee'] = 0; 
+            }
+            
+            if (preg_match('/^grant/i', $this->Item)){
+				if (!isset($_arr[$this->Week]) || !isset($_arr[$this->Week]['gcnt'])) {
+					$_arr[$this->Week]['gcnt' ] = 0;
+					$_arr[$this->Week]['gcnt1'] = 0;
+					$_arr[$this->Week]['gcnt0']	= 0;
+                    $_arr[$this->Week]['gfee' ] = 0;
+                    $_arr[$this->Week]['gfee_paid' ] = 0;	
+                    $_arr[$this->Week]['gfee_free' ] = 0;
+				
+                    $_arr[$this->Week]['gc_free'  ] = 0;
+                    $_arr[$this->Week]['gc_free_0'] = 0;
+                    $_arr[$this->Week]['gc_paid'  ] = 0;
+                    $_arr[$this->Week]['gc_paid_0'] = 0;  
+                }
+
+				$_arr[$this->Week]['gcnt']++;
+
+				$_arr[$this->Week]['gname'][$_arr[$this->Week]['gcnt']] = $this->Name;
+				$_arr[$this->Week]['gc'   ][$_arr[$this->Week]['gcnt']] = $this->CID;
+                $_arr[$this->Week]['gv'   ][$_arr[$this->Week]['gcnt']] = $this->ID;
+                $visa[$this->ID]['grant'][$this->Week][] = $_arr[$this->Week]['gcnt'];
+                $visa[$this->ID]['profit'] = 0;
+                $visa[$this->ID]['has_agreement_fee'] = 0; 		
+			}
+
+            if (preg_match('/^withdraw/i', $this->Item)){
+                if (!isset($_arr[$this->Week]) || !isset($_arr[$this->Week]['wcnt'])) {
+                    $_arr[$this->Week]['wcnt' ] = 0;
+                    $_arr[$this->Week]['wcnt1'] = 0;
+                    $_arr[$this->Week]['wcnt0'] = 0;
+                    $_arr[$this->Week]['wfee' ] = 0;
+                    $_arr[$this->Week]['wfee_paid' ] = 0;   
+                    $_arr[$this->Week]['wfee_free' ] = 0;
+                
+                    $_arr[$this->Week]['wc_free'  ] = 0;
+                    $_arr[$this->Week]['wc_free_0'] = 0;
+                    $_arr[$this->Week]['wc_paid'  ] = 0;
+                    $_arr[$this->Week]['wc_paid_0'] = 0;  
+                }
+
+                $_arr[$this->Week]['wcnt']++;
+
+                $_arr[$this->Week]['wname'][$_arr[$this->Week]['wcnt']] = $this->Name;
+                $_arr[$this->Week]['wc'   ][$_arr[$this->Week]['wcnt']] = $this->CID;
+                $_arr[$this->Week]['wv'   ][$_arr[$this->Week]['wcnt']] = $this->ID;
+                $visa[$this->ID]['withraw'][$this->Week][] = $_arr[$this->Week]['wcnt'];
+                $visa[$this->ID]['profit'] = 0;
+                $visa[$this->ID]['has_agreement_fee'] = 0;      
+            }         
+
+            if (preg_match('/^refused/i', $this->Item)){
+                if (!isset($_arr[$this->Week]) || !isset($_arr[$this->Week]['rcnt'])) {
+                    $_arr[$this->Week]['rcnt' ] = 0;
+                    $_arr[$this->Week]['rcnt1'] = 0;
+                    $_arr[$this->Week]['rcnt0'] = 0;
+                    $_arr[$this->Week]['rfee' ] = 0;
+                    $_arr[$this->Week]['rfee_paid' ] = 0;   
+                    $_arr[$this->Week]['rfee_free' ] = 0;
+                
+                    $_arr[$this->Week]['rc_free'  ] = 0;
+                    $_arr[$this->Week]['rc_free_0'] = 0;
+                    $_arr[$this->Week]['rc_paid'  ] = 0;
+                    $_arr[$this->Week]['rc_paid_0'] = 0;  
+                }
+
+                $_arr[$this->Week]['rcnt']++;
+
+                $_arr[$this->Week]['rname'][$_arr[$this->Week]['rcnt']] = $this->Name;
+                $_arr[$this->Week]['rc'   ][$_arr[$this->Week]['rcnt']] = $this->CID;
+                $_arr[$this->Week]['rv'   ][$_arr[$this->Week]['rcnt']] = $this->ID;
+                $visa[$this->ID]['refuse'][$this->Week][] = $_arr[$this->Week]['rcnt'];
+                $visa[$this->ID]['profit'] = 0;
+                $visa[$this->ID]['has_agreement_fee'] = 0;      
+            }
+
+            if (preg_match('/^cancel agreement/i', $this->Item)){
+                if (!isset($_arr[$this->Week]) || !isset($_arr[$this->Week]['ccnt'])) {
+                    $_arr[$this->Week]['ccnt' ] = 0;
+                    $_arr[$this->Week]['ccnt1'] = 0;
+                    $_arr[$this->Week]['ccnt0'] = 0;
+                    $_arr[$this->Week]['cfee' ] = 0;
+                    $_arr[$this->Week]['cfee_paid' ] = 0;   
+                    $_arr[$this->Week]['cfee_free' ] = 0;
+                
+                    $_arr[$this->Week]['cc_free'  ] = 0;
+                    $_arr[$this->Week]['cc_free_0'] = 0;
+                    $_arr[$this->Week]['cc_paid'  ] = 0;
+                    $_arr[$this->Week]['cc_paid_0'] = 0;  
+                }
+
+                $_arr[$this->Week]['ccnt']++;
+
+                $_arr[$this->Week]['cname'][$_arr[$this->Week]['ccnt']] = $this->Name;
+                $_arr[$this->Week]['cc'   ][$_arr[$this->Week]['ccnt']] = $this->CID;
+                $_arr[$this->Week]['cv'   ][$_arr[$this->Week]['ccnt']] = $this->ID;
+                $visa[$this->ID]['cancel'][$this->Week][] = $_arr[$this->Week]['ccnt'];
+                $visa[$this->ID]['profit'] = 0;
+                $visa[$this->ID]['has_agreement_fee'] = 0;      
+            } 
+
+            if (preg_match('/agent stop/i', $this->Item)){
+                if (!isset($_arr[$this->Week]) || !isset($_arr[$this->Week]['scnt'])) {
+                    $_arr[$this->Week]['scnt' ] = 0;
+                    $_arr[$this->Week]['scnt1'] = 0;
+                    $_arr[$this->Week]['scnt0'] = 0;
+                    $_arr[$this->Week]['sfee' ] = 0;
+                    $_arr[$this->Week]['sfee_paid' ] = 0;   
+                    $_arr[$this->Week]['sfee_free' ] = 0;
+                
+                    $_arr[$this->Week]['sc_free'  ] = 0;
+                    $_arr[$this->Week]['sc_free_0'] = 0;
+                    $_arr[$this->Week]['sc_paid'  ] = 0;
+                    $_arr[$this->Week]['sc_paid_0'] = 0;  
+                }
+
+                $_arr[$this->Week]['scnt']++;
+
+                $_arr[$this->Week]['sname'][$_arr[$this->Week]['scnt']] = $this->Name;
+                $_arr[$this->Week]['sc'   ][$_arr[$this->Week]['scnt']] = $this->CID;
+                $_arr[$this->Week]['sv'   ][$_arr[$this->Week]['scnt']] = $this->ID;
+                $visa[$this->ID]['stop'][$this->Week][] = $_arr[$this->Week]['scnt'];
+                $visa[$this->ID]['profit'] = 0;
+                $visa[$this->ID]['has_agreement_fee'] = 0;      
+            } 
+
+            if (preg_match('/^declined/i', $this->Item)){
+                if (!isset($_arr[$this->Week]) || !isset($_arr[$this->Week]['dcnt'])) {
+                    $_arr[$this->Week]['dcnt' ] = 0;
+                    $_arr[$this->Week]['dcnt1'] = 0;
+                    $_arr[$this->Week]['dcnt0'] = 0;
+                    $_arr[$this->Week]['dfee' ] = 0;
+                    $_arr[$this->Week]['dfee_paid' ] = 0;   
+                    $_arr[$this->Week]['dfee_free' ] = 0;
+                
+                    $_arr[$this->Week]['dc_free'  ] = 0;
+                    $_arr[$this->Week]['dc_free_0'] = 0;
+                    $_arr[$this->Week]['dc_paid'  ] = 0;
+                    $_arr[$this->Week]['dc_paid_0'] = 0;  
+                }
+
+                $_arr[$this->Week]['dcnt']++;
+
+                $_arr[$this->Week]['dname'][$_arr[$this->Week]['dcnt']] = $this->Name;
+                $_arr[$this->Week]['sc'   ][$_arr[$this->Week]['dcnt']] = $this->CID;
+                $_arr[$this->Week]['sv'   ][$_arr[$this->Week]['dcnt']] = $this->ID;
+                $visa[$this->ID]['declined'][$this->Week][] = $_arr[$this->Week]['dcnt'];
+                $visa[$this->ID]['profit'] = 0;
+                $visa[$this->ID]['has_agreement_fee'] = 0;      
+            }
+
+		}
+        
+        //calc payment
+        if (count($visa) > 0) {
+            $sql = "select a.ID, VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD, SUM(IF(STEP = 'agreement' AND DueAmount > 0, 1, 0)) AS HAS_AGREEMENT_FEE, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a left join client_payment b on(a.ID = b.AccountID) Where VisaID IN (".implode(',', array_keys($visa)).") AND ACC_TYPE = 'visa' Group by a.ID";
+            $this->query($sql);
+            
+            while ($this->fetch()){
+                //paperwork profit
+                $visa[$this->VisaID]['profit'] += $this->paid - ($this->GST == 1? $this->DueAmount/11 : 0) - $this->AMOUNT_3RD + ($this->GST_3RD == 1? $this->AMOUNT_3RD/11 : 0);
+                $visa[$this->VisaID]['has_agreement_fee'] += $this->HAS_AGREEMENT_FEE; 
+            }            
+            foreach ($visa as $vid => $v) {
+                if (isset($v['apply'])) {
+                    foreach ($v['apply'] as $w => $vv) {
+                        foreach ($vv as $i) {
+                            //$_arr[$w]['lname'][$i] .= ' $'.$v['profit'];
+                            $_arr[$w]['lfee'] += $v['profit'];
+                            $_arr[$w]['lcnt1']++;
+
+                            if ($v['profit'] <= 0)
+                                $_arr[$w]['lcnt0']++;
+                            
+                            if ($v['has_agreement_fee'] > 0) {
+                                $_arr[$w]['lfee_paid'] += $v['profit'];
+                                $_arr[$w]['lc_paid']++;
+                                if ($v['profit'] <= 0)
+                                    $_arr[$w]['lc_paid_0']++;
+
+                                $_arr[$w]['lname_paid'][$i] = $_arr[$w]['lname'][$i] .' $'.$v['profit'];
+                            }
+                            else {
+                                $_arr[$w]['lfee_free'] += $v['profit'];
+                                $_arr[$w]['lc_free']++;    
+                                if ($v['profit'] <= 0)
+                                    $_arr[$w]['lc_free_0']++;
+
+                                $_arr[$w]['lname_free'][$i] = $_arr[$w]['lname'][$i] .' $'.$v['profit'];                                
+                            }
+
+                            //$_arr[$w]['lname'][$i] .= ' $'.$v['profit'];
+                        }
+                    }
+                }
+                if (isset($v['grant'])) {
+                    foreach ($v['grant'] as $w => $vv) {
+                        foreach ($vv as $i) {
+                            
+                            $_arr[$w]['gfee'] += $v['profit'];
+                            $_arr[$w]['gcnt1']++;
+                            
+                            if ($v['profit'] <= 0) 
+                                $_arr[$w]['gcnt0']++; 
+
+                            if ($v['has_agreement_fee'] > 0) {
+                                $_arr[$w]['gfee_paid'] += $v['profit'];
+                                $_arr[$w]['gc_paid']++;
+                                if ($v['profit'] <= 0)
+                                    $_arr[$w]['gc_paid_0']++;
+
+                                $_arr[$w]['gname_paid'][$i] = $_arr[$w]['gname'][$i] .' $'.$v['profit'];
+                            }
+                            else {
+                                $_arr[$w]['gfee_free'] += $v['profit'];
+                                $_arr[$w]['gc_free']++;
+
+                                if ($v['profit'] > 0)
+                                    $_arr[$w]['gc_free_0']++;
+
+                                $_arr[$w]['gname_free'][$i] = $_arr[$w]['gname'][$i] .' $'.$v['profit']; 
+                            }
+                        }
+                    }
+                }
+
+                if (isset($v['withdraw'])) {
+                    foreach ($v['withdraw'] as $w => $vv) {
+                        foreach ($vv as $i) {
+                            
+                            $_arr[$w]['wfee'] += $v['profit'];
+                            $_arr[$w]['wcnt1']++;
+                            
+                            if ($v['profit'] <= 0) 
+                                $_arr[$w]['wcnt0']++; 
+
+                            if ($v['has_agreement_fee'] > 0) {
+                                $_arr[$w]['wfee_paid'] += $v['profit'];
+                                $_arr[$w]['wc_paid']++;
+                                if ($v['profit'] <= 0)
+                                    $_arr[$w]['wc_paid_0']++;
+
+                                $_arr[$w]['wname_paid'][$i] = $_arr[$w]['wname'][$i] .' $'.$v['profit'];
+                            }
+                            else {
+                                $_arr[$w]['wfee_free'] += $v['profit'];
+                                $_arr[$w]['wc_free']++;
+
+                                if ($v['profit'] > 0)
+                                    $_arr[$w]['wc_free_0']++;
+
+                                $_arr[$w]['wname_free'][$i] = $_arr[$w]['wname'][$i] .' $'.$v['profit']; 
+                            }
+                        }
+                    }
+                }
+
+                if (isset($v['refuse'])) {
+                    foreach ($v['refuse'] as $w => $vv) {
+                        foreach ($vv as $i) {
+                            
+                            $_arr[$w]['rfee'] += $v['profit'];
+                            $_arr[$w]['rcnt1']++;
+                            
+                            if ($v['profit'] <= 0) 
+                                $_arr[$w]['rcnt0']++; 
+
+                            if ($v['has_agreement_fee'] > 0) {
+                                $_arr[$w]['rfee_paid'] += $v['profit'];
+                                $_arr[$w]['rc_paid']++;
+                                if ($v['profit'] <= 0)
+                                    $_arr[$w]['rc_paid_0']++;
+
+                                $_arr[$w]['rname_paid'][$i] = $_arr[$w]['rname'][$i] .' $'.$v['profit'];
+                            }
+                            else {
+                                $_arr[$w]['rfee_free'] += $v['profit'];
+                                $_arr[$w]['rc_free']++;
+
+                                if ($v['profit'] > 0)
+                                    $_arr[$w]['rc_free_0']++;
+
+                                $_arr[$w]['rname_free'][$i] = $_arr[$w]['rname'][$i] .' $'.$v['profit']; 
+                            }
+                        }
+                    }
+                }
+
+                if (isset($v['cancel'])) {
+                    foreach ($v['cancel'] as $w => $vv) {
+                        foreach ($vv as $i) {
+                            
+                            $_arr[$w]['cfee'] += $v['profit'];
+                            $_arr[$w]['ccnt1']++;
+                            
+                            if ($v['profit'] <= 0) 
+                                $_arr[$w]['ccnt0']++; 
+
+                            if ($v['has_agreement_fee'] > 0) {
+                                $_arr[$w]['cfee_paid'] += $v['profit'];
+                                $_arr[$w]['cc_paid']++;
+                                if ($v['profit'] <= 0)
+                                    $_arr[$w]['cc_paid_0']++;
+
+                                $_arr[$w]['cname_paid'][$i] = $_arr[$w]['cname'][$i] .' $'.$v['profit'];
+                            }
+                            else {
+                                $_arr[$w]['cfee_free'] += $v['profit'];
+                                $_arr[$w]['cc_free']++;
+
+                                if ($v['profit'] > 0)
+                                    $_arr[$w]['cc_free_0']++;
+
+                                $_arr[$w]['cname_free'][$i] = $_arr[$w]['cname'][$i] .' $'.$v['profit']; 
+                            }
+                        }
+                    }
+                }
+
+                if (isset($v['stop'])) {
+                    foreach ($v['stop'] as $w => $vv) {
+                        foreach ($vv as $i) {
+                            
+                            $_arr[$w]['sfee'] += $v['profit'];
+                            $_arr[$w]['scnt1']++;
+                            
+                            if ($v['profit'] <= 0) 
+                                $_arr[$w]['scnt0']++; 
+
+                            if ($v['has_agreement_fee'] > 0) {
+                                $_arr[$w]['sfee_paid'] += $v['profit'];
+                                $_arr[$w]['sc_paid']++;
+                                if ($v['profit'] <= 0)
+                                    $_arr[$w]['sc_paid_0']++;
+
+                                $_arr[$w]['sname_paid'][$i] = $_arr[$w]['sname'][$i] .' $'.$v['profit'];
+                            }
+                            else {
+                                $_arr[$w]['sfee_free'] += $v['profit'];
+                                $_arr[$w]['sc_free']++;
+
+                                if ($v['profit'] > 0)
+                                    $_arr[$w]['sc_free_0']++;
+
+                                $_arr[$w]['sname_free'][$i] = $_arr[$w]['sname'][$i] .' $'.$v['profit']; 
+                            }
+                        }
+                    }
+                }
+                if (isset($v['declined'])) {
+                    foreach ($v['declined'] as $w => $vv) {
+                        foreach ($vv as $i) {
+                            
+                            $_arr[$w]['dfee'] += $v['profit'];
+                            $_arr[$w]['dcnt1']++;
+                            
+                            if ($v['profit'] <= 0) 
+                                $_arr[$w]['dcnt0']++; 
+
+                            if ($v['has_agreement_fee'] > 0) {
+                                $_arr[$w]['dfee_paid'] += $v['profit'];
+                                $_arr[$w]['dc_paid']++;
+                                if ($v['profit'] <= 0)
+                                    $_arr[$w]['dc_paid_0']++;
+
+                                $_arr[$w]['dname_paid'][$i] = $_arr[$w]['dname'][$i] .' $'.$v['profit'];
+                            }
+                            else {
+                                $_arr[$w]['dfee_free'] += $v['profit'];
+                                $_arr[$w]['dc_free']++;
+
+                                if ($v['profit'] > 0)
+                                    $_arr[$w]['dc_free_0']++;
+
+                                $_arr[$w]['dname_free'][$i] = $_arr[$w]['dname'][$i] .' $'.$v['profit']; 
+                            }
+                        }
+                    }
+                }
+                
+            }
+        }
+
+		return $_arr;				
+	}
+
+	
+	function getAllOfVisaProcByUser($fromDay, $toDay, $userid){
+		
+		$sql  = "select if(b.Item is null, a.ExItem, b.Item) AS Item, c.AFee, concat(LName, ' ', FName) as Name, d.CID, c.ID, c.r_Status from client_visa_process a left join visa_rs_item b on (a.ItemID = b.ITEMID), client_visa c, client_info d
+		         where a.CVID  = c.ID and c.CID = d.CID and (b.Item not like '%assessment' or b.Item is null) and a.Done = 1 ";
+		if ($userid > 0) {
+			$sql .= " AND c.VUserID = {$userid} ";
+		}
+		if ($fromDay != "" && $toDay  != "") {
+			$sql .= " AND a.BeginDate >= '{$fromDay}' and a.BeginDate <= '{$toDay}' ";
+		}		
+		//$sql .= " GROUP BY b.ITEM,c.ID ";
+        //echo $sql."\n";
+		$this->query($sql);
+		$lodge  = $grant = $withdraw = $refuse = $cancel = $stop = $declined = 0;
+        $visa   = array();
+		while ($this->fetch()) {
+ 			//$comm = round($this->Fee_Recv - $this->Fee_Pay,2);	
+
+			if (preg_match('/^apply/i', $this->Item)) {
+				$_arr['all']['lname' ][$lodge] = $this->Name;
+				$_arr['all']['lc'    ][$lodge] = $this->CID;
+				$_arr['all']['lv'    ][$lodge] = $this->ID; 
+                $visa[$this->ID]['apply'][] = $lodge;
+                $visa[$this->ID]['profit'] = 0;
+                $visa[$this->ID]['has_agreement_fee'] = 0;                
+                $lodge++;
+			}
+            
+            if (preg_match('/^grant/i', $this->Item)){
+				$_arr['all']['gname' ][$grant] = $this->Name;
+                $_arr['all']['gc'    ][$grant] = $this->CID;
+                $_arr['all']['gv'    ][$grant] = $this->ID;		
+				$visa[$this->ID]['grant'][] = $grant;
+                $visa[$this->ID]['profit'] = 0;
+                $visa[$this->ID]['has_agreement_fee'] = 0;                  
+                $grant++;			
+			}
+            elseif (preg_match('/^withdraw/i', $this->Item) ){
+                $_arr['all']['withdraw' ][$withdraw] = $this->Name;
+                $_arr['all']['wc'    ][$withdraw] = $this->CID;
+                $_arr['all']['wv'    ][$withdraw] = $this->ID;     
+                $visa[$this->ID]['withdraw'][] = $withdraw;
+                $visa[$this->ID]['profit'] = 0;
+                $visa[$this->ID]['has_agreement_fee'] = 0;                  
+                $withdraw++;   
+            }
+            elseif (preg_match('/^refused/i', $this->Item) ){
+                $_arr['all']['refuse' ][$refuse] = $this->Name;
+                $_arr['all']['rc'    ][$refuse] = $this->CID;
+                $_arr['all']['rv'    ][$refuse] = $this->ID;     
+                $visa[$this->ID]['refuse'][] = $refuse;
+                $visa[$this->ID]['profit'] = 0;
+                $visa[$this->ID]['has_agreement_fee'] = 0;                  
+                $refuse++;   
+            }
+            elseif (preg_match('/^cancel agreement/i', $this->Item) ){
+                $_arr['all']['cancel' ][$cancel] = $this->Name;
+                $_arr['all']['cc'    ][$cancel] = $this->CID;
+                $_arr['all']['cv'    ][$cancel] = $this->ID;     
+                $visa[$this->ID]['cancel'][] = $cancel;
+                $visa[$this->ID]['profit'] = 0;
+                $visa[$this->ID]['has_agreement_fee'] = 0;                  
+                $cancel++;  
+            }
+            elseif (preg_match('/agent stop/i', $this->Item) ){
+                $_arr['all']['stop' ][$stop] = $this->Name;
+                $_arr['all']['sc'    ][$stop] = $this->CID;
+                $_arr['all']['sv'    ][$stop] = $this->ID;     
+                $visa[$this->ID]['stop'][] = $stop;
+                $visa[$this->ID]['profit'] = 0;
+                $visa[$this->ID]['has_agreement_fee'] = 0;                  
+                $stop++;  
+            }
+            elseif (preg_match('/^declined/i', $this->Item) ){
+                $_arr['all']['declined' ][$declined] = $this->Name;
+                $_arr['all']['dc'    ][$declined] = $this->CID;
+                $_arr['all']['dv'    ][$declined] = $this->ID;     
+                $visa[$this->ID]['declined'][] = $declined;
+                $visa[$this->ID]['profit'] = 0;
+                $visa[$this->ID]['has_agreement_fee'] = 0;                  
+                $declined++; 
+            }
+
+		}
+    
+        //calc payment
+        $lodge_0     = $lc_paid = $lc_paid_0 =  $lc_free = $lc_free_0 = $lrev = $lrev_paid = $lrev_free = 0;
+        $grant_0     = $gc_paid = $gc_paid_0 =  $gc_free = $gc_free_0 = $grev = $grev_paid = $grev_free = 0;
+        $withdraw_0  = $wc_paid = $wc_paid_0 =  $wc_free = $wc_free_0 = $wrev = $wrev_paid = $wrev_free = 0;
+        $refuse_0    = $rc_paid = $rc_paid_0 =  $rc_free = $rc_free_0 = $rrev = $rrev_paid = $rrev_free = 0;
+        $cancel_0    = $cc_paid = $cc_paid_0 =  $cc_free = $cc_free_0 = $crev = $crev_paid = $crev_free = 0;
+        $stop_0      = $sc_paid = $sc_paid_0 =  $sc_free = $sc_free_0 = $srev = $srev_paid = $srev_free = 0;
+        $declined_0  = $dc_paid = $dc_paid_0 =  $dc_free = $dc_free_0 = $drev = $drev_paid = $drev_free = 0;
+
+        $comm_l = $comm_g = array();
+        if (count($visa) > 0) {
+            $sql = "select a.ID, VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD, SUM(IF(STEP = 'agreement' AND DueAmount > 0, 1, 0)) AS HAS_AGREEMENT_FEE, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a left join client_payment b on(a.ID = b.AccountID) Where VisaID IN (".implode(',', array_keys($visa)).") AND ACC_TYPE = 'visa' Group by a.ID";
+            $this->query($sql);
+       
+            while ($this->fetch()){
+                //paperwork profit
+                $visa[$this->VisaID]['profit'] += $this->paid - ($this->GST == 1? $this->DueAmount/11 : 0) - $this->AMOUNT_3RD + ($this->GST_3RD == 1? $this->AMOUNT_3RD/11 : 0);
+                $visa[$this->VisaID]['has_agreement_fee'] += $this->HAS_AGREEMENT_FEE;
+            }            
+        
+            foreach ($visa as $vid => $v) {
+                if (isset($v['apply'])) {
+                    foreach ($v['apply'] as $i) {
+                        
+                        $lrev += $v['profit'];
+                        if ($v['profit'] <= 0)
+                            $lodge_0++;
+
+                        if ($v['has_agreement_fee'] > 0) {
+                            $lrev_paid += $v['profit'];
+                            $_arr['all']['lname_paid'][$i] = $_arr['all']['lname'][$i] .' $'.$v['profit'];
+                            $lc_paid++;
+                            if ($v['profit'] <= 0)
+                                $lc_paid_0++; 
+                        }
+                        else {
+                            $lrev_free += $v['profit'];
+                            $_arr['all']['lname_free'][$i] = $_arr['all']['lname'][$i] .' $'.$v['profit'];
+                            $lc_free++;
+                            if ($v['profit'] <= 0)
+                                $lc_free_0++;
+                        }
+
+                        //$_arr['all']['lname'][$i] .= ' $'.$v['profit'];    
+                    }
+                }
+                if (isset($v['grant'])) {
+                    foreach ($v['grant'] as $i) {
+                        
+                        $grev += $v['profit'];   
+                        if ($v['profit'] <= 0)
+                            $grant_0++;      
+
+                        if ($v['has_agreement_fee'] > 0) {
+                            $grev_paid += $v['profit'];
+                            $_arr['all']['gname_paid'][$i] = $_arr['all']['gname'][$i].' $'.$v['profit'];
+                            $gc_paid++;
+                            if ($v['profit'] <= 0)
+                                $gc_paid_0++;
+                        }
+                        else {
+                            $grev_free += $v['profit'];
+                            $_arr['all']['gname_free'][$i] = $_arr['all']['gname'][$i].' $'.$v['profit'];                           
+                            $gc_free++;
+                            if ($v['profit'] <= 0)
+                                $gc_free_0++;
+                        }
+                        //$_arr['all']['gname'][$i] .= ' $'.$v['profit'];
+                    }
+                }
+                if (isset($v['withdraw'])) {
+                    foreach ($v['withdraw'] as $i) {
+                        
+                        $wrev += $v['profit'];   
+                        if ($v['profit'] <= 0)
+                            $withdraw_0++;      
+
+                        if ($v['has_agreement_fee'] > 0) {
+                            $wrev_paid += $v['profit'];
+                            $_arr['all']['wname_paid'][$i] = $_arr['all']['withdraw'][$i].' $'.$v['profit'];
+                            $wc_paid++;
+                            if ($v['profit'] <= 0)
+                                $wc_paid_0++;
+                        }
+                        else {
+                            $wrev_free += $v['profit'];
+                            $_arr['all']['wname_free'][$i] = $_arr['all']['withdraw'][$i].' $'.$v['profit'];                           
+                            $wc_free++;
+                            if ($v['profit'] <= 0)
+                                $wc_free_0++;
+                        }
+                    }
+                }
+                if (isset($v['refuse'])) {
+                    foreach ($v['refuse'] as $i) {
+                        
+                        $rrev += $v['profit'];   
+                        if ($v['profit'] <= 0)
+                            $refuse_0++;      
+
+                        if ($v['has_agreement_fee'] > 0) {
+                            $rrev_paid += $v['profit'];
+                            $_arr['all']['rname_paid'][$i] = $_arr['all']['refuse'][$i].' $'.$v['profit'];
+                            $rc_paid++;
+                            if ($v['profit'] <= 0)
+                                $rc_paid_0++;
+                        }
+                        else {
+                            $rrev_free += $v['profit'];
+                            $_arr['all']['rname_free'][$i] = $_arr['all']['refuse'][$i].' $'.$v['profit'];                           
+                            $rc_free++;
+                            if ($v['profit'] <= 0)
+                                $rc_free_0++;
+                        }
+                    }
+                }
+                if (isset($v['cancel'])) {
+                    foreach ($v['cancel'] as $i) {
+                        
+                        $crev += $v['profit'];   
+                        if ($v['profit'] <= 0)
+                            $cancel_0++;      
+
+                        if ($v['has_agreement_fee'] > 0) {
+                            $crev_paid += $v['profit'];
+                            $_arr['all']['cname_paid'][$i] = $_arr['all']['cancel'][$i].' $'.$v['profit'];
+                            $cc_paid++;
+                            if ($v['profit'] <= 0)
+                                $cc_paid_0++;
+                        }
+                        else {
+                            $crev_free += $v['profit'];
+                            $_arr['all']['cname_free'][$i] = $_arr['all']['cancel'][$i].' $'.$v['profit'];                           
+                            $cc_free++;
+                            if ($v['profit'] <= 0)
+                                $cc_free_0++;
+                        }
+                    }
+                }
+                if (isset($v['stop'])) {
+                    foreach ($v['stop'] as $i) {
+                        
+                        $srev += $v['profit'];   
+                        if ($v['profit'] <= 0)
+                            $stop_0++;      
+
+                        if ($v['has_agreement_fee'] > 0) {
+                            $srev_paid += $v['profit'];
+                            $_arr['all']['sname_paid'][$i] = $_arr['all']['stop'][$i].' $'.$v['profit'];
+                            $sc_paid++;
+                            if ($v['profit'] <= 0)
+                                $sc_paid_0++;
+                        }
+                        else {
+                            $srev_free += $v['profit'];
+                            $_arr['all']['sname_free'][$i] = $_arr['all']['stop'][$i].' $'.$v['profit'];                           
+                            $sc_free++;
+                            if ($v['profit'] <= 0)
+                                $sc_free_0++;
+                        }
+                    }
+                }
+                if (isset($v['declined'])) {
+                    foreach ($v['declined'] as $i) {
+                        
+                        $drev += $v['profit'];   
+                        if ($v['profit'] <= 0)
+                            $declined_0++;      
+
+                        if ($v['has_agreement_fee'] > 0) {
+                            $drev_paid += $v['profit'];
+                            $_arr['all']['dname_paid'][$i] = $_arr['all']['declined'][$i].' $'.$v['profit'];
+                            $dc_paid++;
+                            if ($v['profit'] <= 0)
+                                $dc_paid_0++;
+                        }
+                        else {
+                            $drev_free += $v['profit'];
+                            $_arr['all']['dname_free'][$i] = $_arr['all']['declined'][$i].' $'.$v['profit'];                           
+                            $dc_free++;
+                            if ($v['profit'] <= 0)
+                                $dc_free_0++;
+                        }
+                    }
+                }
+
+            }
+        } 
+        
+		$_arr['all']['lcnt1'] = $lodge;
+		$_arr['all']['gcnt1'] = $grant;
+        $_arr['all']['wcnt1'] = $withdraw;
+        $_arr['all']['rcnt1'] = $refuse;
+        $_arr['all']['ccnt1'] = $cancel;
+        $_arr['all']['scnt1'] = $stop;
+        $_arr['all']['dcnt1'] = $declined;
+
+		$_arr['all']['lcnt0'] = $lodge_0;
+		$_arr['all']['gcnt0'] = $grant_0;
+        $_arr['all']['wcnt0'] = $withdraw_0;
+        $_arr['all']['rcnt0'] = $refuse_0;
+        $_arr['all']['ccnt0'] = $cancel_0;
+        $_arr['all']['scnt0'] = $stop_0;
+        $_arr['all']['dcnt0'] = $declined_0;
+
+
+		$_arr['all']['lfee'] = $lrev;
+        $_arr['all']['lfee_paid'] = $lrev_paid;
+        $_arr['all']['lfee_free'] = $lrev_free;
+		$_arr['all']['gfee'] = $grev;
+        $_arr['all']['gfee_paid'] = $grev_paid;
+        $_arr['all']['gfee_free'] = $grev_free;
+        $_arr['all']['wfee'] = $wrev;
+        $_arr['all']['wfee_paid'] = $wrev_paid;
+        $_arr['all']['wfee_free'] = $wrev_free;
+        $_arr['all']['rfee'] = $rrev;
+        $_arr['all']['rfee_paid'] = $rrev_paid;
+        $_arr['all']['rfee_free'] = $rrev_free;
+        $_arr['all']['cfee'] = $crev;
+        $_arr['all']['cfee_paid'] = $crev_paid;
+        $_arr['all']['cfee_free'] = $crev_free;
+        $_arr['all']['sfee'] = $srev;
+        $_arr['all']['sfee_paid'] = $srev_paid;
+        $_arr['all']['sfee_free'] = $srev_free;
+        $_arr['all']['dfee'] = $drev;
+        $_arr['all']['dfee_paid'] = $drev_paid;
+        $_arr['all']['dfee_free'] = $drev_free;
+
+        $_arr['all']['lc_paid'] = $lc_paid;
+        $_arr['all']['lc_paid_0'] = $lc_paid_0;
+        $_arr['all']['lc_free'] = $lc_free;
+        $_arr['all']['lc_free_0'] = $lc_free_0;
+        $_arr['all']['gc_paid'] = $gc_paid;
+        $_arr['all']['gc_paid_0'] = $gc_paid_0;
+        $_arr['all']['gc_free'] = $gc_free;
+        $_arr['all']['gc_free_0'] = $gc_free_0;
+        $_arr['all']['wc_paid']   = $wc_paid;
+        $_arr['all']['wc_paid_0'] = $wc_paid_0;
+        $_arr['all']['wc_free']   = $wc_free;
+        $_arr['all']['wc_free_0'] = $wc_free_0;
+        $_arr['all']['rc_paid']   = $rc_paid;
+        $_arr['all']['rc_paid_0'] = $rc_paid_0;
+        $_arr['all']['rc_free']   = $rc_free;
+        $_arr['all']['rc_free_0'] = $rc_free_0;
+        $_arr['all']['cc_paid']   = $cc_paid;
+        $_arr['all']['cc_paid_0'] = $cc_paid_0;
+        $_arr['all']['cc_free']   = $cc_free;
+        $_arr['all']['cc_free_0'] = $cc_free_0;
+        $_arr['all']['sc_paid']   = $sc_paid;
+        $_arr['all']['sc_paid_0'] = $sc_paid_0;
+        $_arr['all']['sc_free']   = $sc_free;
+        $_arr['all']['sc_free_0'] = $sc_free_0;
+        $_arr['all']['dc_paid']   = $dc_paid;
+        $_arr['all']['dc_paid_0'] = $dc_paid_0;
+        $_arr['all']['dc_free']   = $dc_free;
+        $_arr['all']['dc_free_0'] = $dc_free_0;
+
+		return $_arr;				
+	}
+
+	
+	
+	function getCommissionByUser($userid, $page=0, $page_size=0){
+		$sql = "select concat(LName, ' ', FName) as Name, a.CID, b.ID as CourseID, c.ID as SemID, d.Detail, d.KeyPoint from client_info a 
+				left join client_course b on(a.CID = b.CID) 
+				left join client_course_sem c on(b.ID = c.CCID) 
+				left join client_course_sem_process d on(c.ID = d.SemID and d.KeyPoint <> '' and Done = 0) 
+				where d.ID is not null and a.ClientType like '%study%' and c.StartDate <= NOW()"; //a.CID in ($id_str) and 
+		if ($userid > 0) {
+			$sql .= " AND a.CourseUser = {$userid} ";
+		}
+		
+		$sql .= " Order by Name asc ";//d.OrderID
+		
+		if ($page > 0 && $page_size > 0) {
+			$sql .= " Limit ".($page-1)*$page_size.", ".$page_size;
+		}		
+		$_arr = array();
+		$this->query($sql);//echo $sql."<p/>";
+		while ($this->fetch()) {
+			$_arr[$this->CID]['name'] = $this->Name;
+			$_arr[$this->CID]['course'][$this->CourseID][$this->SemID]['desc'] = $this->Detail;
+			$_arr[$this->CID]['course'][$this->CourseID][$this->SemID]['key'] = $this->KeyPoint;
+		}
+		return $_arr;
+	}
+	
+	function getNumOfCommissionsByUser($userid){
+		$sql = "select count(*) as cnt from client_info a 
+				left join client_course b on(a.CID = b.CID) 
+				left join client_course_sem c on(b.ID = c.CCID) 
+				left join client_course_sem_process d on(c.ID = d.SemID and d.KeyPoint <> '' and Done = 0) 
+				where d.ID is not null and a.ClientType like '%study%' and c.StartDate <= NOW()"; //a.CID in ($id_str) and 
+		if ($userid > 0) {
+			$sql .= " AND a.CourseUser = {$userid} ";
+		}
+		
+		$sql .= " Order by d.OrderID asc ";
+		$this->query($sql);//echo $sql."<p/>";
+		while ($this->fetch() && $this->cnt > 0) {
+			return $this->cnt;
+		}
+		return 0;
+	}
+
+
+	function getCoCommissionByUser($userid, $page=0, $page_size=0){
+		/*$sql = "select concat(LName, ' ', FName) as Name, a.CID, b.ID as CourseID, c.ID as SemID, d.Detail, IF(NotifyDate is null or NotifyDate = '0000-00-00','', NotifyDate) as NotifyDate, DoB from client_info a 
+				left join client_course b on(a.CID = b.CID) 
+				left join client_course_sem c on(b.ID = c.CCID) 
+				left join client_course_sem_process d on(c.ID = d.SemID and d.subject like 'AUTO: Course Started%' and done = 1) 
+				where d.id is not null and  (a.ClientType = 'Study' or ClientType = 'all') and c.StartDate <= NOW() AND LName like 'SUB%' AND (RedDate is not null and RedDate != '0000-00-00') AND (CoDate is null or CoDate = '0000-00-00') "; //a.CID in ($id_str) and   d.ID is not null and
+		 */
+		$sql = "SELECT  a.AgentID, concat(LName, ' ', FName) as Name, a.CID, b.ID as CourseID, c.ID as SemID, d.NAME AS SchoolName, c.SEM, RedDate, IF(NotifyDate is null or NotifyDate = '0000-00-00','', NotifyDate) as NotifyDate, DoB  
+				FROM client_info a, client_course b, client_course_sem c, institute d 
+				WHERE a.CID = b.CID AND b.ID = c.CCID AND b.IID = d.ID AND a.ClientType like '%study%' and c.StartDate <= NOW() AND LName like 'SUB%' AND (RedDate is not null and RedDate != '0000-00-00') AND (CoDate is null or CoDate = '0000-00-00') ";
+		if ($userid > 0) {
+			$sql .= " AND a.CourseUser = {$userid} ";
+		}
+		
+		$sql .= " Order by Name asc ";//d.OrderID
+		
+		if ($page > 0 && $page_size > 0) {
+			$sql .= " Limit ".($page-1)*$page_size.", ".$page_size;
+		}		
+		$_arr = array();
+		$this->query($sql);//echo $sql."<p/>";
+		while ($this->fetch()) {
+			$_arr[$this->AgentID][$this->CID]['name'] = $this->Name;
+			$_arr[$this->AgentID][$this->CID]['dob' ] = $this->DoB;			
+
+			if ($this->NotifyDate != '') 
+				$_arr[$this->AgentID][$this->CID]['course'][$this->CourseID][$this->SemID]['desc'] = "SEM *{$this->SEM}: in {$this->SchoolName} co-com notify date {$this->NotifyDate}";
+			else
+				$_arr[$this->AgentID][$this->CID]['course'][$this->CourseID][$this->SemID]['desc'] = "SEM *{$this->SEM}: in {$this->SchoolName} Commission Received {$this->RedDate}";
+
+			$_arr[$this->AgentID][$this->CID]['course'][$this->CourseID][$this->SemID]['date'] = $this->NotifyDate;
+		}
+		return $_arr;
+	}
+
+	function getNumOfCoCommissionsByUser($userid){
+		$sql = "select count(*) as cnt FROM client_info a, client_course b, client_course_sem c, institute d 
+				WHERE a.CID = b.CID AND b.ID = c.CCID AND b.IID = d.ID AND a.ClientType like '%study%' and c.StartDate <= NOW() AND LName like 'SUB%' AND (RedDate is not null and RedDate != '0000-00-00') AND (CoDate is null or CoDate = '0000-00-00') "; //a.CID in ($id_str) and 
+		if ($userid > 0) {
+			$sql .= " AND a.CourseUser = {$userid} ";
+		}
+		
+		$this->query($sql);//echo $sql."<p/>";
+		while ($this->fetch() && $this->cnt > 0) {
+			return $this->cnt;
+		}
+		return 0;
+	}	
+
+	function getAmountofVisaByUser($fromDay, $toDay, $userid){
+//		$sql = "select date_format(PaidDate, '%u') as Week, concat(LName, ' ', FName) as Name, sum(PaidAmount) as Paid, sum(if(DueAmount is null, 0, DueAmount)) as Amount 
+//				from client_payment a, client_account b, client_visa c, client_info d 
+//				where a.AccountID = b.ID and b.VisaID = c.ID and c.CID = d.CID ";
+		$sql = "select date_format(PaidDate, '%Y%u') as Week, concat(LName, ' ', FName) as Name, PaidAmount as Paid, if(DueAmount is null, 0, DueAmount) as Amount 
+				from client_payment a, client_account b, client_visa c, client_info d 
+				where a.AccountID = b.ID and b.VisaID = c.ID and c.CID = d.CID and b.ACC_TYPE = 'visa' ";		
+		if ($userid > 0) {
+			$sql .= " AND c.VUserID = {$userid} ";
+		}
+		if ($fromDay != "" && $toDay  != "") {
+			$sql .= " AND a.PaidDate >= '{$fromDay}' and a.PaidDate <= '{$toDay}' ";
+		}		
+		$sql .= " ORDER BY d.LName, d.FName";
+//		$sql .= " Group by d.CID";
+		$this->query($sql);
+		$_arr = array();
+		while ($this->fetch()) {
+			$_arr[$this->Week]['name'][] = $this->Name."$ ".($this->Amount - $this->Paid);
+			$_arr[$this->Week]['paid'] = isset($_arr[$this->Week]['paid'])? $_arr[$this->Week]['paid']  : 0;
+			$_arr[$this->Week]['paid'] += ($this->Amount - $this->Paid);			
+		}
+		return $_arr;		
+	}
+
+
+	function getTotalAmountofVisaByUser($fromDay, $toDay, $userid){
+		$sql = "select concat(LName, ' ', FName) as Name, sum(PaidAmount) as Paid, sum(if(DueAmount is null, 0, DueAmount)) as Amount from client_payment a, client_account b, client_visa c, client_info d where a.AccountID = b.ID and b.VisaID = c.ID and c.CID = d.CID and ACC_TYPE = 'visa' ";
+		if ($userid > 0) {
+			$sql .= " AND c.VUserID = {$userid} ";
+		}
+		if ($fromDay != "" && $toDay  != "") {
+			$sql .= " AND a.PaidDate >= '{$fromDay}' and a.PaidDate <= '{$toDay}' ";
+		}		
+		$sql .= " Group by d.CID";
+        $this->query($sql);
+//        echo $sql."\n";
+		$_arr = array();
+		$i = $paid = 0;
+		while ($this->fetch()) {
+			$_arr['all']['name'][$i] = $this->Name." $ ".($this->Paid);//$this->Amount - 
+			$paid += ($this->Paid);	//$this->Amount - 
+			$i++;	
+		}		
+		$_arr['all']['paid'] = $paid;
+		return $_arr;
+	}
+	
+	
+    function getAllOfHomeLoan($fromDay, $toDay, $userid){
+        $sql = "select concat(LName, ' ', FName) as Name, a.ID, b.CID, c.Name AS Lending, c.Category from client_homeloan a, client_info b, lending_institue c where a.CID = b.CID and a.LID = c.ID ";
+        if ($userid > 0) {
+            $sql .= " AND a.UserID = {$userid} ";
+        }
+        $sql .= " and EXISTS (select 'x' from client_homeloan_process e WHERE a.ID = e.HID AND STEP = 'refer home loan' AND BEGINDATE between '{$fromDay}' AND '{$toDay}') ";
+        /*
+        if ($fromDay != "" && $fromDay  != "0000-00-00") {
+            $sql .= " AND a.Addtime >= '{$fromDay}'";
+        }
+        if ($toDay != "" && $toDay  != "0000-00-00") {
+            $sql .= " And a.AddTime <= '{$toDay}' ";
+        } 
+        */
+        $sql .= " GROUP BY a.ID ";  
+        $this->query($sql);
+        //echo $sql."\n";
+        $_arr = array();
+        $i = $fee = $signed = $signed_0 = 0;
+        while ($this->fetch()) {
+            $_arr['all']['pname'][$i] = $this->Name." ( {$this->Category} {$this->Lending} )";
+            $_arr['all']['client'][$i] = $this->CID;
+            $_arr['all']['loan'  ][$i] = $this->ID;
+
+            $i++;
+            
+        }
+        $_arr['all']['pcnt'] = $i;
+        return $_arr;        
+    }
+
+
+    function getNumOfHomeLoan($fromDay, $toDay, $userid){
+        $sql = "select date_format(e.BEGINDATE, '%Y%u') as Week, concat(LName, ' ', FName) as Name, a.ID, b.CID, c.Name AS Lending, c.Category from client_homeloan a left join client_homeloan_process e on (a.ID = e.HID), client_info b, lending_institue c where a.CID = b.CID and a.LID = c.ID and STEP = 'Refer home loan' ";
+        if ($userid > 0) {
+            $sql .= " AND a.UserID = {$userid} ";
+        }
+        if ($fromDay != "" && $fromDay  != "0000-00-00") {
+            $sql .= " AND e.BEGINDATE >= '{$fromDay}'";
+        }
+        if ($toDay != "" && $toDay  != "0000-00-00") {
+            $sql .= " And e.BEGINDATE <= '{$toDay}' ";
+        } 
+        $sql .= " GROUP BY a.ID ";  
+        $this->query($sql);
+        $_arr = array();
+        $i = $fee = $signed = $signed_0 = 0;
+        while ($this->fetch()) {
+            if (!isset($_arr[$this->Week])) {
+                $_arr[$this->Week] = array('pcnt' => 0, 'pname'=>array(), 'client'=>array(), 'loan'=>array());
+            }
+
+            $_arr[$this->Week]['pcnt']++;
+
+            $_arr[$this->Week]['pname' ][$_arr[$this->Week]['pcnt']] = $this->Name." ( {$this->Category} {$this->Lending} )";
+            $_arr[$this->Week]['client'][$_arr[$this->Week]['pcnt']] = $this->CID;
+            $_arr[$this->Week]['loan'  ][$_arr[$this->Week]['pcnt']] = $this->ID;
+
+            $i++;
+            
+        }
+        return $_arr;        
+    }
+
+
+    function getAllOfHomeLoanFee($fromDay, $toDay, $userid){
+        $sql = "select concat(LName, ' ', FName) as Name, a.ID, b.CID, c.Name AS Lending, c.Category, Commission from client_homeloan a, client_info b, lending_institue c where a.CID = b.CID and a.LID = c.ID ";
+        if ($userid > 0) {
+            $sql .= " AND a.UserID = {$userid} ";
+        }
+
+        $sql .= " and EXISTS (select 'x' from client_homeloan_process e WHERE a.ID = e.HID AND STEP = 'Commission received' AND BEGINDATE between '{$fromDay}' AND '{$toDay}') ";
+        
+        /*
+        if ($fromDay != "" && $fromDay  != "0000-00-00") {
+            $sql .= " AND a.Addtime >= '{$fromDay}'";
+        }
+        if ($toDay != "" && $toDay  != "0000-00-00") {
+            $sql .= " And a.AddTime <= '{$toDay}' ";
+        } 
+        */
+        $sql .= " GROUP BY a.ID ";  
+        $this->query($sql);
+        $_arr = array();
+        $i = $fee = 0;
+        while ($this->fetch()) {
+            $_arr['all']['pname'][$i] = $this->Name." ( {$this->Category} {$this->Lending} ".'$'.$this->Commission.")";
+            $_arr['all']['client'][$i] = $this->CID;
+            $_arr['all']['loan'  ][$i] = $this->ID;
+
+            $i++;
+            $fee += $this->Commission;
+            
+        }
+        $_arr['all']['fee'] = $fee;
+        return $_arr;        
+    }
+
+
+    function getNumOfHomeLoanFee($fromDay, $toDay, $userid){
+        $sql = "select date_format(e.BEGINDATE, '%Y%u') as Week, concat(LName, ' ', FName) as Name, a.ID, b.CID, c.Name AS Lending, c.Category, Commission from client_homeloan a left join client_homeloan_process e on (a.ID = e.HID), client_info b, lending_institue c where a.CID = b.CID and a.LID = c.ID and STEP = 'Commission received' ";
+        if ($userid > 0) {
+            $sql .= " AND a.UserID = {$userid} ";
+        }
+        if ($fromDay != "" && $fromDay  != "0000-00-00") {
+            $sql .= " AND e.BEGINDATE >= '{$fromDay}'";
+        }
+        if ($toDay != "" && $toDay  != "0000-00-00") {
+            $sql .= " And e.BEGINDATE <= '{$toDay}' ";
+        } 
+        $sql .= " GROUP BY a.ID ";  
+        $this->query($sql);
+        $_arr = array();
+        $i = $fee = $signed = $signed_0 = 0;
+        while ($this->fetch()) {
+            if (!isset($_arr[$this->Week])) {
+                $_arr[$this->Week] = array('pcnt'=>0, 'fee' => 0, 'pname'=>array(), 'client'=>array(), 'loan'=>array());
+            }
+
+            $_arr[$this->Week]['fee'] += $this->Commission;
+            $_arr[$this->Week]['pcnt']++;
+
+            $_arr[$this->Week]['pname' ][$_arr[$this->Week]['pcnt']] = $this->Name." ( {$this->Category} {$this->Lending} ".'$'.$this->Commission.")";
+            $_arr[$this->Week]['client'][$_arr[$this->Week]['pcnt']] = $this->CID;
+            $_arr[$this->Week]['loan'  ][$_arr[$this->Week]['pcnt']] = $this->ID;
+
+            $i++;
+            
+        }
+        return $_arr;        
+    }
+
+	function getVisaReviewByUser($fromDay, $toDay, $userid){
+		$sql = "select CateID, SubClassID, Sum(if(r_Status='active',1,0)) as OpenCase,  Sum(if(r_Status<>'active', 1, 0)) as CloseCase 
+				from client_visa 
+				Where ADate >= '{$fromDay}' and ADate <= '{$toDay}' and ADate != '' and ADate != '0000-00-00'";
+		if ($userid > 0) {
+			$sql .= " AND VUserID = {$userid} ";
+		}
+		
+		$sql .= " Group by CateID , SubClassID ";
+		$this->query($sql);
+		$_arr = array();
+		while ($this->fetch()) {
+			$_arr[$this->CateID][$this->SubClassID]['open'] = $this->OpenCase;		
+			$_arr[$this->CateID][$this->SubClassID]['close'] = $this->CloseCase;
+		}
+//		echo $sql."\n";
+
+		$sql = "select c.CateID, c.SubClassID, 
+					Sum(if(a.DueAmount is null, 0, a.DueAmount))as DueAmount, 
+					Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as PaidAmount, 
+					Sum(if((a.DueAmount - if(b.PaidAmount is null, 0, b.PaidAmount)) < 0, 0, a.DueAmount - if(b.PaidAmount is null, 0, b.PaidAmount))) as SubAmount 
+				from client_account a left join 
+					(select AccountID, sum(PaidAmount)as PaidAmount from client_payment Group by AccountID) b on(a.ID = b.AccountID),  client_visa c  where a.VisaID = c.ID ";		
+		$sql .= " And c.ADate >= '{$fromDay}' and c.ADate < '{$toDay}' ";		
+		
+		if ($userid > 0) {
+			$sql .= " AND c.VUserID = {$userid} ";
+		}	
+		$sql .= " Group by a.ID";
+
+		$this->query($sql);
+		while ($this->fetch()) {
+			$_arr[$this->CateID][$this->SubClassID]['amount'] = isset($_arr[$this->CateID][$this->SubClassID]['amount'])? $_arr[$this->CateID][$this->SubClassID]['amount'] : 0;
+			$_arr[$this->CateID][$this->SubClassID]['paid'] = isset($_arr[$this->CateID][$this->SubClassID]['paid'])? $_arr[$this->CateID][$this->SubClassID]['paid'] : 0;
+			$_arr[$this->CateID][$this->SubClassID]['subamt'] = isset($_arr[$this->CateID][$this->SubClassID]['subamt'])? $_arr[$this->CateID][$this->SubClassID]['subamt'] : 0;
+			$_arr[$this->CateID][$this->SubClassID]['amount'] += $this->DueAmount;		
+			$_arr[$this->CateID][$this->SubClassID]['paid']   += $this->PaidAmount;
+			$_arr[$this->CateID][$this->SubClassID]['subamt'] += $this->SubAmount;
+		}
+		return $_arr;
+	}
+	
+	function getVisaOpenCaseByUser($fromDay, $toDay, $catid, $subid, $userid, $opencase){	
+		$visaArr = array();
+		$sql = "SELECT DISTINCT CVID FROM client_visa_process WHERE BeginDate >= '{$fromDay}' AND BeginDate <= '{$toDay}' ";
+		$this->query($sql);
+		while ($this->fetch()) {
+			array_push($visaArr, $this->CVID);
+		}
+
+		if (count($visaArr) == 0) {
+			return false;
+		}
+		$_str = "'". implode("','", $visaArr) ."'";
+				
+			
+		$sql = "select ID, b.CID, concat(b.FName,' ', b.LName) as Name, CateID, SubClassID, r_Status, ADate, AFee 
+				from client_visa a left join client_info b on(a.CID = b.CID) 
+				Where a.ID in ({$_str})";
+		if ($catid > 0) {
+			$sql .= " AND CateID = {$catid}";
+		}
+		if ($subid > 0) {
+			$sql .= " AND SubClassID = {$subid}";
+		}
+		
+		if ($userid > 0) {
+			$sql .= " AND VUserID = {$userid} ";
+		}	
+		
+		if ($opencase) {
+			$sql .= " AND r_Status = 'active' ";
+		}
+		$sql .= "Order by Name asc, ADate";	
+		$this->query($sql);
+		$_arr = array();
+		while ($this->fetch()) {
+			$_arr[$this->ID]['name'] = $this->Name;	
+			$_arr[$this->ID]['cid'] = $this->CID;	
+			$_arr[$this->ID]['adate'] = $this->ADate;
+			$_arr[$this->ID]['afee'] = $this->AFee;
+			$_arr[$this->ID]['catid'] = $this->CateID;
+			$_arr[$this->ID]['subid'] = $this->SubClassID;
+			$_arr[$this->ID]['case'] = $this->r_Status;
+		}	
+		return $_arr;		
+	}
+	
+    function getAccountOwe(){
+		$sql = "select concat(d.LName, ' ', d.FName) as Name, c.CID, c.CateID, c.SubClassID, a.VisaID, if(DueAmount is null, 0, DueAmount) as amount,
+ 				if((DueDate = '' or DueDate = '0000-00-00') && (if(DueAmount is null, 0, DueAmount) > 0), 0, if(DueAmount is null, 0, DueAmount) - if(b.PaidAmount is null, 0, b.PaidAmount)) as Balance 
+ 						from client_account a 
+						left join (select AccountID, sum(PaidAmount) as PaidAmount from client_payment Group by AccountID) b on(a.ID = b.AccountID) 
+						left join client_visa c on(a.VisaID = c.ID)
+						left join client_info d on(c.CID = d.CID)
+				Group by a.ID having Balance <> 0 order by Balance desc, Name asc ";
+        $this->query($sql);
+        $_arr = array();
+        while ($this->fetch()){
+        	$_arr[$this->VisaID]['client'] = $this->Name;
+        	$_arr[$this->VisaID]['clientid'] = $this->CID;
+        	$_arr[$this->VisaID]['cateid'] = $this->CateID;
+        	$_arr[$this->VisaID]['subclassid'] = $this->SubClassID;
+        	$_arr[$this->VisaID]['balance'] = isset($_arr[$this->VisaID]['balance'])? $_arr[$this->VisaID]['balance'] : 0;
+        	$_arr[$this->VisaID]['balance'] += $this->Balance;
+        	$_arr[$this->VisaID]['amount'] = isset($_arr[$this->VisaID]['amount'])? $_arr[$this->VisaID]['amount'] : 0;
+        	$_arr[$this->VisaID]['amount'] += $this->amount;
+        	
+        }
+        return $_arr;
+    }    		
+}
+?>

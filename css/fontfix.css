@@ -1,0 +1,42 @@
+body, td, th { font-size: 83%; }
+
+.reg, .regb { font-size: 130%; }
+.regb { font-weight: bold; }
+
+h4.pageHead {
+  font-size:130%;
+  margin: 0px;
+  margin-top: 18px;
+}
+
+/* the following override their definition in AdsLater and are 
+needed because they specify relative font size */
+table.minidateselector select, table.minidateselector input {
+	font-size: 80%;
+}
+.buttonbar {
+	font-size:80%;
+}
+.approvalBin, .approvalBin td, .approvalBin p {
+	font-size:83%;
+}
+.smaller {
+	font-size: 90%;
+}
+table.summary td {
+	font-size:83%;
+}
+.bibitresponse {
+	font-size: 80%;
+	line-height: 180%;
+}
+input.smTxt, select.smTxt {
+	font-size: 100%;
+}
+.myics_links {
+	font-size: 100%;
+	border-left: 1px dotted #000000;
+}
+.user, .ip {
+	font-size: 83%;
+}

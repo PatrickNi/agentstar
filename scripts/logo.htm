@@ -1,0 +1,24 @@
+<html>
+<head>
+<title></title>
+</head>
+<body topmargin=0 leftmargin=0 bgcolor="#B8B8DC">
+<table width="100%" height="50" border="0" bgcolor="#6363CB">
+  <tr valign = "bottom">
+    <td valign="bottom"><span style="color:#FFFFFF; font-family:Verdana, Arial, Helvetica, sans-serif; font-size:large; font-weight:bold">Migration System</span>&nbsp;&nbsp;&nbsp;
+		<span id="RunTime" style="color:#FFFFFF; font-family:Verdana, Arial, Helvetica, sans-serif; font-size:10px"></span>
+    </td>
+    <td valign="bottom"><?php echo $_name; ?><a target="_top" href="index.php"><font color="#FFFFFF" face="Arial, Helvetica, sans-serif" size = "-1">Logout</font></a></td>
+	</tr>
+</table>
+<script language=javascript>
+	obj = document.getElementById("RunTime");
+	idt=window.setTimeout("update();",1000);
+	function update(){
+		oDate = new Date;
+		obj.innerHTML = oDate.toLocaleString();
+		idt=window.setTimeout("update();",1000);
+	}
+</script>
+</body>
+</html>
