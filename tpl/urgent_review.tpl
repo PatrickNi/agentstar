@@ -37,7 +37,7 @@ function setSortOrd(col, ord){
 </script>
 {/literal}
 <body>
-<form name="form1" id="form1" target="_self" method="post">
+<form name="form1" id="form1" target="_self">
 <input type="hidden" id="t_view" name="t_view" value="">
 <input type="hidden" id="sort_list" name="sort_list" value="{$sort_list}">
 <table align="center" width="100%"  class="graybordertable" cellpadding="1" cellspacing="1" border="0">
@@ -92,7 +92,7 @@ function setSortOrd(col, ord){
 					<td align="left" nowrap="nowrap">{$arr.cate}</td>
 					<td align="left">{$arr.class}</td>
 					<!-- onClick="openModel('client_visa_process.php?pid={$id}&cid={$arr.clientid}&vid={$arr.visaid}',800,560,'NO', 'form1')"-->
-					<td align="left" style="{if $arr.islodge eq 1}color:#FF3300;{/if}cursor:pointer; text-decoration:underline" onClick="openModel('client_visa_detail.php?cid={$arr.clientid}&vid={$arr.visaid}',screen.width*4/5,screen.height*4/5,'NO', 'form1')">{$arr.item}</td>
+					<td align="left" style="{if $arr.islodge eq 1}color:#FF3300;{/if}cursor:pointer; text-decoration:underline" onClick="window.open('client_visa_detail.php?cid={$arr.clientid}&vid={$arr.visaid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$arr.item}</td>
 					<td nowrap="nowrap" {if $arr.isTodo neq 1}style="color:#660000; font-weight:bold"{/if}>{$arr.due}</td>
 				 </tr>
 				{/foreach}	
@@ -148,8 +148,7 @@ function setSortOrd(col, ord){
 					<td align="left">{$arr.school}</td>
 					<td align="left">{$arr.qual}</td>
 					<td align="left">{$arr.major}</td>
-					<!--onClick="openModel('client_course_process.php?pid={$id}&cid={$arr.clientid}&courseid={$arr.courseid}',700,400,'NO', 'form1')"-->
-					<td style="cursor:pointer; text-decoration:underline; {if $arr.isColor eq 1}color:#0000FF{/if}"  onClick="openModel('client_course_detail.php?cid={$arr.clientid}&courseid={$arr.courseid}',screen.width*4/5,screen.height*4/5,'NO','form1')">{$arr.item}</td>
+					<td style="cursor:pointer; text-decoration:underline; {if $arr.isColor eq 1}color:#0000FF{/if}"  onClick="window.open('client_course_detail.php?cid={$arr.clientid}&courseid={$arr.courseid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$arr.item}</td>
 					<td nowrap="nowrap" {if $arr.isTodo neq 1}style="color:#660000; font-weight:bold"{/if}>{$arr.due}</td>
 				 </tr>
 				 {/foreach}
@@ -180,8 +179,7 @@ function setSortOrd(col, ord){
 				 <tr align="center" class="{cycle values='rowodd,roweven'}">
 				 	<td width="2%"><input type="checkbox"></td>
 					<td align="left" >{$arr.school}</td>
-					<!--onClick="openModel('institute_process.php?pid={$id}&cid={$arr.clientid}&courseid={$arr.courseid}',700,400,'NO', 'form1')"-->
-					<td align="left" style="cursor:pointer; text-decoration:underline" onClick="openModel('institute_process.php?sid={$arr.iid}',screen.width*4/5,screen.height*4/5,'NO','form1')">{$arr.item}</td>
+					<td align="left" style="cursor:pointer; text-decoration:underline" onClick="window.open('institute_process.php?sid={$arr.iid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$arr.item}</td>
 					<td nowrap="nowrap" {if $arr.isTodo neq 1}style="color:#660000; font-weight:bold"{/if}>{$arr.due}</td>
 				 </tr>
 				 {/foreach}
@@ -212,7 +210,6 @@ function setSortOrd(col, ord){
 				 <tr align="center" class="{cycle values='rowodd,roweven'}">
 				 	<td width="2%"><input type="checkbox"></td>
 					<td align="left" nowrap="nowrap">{$arr.agent}</td>
-					<!--onClick="openModel('institute_process.php?pid={$id}&cid={$arr.clientid}&courseid={$arr.courseid}',700,400,'NO', 'form1')"-->
 					<td align="left" style="cursor:pointer; text-decoration:underline" onClick="openAgentPage({$arr.aid});window.open('redir.php?t=agt&pid={$id}&aid={$arr.aid}','','height='+screen.width*3/5+','+'width='+screen.width*4/5)">{$arr.item}</td>
 					<td nowrap="nowrap" {if $arr.isTodo neq 1}style="color:#660000; font-weight:bold"{/if}>{$arr.due}</td>
 				 </tr>

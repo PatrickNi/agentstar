@@ -45,7 +45,11 @@ $sets = array();
 $client_id = isset($_REQUEST['cid'])? trim($_REQUEST['cid']) : 0;
 $isChange = isset($_REQUEST['visaChange'])? (string)trim($_REQUEST['visaChange']) : 0;
 $sets['visa']  = isset($_REQUEST['t_visa'])? (string)trim($_REQUEST['t_visa']) : 0;
+$sets['visa']  = $sets['visa'] == ""? 0 : $sets['visa'];
+
 $sets['class'] = isset($_REQUEST['t_class'])? (string)trim($_REQUEST['t_class']) : 0; 
+$sets['class']  = $sets['class'] == ""? 0 : $sets['class'];
+
 
 	# get client info
 	$sets['pass']  = isset($_REQUEST['t_pass'])? (string)trim($_REQUEST['t_pass']) : "";

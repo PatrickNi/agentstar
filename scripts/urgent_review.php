@@ -49,15 +49,15 @@ foreach ($g_user_grants as $item){
 }
 
 
-$viewWhat = isset($_POST['t_view'])? trim($_POST['t_view']) : "";
-$sort_list = isset($_POST['sort_list'])? trim($_POST['sort_list']) : "";
+$viewWhat = isset($_REQUEST['t_view'])? trim($_REQUEST['t_view']) : "";
+$sort_list = isset($_REQUEST['sort_list'])? trim($_REQUEST['sort_list']) : "";
 
-$vdu = isset($_POST['vdu'])? 1 : 0;
-$cdu = isset($_POST['cdu'])? 1 : 0;
-$idu = isset($_POST['idu'])? 1 : 0;
-$sdu = isset($_POST['sdu'])? 1 : 0;
-$atopdu = isset($_POST['atopdu'])? 1 : 0;
-$asubdu = isset($_POST['asubdu'])? 1 : 0;
+$vdu = isset($_REQUEST['vdu'])? 1 : 0;
+$cdu = isset($_REQUEST['cdu'])? 1 : 0;
+$idu = isset($_REQUEST['idu'])? 1 : 0;
+$sdu = isset($_REQUEST['sdu'])? 1 : 0;
+$atopdu = isset($_REQUEST['atopdu'])? 1 : 0;
+$asubdu = isset($_REQUEST['asubdu'])? 1 : 0;
 //echo "============{$sort_list}=============<p/>";
 # get user position
 $view_all = 0;
