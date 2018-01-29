@@ -18,7 +18,7 @@ $hour    = isset($_REQUEST['t_hour'])? trim($_REQUEST['t_hour']) : 0;
 $cal_id  = isset($_REQUEST['id'])? trim($_REQUEST['id']) : 0;
 
 $min_hour = 9;
-$max_hour = 18;
+$max_hour = 19;
 
 $o_c = new CalendarAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
@@ -32,7 +32,7 @@ if (count($calendar_arr) > 0){
 
 
 $show_arr = array();
-$minute = 30;
+$minute = 0;
 for($i=0; $i<=($max_hour - $min_hour) * 2; $i++){
 	$ht = date("H:i", mktime($min_hour, $minute, 0,0,0,0));
 	$show_arr[$ht]['id']    = "";
