@@ -576,35 +576,40 @@ class ReportAPI extends MysqlDB {
 		$this->query($sql);
 		$_arr = array();
 		while ($this->fetch()) {
-			if ($this->ProcessID == __C_APPLY_OFFER) {
+			if ($this->ProcessID == __C_RECEIVE_OFFER) {
                 $_arr[$this->Week]['aponame'][$this->ID] = $this->Name. " (to ". $this->School ." : ". $this->Qual .")";	
 				$_arr[$this->Week]['apocid' ][$this->ID] = $this->CID;
 				$_arr[$this->Week]['reo'    ][$this->ID] = 0;	
 
-				isset($_arr[$this->Week]['apocnt'])? $_arr[$this->Week]['apocnt']++ : $_arr[$this->Week]['apocnt'] = 1; 
+				//isset($_arr[$this->Week]['apocnt'])? $_arr[$this->Week]['apocnt']++ : $_arr[$this->Week]['apocnt'] = 1; 
             }
-            elseif ($this->ProcessID == __C_RECEIVE_OFFER){
+            elseif ($this->ProcessID == __C_PASS_OFFER){
                 $_arr[$this->Week]['reoname'][$this->ID] = $this->Name. " (to ". $this->School ." : ". $this->Qual .")";	
 				$_arr[$this->Week]['reocid' ][$this->ID] = $this->CID;
 				$_arr[$this->Week]['reo'    ][$this->ID] = 1;	
 				
                 $_arr[$this->Week]['reo_st' ][$this->ID] = $this->IsActive == 2? -1 : 0;	
 
-				isset($_arr[$this->Week]['reocnt'])? $_arr[$this->Week]['reocnt']++ : $_arr[$this->Week]['reocnt'] = 1;
+				//isset($_arr[$this->Week]['reocnt'])? $_arr[$this->Week]['reocnt']++ : $_arr[$this->Week]['reocnt'] = 1;
             }
             elseif ($this->ProcessID == __C_GET_COE){
                 $_arr[$this->Week]['recname'][$this->ID] = $this->Name. " (to ". $this->School ." : ". $this->Qual .")";	
 				$_arr[$this->Week]['reccid' ][$this->ID] = $this->CID;	                
 				$_arr[$this->Week]['rec'    ][$this->ID] = 1;
 
-				isset($_arr[$this->Week]['reccnt'])? $_arr[$this->Week]['reccnt']++ : $_arr[$this->Week]['reccnt'] = 1; 
+				//isset($_arr[$this->Week]['reccnt'])? $_arr[$this->Week]['reccnt']++ : $_arr[$this->Week]['reccnt'] = 1; 
             }
             elseif($this->ProcessID == __C_PAY_TUITION_FEE && isset($_arr[$this->Week]['reo_st'][$this->ID]) && $_arr[$this->Week]['reo_st'][$this->ID] == 0) {
                 $_arr[$this->Week]['reo_st'][$this->ID] = 1;
             }            
         }		
-  
-		return $_arr;			
+        
+        foreach ($_arr as $w => $v) {
+            $_arr[$w]['apocnt'] = isset($_arr[$w]) && isset($_arr[$w]['aponame']) ? count($_arr[$w]['aponame']): 0;
+            $_arr[$w]['reocnt'] = isset($_arr[$w]) && isset($_arr[$w]['reoname']) ? count($_arr[$w]['reoname']): 0;
+            $_arr[$w]['reccnt'] = isset($_arr[$w]) && isset($_arr[$w]['recname']) ? count($_arr[$w]['recname']): 0;
+		}
+        return $_arr;			
 	}
 	
 	
