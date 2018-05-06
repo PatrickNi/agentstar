@@ -445,11 +445,11 @@ class ReportAPI extends MysqlDB {
 	
 	function getVisaService($userid=0){
 		$_arr = array();
-		$sql = "select a.ID as VID, a.CID, a.ExpireDate as Epd, b.FName, b.LName, c.VisaName, d.ClassName, 0 as main from client_visa a left join visa_category c on(a.CateID = c.CateID) left join visa_subclass d on(a.SubClassID = d.SubClassID), client_info b where a.CID = b.CID and a.r_Status = 'active' and a.OnShore = 1 and (a.ADate <> '' and a.ADate <> '0000-00-00')";
+		$sql = "select a.ID as VID, a.CID, a.ExpireDate as Epd, b.FName, b.LName, c.VisaName, d.ClassName, 0 as main from client_visa a left join visa_category c on(a.CateID = c.CateID) left join visa_subclass d on(a.SubClassID = d.SubClassID), client_info b where a.CID = b.CID and a.r_Status = 'active' and a.OnShore = 1 and (a.ADate <> '' and a.ADate <> '0000-00-00') AND a.ExpireDate >= '2018-05-04' ";
 		if($userid > 0){
 			$sql .= " AND (a.AUserID = {$userid} or a.VUserID = {$userid}) ";
 		}
-		$sql .= "Union all select e.CVID as VID, e.DepID, e.ExpireDate as Epd, b.FName, b.LName, c.VisaName, d.ClassName, a.CID as main from client_visa a left join visa_category c on(a.CateID = c.CateID) left join visa_subclass d on(a.SubClassID = d.SubClassID) , client_visa_dep e, client_info b where e.DepID = b.CID and e.CVID = a.ID and a.r_Status = 'active' and (a.ADate <> '' and a.ADate <> '0000-00-00') ";
+		$sql .= "Union all select e.CVID as VID, e.DepID, e.ExpireDate as Epd, b.FName, b.LName, c.VisaName, d.ClassName, a.CID as main from client_visa a left join visa_category c on(a.CateID = c.CateID) left join visa_subclass d on(a.SubClassID = d.SubClassID) , client_visa_dep e, client_info b where e.DepID = b.CID and e.CVID = a.ID and a.r_Status = 'active' and (a.ADate <> '' and a.ADate <> '0000-00-00')  AND a.ExpireDate >= '2018-05-04' ";
 		if($userid > 0){
 			$sql .= " AND (a.AUserID = {$userid} or a.VUserID = {$userid}) ";
 		}		
@@ -472,7 +472,7 @@ class ReportAPI extends MysqlDB {
 	
 	function getOtherService($userid=0){
 		$_arr = array();
-		$sql = "select a.ID, a.CID, a.DueDate, b.LName, b.FName, c.VisaName, d.ClassName from client_service a left join visa_category c on(c.CateID = a.VisaCateID) left join visa_subclass d on(d.SubClassID = a.VisaSubClassID ), client_info b where a.Done = 0 and a.VisaCateID > 0 and a.CID = b.CID and a.CID not in (select distinct DepID from client_visa_dep t1, client_visa t2 where t1.CVID = t2.ID and t2.r_Status = 'active')";
+		$sql = "select a.ID, a.CID, a.DueDate, b.LName, b.FName, c.VisaName, d.ClassName from client_service a left join visa_category c on(c.CateID = a.VisaCateID) left join visa_subclass d on(d.SubClassID = a.VisaSubClassID ), client_info b where a.Done = 0 and a.VisaCateID > 0 and a.CID = b.CID and a.CID not in (select distinct DepID from client_visa_dep t1, client_visa t2 where t1.CVID = t2.ID and t2.r_Status = 'active') AND a.DueDate >= '2018-05-04' ";
 		if($userid > 0){
 			$sql .= " AND b.CourseUser = {$userid} ";
 		}

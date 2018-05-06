@@ -19,7 +19,7 @@
 			<input style="font-weight:bold;" type="button" value="Sales Point" onClick="javascript:this.form.action='sales.php';this.form.submit();">&nbsp;&nbsp;
 			<input style="font-weight:bold;" type="button" value="Staff" onClick="javascript:this.form.action='institute_staff.php';this.form.submit();">&nbsp;&nbsp;
 			{if $ugs.i_proc.v eq 1}
-			<input style="font-weight:bold;" type="button" value="Process" onClick="javascript:this.form.action='institute_process.php';this.form.submit();">&nbsp;&nbsp;
+			<input style="font-weight:bold;" type="button" value="Progress" onClick="javascript:this.form.action='institute_process.php';this.form.submit();">&nbsp;&nbsp;
 			{/if}
 			{if $ugs.i_comm.v eq 1}
 			<input style="font-weight:bold;" type="button" value="Commission" onClick="javascript:this.form.action='institute_comm.php';this.form.submit();">&nbsp;&nbsp;
@@ -27,7 +27,9 @@
 			{if $ugs.i_st.v eq 1}
 			<input style="font-weight:bold;" type="button" value="Student" onClick="javascript:this.form.action='institute_student.php';this.form.submit();">&nbsp;&nbsp;
 			{/if}
+			{if $ugs.i_proc.v eq 1}
 			<input type="button" value="Attachment" style="font-weight:bold" onClick="openModel('attachment.php?item={$sid}&type={$itemtype}',screen.width*6/7,screen.height*4/7,'NO', 'form1')">
+			{/if}
 		</td>
 	</tr>
 	<tr><td colspan="2"><table cellpadding="0" cellspacing="0" width="100%">

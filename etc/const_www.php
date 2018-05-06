@@ -50,7 +50,7 @@ $course_process_arr = array(__C_APPLY_OFFER=>"Collect Document", __C_RECEIVE_OFF
 
 # user right configuration
 $position_arr = array('E'=>'Employee', 'M'=>'Manager', 'C'=>'CEO');
-$mark_arr	  = array('S'=>'Super', 'C'=>'Course', 'V'=>'Visa');
+$mark_arr     = array('S'=>'Super', 'C'=>'Course', 'V'=>'Visa');
 define('ADV_BI', 'BI');
 define('ADV_CI', 'CI');
 define('ADV_VI', 'VI');
@@ -95,12 +95,13 @@ $g_visa_status = array('active', 'grant', 'withdraw', 'cancel', 'cancel DIMA', '
 
 #grants
 $g_user_grants = array('b_service', 'b_visa', 'b_ctype', 'b_suba','b_epd', 'b_abouts', 'b_nocp','b_fromto',
-					   'c_service', 'c_user', 'c_track','c_rev',
-					   'v_service', 'v_visa', 'v_abas', 'v_agsf', 'v_vpwk', 'v_agd', 'v_agf','v_pay', 'v_dp', 'v_epd',
-					   'i_service', 'i_course', 'i_proc', 'i_comm', 'i_rev', 'i_st','i_del', 'i_nocp', 'i_export',
-					   'a_service', 'a_dt', 'a_proc', 'a_st', 'a_rev', 'a_top', 'a_sub', 'a_del',
-					   'seeall', 'p_duedate', 'p_h', 'rpt_staff_rc', 'rpt_staff_pc',
-					 'rpt_staff', 'export', 'v_track', 'todo_visa', 'todo_course');
-					   
-$g_user_ops = array('v'=>0x1, 'i'=>0x2, 'm'=>0x4, 'd'=>0x8);		
+                       'c_service', 'c_user', 'c_track','c_rev',
+                       'v_service', 'v_visa', 'v_abas', 'v_agsf', 'v_vpwk', 'v_agd', 'v_agf','v_pay', 'v_dp', 'v_epd',
+                       'i_service', 'i_course', 'i_proc', 'i_comm', 'i_rev', 'i_st','i_del', 'i_nocp', 'i_export','i_tta',
+                       'a_service', 'a_dt', 'a_proc', 'a_st', 'a_rev', 'a_top', 'a_sub', 'a_del',
+                       'seeall', 'p_duedate', 'p_h', 'rpt_staff_rc', 'rpt_staff_pc',
+                     'rpt_staff', 'export', 'v_track', 'todo_visa', 'todo_course');
+                       
+$g_user_ops = array('v'=>0x1, 'i'=>0x2, 'm'=>0x4, 'd'=>0x8);        
 
+?>

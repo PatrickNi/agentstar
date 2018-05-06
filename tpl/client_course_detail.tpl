@@ -125,6 +125,7 @@
               </select>
             </td>
           </tr>
+          {if $ugs.i_tta.v eq 1}
           <tr>
             <td width="28%" align="left" class="rowodd"><strong>To top-agent :</strong>&nbsp;&nbsp;</td>
             <td align="left" width="72%" class="roweven"><select name="t_agent" onChange="this.form.t_key.focus();">
@@ -140,6 +141,7 @@
               </select>
             </td>
           </tr>
+          {/if}
           <tr>
             <td colspan="2"><hr></td>
           </tr>

@@ -801,6 +801,38 @@ class GeicAPI extends MysqlDB {
 		}else{
 			return 0;
 		}
-	}	
+	}
+
+    function set_sys_views($userid, $type, $view_uids) {
+        $sql = "DELETE FROM sys_user_views WHERE UserID = {$userid} AND ViewType = '{$type}' ";
+        $this->query($sql);
+        $inserts = array();
+        foreach ($view_uids as $u) {
+            array_push($inserts, "({$userid}, '{$type}', $u)");
+        }
+        $sql = "INSERT INTO sys_user_views (UserID, ViewType, ViewUserID) values " .implode(',', $inserts);
+        return $this->query($sql);
+    }
+
+    function get_sys_views($userid) {
+        $arr = array();
+        $sql = "SELECT * FROM sys_user_views WHERE UserID = {$userid}";
+        $this->query($sql);
+        while ($this->fetch()) {
+            $arr[$this->ViewType][]=$this->ViewUserID;
+        }
+        return $arr;
+    }
+
+    function get_course_viewer($userid) {
+        $sql = "select ID, UserName from sys_user a, sys_user_views b WHERE a.id = b.ViewUserID and b.viewtype = 'course' and b.UserID = $userid";
+        $this->query($sql);
+        $_arr = array();
+        while($this->fetch()){
+            $_arr[$this->ID] = $this->UserName;
+        }
+
+        return $_arr;   
+    }	
 }
 ?>

@@ -13,7 +13,6 @@ if (!($_userid > 0)) {
 
 $o_f = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
-
 $u_id = isset($_POST['uid'])? trim($_POST['uid']) : 0;
 # set user function relation
 if($u_id > 0 && isset($_POST['qflag']) && strtoupper($_POST['qflag']) == 'APPROVE'){
@@ -31,6 +30,19 @@ if($u_id > 0 && isset($_POST['qflag']) && strtoupper($_POST['qflag']) == 'APPROV
 		}
 	}
 	$o_f->set_user_adv($u_id,  $_grants);
+
+	//sys user views
+	$tmp = array();
+	if (isset($_POST['sys_views'])) {
+		foreach ($_POST['sys_views'] as $v) {
+			$v = explode('_', $v);
+			$tmp[$v[0]][]=$v[1];
+		}
+
+		foreach ($tmp as $type => $u) {
+			$o_f->set_sys_views($u_id, $type, $u);
+		}
+	}
 }
 
 
@@ -72,6 +84,7 @@ $o_tpl->assign("user_arr", $user_arr);
 
 $o_tpl->assign("grant", $sys_grants);
 $o_tpl->assign("ugs", $ugs);
+$o_tpl->assign("sys_views", $o_f->get_sys_views($u_id));
 
 $o_tpl->assign("uid", $u_id);
 $o_tpl->display("sys_assign.tpl");

@@ -297,6 +297,13 @@
 			view&nbsp;
 			<input type="checkbox" name="g_i_soc[]" value="{$grant.i_soc.v}" {if $ugs.i_soc.v eq 1} checked="checked" {/if}>&nbsp;&nbsp;
 		</td>
+   </tr> 
+    <tr class="roweven">
+        <td align="left" ><ul>To Top-Agent</ul></td>
+        <td align="left">
+            view&nbsp;
+            <input type="checkbox" name="g_i_tta[]" value="{$grant.i_tta.v}" {if $ugs.i_tta.v eq 1} checked="checked" {/if}>&nbsp;&nbsp;
+        </td>
    </tr>        
    <!-- Agent -->  
    <tr class="rowodd"><td align="left" colspan="2"><li>Agents&nbsp;<input type="checkbox" name="g_a_service[]" value="{$grant.a_service.v}" {if $ugs.a_service.v eq 1} checked="checked" {/if}>&nbsp;&nbsp;[Grants for to-do and urgent list]</li></td></tr>
@@ -322,7 +329,7 @@
 		</td>
    </tr>      
    <tr class="roweven">
-		<td align="left" ><ul>Process</ul></td>
+		<td align="left" ><ul>Progress/Attachment</ul></td>
 		<td align="left">
 			view&nbsp;<input type="checkbox" name="g_a_proc[]" value="{$grant.a_proc.v}" {if $ugs.a_proc.v eq 1} checked="checked" {/if}>&nbsp;&nbsp;
 			insert&nbsp;<input type="checkbox" name="g_a_proc[]" value="{$grant.a_proc.i}" {if $ugs.a_proc.i eq 1} checked="checked" {/if}>&nbsp;&nbsp;
@@ -384,6 +391,10 @@
 		<td align="left">
 			view all consultant&nbsp;
 			<input type="checkbox" name="g_todo_course[]" value="{$grant.todo_course.v}" {if $ugs.todo_course.v eq 1} checked="checked" {/if}>&nbsp;&nbsp;
+            view Hunter cases&nbsp;
+            <input type="checkbox" name="sys_views[]" value="course_37" {if is_array($sys_views.course) && in_array(37, $sys_views.course)} checked="checked" {/if}>&nbsp;&nbsp;
+            view Mary cases&nbsp;
+            <input type="checkbox" name="sys_views[]" value="course_45" {if is_array($sys_views.course) && in_array(45, $sys_views.course)} checked="checked" {/if}>&nbsp;&nbsp;
 		</td>
    </tr>              
    {/if}       

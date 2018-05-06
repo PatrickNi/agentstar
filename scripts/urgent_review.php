@@ -137,6 +137,8 @@ if ((isset($ugs['todo_visa']) && $ugs['todo_visa']['v'] == 1 && $viewWhat == 'v'
 }else {
 	$o_tpl->assign('slUsers', $o_g->getUserNameArr($staff_id));
 }
+
+$o_tpl->assign('slCourseViewer', $o_g->get_course_viewer($user_id));
 $o_tpl->assign('ugs', $ugs);
 $o_tpl->display('urgent_review.tpl');
 ?>
