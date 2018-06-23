@@ -6,8 +6,8 @@ $id = isset($_REQUEST['id'])? $_REQUEST['id'] : 0;
 $qualid = isset($_REQUEST['qual'])? $_REQUEST['qual'] : 0;
 $o_s = new SchoolAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
-if(isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
-	$majorName = isset($_POST['t_name'])? $_POST['t_name'] : "";
+if(isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
+	$majorName = isset($_REQUEST['t_name'])? $_REQUEST['t_name'] : "";
 	if ($id > 0){
 		$o_s->setCourseMajor($id, $majorName);
 	}elseif($qualid > 0){
@@ -15,7 +15,7 @@ if(isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
 	}
 	echo "<script language='javascript'>window.returnValue=1;self.close();</script>";
 	exit;
-}elseif(isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "DELETE"){
+}elseif(isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "DELETE"){
 	if ($id > 0){
 		$o_s->delCourseMajor($id);
 	}

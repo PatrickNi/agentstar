@@ -28,6 +28,7 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 	$sets['date'] = isset($_REQUEST['t_date'])? trim($_REQUEST['t_date']) : "0000-00-00";
 	$sets['date'] = $sets['date'] == ""? "0000-00-00" : $sets['date'];
 	$sets['due']  = isset($_REQUEST['t_due'])? trim($_REQUEST['t_due']) : "0000-00-00";
+	$sets['epd']  = isset($_REQUEST['t_epdate'])? trim($_REQUEST['t_epdate']) : "0000-00-00";
 	$sets['due']  = $sets['due'] == ""? "0000-00-00" : $sets['due'];
 	
 	$sets['detail']  = isset($_REQUEST['t_detail'])? trim($_REQUEST['t_detail']) : "";
@@ -47,7 +48,7 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 		$change_visa_status = 'grant';
 	}
 	
-
+	
     if ($sets['date'] == '0000-00-00' && $sets['done'] == 1) {
     	$error = "<script language='javascript'>alert('Please input the DATE when you done this process!');</script>";
     }
@@ -68,6 +69,20 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 	elseif ($change_visa_status == 'grant' && $sets['done'] == 1) {
 		if(!$o_c->checkVisaAmont($visa_id)){
 			$error = "<script language='javascript'>alert('Unfinished Agreement! Plesas check payments');</script>";     		
+		}
+
+		if ($sets['epd'] == '0000-00-00') {
+			$error = "<script language='javascript'>alert('Current Visa Expire Date not set');</script>";
+		}
+		else {
+			//sync visa expire date
+			$o_v->setVisaExpire($visa_id, $sets['epd']);
+		
+			if ($sets['epd'] > date('Y-m-d')) {
+				//sync client main
+				$visa_rs_arr['epd'] = $sets['epd'];
+				$o_c->setClientMainVisa($visa_rs_arr, $client_id);
+			}
 		}
 	}
 
@@ -143,6 +158,7 @@ $o_tpl->assign('pid', $process_id);
 $o_tpl->assign('isOther', $isOther);
 $o_tpl->assign('isNew', $isNew);
 $o_tpl->assign('errormsg', $error);
+$o_tpl->assign('visa_rs', $visa_rs_arr);
 $o_tpl->display('client_visa_process.tpl');
 ?>
 

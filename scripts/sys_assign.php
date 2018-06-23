@@ -43,6 +43,9 @@ if($u_id > 0 && isset($_POST['qflag']) && strtoupper($_POST['qflag']) == 'APPROV
 			$o_f->set_sys_views($u_id, $type, $u);
 		}
 	}
+	else {
+		$o_f->del_sys_views($u_id, 'course');
+	}
 }
 
 

@@ -40,11 +40,14 @@ $visa_expire = $o_r->getVisaService($view_all);
 $other_expire = array();
 $other_expire = $o_r->getOtherService($view_all);
 
+$main_expire = array();
+$main_expire = $o_r->getMainVisa($view_all);
 
 # set smarty tpl
 $o_tpl = new Template;
 $o_tpl->assign('ugs', $ugs);
 $o_tpl->assign('visa_expire', $visa_expire);
 $o_tpl->assign('other_expire', $other_expire);
+$o_tpl->assign('main_expire', $main_expire);
 $o_tpl->display('report_expir.tpl');
 ?>

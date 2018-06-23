@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="../css/sam.css">
 <script language="javascript" src="../js/audit.js"></script>
 <body {$forbid_sl} {$forbid_cp} {$forbid_rc}>
-<form name="form1" action="" target="_self" method="post">
+<form name="form1" action="" target="_self" method="get">
 <input type="hidden" name="sid" value="{$sid}">
 <input type="hidden" name="isChange" value="0">
 <table align="center" width="100%"  class="graybordertable" cellpadding="1" cellspacing="1">

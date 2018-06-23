@@ -20,7 +20,7 @@ class ExportAPI extends MysqlDB {
 //	}
 	
 	public function dlEmails($mailArr, $filename){
-		$content = implode(';', $mailArr);
+		$content = implode("\r\n", $mailArr);
 		//download function
 		Header("Content-type: application/octet-stream");
 		Header("Accept-Ranges: bytes");
@@ -30,9 +30,9 @@ class ExportAPI extends MysqlDB {
 		exit;	
 	}
 	
-	public function exportClientEmail($col_f="", $col_v="", $from="", $to="", $clientArr=array(), $file){
+	public function exportClientEmail($col_f="", $col_v="", $from="", $to="", $clientArr=array(), $file=''){
 		
-		$sql = "SELECT EMAIL, CNCT_EMAIL FROM client_info WHERE (EMAIL <> '' OR CNCT_EMAIL <> '')";
+		$sql = "SELECT EMAIL, CNCT_EMAIL FROM client_info WHERE (EMAIL <> '' OR CNCT_EMAIL <> '') AND EMAIL NOT LIKE '%@geic.com%' ";
 		if($col_f != "" && $col_v != ""){
 			$sql .= " AND {$col_f} like '{$col_v}%' ";
 		}

@@ -31,15 +31,15 @@ $school_id = isset($_REQUEST['sid'])? trim($_REQUEST['sid']) : 0;
 $isChange = isset($_REQUEST['isChange'])? trim($_REQUEST['isChange']) : 0;
 
 $set_arr = array();
-$set_arr['school'] = isset($_POST['t_school'])? trim($_POST['t_school']) : "";
-$set_arr['web']    = isset($_POST['t_web'])? trim($_POST['t_web']) : "";
-$set_arr['agent']  = isset($_POST['t_agent'])? trim($_POST['t_agent']) : 0;
-$set_arr['note']   = isset($_POST['t_note'])? trim($_POST['t_note']) : "";
-$set_arr['cate']   = isset($_POST['t_cate'])? trim($_POST['t_cate']) : 0;
-$set_arr['subcate']= isset($_POST['t_subcate'])? trim($_POST['t_subcate']) : 0;
+$set_arr['school'] = isset($_REQUEST['t_school'])? trim($_REQUEST['t_school']) : "";
+$set_arr['web']    = isset($_REQUEST['t_web'])? trim($_REQUEST['t_web']) : "";
+$set_arr['agent']  = isset($_REQUEST['t_agent'])? trim($_REQUEST['t_agent']) : 0;
+$set_arr['note']   = isset($_REQUEST['t_note'])? trim($_REQUEST['t_note']) : "";
+$set_arr['cate']   = isset($_REQUEST['t_cate'])? trim($_REQUEST['t_cate']) : 0;
+$set_arr['subcate']= isset($_REQUEST['t_subcate'])? trim($_REQUEST['t_subcate']) : 0;
 
 
-if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE") {
+if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE") {
 
 	if ($school_id > 0){
 		$o_s->setSchoolInfo($school_id, $set_arr);
@@ -47,7 +47,7 @@ if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE") {
 		$o_s->addSchoolInfo($set_arr);
 		$school_id = $o_s->getLastInsertID();
 	}
-}elseif (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "DELETE"){
+}elseif (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "DELETE"){
     $o_s->delSchoold($school_id);
     header("Location: institute.php");
     exit;

@@ -814,6 +814,12 @@ class GeicAPI extends MysqlDB {
         return $this->query($sql);
     }
 
+    function del_sys_views($userid, $type) {
+        $sql = "DELETE FROM sys_user_views WHERE UserID = {$userid} AND ViewType = '{$type}' ";
+        return $this->query($sql);
+        
+    }
+
     function get_sys_views($userid) {
         $arr = array();
         $sql = "SELECT * FROM sys_user_views WHERE UserID = {$userid}";

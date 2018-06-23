@@ -43,7 +43,7 @@
 					<tr>
 						<td width="19%" align="left" class="rowodd"><strong>Subject:</strong>&nbsp;&nbsp;</td>
 						<td align="left" width="81%" class="roweven">
-							<select name="t_subject" onChange="this.form.t_detail.focus();" {if $isNew eq 1}readonly{/if}>
+							<select id="t_subject" name="t_subject" onChange="sl_step()" {if $isNew eq 1}readonly{/if}>
 							{foreach key=pid item=process from=$subject_arr}
 								{if stripos($process, 'grant') !== false} 
                                      <optgroup label="---------------------------------------">
@@ -59,6 +59,11 @@
 								{/if}
 							{/foreach}
 							</select>
+								<span id="epd_span" {if stripos($subject_arr[$dt_arr.itemid], 'grant') === false} style="visibility:hidden;" {/if}>
+								&nbsp;
+								&nbsp;
+								Expire Date: <input type="text" name="t_epdate" id="t_epdate" value="{$visa_rs.epd}" size="20" {if stripos($subject_arr[$dt_arr.itemid], 'grant') === false} disabled="disabled"{/if} >
+								</span>								
 						</td>
 					</tr>
 				{/if}										
@@ -83,6 +88,17 @@
 <script type="text/javascript">
 	$('#t_date').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });        
 	$('#t_due').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });
+	$('#t_epdate').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });
+	function sl_step() {
+		 if ($("#t_subject").find("option:selected").text().indexOf('grant') != -1) {
+		 	$("#epd_span").css("visibility","");
+		 	$("#t_epdate").removeAttr("disabled");
+		 }
+		 else {
+		 	$("#epd_span").css("visibility","hidden");
+		 	$("#t_epdate").attr("disabled","disabled");
+		 }
+	}
 </script>
 {/literal}
 {$errormsg}

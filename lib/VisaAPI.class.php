@@ -497,5 +497,13 @@ class VisaAPI extends MysqlDB {
         return false;
     }
 
+    function setVisaExpire($vid, $date) {
+        if (!$vid || !$date)
+            return false;
+        
+        $sql = "UPDATE client_visa SET ExpireDate = '{$date}' WHERE ID = {$vid}";
+        return $this->query($sql);
+    }
+
 }
 ?>

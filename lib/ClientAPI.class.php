@@ -1,5 +1,6 @@
 <?php
 require_once('MysqlDB.class.php');
+
 class ClientAPI extends MysqlDB {
 
     function ClientAPI($host, $user, $pswd, $database, $debug) {
@@ -1368,13 +1369,15 @@ class ClientAPI extends MysqlDB {
 	
 	function getVisaRsID($vid){
 		if ($vid > 0){
-			$sql = "select CateID, SubClassID, ADate from client_visa where ID = {$vid}";
+			$sql = "select CateID, SubClassID, ADate, ExpireDate from client_visa where ID = {$vid}";
 			$this->query($sql);
 			$_arr = array();
 			while($this->fetch()){
 				$_arr['visa']  = $this->CateID;
 				$_arr['class'] = $this->SubClassID;
 				$_arr['adate'] = $this->ADate;
+				$_arr['epd']   = $this->ExpireDate;
+				$_arr['vid']   = $vid;
 			}
 			return $_arr;
 		}
@@ -2128,6 +2131,14 @@ function getSpand($aid){
             $sql = "delete from client_from where Item = '{$about}' ";
             $this->query($sql);
         }    
+    }
+
+    function setClientMainVisa($arr, $client_id) {
+    	if (!$arr || !$client_id)
+    		return false;
+
+    	$sql = "UPDATE client_info SET VISAID = '{$arr['visa']}', VISACLASSID = '{$arr['class']}', EXPIRDATE = '{$arr['epd']}' WHERE CID = {$client_id} ";
+    	return $this->query($sql);
     }
 
 }

@@ -141,6 +141,8 @@
               </select>
             </td>
           </tr>
+          {else}
+            <input type="hidden" name="t_agent" value="0">
           {/if}
           <tr>
             <td colspan="2"><hr></td>

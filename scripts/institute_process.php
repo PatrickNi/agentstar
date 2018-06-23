@@ -31,7 +31,7 @@ foreach ($g_user_grants as $item){
 
 
 # get action
-$action = isset($_POST["at_{$process_id}"])? trim($_POST["at_{$process_id}"]) : "";
+$action = isset($_REQUEST["at_{$process_id}"])? trim($_REQUEST["at_{$process_id}"]) : "";
 switch (strtoupper($action)){
 	case __ACT_DONE:
 		$o_s->endProcess($process_id);
@@ -44,13 +44,13 @@ switch (strtoupper($action)){
 		break;					
 }
 
-if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
-	$sets['date'] = isset($_POST['t_date'])? trim($_POST['t_date']) : "0000-00-00";
+if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
+	$sets['date'] = isset($_REQUEST['t_date'])? trim($_REQUEST['t_date']) : "0000-00-00";
 	$sets['date'] = $sets['date'] != ""? $sets['date'] : "0000-00-00";
 	
-	$sets['detail']  = isset($_POST['t_detail'])? trim($_POST['t_detail']) : "";
-	$sets['subject'] = isset($_POST['t_subject'])? trim($_POST['t_subject']) : "";
-	$sets['due']     = isset($_POST['t_due'])? trim($_POST['t_due']) : "0000-00-00";
+	$sets['detail']  = isset($_REQUEST['t_detail'])? trim($_REQUEST['t_detail']) : "";
+	$sets['subject'] = isset($_REQUEST['t_subject'])? trim($_REQUEST['t_subject']) : "";
+	$sets['due']     = isset($_REQUEST['t_due'])? trim($_REQUEST['t_due']) : "0000-00-00";
 	$sets['due']     = $sets['due'] != ""? $sets['due'] : "0000-00-00";
 	
 	if($process_id > 0){

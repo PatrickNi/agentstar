@@ -18,7 +18,7 @@ $sub_id = isset($_REQUEST['subid'])? trim($_REQUEST['subid']) : 0;
 
 
 # get action
-$action = isset($_POST["at_{$sub_id}"])? trim($_POST["at_{$sub_id}"]) : "";
+$action = isset($_REQUEST["at_{$sub_id}"])? trim($_REQUEST["at_{$sub_id}"]) : "";
 switch (strtoupper($action)){
 //	case __ACT_RElATION:
 //		header("Location: visa_relate.php?catid={$cat_id}&subid={$sub_id}");
@@ -34,8 +34,8 @@ switch (strtoupper($action)){
 		break;					
 }
 
-if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
-	$class_name = isset($_POST['t_name'])? trim($_POST['t_name']) : "";
+if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
+	$class_name = isset($_REQUEST['t_name'])? trim($_REQUEST['t_name']) : "";
 
 	if($sub_id > 0){
 		$o_s->setSubCategory($sub_id, $class_name);
@@ -44,7 +44,7 @@ if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
 	}
 	$sub_id = 0;
 	$isNone = "none";
-}elseif (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "NEW"){
+}elseif (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "NEW"){
 	$isNone = "block";
 }
 

@@ -85,7 +85,8 @@ switch ($viewWhat){
 //        $reports = array_merge($o_r->getUrgentVisa($view_all, $sort_col, $sort_ord),$o_r->getTodoVisa($view_all, $sort_col, $sort_ord));		
 		break;
 	case "c":
-		if (isset($ugs['todo_course']) && $ugs['todo_course']['v'] == 1){
+		/*
+        if (isset($ugs['todo_course']) && $ugs['todo_course']['v'] == 1){
 			if(isset($_REQUEST['cUid'])) {
 				$staff_id = $_REQUEST['cUid'];
 			}
@@ -93,8 +94,23 @@ switch ($viewWhat){
 				$staff_id = 0;
 			}
 		}
+        */
+        $staff_id = $_REQUEST['cUid'];
+        $slCourseViewer = array();
+        $sys_course_viewers = $o_g->get_course_viewer($user_id);
+        foreach ($o_g->getUserNameArr() as $k => $v) {
+            if ($ugs['todo_course']['v'] == 1 || isset($sys_course_viewers[$k])) {
+                $slCourseViewer[$k] = $v;
+            }
+        }
+        if (!$staff_id) {
+            $staff_id = key($slCourseViewer);
+        }
+
         $sort_col_arr = array(1=>'ClientName',2=>'Name',3=>'Qual',4=>'Major',5=>'ProcessName', 6=>'SortDue');
-        $reports = $o_r->getUrgentCourse($staff_id,getSortList($sort_list, $sort_col_arr, $sort_ord_arr), $only_course, $cdu);
+        if ($staff_id > 0) {
+            $reports = $o_r->getUrgentCourse($staff_id,getSortList($sort_list, $sort_col_arr, $sort_ord_arr), $only_course, $cdu);
+        }
 //		$reports = array_merge($o_r->getUrgentCourse($view_all, $sort_col, $sort_ord), $o_r->getTodoCourse($view_all, $sort_col, $sort_ord));
 		break;
 	case "i":
@@ -126,6 +142,7 @@ $o_tpl->assign('viewWhat', $viewWhat);
 $o_tpl->assign('ugs', $ugs);
 $o_tpl->assign('sort_list', $sort_list);
 $o_tpl->assign('staffid', $staff_id);
+$o_tpl->assign('userid', $user_id);
 $o_tpl->assign('vdu', $vdu);
 $o_tpl->assign('idu', $idu);
 $o_tpl->assign('cdu', $cdu);
@@ -137,8 +154,8 @@ if ((isset($ugs['todo_visa']) && $ugs['todo_visa']['v'] == 1 && $viewWhat == 'v'
 }else {
 	$o_tpl->assign('slUsers', $o_g->getUserNameArr($staff_id));
 }
-
-$o_tpl->assign('slCourseViewer', $o_g->get_course_viewer($user_id));
+//var_dump($o_g->getUserNameArr(),$o_g->get_course_viewer($user_id) );
+$o_tpl->assign('slCourseViewer', $slCourseViewer);
 $o_tpl->assign('ugs', $ugs);
 $o_tpl->display('urgent_review.tpl');
 ?>

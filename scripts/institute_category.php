@@ -16,7 +16,7 @@ $cat_id = isset($_REQUEST['catid'])? trim($_REQUEST['catid']) : 0;
 
 
 # get action
-$action = isset($_POST["at_{$cat_id}"])? trim($_POST["at_{$cat_id}"]) : "";
+$action = isset($_REQUEST["at_{$cat_id}"])? trim($_REQUEST["at_{$cat_id}"]) : "";
 switch (strtoupper($action)){
     case __ACT_SUBCLASS:
         header("Location: institute_subcate.php?catid={$cat_id}");
@@ -32,8 +32,8 @@ switch (strtoupper($action)){
         break;                  
 }
 
-if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
-    $cat_name = isset($_POST['t_name'])? trim($_POST['t_name']) : "";
+if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
+    $cat_name = isset($_REQUEST['t_name'])? trim($_REQUEST['t_name']) : "";
 
     if($cat_id > 0){
         $o_s->setCategory($cat_id, $cat_name);
@@ -42,7 +42,7 @@ if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
     }
     $cat_id = 0;
     $isNone = "none";
-}elseif (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "NEW"){
+}elseif (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "NEW"){
     $isNone = "block";
 }
 
