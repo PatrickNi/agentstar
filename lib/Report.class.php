@@ -642,7 +642,7 @@ class ReportAPI extends MysqlDB {
 			$where .= " AND BeginDate >= '{$fromDay}' and BeginDate <= '{$toDay}' ";
 		}
 		//get apply offer
-		$sql = "select b.IsActive, b.ID, a.ProcessID, concat(LName, ' ', FName) as Name, d.Name as School, e.Qual, c.CID, CourseVisitDate from client_course_process a, client_info c, client_course b left join institute d on(b.IID = d.ID) left join institute_qual e on(b.QualID = e.ID) where (a.ProcessID = ".__C_RECEIVE_OFFER." or a.ProcessID = ".__C_PASS_OFFER." or a.ProcessID = ".__C_GET_COE." or a.ProcessID = ".__C_PAY_TUITION_FEE.") and a.CCID = b.ID and b.CID = c.CID and a.Done = 1 ";
+		$sql = "select b.IsActive, b.ID, a.ProcessID, concat(LName, ' ', FName) as Name, d.Name as School, e.Qual, c.CID, CourseVisitDate, c.AgentID from client_course_process a, client_info c, client_course b left join institute d on(b.IID = d.ID) left join institute_qual e on(b.QualID = e.ID) where (a.ProcessID = ".__C_RECEIVE_OFFER." or a.ProcessID = ".__C_PASS_OFFER." or a.ProcessID = ".__C_GET_COE." or a.ProcessID = ".__C_PAY_TUITION_FEE.") and a.CCID = b.ID and b.CID = c.CID and a.Done = 1 ";
         $this->query($sql.$where);
 
 		$_arr = array();
@@ -650,27 +650,49 @@ class ReportAPI extends MysqlDB {
 			if ($this->ProcessID == __C_RECEIVE_OFFER) {
                 $_arr['all']['aponame'][$this->ID] = $this->Name. " (to ". $this->School ." : ". $this->Qual .")";	
 				$_arr['all']['apocid' ][$this->ID] = $this->CID;
-				$_arr['all']['reo'    ][$this->ID] = 0;	
-                if ($this->CourseVisitDate >= $fromDay && $this->CourseVisitDate <= $toDay)
+                
+                if ($this->AgentID > 0)
+                    $_arr['all']['apoaid' ][$this->ID] = $this->CID;
+				
+                $_arr['all']['reo'    ][$this->ID] = 0;	
+                if ($this->CourseVisitDate >= $fromDay && $this->CourseVisitDate <= $toDay) {
                     $_arr['all']['apo_new'][$this->CID]=1;
+                    if ($this->AgentID > 0) 
+                        $_arr['all']['apo_new_aid'][$this->CID]=1;
+                }
 
             }
             elseif ($this->ProcessID == __C_PASS_OFFER){
                 $_arr['all']['reoname'][$this->ID] = $this->Name. " (to ". $this->School ." : ". $this->Qual .")";	
 				$_arr['all']['reocid' ][$this->ID] = $this->CID;
-				$_arr['all']['reo'    ][$this->ID] = 1;	
+                
+                if ($this->AgentID > 0)
+                    $_arr['all']['reoaid' ][$this->ID] = $this->CID;
+				
+                $_arr['all']['reo'    ][$this->ID] = 1;	
 				
 				$_arr['all']['reo_st' ][$this->ID] = $this->IsActive == 2? -1 : 0;	
-                if ($this->CourseVisitDate >= $fromDay && $this->CourseVisitDate <= $toDay)
+                if ($this->CourseVisitDate >= $fromDay && $this->CourseVisitDate <= $toDay){
                     $_arr['all']['reo_new'][$this->CID]=1;
+                    if ($this->AgentID > 0)
+                        $_arr['all']['reo_new_aid'][$this->CID]=1;
+                }
 
             }
             elseif ($this->ProcessID == __C_GET_COE){
                 $_arr['all']['recname'][$this->ID] = $this->Name. " (to ". $this->School ." : ". $this->Qual .")";	
-				$_arr['all']['reccid' ][$this->ID] = $this->CID;	                
-				$_arr['all']['rec'    ][$this->ID] = 1;
-                if ($this->CourseVisitDate >= $fromDay && $this->CourseVisitDate <= $toDay)
+				$_arr['all']['reccid' ][$this->ID] = $this->CID;
+               
+                if ($this->AgentID > 0)
+                    $_arr['all']['recaid' ][$this->ID] = $this->CID;	                
+				
+                $_arr['all']['rec'    ][$this->ID] = 1;
+                if ($this->CourseVisitDate >= $fromDay && $this->CourseVisitDate <= $toDay){
                     $_arr['all']['rec_new'][$this->CID]=1;
+                   
+                    if ($this->AgentID > 0)
+                        $_arr['all']['rec_new_aid'][$this->CID]=1;
+                }
             }
             elseif($this->ProcessID == __C_PAY_TUITION_FEE && isset($_arr['all']['reo_st'][$this->ID]) && $_arr['all']['reo_st'][$this->ID] == 0) {
                 $_arr['all']['reo_st'][$this->ID] = 1;
@@ -688,6 +710,17 @@ class ReportAPI extends MysqlDB {
         $_arr['all']['apo_new'] = isset($_arr['all']) && isset($_arr['all']['apo_new']) ? count($_arr['all']['apo_new']) : 0;
         $_arr['all']['reo_new'] = isset($_arr['all']) && isset($_arr['all']['reo_new']) ? count($_arr['all']['reo_new']): 0;
         $_arr['all']['rec_new'] = isset($_arr['all']) && isset($_arr['all']['rec_new']) ? count($_arr['all']['rec_new']): 0;
+
+        $_arr['all']['apocnt_aid'] = isset($_arr['all']) && isset($_arr['all']['apoaid']) ? count(array_unique(array_values($_arr['all']['apoaid']))) : 0;
+        $_arr['all']['reocnt_aid'] = isset($_arr['all']) && isset($_arr['all']['reoaid']) ? count(array_unique(array_values($_arr['all']['reoaid']))): 0;
+        $_arr['all']['reccnt_aid'] = isset($_arr['all']) && isset($_arr['all']['recaid']) ? count(array_unique(array_values($_arr['all']['recaid']))): 0;
+
+        $_arr['all']['apo_new_aid'] = isset($_arr['all']) && isset($_arr['all']['apo_new_aid']) ? count($_arr['all']['apo_new_aid']) : 0;
+        $_arr['all']['reo_new_aid'] = isset($_arr['all']) && isset($_arr['all']['reo_new_aid']) ? count($_arr['all']['reo_new_aid']): 0;
+        $_arr['all']['rec_new_aid'] = isset($_arr['all']) && isset($_arr['all']['rec_new_aid']) ? count($_arr['all']['rec_new_aid']): 0;
+
+
+
 		return $_arr;			
 	}
 
@@ -737,7 +770,7 @@ class ReportAPI extends MysqlDB {
 	function getAllOfCourseCommByUser($fromDay, $toDay, $userid){
 		      $sql = "SELECT  date_format(RedDate, '%Y-%u') as wk,
                         concat(LName, ' ', FName) as Name, 
-                        c.CID, a.ID, a.CCID,c.DOB, CourseVisitDate,
+                        c.CID, a.ID, a.CCID,c.DOB, CourseVisitDate, c.AgentID,
 						IF(t1.BeginDate >= d.StartDate and d.StartDate <> '' and d.StartDate <> '0000-00-00', IF(CoComm > 0 OR Discount > 0, RComm-CoComm-Discount,RedComm-Discount), 0) as bonus,
 						IF(t1.BeginDate >= d.StartDate and d.StartDate <> '' and d.StartDate <> '0000-00-00', 0, 1) as nobonus
                       FROM client_course_sem a
@@ -766,15 +799,23 @@ class ReportAPI extends MysqlDB {
 			$_arr['all']['sem'   ][$i] = $this->ID;
 			$_arr['all']['course'][$i] = $this->CCID;
 
-            if ($this->CourseVisitDate >= $fromDay && $this->CourseVisitDate <= $toDay)
+            if ($this->AgentID > 0)
+                $_arr['all']['agent'][$i] = $this->CID;
+
+            if ($this->CourseVisitDate >= $fromDay && $this->CourseVisitDate <= $toDay){
                 $_arr['all']['bonus_new'][$this->CID] = 1;
+                if ($this->AgentID > 0) 
+                    $_arr['all']['bonus_new_aid'][$this->CID] = 1;  
+            }
 
 			$bonus += $this->bonus;
 			$i++;
 		}
 		$_arr['all']['bonus'] = $bonus;
-        $_arr['all']['bonus_st'] = count(array_unique($_arr['all']['client']), SORT_NUMERIC);
-        $_arr['all']['bonus_new'] = count($_arr['all']['bonus_new']);
+        @$_arr['all']['bonus_st'] = count(array_unique($_arr['all']['client'], SORT_NUMERIC));
+        @$_arr['all']['bonus_new'] = count($_arr['all']['bonus_new']);
+        @$_arr['all']['bonus_aid'] = count(array_unique($_arr['all']['agent'], SORT_NUMERIC));
+        @$_arr['all']['bonus_new_aid'] = count($_arr['all']['bonus_new_aid']);
 		return $_arr;			
 	}
 
@@ -828,7 +869,7 @@ class ReportAPI extends MysqlDB {
     			//concat(LName, ' ', FName) like 'sub-%',
 		      $sql = "SELECT  date_format(BeginDate, '%Y-%u') as wk,
                         concat(LName, ' ', FName) as Name, CourseVisitDate,
-                        c.CID, a.ID, a.CCID, c.DOB,
+                        c.CID, a.ID, a.CCID, c.DOB, c.AgentID,
 						IF(t1.BeginDate >= d.StartDate and d.StartDate <> '' and d.StartDate <> '0000-00-00', IF(CoComm > 0 OR Discount > 0, RComm-CoComm-Discount,RComm-Discount), 0) as rcomm,
 						IF(t1.BeginDate >= d.StartDate and d.StartDate <> '' and d.StartDate <> '0000-00-00', 0, 1) as norcomm
                       FROM client_course_sem a
@@ -856,16 +897,25 @@ class ReportAPI extends MysqlDB {
 			$_arr['all']['client'][$i] = $this->CID;
 			$_arr['all']['sem'   ][$i] = $this->ID;
 			$_arr['all']['course'][$i] = $this->CCID;
-            if ($this->CourseVisitDate >= $fromDay && $this->CourseVisitDate <= $toDay)
+            if ($this->AgentID) 
+                $_arr['all']['agent'][$i] = $this->CID;
+            if ($this->CourseVisitDate >= $fromDay && $this->CourseVisitDate <= $toDay){
                 $_arr['all']['rcomm_new'][$this->CID] = 1;
+                if ($this->AgentID > 0) 
+                    $_arr['all']['rcomm_new_aid'][$this->CID] = 1;
+                   
+            }
 
 			$rcomm += $this->rcomm;
 			$i++;
 		}
+
 		$_arr['all']['rcomm'] = $rcomm;
-        $_arr['all']['rcomm_st'] = count(array_unique($_arr['all']['client']), SORT_NUMERIC);
-        $_arr['all']['rcomm_new'] = count($_arr['all']['rcomm_new']);
-		return $_arr;			
+        @$_arr['all']['rcomm_st'] = count(array_unique($_arr['all']['client'], SORT_NUMERIC));
+        @$_arr['all']['rcomm_new'] = count($_arr['all']['rcomm_new']);
+        @$_arr['all']['rcomm_aid'] = count(array_unique($_arr['all']['agent'], SORT_NUMERIC));
+        @$_arr['all']['rcomm_new_aid'] = count($_arr['all']['rcomm_new_aid']);
+        return $_arr;			
 	}
 
 	function getNumOfAgreementByUser($fromDay, $toDay, $userid){

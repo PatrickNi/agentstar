@@ -91,7 +91,15 @@ class MysqlDB {
 		return true;
 	}
 	
-	
+	function fetch_array() {
+        if($this->m_res){
+            return mysql_fetch_assoc($this->m_res); 
+        }
+        else{
+            return false;
+        }
+    }
+
 	function fetch(){
 		if($this->m_res){
 			$_arr = mysql_fetch_assoc($this->m_res); 

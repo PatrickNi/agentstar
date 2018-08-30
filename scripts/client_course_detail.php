@@ -30,7 +30,7 @@ $sem_id = isset($_REQUEST['semid'])? trim($_REQUEST['semid']) : 0;
 $isChange = isset($_REQUEST['isChange'])? trim($_REQUEST['isChange']) : 0;
 
 $o_c = new ClientAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
-//$o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
+$o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 $o_s = new SchoolAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 $o_a = new AgentAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
@@ -71,6 +71,10 @@ $set_course['unit']  = isset($_REQUEST['t_unit'])? (string)trim($_REQUEST['t_uni
 
 $apodue = isset($_REQUEST['t_apodue'])? (string)trim($_REQUEST['t_apodue']) : "0000-00-00";
 $apodue = $apodue != ''? $apodue : "0000-00-00";
+
+$set_course['consultant_date']   = isset($_REQUEST['t_consultant_date'])? (string)trim($_REQUEST['t_consultant_date']) : "0000-00-00";
+$set_course['consultant_date']   = $set_course['consultant_date'] == ""? "0000-00-00" : $set_course['consultant_date'];
+$set_course['consultant'] = isset($_REQUEST['t_consultant'])? (string)trim($_REQUEST['t_consultant']) : 0;
 
 
 $msg = '';
@@ -173,6 +177,12 @@ if ($isChange == 0 && $course_id > 0 && array_key_exists($cateid, $course_arr) &
 	$set_course = $course_arr[$cateid][$course_id];
 	$set_course['catid'] = $cateid;
 }
+
+if ($course_id > 0 && $ugs['c_track']['v'] == 0 && $course_arr[$cateid][$course_id]['consultant'] != $user_id) {
+	echo "<script language='javascript'>alert('Access denied!');window.close();</script>";
+	exit;
+}
+
 //$msg = "";
 if ($o_c->isGetCOEByCourse($course_id) != 0 && $o_c->getSemNumByCourse($course_id) == 0){
 	$set_course['active'] = $set_course['active'] !=2? 1 : $set_course['active'] ;
@@ -230,12 +240,12 @@ if (count($arr) > 0 && array_key_exists($set_course['qual'], $arr[$set_course['i
 }
 $o_tpl->assign('dt_arr', $set_course);
 
-
+$o_tpl->assign('user_arr',$o_g->getUserNameArr());
 $o_tpl->assign('item_arr', $o_c->getProcessOfCourse());
 $o_tpl->assign('courseid', $course_id);
 $o_tpl->assign('cid', $client_id);
 $o_tpl->assign('isapprove', $o_c->getCourseConsult($client_id) == $user_id || (isset($ugs['c_track']['v']) && $ugs['c_track']['v'] == 1)? 1 :  0);
-$o_tpl->assign('loginid', $user_id);
+$o_tpl->assign('user_id', $user_id);
 $o_tpl->assign('method_arr', $o_c->getMethodOfCourse());
 $o_tpl->assign("itemtype", __FILE_APPLY_COURSE);
 $o_tpl->assign("ugs", $ugs);

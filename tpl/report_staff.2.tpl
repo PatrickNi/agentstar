@@ -77,7 +77,13 @@
             {/foreach}
         </ul>
         <span style="font-size:16px; font-weight:bolder; cursor:pointer;" onClick="d1_{$week}.style.display='none'">&times;</span> </div></td>
-    <td><span onClick="openinSatff('d2_{$week}');" style="text-decoration:underline; cursor:pointer;">{$courseprocs[$week].apocnt}({$courseprocs[$week].apocnt_st} student - {$courseprocs[$week].apo_new} new clients)</span>
+    <td><span onClick="openinSatff('d2_{$week}');" style="cursor:pointer;">
+          {$courseprocs[$week].apocnt}<br/>
+          {$courseprocs[$week].apocnt_st} old students 
+          <br/>&nbsp;&nbsp;<span style="text-decoration:underline; ">(inc {$courseprocs[$week].apocnt_aid} subagents)</span><br/> 
+          {$courseprocs[$week].apo_new} new clients 
+          <br/>&nbsp;&nbsp;<span style="text-decoration:underline; ">(inc {$courseprocs[$week].apo_new_aid} subagents)</span> 
+        </span>
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:500px" id="d2_{$week}">
         <ul>
           {foreach key=id item=name from=$courseprocs[$week].aponame}
@@ -86,7 +92,13 @@
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="d2_{$week}.style.display='none'">&times;</span> </div></td>  
 
-     <td ><span onClick="openinSatff('d3_{$week}');" style="text-decoration:underline; cursor:pointer;">{$courseprocs[$week].reocnt}({$courseprocs[$week].reocnt_st} student - {$courseprocs[$week].reo_new} new clients)</span>
+     <td ><span onClick="openinSatff('d3_{$week}');" style="cursor:pointer;">
+           {$courseprocs[$week].reocnt}<br/>
+           {$courseprocs[$week].reocnt_st} old students 
+           <br/>&nbsp;&nbsp;<span style="text-decoration:underline; ">(inc {$courseprocs[$week].reocnt_aid} subagents)</span><br/> 
+           {$courseprocs[$week].reo_new} new clients 
+           <br/>&nbsp;&nbsp;<span style="text-decoration:underline; ">(inc {$courseprocs[$week].reo_new_aid} subagents)</span> 
+        </span>
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:500px" id="d3_{$week}">
         <ul>
           {foreach key=id item=name from=$courseprocs[$week].reoname}
@@ -95,7 +107,13 @@
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="d3_{$week}.style.display='none'">&times;</span> </div></td>   
 
-    <td><span onClick="openinSatff('d4_{$week}');" style="text-decoration:underline; cursor:pointer;">{$courseprocs[$week].reccnt}({$courseprocs[$week].reccnt_st} student - {$courseprocs[$week].rec_new} new clients)</span>
+    <td><span onClick="openinSatff('d4_{$week}');" style="cursor:pointer;">
+        {$courseprocs[$week].reccnt}<br/>
+        {$courseprocs[$week].reccnt_st} old students 
+        <br/>&nbsp;&nbsp;<span style="text-decoration:underline; ">(inc {$courseprocs[$week].reccnt_aid} subagents)</span><br/>  
+        {$courseprocs[$week].rec_new} new clients 
+        <br/>&nbsp;&nbsp;<span style="text-decoration:underline; ">(inc {$courseprocs[$week].rec_new_aid} subagents)</span> 
+     </span>
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:500px" id="d4_{$week}">
         <ul>
           {foreach key=id item=name from=$courseprocs[$week].recname}
@@ -105,7 +123,13 @@
         <span style="font-weight:bolder; cursor:pointer;" onClick="d4_{$week}.style.display='none'">&times;</span> </div></td>  
     <td>
       {if $ugs.rpt_staff_pc.v eq 1}
-      <span onClick="openinSatff('d5_{$week}');" style="text-decoration:underline; cursor:pointer;">{$coursepots[$week].rcomm|string_format:"%.2f"}({$coursepots[$week].rcomm_st} student - {$coursepots[$week].rcomm_new} new clients)</span>
+      <span onClick="openinSatff('d5_{$week}');" style="cursor:pointer;">
+        {$coursepots[$week].rcomm|string_format:"%.2f"}<br/>
+        {$coursepots[$week].rcomm_st} old students 
+        <br/>&nbsp;&nbsp;<span style="text-decoration:underline; ">(inc {$coursepots[$week].rcomm_aid} subagents)</span><br/>  
+        {$coursepots[$week].rcomm_new} new clients 
+        <br/>&nbsp;&nbsp;<span style="text-decoration:underline; ">(inc {$coursepots[$week].rcomm_new_aid} subagents)</span>
+      </span>
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:180px" id="d5_{$week}">
         <table width="100%">
         <tr><td>Name</td><td  align="right">Comm($)</td></tr>
@@ -118,7 +142,13 @@
     </td>                   
      <td>
        {if $ugs.rpt_staff_rc.v eq 1}
-       <span onClick="openinSatff('d11_{$week}');" style="text-decoration:underline; cursor:pointer;">{$coursesems[$week].bonus|string_format:"%.2f"}({$coursesems[$week].bonus_st} student - {$coursesems[$week].bonus_new} new clients )</span>
+       <span onClick="openinSatff('d11_{$week}');" style="cursor:pointer;">
+        {$coursesems[$week].bonus|string_format:"%.2f"}<br/>
+        {$coursesems[$week].bonus_st} old students 
+        <br/>&nbsp;&nbsp;<span style="text-decoration:underline; ">(inc {$coursesems[$week].bonus_aid} subagents)</span><br/> 
+        {$coursesems[$week].bonus_new} new clients 
+        <br/>&nbsp;&nbsp;<span style="text-decoration:underline; ">(inc {$coursesems[$week].bonus_new_aid} subagents) </span>
+      </span>
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:180px" id="d11_{$week}">
         <table width="100%">
         <tr><td>Name</td><td align="right">Comm($)</td></tr>

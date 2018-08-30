@@ -696,7 +696,7 @@ class GeicAPI extends MysqlDB {
 	function setSalesCategory($cateid, $categoryName){
 		if($cateid > 0 && $categoryName != ""){
 			$categoryName = addslashes($categoryName);
-			$sql = "Update `sales_category` SET CategoryName = '{$categoryName}' where ID = {$categoryName} ";
+			$sql = "Update `sales_category` SET CategoryName = '{$categoryName}' where ID = {$cateid} ";
 			return $this->query($sql);
 		}
 	}

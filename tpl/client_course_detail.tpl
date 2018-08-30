@@ -50,6 +50,23 @@
             </td>
           </tr>
           <tr>
+            <td width="28%" align="left" class="rowodd"><strong>Consultant:</strong>&nbsp;&nbsp;</td>
+            <td align="left" width="72%" class="roweven">
+                <select name="t_consultant">      
+                  <option value="0" selected>choose a consultant</option>
+                  {foreach key=uid item=user_name from=$user_arr}
+                    <option value="{$uid}" {if $dt_arr.consultant eq $uid || ($dt_arr.consultant eq 0 && $user_id eq $uid)} selected {/if}>{$user_name}</option>
+                  {/foreach}
+                </select>
+            </td>
+          </tr>     
+          <tr>
+            <td width="28%" align="left" class="rowodd"><strong>Consultant Date:</strong>&nbsp;&nbsp;</td>
+            <td align="left" width="72%" class="roweven">
+              <input type="text" name="t_consultant_date" id="t_consultant_date" onchange="audit_date(this)"  value="{$dt_arr.consultant_date}">
+            </td>
+          </tr>                
+          <tr>
             <td colspan="2"><hr></td>
           </tr>
           <tr>
@@ -250,5 +267,6 @@
 	$('#t_apodue').datepicker({ dateFormat: "yy-mm-dd" , changeMonth: true, changeYear: true});	
 	$('#t_tusdate').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });	
 	$('#t_tsdate').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });	
+  $('#t_consultant_date').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true }); 
 </script>
 {/literal}	

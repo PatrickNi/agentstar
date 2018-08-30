@@ -589,7 +589,7 @@ class ClientAPI extends MysqlDB {
 		return 0;
 	}
 	function getCourseByUser($course_id=0, $client_id=0){
-		$sql = "select a.ID, b.Name, a.IID, b.CateID, d.Qual, e.Major, AppFee, ToUsDate, ToSchoolDate, UserID, AgentID, IsActive, StartDate, EndDate, TFee, Duration, a.QualID, MethodID, a.MajorID, Unit, KeyPoint, Refuse 
+		$sql = "select a.ID, b.Name, a.IID, b.CateID, d.Qual, e.Major, AppFee, ToUsDate, ToSchoolDate, UserID, AgentID, IsActive, StartDate, EndDate, TFee, Duration, a.QualID, MethodID, a.MajorID, Unit, KeyPoint, Refuse, ConsultantID, ConsultantDate 
 						from client_course a left join institute b on(a.IID = b.ID) 
 							 left join institute_category c on(a.IID = c.ID)
 							 left join institute_qual d on(a.QualID = d.ID) 
@@ -626,12 +626,14 @@ class ClientAPI extends MysqlDB {
 			$_arr[$this->CateID][$this->ID]['unit'] 	 = $this->Unit;
 			$_arr[$this->CateID][$this->ID]['key'] 	 = $this->KeyPoint;
 			$_arr[$this->CateID][$this->ID]['refuse'] 	 = $this->Refuse;
+			$_arr[$this->CateID][$this->ID]['consultant'] 	 = $this->ConsultantID;
+			$_arr[$this->CateID][$this->ID]['consultant_date'] 	 = $this->ConsultantDate;
 		}
 		return $_arr;
 	}
 	
 	function getCourseByUserV2($course_id=0, $client_id=0){
-		$sql = "select a.ID, b.Name, a.IID, b.CateID, d.Qual, e.Major, AppFee, ToUsDate, ToSchoolDate, UserID, AgentID, IsActive, StartDate, EndDate, TFee, Duration, a.QualID, MethodID, a.MajorID, Unit, KeyPoint, Refuse 
+		$sql = "select a.ID, b.Name, a.IID, b.CateID, d.Qual, e.Major, AppFee, ToUsDate, ToSchoolDate, UserID, AgentID, IsActive, StartDate, EndDate, TFee, Duration, a.QualID, MethodID, a.MajorID, Unit, KeyPoint, Refuse, ConsultantID, ConsultantDate 
 						from client_course a left join institute b on(a.IID = b.ID) 
 							 left join institute_category c on(a.IID = c.ID)
 							 left join institute_qual d on(a.QualID = d.ID) 
@@ -669,6 +671,8 @@ class ClientAPI extends MysqlDB {
 			$_arr[$this->ID]['key'] 	 = $this->KeyPoint;
 			$_arr[$this->ID]['refuse'] 	 = $this->Refuse;
 			$_arr[$this->ID]['cate']     = $this->CateID;
+			$_arr[$this->ID]['consultant'] 	 = $this->ConsultantID;
+			$_arr[$this->ID]['consultant_date'] 	 = $this->ConsultantDate;			
 		}
 		return $_arr;
 	}
@@ -712,8 +716,8 @@ class ClientAPI extends MysqlDB {
 			$v = addslashes($v);
 		}
 		
-		$sql = "insert into `client_course` (CID, IID, MajorID, QualID, AppFee, ToUsDate, ToSchoolDate, UserID, AgentID, MethodID, StartDate, EndDate, Duration, TFee, IsActive, Refuse, Unit, KeyPoint) values ";
-		$sql .= "('{$cid}', '{$sets['iid']}', '{$sets['major']}', '{$sets['qual']}', '{$sets['appfee']}', '{$sets['tusdate']}', '{$sets['tsdate']}', '{$user_id}', '{$sets['agent']}',  '{$sets['method']}',  '{$sets['start']}',  '{$sets['end']}',  '{$sets['due']}',  '{$sets['fee']}',  '{$sets['done']}',  '{$sets['refuse']}', '{$sets['unit']}', '{$sets['key']}')";
+		$sql = "insert into `client_course` (CID, IID, MajorID, QualID, AppFee, ToUsDate, ToSchoolDate, UserID, AgentID, MethodID, StartDate, EndDate, Duration, TFee, IsActive, Refuse, Unit, KeyPoint, ConsultantID, ConsultantDate) values ";
+		$sql .= "('{$cid}', '{$sets['iid']}', '{$sets['major']}', '{$sets['qual']}', '{$sets['appfee']}', '{$sets['tusdate']}', '{$sets['tsdate']}', '{$user_id}', '{$sets['agent']}',  '{$sets['method']}',  '{$sets['start']}',  '{$sets['end']}',  '{$sets['due']}',  '{$sets['fee']}',  '{$sets['done']}',  '{$sets['refuse']}', '{$sets['unit']}', '{$sets['key']}', '{$sets['consultant']}', '{$sets['consultant_date']}')";
 		$this->query($sql);
 		return $this->getLastInsertID();
 	}
@@ -722,7 +726,7 @@ class ClientAPI extends MysqlDB {
 		foreach($sets as &$v){
 			$v = addslashes($v);
 		}
-		$sql = "update client_course SET IID = '{$sets['iid']}', MajorID = '{$sets['major']}', QualID = '{$sets['qual']}', AppFee = '{$sets['appfee']}', ToUsDate = '{$sets['tusdate']}', ToSchoolDate = '{$sets['tsdate']}', AgentID = '{$sets['agent']}', MethodID = '{$sets['method']}', StartDate = '{$sets['start']}', EndDate = '{$sets['end']}', Duration = '{$sets['due']}', TFee = '{$sets['fee']}', IsActive = {$sets['done']}, Refuse = '{$sets['refuse']}', Unit = '{$sets['unit']}', KeyPoint = '{$sets['key']}' where ID = {$course_id}";
+		$sql = "update client_course SET IID = '{$sets['iid']}', MajorID = '{$sets['major']}', QualID = '{$sets['qual']}', AppFee = '{$sets['appfee']}', ToUsDate = '{$sets['tusdate']}', ToSchoolDate = '{$sets['tsdate']}', AgentID = '{$sets['agent']}', MethodID = '{$sets['method']}', StartDate = '{$sets['start']}', EndDate = '{$sets['end']}', Duration = '{$sets['due']}', TFee = '{$sets['fee']}', IsActive = {$sets['done']}, Refuse = '{$sets['refuse']}', Unit = '{$sets['unit']}', KeyPoint = '{$sets['key']}', ConsultantID = '{$sets['consultant']}', ConsultantDate = '{$sets['consultant_date']}' where ID = {$course_id}";
 		return $this->query($sql);
 	}
 	

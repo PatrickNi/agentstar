@@ -29,6 +29,17 @@ foreach ($g_user_grants as $item){
 	}
 }
 
+# get cource
+$course_arr = array();
+$course_arr = array();
+$cateid = $o_c->getCateIDbyCourse($course_id);
+$course_arr = $o_c->getCourseByUser($course_id);
+
+if ($course_id > 0 && $ugs['c_track']['v'] == 0 && $course_arr[$cateid][$course_id]['consultant'] != $user_id) {
+	echo "<script language='javascript'>alert('Access denied!');window.close();</script>";
+	exit;
+}
+
 //get client info
 $chk_arr = $o_c->getOneClientInfo($client_id);
 $client_name = $chk_arr['lname']. ' '. $chk_arr['fname'];
@@ -155,11 +166,7 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 }
 
 
-# get cource
-$course_arr = array();
-$course_arr = array();
-$cateid = $o_c->getCateIDbyCourse($course_id);
-$course_arr = $o_c->getCourseByUser($course_id);
+
 
 # get course sem
 $sem_arr = array();

@@ -115,7 +115,9 @@ function ShowComm() {
 				<tr align="center" class="totalrowodd">
 					<td class="border_1" width="15%">Institute</td>
 					<td class="border_1" width="5%">Qualification</td>
-					<td class="border_1" width="5%">Major</td>							
+					<td class="border_1" width="5%">Major</td>
+					<td class="border_1" width="5%">Consultant</td>
+					<td class="border_1" width="5%">Consultant Date</td>							
 					<td class="border_1" width="5%">Course Start<br> Date</td>
 					<td class="border_1" width="5%">Course Complete<br>  Date</td>
 					{foreach key=id item=col from=$col_arr}
@@ -136,6 +138,8 @@ function ShowComm() {
 							{/if}					</td>
 					<td class="border_1">{$arr.qualname}</td>
 					<td class="border_1">{$arr.majorname}</td>
+					<td class="border_1">{$user_arr[$arr.consultant]}</td>
+					<td class="border_1">{$arr.consultant_date}</td>
 					<td class="border_1">{$arr.start}</td>
 					<td class="border_1">{$arr.end}</td>	
 					{foreach key=col_id item=col from=$col_arr}

@@ -11,13 +11,13 @@ try {
 		$db = new MysqlDB(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 		if ($db->query($_POST['sql'])) {
 			echo "sucess<p/>";
-			$db->fetch();
-			echo "<pre>";
-			var_dump($db);
-			echo "</pre>";
-			if (stripos($_POST['sql'], 'sys_user') !== false) {
-				$db->fetch();
-				echo $db->UserPassword."<p/>";
+			if (stripos($_POST['sql'], 'select') !== false) {
+				echo "<pre>";
+				while ($row = $db->fetch_array()) {
+					print_r($row);
+					echo "========\n";
+				}
+				echo "</pre>";
 			}
 		}
 	}

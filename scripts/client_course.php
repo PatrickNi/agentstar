@@ -91,7 +91,7 @@ $o_tpl->assign('client', $client_arr);
 $o_tpl->assign('client_type', $o_c->getClientType($client_id));
 $o_tpl->assign('ugs', $ugs);
 $o_tpl->assign('coursecount', count($course_arr));
-$o_tpl->assign('show_detail', ($client_arr['cuser'] == $user_id || $ugs['c_track']['v'] == 1)? 1 : 0);
+$o_tpl->assign('show_detail', 1);// ($client_arr['cuser'] == $user_id || $ugs['c_track']['v'] == 1)? 1 : 0);
 
 # check has sub agents
 if (is_array($client_arr) && isset($client_arr['agent']) && $client_arr['agent'] > 0){
