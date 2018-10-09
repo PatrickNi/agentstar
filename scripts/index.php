@@ -40,6 +40,7 @@ $oTpl = new Template;
 $oTpl->assign('func_name', $func_name);
 $oTpl->assign('group_name', $group_name);
 $oTpl->assign('gid', $group_id);
+$oTpl->assign('uid', $user_id);
 $oTpl->assign('url', $url);
 $oTpl->assign('grouArr', $arr_func);
 $oTpl->assign('task_num', $o_func->getNumberOfUndoTask($user_id));

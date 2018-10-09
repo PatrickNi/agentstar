@@ -391,12 +391,14 @@
 		<td align="left">
 			view all consultant&nbsp;
 			<input type="checkbox" name="g_todo_course[]" value="{$grant.todo_course.v}" {if $ugs.todo_course.v eq 1} checked="checked" {/if}>&nbsp;&nbsp;
+            <!--
             view Hunter cases&nbsp;
             <input type="checkbox" name="sys_views[]" value="course_37" {if is_array($sys_views.course) && in_array(37, $sys_views.course)} checked="checked" {/if}>&nbsp;&nbsp;
             view Mary cases&nbsp;
             <input type="checkbox" name="sys_views[]" value="course_45" {if is_array($sys_views.course) && in_array(45, $sys_views.course)} checked="checked" {/if}>&nbsp;&nbsp;
 		    view Stella cases&nbsp;
             <input type="checkbox" name="sys_views[]" value="course_73" {if is_array($sys_views.course) && in_array(73, $sys_views.course)} checked="checked" {/if}>&nbsp;&nbsp;
+            -->
         </td>
    </tr>              
    {/if}       

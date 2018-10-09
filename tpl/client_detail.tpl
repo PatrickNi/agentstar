@@ -215,7 +215,7 @@
     </tr>
     <tr>
       <td width="28%"  align="left" class="rowodd"><strong>Note:</strong>&nbsp;&nbsp;</td>
-      <td align="left" width="72%" class="roweven"><textarea style="width:300px; height:100px;" name="t_note">{$arr.note}</textarea></td>
+      <td align="left" width="72%" class="roweven"><textarea style="width:600px; height:200px;" name="t_note">{$arr.note}</textarea></td>
     </tr>
     <tr>
       <td colspan="2"><hr></td>

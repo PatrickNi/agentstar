@@ -85,7 +85,7 @@ switch ($viewWhat){
 //        $reports = array_merge($o_r->getUrgentVisa($view_all, $sort_col, $sort_ord),$o_r->getTodoVisa($view_all, $sort_col, $sort_ord));		
 		break;
 	case "c":
-		/*
+		
         if (isset($ugs['todo_course']) && $ugs['todo_course']['v'] == 1){
 			if(isset($_REQUEST['cUid'])) {
 				$staff_id = $_REQUEST['cUid'];
@@ -94,7 +94,7 @@ switch ($viewWhat){
 				$staff_id = 0;
 			}
 		}
-        */
+        /*
         $staff_id = $_REQUEST['cUid'];
         $slCourseViewer = array();
         $sys_course_viewers = $o_g->get_course_viewer($user_id);
@@ -106,11 +106,11 @@ switch ($viewWhat){
         if (!$staff_id) {
             $staff_id = key($slCourseViewer);
         }
-
+*/
         $sort_col_arr = array(1=>'ClientName',2=>'Name',3=>'Qual',4=>'Major',5=>'ProcessName', 6=>'SortDue');
-        if ($staff_id > 0) {
+        //if ($staff_id > 0) {
             $reports = $o_r->getUrgentCourse($staff_id,getSortList($sort_list, $sort_col_arr, $sort_ord_arr), $only_course, $cdu);
-        }
+        //}
 //		$reports = array_merge($o_r->getUrgentCourse($view_all, $sort_col, $sort_ord), $o_r->getTodoCourse($view_all, $sort_col, $sort_ord));
 		break;
 	case "i":

@@ -194,16 +194,18 @@ class TodoAPI {
         return '';
     }
 
-    function getUndoneList($userid,$src='') {
+    function getUndoneList($userid,$src='',$limit=false) {
         $rtn = array();
-        $sql = "SELECT *, IF(REMIND_TIME IS NOT NULL, 1, 0) as alert FROM ".self::TBL. " WHERE STATUS <> '".self::STATUS_DONE."' ";
+        $sql = "SELECT *, IF(REMIND_TIME IS NOT NULL, REMIND_TIME, '9999-99-99 99:99:99') as alert FROM ".self::TBL. " WHERE STATUS <> '".self::STATUS_DONE."' AND (REMIND_TIME IS NULL OR REMIND_TIME < NOW()) ";
         if ($src != '')
             $sql .= " AND SOURCE = '{$src}' ";
 
         if ($userid > 0)
             $sql .= " AND USER_ID = '{$userid}' ";
 
-        $sql .= " ORDER BY alert, due_date";
+        $sql .= " ORDER BY alert, due_date ";
+        if ($limit) 
+            $sql .= " LIMIT {$limit} ";
         $this->db->query($sql);
         while ($this->db->fetch()) {
             $json = json_decode($this->db->raw_data, true);

@@ -106,11 +106,12 @@ function setSortOrd(col, ord){
 				<tr align="left" class="title">
 					<td colspan="6">
               	        <select name="cUid" onChange="sort_list.value='';t_view.value='c';form1.submit();">
-                        {foreach key=user_id item=user_name from=$slCourseViewer}
-                       		
+                        {foreach key=user_id item=user_name from=$slUsers}
                           	<option value="{$user_id}" {if $staffid eq $user_id} selected {/if}>{$user_name}</option>  
-                     
-                        {/foreach}                    			                      		
+                        {/foreach}                    			          
+                        {if $ugs.todo_course.v eq 1}				
+                          <option value="0" {if $staffid eq '0'} selected {/if}>All Staff</option>  
+                        {/if}	            		
                     </select>
                     </td>
                  </tr>

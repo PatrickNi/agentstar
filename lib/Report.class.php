@@ -110,7 +110,7 @@ class ReportAPI extends MysqlDB {
 					where b.CID = f.CID and a.Done = 0 and a.CCID = b.ID and b.QualID = c.ID and b.MajorID = d.ID and b.IID = e.ID ";
     	//a.DueDate >= Date(NOW()) and 
 		if ($userid > 0 && $only_course == 0){
-			$sql .= " AND f.CourseUser = {$userid}";
+			$sql .= " AND b.ConsultantID = {$userid}";
 		}
 		
 		if ($only_course == 1){

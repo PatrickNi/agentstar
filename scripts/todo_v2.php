@@ -19,6 +19,7 @@ try {
     $task_id = isset($_REQUEST['id'])? $_REQUEST['id'] : 0;
     $delay_time = isset($_REQUEST['dt'])? $_REQUEST['dt'] : 0;
     $action = isset($_REQUEST['act'])? $_REQUEST['act'] : '';
+    $o_tpl = new Template;
     switch ($action) {
         case 'reload':
             $todo->genVisaTask($_REQUEST['uid']);
@@ -39,7 +40,15 @@ try {
             echo json_encode(array('succ'=>1));
             exit;
             break;
-        
+        case 'getone':
+            $data = $todo->getUndoneList($user_id, '', 1);
+            if (count($data) == 0) {
+                echo "";
+                exit;
+            }
+            $o_tpl->assign('todos', $data);
+            $o_tpl->display('todo_sample.tpl');
+            break;
         default:
 
             if ((time() - $last_reload_time) > 4*3600) {
