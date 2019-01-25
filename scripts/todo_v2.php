@@ -23,9 +23,10 @@ try {
     switch ($action) {
         case 'reload':
             $todo->genVisaTask($_REQUEST['uid']);
-            $todo->genMinVisaExpire($_REQUEST['uid']);
+            $todo->genMainVisaExpire($_REQUEST['uid']);
             $todo->genApplyVisaExpire($_REQUEST['uid']);
             $todo->genCourseTask($_REQUEST['uid']);
+            $todo->genDoBTask($_REQUEST['uid']);
             echo "reload OK";
             exit;
             break;
@@ -53,9 +54,10 @@ try {
 
             if ((time() - $last_reload_time) > 4*3600) {
                 $todo->genVisaTask($user_id);
-                $todo->genMinVisaExpire($user_id);
+                $todo->genMainVisaExpire($user_id);
                 $todo->genApplyVisaExpire($user_id);
                 $todo->genCourseTask($user_id);    
+                $todo->genDoBTask($user_id);
                 setCookie('last_reload', time(), time()+24*3600);            
             }
 

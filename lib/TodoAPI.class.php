@@ -25,6 +25,28 @@ class TodoAPI {
     } 
 
 
+    function genDoBTask($userid) {
+        $sql = "select b.CID, b.DOB,  concat(LName, ' ', FName) as ClientName from client_course a, client b where a.CID = b.CID  AND date_format(a.DueDate, '%Y-%m-%d') >= Date(NOW()) and date_format(a.DueDate, '%Y-%m-%d') < Date(NOW()) + INTERVAL 7 Day AND a.ConsultantID = {$userid}";
+
+        $this->db->query($sql);
+        $data = array();
+        while ($this->db->fetch()) {
+            array_push($data, array('user_id'=>$userid, 
+                                     'source'=>'dob', 
+                                     'source_id'=>$this->db->CID, 
+                                     'begin_date'=>$this->db->DOB, 
+                                     'due_date'=>$this->db->DOB, 
+                                     'raw_data'=>array('client'=>$this->db->ClientName, 
+                                                        'subject'=>$this->db->DOB,
+                                                        'cid'=>$this->db->CID
+                                                    )
+                                 )
+                        );
+        }
+
+        return $this->upload($data);         
+    }
+
 
     function genVisaTask($userid){
         $sql = "select a.ID, concat(LName, ' ', FName) as ClientName, VisaName, ClassName, IF(a.ItemID > 0, Item, ExItem) as Item, DueDate, BeginDate, f.CID, CVID from client_visa_process a left join visa_rs_item c on(a.ItemID = c.ItemID) ,  client_visa  b, visa_category d,  visa_subclass e, client_info f where a.Done = 0 and a.CVID = b.ID and b.CID = f.CID and b.CateID = d.CateID and b.SubClassID = e.SubClassID AND (a.DueDate >= '2018-05-01' and a.DueDate < Date(NOW()) + INTERVAL 7 Day)  AND b.VUserID = {$userid} ";
@@ -51,12 +73,18 @@ class TodoAPI {
         return $this->upload($data);
     }
 
-    function genMinVisaExpire($userid) {
-        $sql = "select CID, concat(LName, ' ', FName) as ClientName, c.VisaName, d.ClassName, ExpirDate as Epd from client_info a left join visa_category c on(a.VisaID = c.CateID) left join visa_subclass d on(a.VisaClassID = d.SubClassID) where ExpirDate >= '2018-05-04' AND ExpirDate < Date(NOW()) + INTERVAL 1 Month AND CourseUser = {$userid} ";
+    function genMainVisaExpire($userid) {
+        $file_lck = dirname(__FILE__).'/mainvisa.lck';
+        if (file_exists($file_lck))
+            return false;
+        touch($file_lck);
+
+        $sql = "select CID, concat(LName, ' ', FName) as ClientName, c.VisaName, d.ClassName, ExpirDate as Epd from client_info a left join visa_category c on(a.VisaID = c.CateID) left join visa_subclass d on(a.VisaClassID = d.SubClassID) where ExpirDate >= '2018-05-04' AND ExpirDate < Date(NOW()) + INTERVAL 1 Month";
         $this->db->query($sql);
-        $data = array();
+        $data = $visa_student = $visa_other = array();
+        $i = 0;
         while ($this->db->fetch()) {
-            array_push($data, array('user_id'=>$userid, 
+            $data[$i] = array('user_id'=>3, // grace is default 
                                      'source'=>'expire_main', 
                                      'source_id'=>$this->db->CID, 
                                      'begin_date'=> '0000-00-00',
@@ -66,11 +94,49 @@ class TodoAPI {
                                                         'subclass'=>$this->db->ClassName,
                                                         'cid'=>$this->db->CID,
                                                     )
-                                 )
-                        );
+                                 );
+            $i++;
+
+            if (stripos($this->db->VisaName, 'student') !== false) {
+                if (isset($visa_student[$this->db->CID])) {
+                    array_push($visa_student[$this->db->CID], $i);
+                }
+                else
+                    $visa_student[$this->db->CID] = array($i);   
+            }
+            else {
+                if (isset($visa_other[$this->db->CID])) {
+                    array_push($visa_other[$this->db->CID], $i);
+                }
+                else
+                    $visa_other[$this->db->CID] = array($i);                
+            }
         }
 
-        return $this->upload($data);        
+        if (count($visa_student) > 0) {
+            $sql = "SELECT CID, ConsultantID, MAX(ID) FROM client_course WHERE CID IN (".implode(',', array_keys($visa_student)).") group by CID";
+            $this->db->query($sql);
+            while($this->db->fetch()) {
+                foreach ($visa_student[$this->db->CID] as $k) {
+                    $data[$k]['user_id'] = $this->db->ConsultantID;
+                }
+            }
+        }
+        
+
+        if (count($visa_other) > 0) {
+            $sql = "SELECT CID, AUserID, MAX(ID) FROM client_visa WHERE CID IN (".implode(',', array_keys($visa_student)).") group by CID";
+            $this->db->query($sql);
+            while($this->db->fetch()) {
+                foreach ($visa_other[$this->db->CID] as $k) {
+                    $data[$k]['user_id'] = $this->db->AUserID;
+                }
+            }
+        }
+
+        $this->upload($data);
+        unlink($file_lck);
+        return true;        
     }
 
 
@@ -139,6 +205,9 @@ class TodoAPI {
             case 'expire_apply':
                 return 'Apply Visa Expired';
                 break;
+            case 'dob':
+                return 'Date of Birthday';
+                break;
             default:
                 return $source;
         }
@@ -149,6 +218,7 @@ class TodoAPI {
             case 'expire_main':
             case 'expire_apply':
             case 'visa':
+            case 'dob':
                 return $data['client'];
                 break;
             case 'course':
@@ -171,6 +241,9 @@ class TodoAPI {
             case 'course':
                 return "{$data['qual']} {$data['major']} {$data['qual']} {$data['subject']} ";
                 break;
+            case 'dob':
+                return 'Birthday: '.$data['dob'];
+                break;
             default:
                 return $source;
         }
@@ -190,8 +263,11 @@ class TodoAPI {
             case 'course':
                 return "/scripts/client_course_detail.php?cid={$data['cid']}&courseid={$data['ccid']}";
                 break;
+            case 'dob':
+                return '#';
+                break;
         }
-        return '';
+        return '#';
     }
 
     function getUndoneList($userid,$src='',$limit=false) {
@@ -242,6 +318,23 @@ class TodoAPI {
             return false;
 
         $sql = "UPDATE ".self::TBL." SET STATUS = '".self::STATUS_DONE."' WHERE ID = {$id}";
+        return $this->db->query($sql);
+    }
+
+    function doneBySourceId($source, $id) {
+        if (!$source || !$id)
+            return false;
+
+        $sql = "UPDATE ".self::TBL." SET STATUS = '".self::STATUS_DONE."' WHERE source = '{$source}' AND source_id = {$id}";
+        return $this->db->query($sql);
+    }
+
+    
+    function setDueDate($source, $id, $due_date) {
+        if ($due_date == '0000-00-00')
+            return false;
+
+        $sql = "UPDATE ".self::TBL." SET DUE_DATE = '{$due_date}' WHERE source = '{$source}' AND source_id = {$id}";
         return $this->db->query($sql);
     }
 

@@ -72,13 +72,16 @@ $page_link = '';
 $client_arr = array();
 if (isset($_REQUEST['bt_name']) && $_REQUEST['bt_name'] == 'QUERY' && array_key_exists($srch_type, $columns)){
 	$client_arr = $o_c->getClientInfo($page, $page_size, 0, $view_all, $columns[$srch_type], $srch_qtext, $from_date, $to_date, $only_course, $status);
-	$rows_arr   = $o_c->getClientNumRows(0, $view_all, $columns[$srch_type], $srch_qtext, $from_date, $to_date, $only_course, $status);
-    $rows_num   = isset($rows_arr['all'])? array_sum($rows_arr['all']) : 0;
+	$rows_num = $o_c->getClientTotalRows();
+    $rows_arr   = $o_c->getClientNumRows(0, $view_all, $columns[$srch_type], $srch_qtext, $from_date, $to_date, $only_course, $status);
+    //$rows_num   = isset($rows_arr['all'])? array_sum($rows_arr['all']) : 0;
 	$page_link  = "&bt_name={$_REQUEST['bt_name']}&srchType={$srch_type}&srchTxt={$srch_qtext}&t_fdate={$from_date}&t_tdate={$to_date}";
 }else{
 	$client_arr = $o_c->getClientInfo($page, $page_size, 0, $view_all, "", "", $from_date, $to_date, $only_course, $status);
-	$rows_arr   = $o_c->getClientNumRows(0, $view_all, "", "", $from_date, $to_date, $only_course, $status);
-	$rows_num   = array_sum($rows_arr['all']);
+	$rows_num = $o_c->getClientTotalRows();
+    $rows_arr   = $o_c->getClientNumRows(0, $view_all, "", "", $from_date, $to_date, $only_course, $status);
+	//$rows_num   = array_sum($rows_arr['all']);
+
 }
 
 if (isset($_REQUEST['bt_export']) && strtoupper($_REQUEST['bt_export']) == 'EXPORT CLIENT EMAILS'){

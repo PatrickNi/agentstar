@@ -58,8 +58,15 @@ class ClientAPI extends MysqlDB {
 		}
 	}
 
+	function getClientTotalRows() {
+		$sql = "SELECT FOUND_ROWS() AS C";
+		$this->query($sql);
+		$this->fetch();
+		return $this->C;
+	}
+
 	function getClientInfo($page, $page_size, $cid = 0, $user_id=0, $col_f="", $col_v="", $from="", $to="", $only_course=0, $status=''){
-		$sql = " select CID, LName, FName, Gender, DoB, EName, Email, HTel, Mobile, CurResiAdd, CNCT_PName, CNCT_HTel, CNCT_Mobile, CNCT_Add, VisaID, VisaClassID, ExpirDate, ClientType, CreateTime, STATUS, MaritalStatus, VisaClassTxt, ActiveMem, ActiveMem_Date, Bank from client_info where 1";
+		$sql = " select SQL_CALC_FOUND_ROWS CID, LName, FName, Gender, DoB, EName, Email, HTel, Mobile, CurResiAdd, CNCT_PName, CNCT_HTel, CNCT_Mobile, CNCT_Add, VisaID, VisaClassID, ExpirDate, ClientType, CreateTime, STATUS, MaritalStatus, VisaClassTxt, ActiveMem, ActiveMem_Date, Bank from client_info where 1";
 		
 		if ($user_id > 0){
 			$sql .= " AND CID in (select distinct CID from client_user where UID = {$user_id}) ";
@@ -1735,12 +1742,23 @@ function getSpand($aid){
     }
     
     
-    function getCourseConsult($client_id){
-    	if($client_id > 0){
-    		$sql = "select CourseUser from client_info where CID = '{$client_id}' ";
+    function getCourseConsult($course_id){
+    	if($course_id > 0){
+    		$sql = "select ConsultantID from client_course where ID = '{$course_id}'";
     		$this->query($sql);
     		while ($this->fetch()){
-    			return $this->CourseUser;
+    			return $this->ConsultantID;
+    		}
+    		return 0;
+    	}
+    }
+
+    function getCourseConsultBySem($sem_id){
+    	if($sem_id > 0){
+    		$sql = "select ConsultantID from client_course a, client_course_sem b where a.id = b.CCID and b.ID = '{$sem_id}'";
+    		$this->query($sql);
+    		while ($this->fetch()){
+    			return $this->ConsultantID;
     		}
     		return 0;
     	}

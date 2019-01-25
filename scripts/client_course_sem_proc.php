@@ -73,6 +73,6 @@ if($isNew == 0 && $process_id > 0 && array_key_exists($process_id, $show_arr)){
 $o_tpl->assign('semid', $sem_id);
 $o_tpl->assign('pid', $process_id);
 $o_tpl->assign('isNew', $isNew);
-$o_tpl->assign('isapprove', $o_c->getCourseConsult($client_id) == $user_id || (isset($ugs['c_track']['v']) && $ugs['c_track']['v'] == 1)? 1 :  0);
+$o_tpl->assign('isapprove', $o_c->getCourseConsultBySem($sem_id) == $user_id || (isset($ugs['c_track']['v']) && $ugs['c_track']['v'] == 1)? 1 :  0);
 $o_tpl->display('client_course_sem_process.tpl');
 ?>

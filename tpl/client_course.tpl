@@ -86,7 +86,9 @@ function ShowComm() {
 		<td align="left" style="font-size:16px " colspan="2"> <span class="highyellow">Client: {$client.lname} {$client.fname}</span>&nbsp;&nbsp; <span class="highyellow">DoB: {$client.dob}</span>&nbsp;&nbsp; <span class="highyellow">Main Visa: {$client.visa_n}-{$client.class_n}, expr: {$client.epdate}</span></td>
 	</tr>
 	 <tr class="greybg" align="center">
-	   <td align="left" colspan="2"><strong>Course-consulant:</strong>&nbsp;&nbsp;
+	   <td align="left" colspan="2">
+		<!--
+	   	<strong>Course-consulant:</strong>&nbsp;&nbsp;
 		{if $ugs.c_user.v eq 1 && $ugs.c_user.m eq 0 && ($client.cuser gt 0 || $ugs.c_user.i eq 0)}<input type="hidden" name="t_cuser" value="{$user_id}">{/if}		  
 		<select name="t_cuser" {if $ugs.c_user.v eq 0} style="visibility:hidden"{/if} {if $ugs.c_user.v eq 1 && $ugs.c_user.m eq 0 && ($client.cuser gt 0 || $ugs.c_user.i eq 0)} disabled="disabled" {/if}>		  
 			  <option value="0" selected>choose a user</option>
@@ -100,6 +102,7 @@ function ShowComm() {
 	   {if $ugs.c_user.v eq 1 && $ugs.c_user.m eq 0 && ($coursecount gt 0 || $ugs.c_user.i eq 0)}<input type="hidden" name="t_first" value="{$client.cvdate}"> {/if}
 	    <input type="text" name="t_first" id="t_first" onchange="audit_date(this)"  value="{$client.cvdate}"  {if $ugs.c_user.v eq 0} style="visibility:hidden"{/if} {if $ugs.c_user.v eq 1 && $ugs.c_user.m eq 0 && ($client.cvdate != "" || $ugs.c_user.i eq 0)} disabled="disabled" {/if}>&nbsp;&nbsp;&nbsp;&nbsp;
 	    <input type="submit" name="bt_name" value="Save" style="font-weight:bold ">
+		-->
         {if $ugs.c_service.i eq 1}
         &nbsp;&nbsp;&nbsp;
         <input type="button" name="bt_name" value="Show comm" style="font-weight:bold" onClick="ShowComm()">

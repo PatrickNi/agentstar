@@ -103,7 +103,7 @@ if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" |
 	}
 
 	//check necessary column
-	if($set_course['catid'] == 0 ||	$set_course['iid'] == 0 || $set_course['qual'] == 0 || $set_course['major'] == 0 || $set_course['agent'] == '' || $set_course['start'] == '0000-00-00' || $set_course['end'] == '0000-00-00' || $set_course['fee'] == 0 || $set_course['due'] == "" || $process || $apodue == "0000-00-00" || ($set_course['refuse'] == "" && $set_course['active'] == 2)) {
+	if($course_id > 0 && ($set_course['catid'] == 0 ||	$set_course['iid'] == 0 || $set_course['qual'] == 0 || $set_course['major'] == 0 || $set_course['agent'] == '' || $set_course['start'] == '0000-00-00' || $set_course['end'] == '0000-00-00' || $set_course['fee'] == 0 || $set_course['due'] == "" || $process || $apodue == "0000-00-00" || ($set_course['refuse'] == "" && $set_course['active'] == 2))) {
 		if($msg == '') {
 			if ($set_course['refuse'] == "" && $set_course['active'] == 2) {
 				$msg = 'alert("Refuse reason should not be empty")';
@@ -115,6 +115,9 @@ if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" |
 				$msg = 'alert("[INCOMPLETED INFO] \nCheck follwoings: \n1.Category\n2.Institute\n3.Qualification\n4.Major\n5.Top-Agent\n6.Start Date\n7.Compere Date\n8.Tution Fee\n9.Duration\n")';
 			}
 		}
+	}
+	elseif ($set_course['consultant'] == 0 || $set_course['consultant_date'] == '0000-00-00') {
+		$msg = 'alert("Consultant and Consultant Date should be necessary")';
 	}
 	else {
 
@@ -173,9 +176,15 @@ if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" |
 $course_arr = array();
 $course_arr = $o_c->getCourseByUser($course_id);
 $cateid = $o_c->getCateIDbyCourse($course_id);
-if ($isChange == 0 && $course_id > 0 && array_key_exists($cateid, $course_arr) && array_key_exists($course_id, $course_arr[$cateid])){
-	$set_course = $course_arr[$cateid][$course_id];
-	$set_course['catid'] = $cateid;
+if ($isChange == 0 && $course_id > 0 ){
+	if (array_key_exists($cateid, $course_arr) && array_key_exists($course_id, $course_arr[$cateid])) {
+		$set_course = $course_arr[$cateid][$course_id];
+		$set_course['catid'] = $cateid;
+	}
+	else {
+		$set_course = $course_arr[null][$course_id];
+		$set_course['catid'] = 0;
+	}
 }
 
 if ($course_id > 0 && $ugs['c_track']['v'] == 0 && $course_arr[$cateid][$course_id]['consultant'] != $user_id) {
@@ -244,7 +253,7 @@ $o_tpl->assign('user_arr',$o_g->getUserNameArr());
 $o_tpl->assign('item_arr', $o_c->getProcessOfCourse());
 $o_tpl->assign('courseid', $course_id);
 $o_tpl->assign('cid', $client_id);
-$o_tpl->assign('isapprove', $o_c->getCourseConsult($client_id) == $user_id || (isset($ugs['c_track']['v']) && $ugs['c_track']['v'] == 1)? 1 :  0);
+$o_tpl->assign('isapprove', $course_id == 0 || $o_c->getCourseConsult($course_id) == $user_id || (isset($ugs['c_track']['v']) && $ugs['c_track']['v'] == 1)? 1 :  0);
 $o_tpl->assign('user_id', $user_id);
 $o_tpl->assign('method_arr', $o_c->getMethodOfCourse());
 $o_tpl->assign("itemtype", __FILE_APPLY_COURSE);

@@ -74,6 +74,7 @@
 </div>
 
 </body>
+{if $ugs.todo_alert.v eq 1} 
 {literal}
 <script type="text/javascript">
     Date.prototype.format = function(format) {
@@ -124,7 +125,7 @@
       var postdata = {'act':act, 'id':id}
       if (act == "remind") {
           var newDate = new Date();
-          newDate.setTime(Date.parse(new Date()) + 4 * 3600 * 1000);
+          newDate.setTime(Date.parse(new Date()) + $('#remind_duetime').val() * 3600 * 1000);
           postdata['dt'] =  newDate.format('yyyy-MM-dd h:m:s');
       }
 
@@ -145,9 +146,9 @@
                          }
         });
   }
- 
   setTimeout("remind_task()", 300000);
   setTimeout("sync_task()", 150000);
 </script>
 {/literal}
+{/if}
 </html>  

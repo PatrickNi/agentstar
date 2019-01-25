@@ -5,6 +5,8 @@ require_once(__LIB_PATH.'GeicAPI.class.php');
 ini_set("display_errors", 1);
 error_reporting(2047);
 
+array_push($g_user_grants, 'todo_alert');
+
 $_userid = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
 
 if (!($_userid > 0)) {

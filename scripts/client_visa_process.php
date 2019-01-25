@@ -3,6 +3,8 @@ require_once('../etc/const.php');
 require_once(__LIB_PATH.'Template.class.php');
 require_once(__LIB_PATH.'ClientAPI.class.php');
 require_once(__LIB_PATH.'VisaAPI.class.php');
+require_once(__LIB_PATH.'TodoAPI.class.php');
+
 
 $PROCESS_VISA_STATUS = array('withdraw'=>'withdraw', 'refused'=>'refused', 'cancel agreement'=>'cancel agreement', 'agent stop'=>'agent stop', 'declined' => 'declined' );
 
@@ -22,6 +24,8 @@ $visa_rs_arr = $o_c->getVisaRsID($visa_id);
 # get item array
 $o_v = new VisaAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 $process_item_arr = $o_v->getVisaItemArr($visa_rs_arr['visa'], $visa_rs_arr['class']); 
+
+$o_t = new TodoAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
 
 if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
@@ -112,6 +116,12 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 				reset($process_item_arr);
 			}	
 
+			if ($sets['done'] == 1 && $process_id > 0) {
+				$o_t->doneBySourceId('visa', $process_id);
+			}
+
+			if ($sets['due'] > '0000-00-00')
+				$o_t->setDueDate('visa', $process_id, $sets['due']);
 
 			if ($change_visa_status && $sets['done'] == 1) {
 				$o_c->setApplyVisaStatus($visa_id, $change_visa_status);

@@ -200,6 +200,6 @@ $o_tpl->assign('semid', $sem_id);
 $o_tpl->assign('courseid', $course_id);
 $o_tpl->assign('cid', $client_id);
 $o_tpl->assign('ugs', $ugs);
-$o_tpl->assign('isapprove', ($o_c->getCourseConsult($client_id) == $user_id) || ($ugs['i_rev']['v'] == 1) || (isset($ugs['c_track']['v']) && $ugs['c_track']['v'] == 1)? 1 :  0);
+$o_tpl->assign('isapprove', ($o_c->getCourseConsult($course_id) == $user_id) || ($ugs['i_rev']['v'] == 1) || (isset($ugs['c_track']['v']) && $ugs['c_track']['v'] == 1)? 1 :  0);
 $o_tpl->display('client_course_sem.tpl');
 ?>

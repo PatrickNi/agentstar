@@ -6,7 +6,14 @@
   <hr>
   <p class="mb-0">
     <a href="#" class="btn btn-success" onclick="update_task('done', {$task.id});">Done</a>
-    <a href="#" class="btn {if $task.remind == ''} btn-warning {else}btn-light{/if}" onclick="update_task('remind', {$task.id});">Remind after 4h</a>
+    <a href="#" class="btn {if $task.remind == ''} btn-warning {else}btn-light{/if}" onclick="update_task('remind', {$task.id});">Remind after</a>
+    <select class="form form-control-sm" id="remind_duetime">
+        <option value="0.5">30(min)</option>
+        <option value="1">1(hr)</option>
+        <option value="2">2(hr)</option>
+        <option value="4">4(hr)</option>
+      </select>
+    </div>
  </p>
 </div>
 {/foreach}

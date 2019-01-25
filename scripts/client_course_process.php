@@ -3,6 +3,7 @@ require_once('../etc/const.php');
 require_once(__LIB_PATH.'Template.class.php');
 require_once(__LIB_PATH.'ClientAPI.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
+require_once(__LIB_PATH.'TodoAPI.class.php');
 
 
 # check valid user
@@ -13,6 +14,8 @@ if (!($user_id > 0)) {
 
 //user grants
 $o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
+$o_t = new TodoAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
+
 $ugs = array();
 $user_grants = $o_g->get_user_grants($user_id);
 foreach ($g_user_grants as $item){
@@ -67,6 +70,8 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 			$o_c->setCourseProcess($process_id, $sets, $course_id);
 
 			if($sets['done'] == 1 && $process_id > 0){		
+				$o_t->doneBySourceId('course', $process_id);
+				
 				$sets['order'] = $o_c->getCourseProcessOrder($process_id, $course_id);
 				$sets['subject'] = $o_c->getNextCourseProcessID($sets['subject']);
 				$sets['order'] = $sets['order'] + 1;
@@ -76,6 +81,9 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 				$sets['done']    = 0;
 				$o_c->autoCourseProcess($course_id, $sets);			
 			}
+
+			if ($sets['due'] > '0000-00-00')
+				$o_t->setDueDate('course', $process_id, $sets['due']);			
 		}
 
 		echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
@@ -105,7 +113,7 @@ $o_tpl->assign('cid', $client_id);
 $o_tpl->assign('course_id', $course_id);
 $o_tpl->assign('pid', $process_id);
 $o_tpl->assign('isOther', $isOther);
-$o_tpl->assign('isapprove', $o_c->getCourseConsult($client_id) == $user_id || (isset($ugs['c_track']['v']) && $ugs['c_track']['v'] == 1)? 1 :  0);
+$o_tpl->assign('isapprove', $o_c->getCourseConsult($course_id) == $user_id || (isset($ugs['c_track']['v']) && $ugs['c_track']['v'] == 1)? 1 :  0);
 $o_tpl->assign('msg', $msg);
 $o_tpl->display('client_course_process.tpl');
 ?>

@@ -400,7 +400,14 @@
             <input type="checkbox" name="sys_views[]" value="course_73" {if is_array($sys_views.course) && in_array(73, $sys_views.course)} checked="checked" {/if}>&nbsp;&nbsp;
             -->
         </td>
-   </tr>              
+   </tr>
+   <tr class="roweven">
+        <td align="left" ><ul>Todo Alarm</ul></td>
+        <td align="left">
+            open&nbsp;
+            <input type="checkbox" name="g_todo_alert[]" value="{$grant.todo_alert.v}" {if $ugs.todo_alert.v eq 1} checked="checked" {/if}>&nbsp;&nbsp;
+        </td>
+   </tr>                
    {/if}       
 </table>            
 </form> 

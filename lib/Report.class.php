@@ -510,12 +510,12 @@ class ReportAPI extends MysqlDB {
 
 	function getNumOfCourseClientByUser($fromDay, $toDay, $userid){
 		//$sql = "select Date_Format(CourseVisitDate, '%Y%u') as Week,  concat(LName, ' ', FName) as Name, a.CID, School, Qual from client_info a left join (select CID, School, Qual, max(t1.ID) from client_qual t1, school t2, course_qual t3 where t1.SchoolID = t2.ID and t1.QualID = t3.ID Group by t1.CID) b on(b.CID = a.CID) where CourseVisitDate != '0000-00-00' ";
-		$sql = "select Date_Format(CourseVisitDate, '%Y%u') as Week,  concat(LName, ' ', FName) as Name, t1.CID, t2.ID as CourseID, t2.ProcessID, t3.IsActive from client_info t1 left join (select a.ID as PID, b.CID, b.ID, a.ProcessID from client_course_process a, client_course b where a.ProcessID = ".__C_APPLY_OFFER." and a.CCID = b.ID AND a.Done = 1) t2 on (t1.CID = t2.CID) left join client_course t3 ON(t1.CID = t3.CID) WHERE 1 ";		
+		$sql = "select Date_Format(ConsultantDate, '%Y%u') as Week,  concat(LName, ' ', FName) as Name, t1.CID, t2.ID as CourseID, t2.ProcessID, t3.IsActive from client_info t1 left join (select a.ID as PID, b.CID, b.ID, a.ProcessID from client_course_process a, client_course b where a.ProcessID = ".__C_APPLY_OFFER." and a.CCID = b.ID AND a.Done = 1) t2 on (t1.CID = t2.CID) left join client_course t3 ON(t1.CID = t3.CID) WHERE 1 ";		
 		if ($userid > 0) {
-			$sql .= " AND CourseUser = {$userid} ";
+			$sql .= " AND ConsultantID = {$userid} ";
 		}
 		if ($fromDay != "" && $toDay  != "") {
-			$sql .= " AND CourseVisitDate >= '{$fromDay}' and CourseVisitDate <= '{$toDay}' ";
+			$sql .= " AND ConsultantDate >= '{$fromDay}' and ConsultantDate <= '{$toDay}' ";
 		}
 		$this->query($sql);
 		$_arr = array();
@@ -549,10 +549,10 @@ class ReportAPI extends MysqlDB {
 		$sql = "select concat(LName, ' ', FName) as Name, t1.CID, t2.ID as CourseID, t2.ProcessID, t3.IsActive from client_info t1 left join (select a.ID as PID, b.CID, b.ID, a.ProcessID, b.IsActive from client_course_process a, client_course b where a.ProcessID = ".__C_APPLY_OFFER." and a.CCID = b.ID AND a.Done = 1) t2 on (t1.CID = t2.CID) left join client_course t3 ON (t1.CID = t3.CID) WHERE 1 ";
 
 		if ($userid > 0) {
-			$sql .= " AND CourseUser = {$userid} ";
+			$sql .= " AND ConsultantDate = {$userid} ";
 		}
 		if ($fromDay != "" && $toDay  != "") {
-			$sql .= " AND CourseVisitDate >= '{$fromDay}' and CourseVisitDate <= '{$toDay}' ";
+			$sql .= " AND ConsultantDate >= '{$fromDay}' and ConsultantDate <= '{$toDay}' ";
 		}		
 
 		$this->query($sql);
@@ -584,7 +584,7 @@ class ReportAPI extends MysqlDB {
         $sql = "select Date_Format(BeginDate, '%Y%u') as Week, b.IsActive, b.ID, a.ProcessID, concat(LName, ' ', FName) as Name, d.Name as School, e.Qual, c.CID from client_course_process a, client_info c, client_course b left join institute d on(b.IID = d.ID) left join institute_qual e on(b.QualID = e.ID) where (a.ProcessID = ".__C_RECEIVE_OFFER." or a.ProcessID = ".__C_PASS_OFFER." or a.ProcessID = ".__C_GET_COE." or a.ProcessID = ".__C_PAY_TUITION_FEE.") and a.CCID = b.ID and b.CID = c.CID and a.Done = 1 ";
    
 		if ($userid > 0) {
-			$sql .= " AND c.CourseUser = {$userid} ";
+			$sql .= " AND b.ConsultantID = {$userid} ";
 		}else{
 			
 		}
@@ -635,14 +635,14 @@ class ReportAPI extends MysqlDB {
 	function getAllOfCourseProcessByUser($fromDay, $toDay, $userid){
 		$where = "";
 		if ($userid > 0) {
-			$where .= " AND c.CourseUser = {$userid} ";
+			$where .= " AND b.ConsultantID = {$userid} ";
 		}
 		
 		if ($fromDay != "" && $toDay  != "") {
 			$where .= " AND BeginDate >= '{$fromDay}' and BeginDate <= '{$toDay}' ";
 		}
 		//get apply offer
-		$sql = "select b.IsActive, b.ID, a.ProcessID, concat(LName, ' ', FName) as Name, d.Name as School, e.Qual, c.CID, CourseVisitDate, c.AgentID from client_course_process a, client_info c, client_course b left join institute d on(b.IID = d.ID) left join institute_qual e on(b.QualID = e.ID) where (a.ProcessID = ".__C_RECEIVE_OFFER." or a.ProcessID = ".__C_PASS_OFFER." or a.ProcessID = ".__C_GET_COE." or a.ProcessID = ".__C_PAY_TUITION_FEE.") and a.CCID = b.ID and b.CID = c.CID and a.Done = 1 ";
+		$sql = "select b.IsActive, b.ID, a.ProcessID, concat(LName, ' ', FName) as Name, d.Name as School, e.Qual, c.CID, ConsultantDate, c.AgentID from client_course_process a, client_info c, client_course b left join institute d on(b.IID = d.ID) left join institute_qual e on(b.QualID = e.ID) where (a.ProcessID = ".__C_RECEIVE_OFFER." or a.ProcessID = ".__C_PASS_OFFER." or a.ProcessID = ".__C_GET_COE." or a.ProcessID = ".__C_PAY_TUITION_FEE.") and a.CCID = b.ID and b.CID = c.CID and a.Done = 1 ";
         $this->query($sql.$where);
 
 		$_arr = array();
@@ -655,7 +655,7 @@ class ReportAPI extends MysqlDB {
                     $_arr['all']['apoaid' ][$this->ID] = $this->CID;
 				
                 $_arr['all']['reo'    ][$this->ID] = 0;	
-                if ($this->CourseVisitDate >= $fromDay && $this->CourseVisitDate <= $toDay) {
+                if ($this->ConsultantDate >= $fromDay && $this->ConsultantDate <= $toDay) {
                     $_arr['all']['apo_new'][$this->CID]=1;
                     if ($this->AgentID > 0) 
                         $_arr['all']['apo_new_aid'][$this->CID]=1;
@@ -672,7 +672,7 @@ class ReportAPI extends MysqlDB {
                 $_arr['all']['reo'    ][$this->ID] = 1;	
 				
 				$_arr['all']['reo_st' ][$this->ID] = $this->IsActive == 2? -1 : 0;	
-                if ($this->CourseVisitDate >= $fromDay && $this->CourseVisitDate <= $toDay){
+                if ($this->ConsultantDate >= $fromDay && $this->ConsultantDate <= $toDay){
                     $_arr['all']['reo_new'][$this->CID]=1;
                     if ($this->AgentID > 0)
                         $_arr['all']['reo_new_aid'][$this->CID]=1;
@@ -687,7 +687,7 @@ class ReportAPI extends MysqlDB {
                     $_arr['all']['recaid' ][$this->ID] = $this->CID;	                
 				
                 $_arr['all']['rec'    ][$this->ID] = 1;
-                if ($this->CourseVisitDate >= $fromDay && $this->CourseVisitDate <= $toDay){
+                if ($this->ConsultantDate >= $fromDay && $this->ConsultantDate <= $toDay){
                     $_arr['all']['rec_new'][$this->CID]=1;
                    
                     if ($this->AgentID > 0)
@@ -741,10 +741,10 @@ class ReportAPI extends MysqlDB {
                      , client_course b,client_info c, sys_user d
                 WHERE a.CCID = b.ID 
                   AND b.CID = c.CID 
-                  AND c.CourseUser = d.ID
+                  AND b.ConsultantID = d.ID
                   AND RedDate >= '{$fromDay}' AND RedDate <= '{$toDay}' "; 
 	    if ($userid > 0) {
-            $sql .= " AND c.CourseUser = {$userid} ";
+            $sql .= " AND b.ConsultantID = {$userid} ";
         }
         $sql .= " Order by wk, Name, a.SEM ";
 		$this->query($sql);
@@ -770,7 +770,7 @@ class ReportAPI extends MysqlDB {
 	function getAllOfCourseCommByUser($fromDay, $toDay, $userid){
 		      $sql = "SELECT  date_format(RedDate, '%Y-%u') as wk,
                         concat(LName, ' ', FName) as Name, 
-                        c.CID, a.ID, a.CCID,c.DOB, CourseVisitDate, c.AgentID,
+                        c.CID, a.ID, a.CCID,c.DOB, ConsultantDate, c.AgentID,
 						IF(t1.BeginDate >= d.StartDate and d.StartDate <> '' and d.StartDate <> '0000-00-00', IF(CoComm > 0 OR Discount > 0, RComm-CoComm-Discount,RedComm-Discount), 0) as bonus,
 						IF(t1.BeginDate >= d.StartDate and d.StartDate <> '' and d.StartDate <> '0000-00-00', 0, 1) as nobonus
                       FROM client_course_sem a
@@ -778,11 +778,11 @@ class ReportAPI extends MysqlDB {
 		                    , client_course b,client_info c, sys_user d
 		               WHERE a.CCID = b.ID 
 		                  AND b.CID = c.CID 
-                          AND c.CourseUser = d.ID 
+                          AND b.ConsultantID = d.ID 
                           AND RedDate >= '{$fromDay}' AND RedDate <= '{$toDay}'";
                   
 		if ($userid > 0) {
-			$sql .= " AND c.CourseUser = {$userid} ";
+			$sql .= " AND b.ConsultantID = {$userid} ";
         }
 
         $sql .= " Order by wk, Name, a.SEM ";
@@ -802,7 +802,7 @@ class ReportAPI extends MysqlDB {
             if ($this->AgentID > 0)
                 $_arr['all']['agent'][$i] = $this->CID;
 
-            if ($this->CourseVisitDate >= $fromDay && $this->CourseVisitDate <= $toDay){
+            if ($this->ConsultantDate >= $fromDay && $this->ConsultantDate <= $toDay){
                 $_arr['all']['bonus_new'][$this->CID] = 1;
                 if ($this->AgentID > 0) 
                     $_arr['all']['bonus_new_aid'][$this->CID] = 1;  
@@ -829,7 +829,7 @@ class ReportAPI extends MysqlDB {
                         a.ID,
                         a.CCID,
                         c.DOB,
-                        CourseVisitDate, 
+                        ConsultantDate, 
 						IF(t1.BeginDate >= d.StartDate and d.StartDate <> '' and d.StartDate <> '0000-00-00', IF(CoComm > 0 OR Discount > 0, RComm-CoComm-Discount,RComm-Discount), 0) as rcomm,
 						IF(t1.BeginDate >= d.StartDate and d.StartDate <> '' and d.StartDate <> '0000-00-00', 0, 1) as norcomm
                 FROM client_course_sem a  
@@ -837,10 +837,10 @@ class ReportAPI extends MysqlDB {
                      , client_course b,client_info c, sys_user d
                 WHERE a.CCID = b.ID 
                   AND b.CID = c.CID 
-                  AND c.CourseUser = d.ID
+                  AND b.ConsultantID = d.ID
                   AND t1.BeginDate >= '{$fromDay}' AND t1.BeginDate <= '{$toDay}' "; 
 	    if ($userid > 0) {
-            $sql .= " AND c.CourseUser = {$userid} ";
+            $sql .= " AND b.ConsultantID = {$userid} ";
         }
         $sql .= " Order by wk, Name, a.SEM ";
         $this->query($sql);
@@ -868,7 +868,7 @@ class ReportAPI extends MysqlDB {
     function getAllOfCoursePotCommByUser($fromDay, $toDay, $userid){
     			//concat(LName, ' ', FName) like 'sub-%',
 		      $sql = "SELECT  date_format(BeginDate, '%Y-%u') as wk,
-                        concat(LName, ' ', FName) as Name, CourseVisitDate,
+                        concat(LName, ' ', FName) as Name, ConsultantDate,
                         c.CID, a.ID, a.CCID, c.DOB, c.AgentID,
 						IF(t1.BeginDate >= d.StartDate and d.StartDate <> '' and d.StartDate <> '0000-00-00', IF(CoComm > 0 OR Discount > 0, RComm-CoComm-Discount,RComm-Discount), 0) as rcomm,
 						IF(t1.BeginDate >= d.StartDate and d.StartDate <> '' and d.StartDate <> '0000-00-00', 0, 1) as norcomm
@@ -877,11 +877,11 @@ class ReportAPI extends MysqlDB {
 		                    , client_course b,client_info c, sys_user d
 		               WHERE a.CCID = b.ID 
 		                  AND b.CID = c.CID 
-                          AND c.CourseUser = d.ID 
+                          AND b.ConsultantID = d.ID 
                           AND t1.BeginDate >= '{$fromDay}' AND t1.BeginDate <= '{$toDay}'";
                   
 		if ($userid > 0) {
-			$sql .= " AND c.CourseUser = {$userid} ";
+			$sql .= " AND b.ConsultantID = {$userid} ";
         }
 
         $sql .= " Order by wk, Name, a.SEM ";
@@ -899,7 +899,7 @@ class ReportAPI extends MysqlDB {
 			$_arr['all']['course'][$i] = $this->CCID;
             if ($this->AgentID) 
                 $_arr['all']['agent'][$i] = $this->CID;
-            if ($this->CourseVisitDate >= $fromDay && $this->CourseVisitDate <= $toDay){
+            if ($this->ConsultantDate >= $fromDay && $this->ConsultantDate <= $toDay){
                 $_arr['all']['rcomm_new'][$this->CID] = 1;
                 if ($this->AgentID > 0) 
                     $_arr['all']['rcomm_new_aid'][$this->CID] = 1;

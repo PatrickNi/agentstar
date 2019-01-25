@@ -11,8 +11,20 @@ if (!($user_id > 0)) {
 	echo "<script language='javascript'>parent.location.href='login.php';</script>";
 }
 
-
 $o_func = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, true);
+
+
+$ugs = array();
+array_push($g_user_grants, 'todo_alert');
+$user_grants = $o_func->get_user_grants($user_id);
+foreach ($g_user_grants as $item){
+	if (array_key_exists($item, $user_grants)) {
+		foreach ($g_user_ops as $key=>$op){
+			$ugs[$item][$key] = $o_func->check_user_grant($user_grants[$item], $op); 	
+		}		
+	}
+}
+
 
 $taskArr = $o_func->getReceiveTask(0, $user_id);
 
@@ -45,7 +57,7 @@ $oTpl->assign('url', $url);
 $oTpl->assign('grouArr', $arr_func);
 $oTpl->assign('task_num', $o_func->getNumberOfUndoTask($user_id));
 $oTpl->assign('user_name', $o_func->getUserName($user_id));
-
+$oTpl->assign('ugs', $ugs);
 $oTpl->display('frame_test.tpl');
 
 echo '<script language="javascript">
