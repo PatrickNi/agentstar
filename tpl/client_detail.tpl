@@ -58,7 +58,7 @@
         </table></td>
     </tr>
     <tr align="center"  class="greybg" >
-      <td align="left" colspan="2" style="font-size:16px "><span class="highyellow">Client: {$arr.lname} {$arr.fname}</span>&nbsp;&nbsp; <span class="highyellow">DoB: {$arr.dob}</span>&nbsp;&nbsp; <span class="highyellow">Main Visa: {$client.visa_n}-{$client.class_n}, expr: {$client.epdate}</span>&nbsp;&nbsp;             	
+      <td align="left" colspan="2" style="font-size:16px "><span class="highyellow">Client: {$arr.lname} {$arr.fname}</span>&nbsp;&nbsp; <span class="highyellow">DoB: {$arr.dob}</span>&nbsp;&nbsp; <span class="highyellow">Main Visa: {$arr.visa_n}-{$arr.class_n}, expr: {$arr.epdate}</span>&nbsp;&nbsp;             	
       {if $arr.status == 'new'}
 	      <input type="submit" value="Approve From GEIC" style="font-weight:bold; color:#FF0000" onClick="this.form.bt_name.value='approved';this.disable=false;" >
       {/if}
