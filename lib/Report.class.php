@@ -517,6 +517,7 @@ class ReportAPI extends MysqlDB {
 		if ($fromDay != "" && $toDay  != "") {
 			$sql .= " AND ConsultantDate >= '{$fromDay}' and ConsultantDate <= '{$toDay}' ";
 		}
+        
 		$this->query($sql);
 		$_arr = array();
 		while ($this->fetch()) {
@@ -546,15 +547,15 @@ class ReportAPI extends MysqlDB {
 	function getAllOfCourseClientByUser($fromDay, $toDay, $userid){
 		//$sql = "select count(*) as cnt from client_info where CourseVisitDate != '0000-00-00' ";
 		//$sql = "select concat(LName, ' ', FName) as Name, a.CID, School, Qual from client_info a left join (select CID, School, Qual, max(t1.ID) from client_qual t1, school t2, course_qual t3 where t1.SchoolID = t2.ID and t1.QualID = t3.ID Group by t1.CID) b on(b.CID = a.CID) where CourseVisitDate != '0000-00-00' ";
-		$sql = "select concat(LName, ' ', FName) as Name, t1.CID, t2.ID as CourseID, t2.ProcessID, t3.IsActive from client_info t1 left join (select a.ID as PID, b.CID, b.ID, a.ProcessID, b.IsActive from client_course_process a, client_course b where a.ProcessID = ".__C_APPLY_OFFER." and a.CCID = b.ID AND a.Done = 1) t2 on (t1.CID = t2.CID) left join client_course t3 ON (t1.CID = t3.CID) WHERE 1 ";
+		$sql = "select concat(LName, ' ', FName) as Name, t1.CID, t2.ID as CourseID, t2.ProcessID, t3.IsActive from client_info t1 left join (select a.ID as PID, b.CID, b.ID, a.ProcessID from client_course_process a, client_course b where a.ProcessID = ".__C_APPLY_OFFER." and a.CCID = b.ID AND a.Done = 1) t2 on (t1.CID = t2.CID) left join client_course t3 ON (t1.CID = t3.CID) WHERE 1 ";
 
 		if ($userid > 0) {
-			$sql .= " AND ConsultantDate = {$userid} ";
+			$sql .= " AND ConsultantID = {$userid} ";
 		}
 		if ($fromDay != "" && $toDay  != "") {
 			$sql .= " AND ConsultantDate >= '{$fromDay}' and ConsultantDate <= '{$toDay}' ";
 		}		
-
+        
 		$this->query($sql);
 		$_arr = array();
 		while ($this->fetch()) {
@@ -575,7 +576,7 @@ class ReportAPI extends MysqlDB {
 				$_arr['all']['refuse'][$this->CID] += $this->IsActive == 2? 1 : 0;							
 			}
 		}
-
+        //print_r($_arr);
 		$_arr['all']['cnt'] = isset($_arr['all'])? count($_arr['all']['name']) : 0;
 		return $_arr;		 
 	}
