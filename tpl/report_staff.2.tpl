@@ -77,50 +77,71 @@
             {/foreach}
         </ul>
         <span style="font-size:16px; font-weight:bolder; cursor:pointer;" onClick="d1_{$week}.style.display='none'">&times;</span> </div></td>
-    <td><span onClick="openinSatff('d2_{$week}');" style="cursor:pointer;">
-          {$courseprocs[$week].apocnt}<br/>
-          {$courseprocs[$week].apocnt_st} old students 
-          <br/>&nbsp;&nbsp;<span style="text-decoration:underline; ">(inc {$courseprocs[$week].apocnt_aid} subagents)</span><br/> 
-          {$courseprocs[$week].apo_new} new clients 
-          <br/>&nbsp;&nbsp;<span style="text-decoration:underline; ">(inc {$courseprocs[$week].apo_new_aid} subagents)</span> 
-        </span>
-      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:500px" id="d2_{$week}">
+    <td>
+          {$courseprocs[$week].apocnt}
+          <br/><span onClick="openinSatff('d2_old_{$week}');"  style="text-decoration:underline; cursor:pointer;">{$courseprocs[$week].apocnt_st} old students</span> 
+          <br/>&nbsp;&nbsp;(inc {$courseprocs[$week].apocnt_aid} subagents)
+          <br/><span onClick="openinSatff('d2_new_{$week}');"  style="text-decoration:underline; cursor:pointer;">{$courseprocs[$week].apo_new} new clients</span> 
+          <br/>&nbsp;&nbsp;(inc {$courseprocs[$week].apo_new_aid} subagents)
+      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:500px" id="d2_old_{$week}">
         <ul>
-          {foreach key=id item=name from=$courseprocs[$week].aponame}
+          {foreach key=id item=name from=$courseprocs[$week].aponame_old}
           <li><span style="text-decoration:underline; cursor:pointer; {if $courseprocs[$week].reo.$id eq 0}color:#0000FF{elseif $courseprocs[$week].reo_st.$id eq -1}color:#999999;{/if}" onClick="openModel('client_course_detail.php?cid={$courseprocs.$week.apocid.$id}&courseid={$id}',screen.width*4/5,screen.height*4/5,'NO', 'form1')">{$name}</span>
             {/foreach}
         </ul>
-        <span style="font-weight:bolder; cursor:pointer;" onClick="d2_{$week}.style.display='none'">&times;</span> </div></td>  
-
-     <td ><span onClick="openinSatff('d3_{$week}');" style="cursor:pointer;">
-           {$courseprocs[$week].reocnt}<br/>
-           {$courseprocs[$week].reocnt_st} old students 
-           <br/>&nbsp;&nbsp;<span style="text-decoration:underline; ">(inc {$courseprocs[$week].reocnt_aid} subagents)</span><br/> 
-           {$courseprocs[$week].reo_new} new clients 
-           <br/>&nbsp;&nbsp;<span style="text-decoration:underline; ">(inc {$courseprocs[$week].reo_new_aid} subagents)</span> 
-        </span>
-      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:500px" id="d3_{$week}">
+        <span style="font-weight:bolder; cursor:pointer;" onClick="d2_old_{$week}.style.display='none'">&times;</span> </div>
+      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:500px" id="d2_new_{$week}">
         <ul>
-          {foreach key=id item=name from=$courseprocs[$week].reoname}
+          {foreach key=id item=name from=$courseprocs[$week].aponame_new}
+          <li><span style="text-decoration:underline; cursor:pointer; {if $courseprocs[$week].reo.$id eq 0}color:#0000FF{elseif $courseprocs[$week].reo_st.$id eq -1}color:#999999;{/if}" onClick="openModel('client_course_detail.php?cid={$courseprocs.$week.apocid.$id}&courseid={$id}',screen.width*4/5,screen.height*4/5,'NO', 'form1')">{$name}</span>
+            {/foreach}
+        </ul>
+        <span style="font-weight:bolder; cursor:pointer;" onClick="d2_new_{$week}.style.display='none'">&times;</span> </div>
+    </td>  
+
+     <td >
+           {$courseprocs[$week].reocnt}
+           <br/><span onClick="openinSatff('d3_old_{$week}');" style="text-decoration:underline; cursor:pointer;">{$courseprocs[$week].reocnt_st} old students</span> 
+           <br/>&nbsp;&nbsp;(inc {$courseprocs[$week].reocnt_aid} subagents)
+           <br/><span onClick="openinSatff('d3_new_{$week}');" style="text-decoration:underline; cursor:pointer;">{$courseprocs[$week].reo_new} new clients</span> 
+           <br/>&nbsp;&nbsp;(inc {$courseprocs[$week].reo_new_aid} subagents)
+      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:500px" id="d3_old_{$week}">
+        <ul>
+          {foreach key=id item=name from=$courseprocs[$week].reoname_old}
           <li><span style="text-decoration:underline; cursor:pointer; {if $courseprocs[$week].reo_st.$id eq 0}color:#0000FF{elseif $courseprocs[$week].reo_st.$id eq -1}color:#999999;{/if}" onClick="openModel('client_course_detail.php?cid={$courseprocs.$week.reocid.$id}&courseid={$id}',screen.width*4/5,screen.height*4/5,'NO', 'form1')">{$name}</span>
             {/foreach}
         </ul>
-        <span style="font-weight:bolder; cursor:pointer;" onClick="d3_{$week}.style.display='none'">&times;</span> </div></td>   
-
-    <td><span onClick="openinSatff('d4_{$week}');" style="cursor:pointer;">
-        {$courseprocs[$week].reccnt}<br/>
-        {$courseprocs[$week].reccnt_st} old students 
-        <br/>&nbsp;&nbsp;<span style="text-decoration:underline; ">(inc {$courseprocs[$week].reccnt_aid} subagents)</span><br/>  
-        {$courseprocs[$week].rec_new} new clients 
-        <br/>&nbsp;&nbsp;<span style="text-decoration:underline; ">(inc {$courseprocs[$week].rec_new_aid} subagents)</span> 
-     </span>
-      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:500px" id="d4_{$week}">
+        <span style="font-weight:bolder; cursor:pointer;" onClick="d3_old_{$week}.style.display='none'">&times;</span> </div>
+        <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:500px" id="d3_new_{$week}">
         <ul>
-          {foreach key=id item=name from=$courseprocs[$week].recname}
+          {foreach key=id item=name from=$courseprocs[$week].reoname_new}
+          <li><span style="text-decoration:underline; cursor:pointer; {if $courseprocs[$week].reo_st.$id eq 0}color:#0000FF{elseif $courseprocs[$week].reo_st.$id eq -1}color:#999999;{/if}" onClick="openModel('client_course_detail.php?cid={$courseprocs.$week.reocid.$id}&courseid={$id}',screen.width*4/5,screen.height*4/5,'NO', 'form1')">{$name}</span>
+            {/foreach}
+        </ul>
+        <span style="font-weight:bolder; cursor:pointer;" onClick="d3_new_{$week}.style.display='none'">&times;</span> </div>
+      </td>   
+
+    <td>
+        {$courseprocs[$week].reccnt}
+        <br/><span onClick="openinSatff('d4_old_{$week}');" style="text-decoration:underline; cursor:pointer;">{$courseprocs[$week].reccnt_st} old students</span> 
+        <br/>&nbsp;&nbsp;(inc {$courseprocs[$week].reccnt_aid} subagents)</span>  
+        <br/><span onClick="openinSatff('d4_new_{$week}');" style="text-decoration:underline; cursor:pointer;">{$courseprocs[$week].rec_new} new clients</span> 
+        <br/>&nbsp;&nbsp;(inc {$courseprocs[$week].rec_new_aid} subagents) 
+      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:500px" id="d4_old_{$week}">
+        <ul>
+          {foreach key=id item=name from=$courseprocs[$week].recname_old}
           <li><span style="text-decoration:underline; cursor:pointer;" onClick="openModel('client_course_detail.php?cid={$courseprocs.$week.reccid.$id}&courseid={$id}',screen.width*4/5,screen.height*4/5,'NO', 'form1')">{$name}</span>
             {/foreach}
         </ul>
-        <span style="font-weight:bolder; cursor:pointer;" onClick="d4_{$week}.style.display='none'">&times;</span> </div></td>  
+        <span style="font-weight:bolder; cursor:pointer;" onClick="d4_old_{$week}.style.display='none'">&times;</span> </div>
+     <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:500px" id="d4_new_{$week}">
+        <ul>
+          {foreach key=id item=name from=$courseprocs[$week].recname_new}
+          <li><span style="text-decoration:underline; cursor:pointer;" onClick="openModel('client_course_detail.php?cid={$courseprocs.$week.reccid.$id}&courseid={$id}',screen.width*4/5,screen.height*4/5,'NO', 'form1')">{$name}</span>
+            {/foreach}
+        </ul>
+        <span style="font-weight:bolder; cursor:pointer;" onClick="d4_new_{$week}.style.display='none'">&times;</span> </div>
+    </td>  
     <td>
       {if $ugs.rpt_staff_pc.v eq 1}
       <span onClick="openinSatff('d5_{$week}');" style="cursor:pointer;">

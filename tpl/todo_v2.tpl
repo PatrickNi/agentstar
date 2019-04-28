@@ -54,7 +54,11 @@
                       <li class="list-group-item d-flex justify-content-between align-items-center  {if $source eq 'expire_apply'} list-group-item-primary {/if}">
                         <a href="/scripts/todo_v2.php?src=expire_apply" >Apply Visa Expired</a>
                         <span class="badge badge-primary badge-pill">{$filters.expire_apply}</span>
-                      </li>                                            
+                      </li>        
+                      <li class="list-group-item d-flex justify-content-between align-items-center  {if $source eq 'dob'} list-group-item-primary {/if}">
+                        <a href="/scripts/todo_v2.php?src=dob" >Happy Birthday</a>
+                        <span class="badge badge-primary badge-pill">{$filters.dob}</span>
+                      </li>                                      
                     </ul>
              </div>
         </div>

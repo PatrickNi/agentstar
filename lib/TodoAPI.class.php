@@ -26,7 +26,7 @@ class TodoAPI {
 
 
     function genDoBTask($userid) {
-        $sql = "select b.CID, b.DOB,  concat(LName, ' ', FName) as ClientName from client_course a, client b where a.CID = b.CID  AND date_format(a.DueDate, '%Y-%m-%d') >= Date(NOW()) and date_format(a.DueDate, '%Y-%m-%d') < Date(NOW()) + INTERVAL 7 Day AND a.ConsultantID = {$userid}";
+        $sql = "select b.CID, b.DOB,  concat(LName, ' ', FName) as ClientName from client_course a, client_info b where a.CID = b.CID  AND date_format(b.DOB, '%Y-%m-%d') >= Date(NOW()) and date_format(b.DOB, '%Y-%m-%d') < Date(NOW()) + INTERVAL 7 Day AND a.ConsultantID = {$userid}";
 
         $this->db->query($sql);
         $data = array();
@@ -37,7 +37,7 @@ class TodoAPI {
                                      'begin_date'=>$this->db->DOB, 
                                      'due_date'=>$this->db->DOB, 
                                      'raw_data'=>array('client'=>$this->db->ClientName, 
-                                                        'subject'=>$this->db->DOB,
+                                                        'subject'=>'Send happy birthday message on '.$this->db->DOB,
                                                         'cid'=>$this->db->CID
                                                     )
                                  )
