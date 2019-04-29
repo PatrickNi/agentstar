@@ -69,10 +69,13 @@
   </tr>
 
   <tr align="right" class="roweven" >
-    <td><span onClick="openinSatff('d1_{$week}');" style="text-decoration:underline; cursor:pointer;">{$courses[$week].cnt}</span>
+    <td><span onClick="openinSatff('d1_{$week}');" style="text-decoration:underline; cursor:pointer;">
+        {$courses[$week].cnt} 
+        <br/>(New clients: {$courses[$week].cnt_new})
+      </span>
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:300px" id="d1_{$week}">
         <ul>
-          {foreach key=id item=name from=$courses[$week].name}
+          {foreach key=id item=name from=$courses[$week].name_new}
           <li><span style="text-decoration:underline; cursor:pointer; {if $courses[$week].apo.$id eq 0}color:#0000FF{elseif $courses[$week].num.$id eq $courses[$week].refuse.$id}color:#999999;{/if}" onClick="openModel('client_course.php?cid={$id}',screen.width*4/5,screen.height*4/5,'NO', 'form1')">{$name}</span>
             {/foreach}
         </ul>
