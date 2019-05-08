@@ -1,32 +1,44 @@
 <?php
 require_once('../etc/const.php');
 require_once(__LIB_PATH.'MysqlDB.class.php');
-require_once(__LIB_PATH.'VisaAPI.class.php');
+require_once(__LIB_PATH.'GeicAPI.class.php');
 
 $db = new MysqlDB(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
-$sql = "SELECT cateid, subclassid FROM visa_rs_item where item like 'issue biz %' or item like 'issue business%' ";
+$sql = "select distinct c.CVID from client_visa_process as c, visa_rs_item i, (select VisaID, Sum(DueAmount) as totalpay, Sum(b.paid) as paid from client_account a left join  (select AccountID, SUM(PaidAmount) as paid from client_payment Group by AccountID) b on (a.ID = b.AccountID) where ACC_TYPE = 'visa' Group by VisaID having totalpay > paid) d where c.cvid = d.visaid and c.itemid = i.itemid and i.item like 'apply%' ";
 $db->query($sql);
-$items = array();
+$visas = array();
 while ($db->fetch()) {
-    $items[$db->cateid."-".$db->subclassid] = 1;
+    $visas[$db->CVID] = array();
+}
+
+$sql = "SELECT v.id, cateid, subclassid, lname, fname, v.cid, VUserID from client_visa v, client_info c where v.cid = c.cid and v.id in (".implode(',', array_keys($visas)).")";
+$db->query($sql);
+while ($db->fetch()) {
+    $results[$db->VUserID][$db->id]['name'] = $db->fname." ".$db->lname;
+    $results[$db->VUserID][$db->id]['visa'] = $db->cateid."\t".$db->subclassid;
+    $results[$db->VUserID][$db->id]['cid' ] = $db->cid;
 }
 
 $sql = "SELECT a.cateid, a.visaname, b.subclassid, b.classname FROM visa_category a, visa_subclass b where a.cateid = b.cateid ";
 $db->query($sql);
-echo "<pre>";
-$o_v = new VisaAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
+$visa_names = array();
 while ($db->fetch()) {
-    $k =$db->cateid."-".$db->subclassid;
-    if (!isset($items[$k])) {
-        echo $db->visaname."\t".$db->classname."........";
-        if ($o_v->addVisaRelate($db->cateid, $db->subclassid, 'issue biz invoice', 0))
-            echo "ok\n";
-        else 
-            echo "fail\n";
+    $visa_names[$db->cateid."\t".$db->subclassid] = $db->visaname." ".$db->classname;
+}
+
+
+# get user
+$o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1); 
+$user_arr = $o_g->getUserNameArr();
+
+echo "<dl>";
+foreach ($results as $paperwork => $vv) {
+    echo "<dt>Paperwork: {$user_arr[$paperwork]}</dt>";
+    foreach ($vv as $id => $v) {
+        echo '<dd><a href="http://60.229.252.229:8080/scripts/client_visa_detail.php'."?cid={$v['cid']}&vid={$id}".'" target="_blank">'."{$v['name']} ({$visa_names[$v['visa']]})".'</a></dd>';
     }
 }
-echo "</pre>";
-
+echo "</dl>";
 exit;
 //require_once('../etc/const.php');
 require_once('class.phpmailer.php');

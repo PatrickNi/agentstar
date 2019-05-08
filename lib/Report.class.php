@@ -542,12 +542,13 @@ class ReportAPI extends MysqlDB {
             $clients[$this->CID] = 1;	
         }
 
-        
-        $sql = "select t1.CID, Date_Format(ConsultantDate, '%Y%u') as Week, MIN(ConsultantDate) as cd from client_info t1 left join (select a.ID as PID, b.CID, b.ID, a.ProcessID from client_course_process a, client_course b where a.ProcessID = ".__C_APPLY_OFFER." and a.CCID = b.ID AND a.Done = 1) t2 on (t1.CID = t2.CID) left join client_course t3 ON (t1.CID = t3.CID) WHERE t1.CID in (".implode(',', array_keys($clients)).") GROUP BY t1.CID HAVING cd >= '{$fromDay}' and cd <= '{$toDay}' ";
-        $this->query($sql);
-        while ($this->fetch()) {
-            if(isset($_arr[$this->Week]) && isset($_arr[$this->Week]['name'][$this->CID]))
-                $_arr[$this->Week]['name_new'][$this->CID] = $_arr[$this->Week]['name'][$this->CID];
+        if (count($clients) > 0) {        
+            $sql = "select t1.CID, Date_Format(ConsultantDate, '%Y%u') as Week, MIN(ConsultantDate) as cd from client_info t1 left join (select a.ID as PID, b.CID, b.ID, a.ProcessID from client_course_process a, client_course b where a.ProcessID = ".__C_APPLY_OFFER." and a.CCID = b.ID AND a.Done = 1) t2 on (t1.CID = t2.CID) left join client_course t3 ON (t1.CID = t3.CID) WHERE t1.CID in (".implode(',', array_keys($clients)).") GROUP BY t1.CID HAVING cd >= '{$fromDay}' and cd <= '{$toDay}' ";
+            $this->query($sql);
+            while ($this->fetch()) {
+                if(isset($_arr[$this->Week]) && isset($_arr[$this->Week]['name'][$this->CID]))
+                    $_arr[$this->Week]['name_new'][$this->CID] = $_arr[$this->Week]['name'][$this->CID];
+            }        
         }
         
         foreach ($_arr as $w => $v) {
@@ -592,11 +593,13 @@ class ReportAPI extends MysqlDB {
         //print_r($_arr);
 		$_arr['all']['cnt'] = isset($_arr['all'])? count($_arr['all']['name']) : 0;
 
-        $sql = "select t1.CID, MIN(ConsultantDate) as cd from client_info t1 left join (select a.ID as PID, b.CID, b.ID, a.ProcessID from client_course_process a, client_course b where a.ProcessID = ".__C_APPLY_OFFER." and a.CCID = b.ID AND a.Done = 1) t2 on (t1.CID = t2.CID) left join client_course t3 ON (t1.CID = t3.CID) WHERE t1.CID in (".implode(',', array_keys($_arr['all']['name'])).") GROUP BY t1.CID HAVING cd >= '{$fromDay}' and cd <= '{$toDay}' ";
-        $this->query($sql);
-        while ($this->fetch()) {
-            if(isset($_arr['all']['name'][$this->CID]))
-                $_arr['all']['name_new'][$this->CID] = $_arr['all']['name'][$this->CID];
+        if ($_arr['all']['cnt'] > 0) {
+            $sql = "select t1.CID, MIN(ConsultantDate) as cd from client_info t1 left join (select a.ID as PID, b.CID, b.ID, a.ProcessID from client_course_process a, client_course b where a.ProcessID = ".__C_APPLY_OFFER." and a.CCID = b.ID AND a.Done = 1) t2 on (t1.CID = t2.CID) left join client_course t3 ON (t1.CID = t3.CID) WHERE t1.CID in (".implode(',', array_keys($_arr['all']['name'])).") GROUP BY t1.CID HAVING cd >= '{$fromDay}' and cd <= '{$toDay}' ";
+            $this->query($sql);
+            while ($this->fetch()) {
+                if(isset($_arr['all']['name'][$this->CID]))
+                    $_arr['all']['name_new'][$this->CID] = $_arr['all']['name'][$this->CID];
+            }
         }
         @$_arr['all']['cnt_new'] = isset($_arr['all']['name_new'])? count($_arr['all']['name_new']) : 0;
 		return $_arr;		 

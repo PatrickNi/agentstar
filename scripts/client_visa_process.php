@@ -52,7 +52,6 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 		$change_visa_status = 'grant';
 	}
 	
-	
     if ($sets['date'] == '0000-00-00' && $sets['done'] == 1) {
     	$error = "<script language='javascript'>alert('Please input the DATE when you done this process!');</script>";
     }
@@ -89,6 +88,14 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 			}
 		}
 	}
+	elseif (isset($process_item_arr[$sets['subject']]) && stripos($process_item_arr[$sets['subject']], 'apply') !== false && $sets['done'] == 1){
+		if(!$o_c->checkVisaAmont($visa_id)){
+			$error = "<script language='javascript'>alert('Unfinished Agreement! Plesas check payments');</script>";     		
+		}		 
+	}
+	elseif (stripos($sets['add'], 'apply') !== false) {
+		$error = "<script language='javascript'>alert('Additional Step cannot include \"Apply\" !');</script>";
+	}
 
 	if ($error == '') {
 		if($isNew == 1){
@@ -123,7 +130,7 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 			if ($sets['due'] > '0000-00-00')
 				$o_t->setDueDate('visa', $process_id, $sets['due']);
 
-			if ($change_visa_status && $sets['done'] == 1) {
+			if ($change_visa_status == 'grant' && $sets['done'] == 1) {
 				$o_c->setApplyVisaStatus($visa_id, $change_visa_status);
 			}
 			echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";

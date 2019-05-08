@@ -1483,7 +1483,7 @@ class ClientAPI extends MysqlDB {
     	}
 		$sql = "select Sum(DueAmount) as totalpay, Sum(b.paid) as paid 
 				from client_account a left join  (select AccountID, SUM(PaidAmount) as paid from client_payment Group by AccountID) b on (a.ID = b.AccountID)
-				Where VisaID = {$visa_id} ";    	
+				Where VisaID = {$visa_id} and ACC_TYPE = 'visa' ";    	
 	    $this->query($sql);
        if($this->fetch() && ($this->totalpay - $this->paid) == 0){
        		return true;
