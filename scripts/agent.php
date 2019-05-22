@@ -14,7 +14,7 @@ $cates['education'] = array('n'=>'Education agent', 's'=>0, 'o'=>0, 'c'=>0, 'rc'
 $cates['company'  ] = array('n'=>'Company agent', 's'=>0, 'o'=>0, 'c'=>0, 'rc'=>0, 'pc'=>0, 'aid'=>array());
 $cates['student'  ] = array('n'=>'Student ambassador', 's'=>0, 'o'=>0, 'c'=>0, 'rc'=>0, 'pc'=>0, 'aid'=>array());
 $cates['inactive' ] = array('n'=>'Inactive agent', 's'=>0, 'o'=>0, 'c'=>0, 'rc'=>0, 'pc'=>0, 'aid'=>array());
-$cates['other'    ] = array('n'=>'Other', 's'=>0, 'o'=>0, 'c'=>0, 'rc'=>0, 'pc'=>0, 'aid'=>array());
+//$cates['other'    ] = array('n'=>'Other', 's'=>0, 'o'=>0, 'c'=>0, 'rc'=>0, 'pc'=>0, 'aid'=>array());
 
 if (!($user_id > 0)) {
     echo "<script language='javascript'>parent.location.href='login.php';</script>";
@@ -39,12 +39,23 @@ $fromDay  = isset($_REQUEST['t_fdate'])? trim($_REQUEST['t_fdate']) : "";
 $toDay    = isset($_REQUEST['t_tdate'])? trim($_REQUEST['t_tdate']) : "";
 
 
-$form = isset($_POST['t_form'])? trim($_POST['t_form']) : "";
+$form = isset($_REQUEST['t_form'])? trim($_REQUEST['t_form']) : "";
 if(isset($_POST['qflag']) && strtoupper($_POST['qflag']) == "REMOVE" && isset($_POST['agentId'])){
     $o_a->delAgentByArr($_POST['agentId']);
 }
 
-$t_cate = isset($_POST['t_cate'])? trim($_POST['t_cate']) : "";
+$t_cate = isset($_REQUEST['t_cate'])? trim($_REQUEST['t_cate']) : "";
+
+//fix category manuall
+if ($form == 'top') {
+	unset($cates['company']);
+	unset($cates['student']);
+}
+elseif ($form == 'sub') {
+	unset($cates['company']);
+	$cates['education']['n'] = 'Global Partner';
+	$cates['student'  ]['n'] = 'Global Ambassador';
+}
 
 # get user position
 $view_all = 0;

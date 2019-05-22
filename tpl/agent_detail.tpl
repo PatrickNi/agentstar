@@ -38,10 +38,19 @@
 					<td width="12%" height="30" align="left" class="rowodd" style=" color:#FF0000"><strong>Category:</strong>&nbsp;&nbsp;</td>
 					<td align="left" width="88%" class="roweven">
                     	<select name="t_cate">
-                        	<option value="education" {if $dt_arr.cate eq "education"} selected {/if}>Education agent</option>
-                        	<option value="company" {if $dt_arr.cate eq "company"} selected {/if}>Company agent</option>
-                        	<option value="student" {if $dt_arr.cate eq "student"} selected {/if}>Student ambassador</option>  
-                        	<option value="inactive" {if $dt_arr.cate eq "inactive"} selected {/if}>Inactive agent</option>                              
+                    		{if $dt_arr.type eq 'top' || $exType eq 'top'}
+                        		<option value="education" {if $dt_arr.cate eq "education"} selected {/if}>Education agent</option>
+                        		<option value="inactive" {if $dt_arr.cate eq "inactive"} selected {/if}>Inactive agent</option>    
+                        	{elseif $dt_arr.type eq 'sub' || $exType eq 'sub'}
+							    <option value="education" {if $dt_arr.cate eq "education"} selected {/if}>Global Partner</option>
+                        		<option value="student" {if $dt_arr.cate eq "student"} selected {/if}>Global Ambassador</option>  
+                        		<option value="inactive" {if $dt_arr.cate eq "inactive"} selected {/if}>Inactive agent</option>    
+							{else}
+                        		<option value="education" {if $dt_arr.cate eq "education"} selected {/if}>Education agent</option>
+                        		<option value="company" {if $dt_arr.cate eq "company"} selected {/if}>Company agent</option>
+                        		<option value="student" {if $dt_arr.cate eq "student"} selected {/if}>Student ambassador</option>  
+                        		<option value="inactive" {if $dt_arr.cate eq "inactive"} selected {/if}>Inactive agent</option>    
+                        	{/if}                          
                                                                                   
                         </select>
 					</td>

@@ -176,6 +176,7 @@ if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" |
 $course_arr = array();
 $course_arr = $o_c->getCourseByUser($course_id);
 $cateid = $o_c->getCateIDbyCourse($course_id);
+$cateid = $cateid > 0? $cateid : "";
 if ($isChange == 0 && $course_id > 0 ){
 	if (array_key_exists($cateid, $course_arr) && array_key_exists($course_id, $course_arr[$cateid])) {
 		$set_course = $course_arr[$cateid][$course_id];

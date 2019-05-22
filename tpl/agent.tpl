@@ -17,7 +17,7 @@
     <input type="hidden" name="qflag" value="">
     <input type="hidden" name="status" value="">
     <tr  class="bordered_2" >
-      <td colspan="11"><select name="t_form" onChange="this.form.submit();">
+      <td colspan="11"><select name="t_form" onChange="this.form.submit();" disabled="disabled">
           
 				{if $ugs.a_top.v eq 1 }
           <option value="top" {if $form eq 'top'} selected {/if}>Top-Agent</option>
@@ -32,11 +32,12 @@
 				{/if}				
 			
         </select>
-        {if $ugs.a_top.v eq 1}
+
+        {if $ugs.a_top.v eq 1 && $form eq 'top'}
         <input type="button" value="Add Top-agent" onClick="javascript:this.form.status.value='top';this.form.action='agent_add.php';this.form.submit();" style="font-weight:bold;">
         &nbsp;&nbsp;
         {/if}
-        {if $ugs.a_sub.v eq 1}
+        {if $ugs.a_sub.v eq 1  && $form eq 'sub'}
         <input type="button" value="Add Sub-agent" onClick="javascript:this.form.status.value='sub';this.form.action='agent_add.php';this.form.submit();" style="font-weight:bold;">
         &nbsp;&nbsp;
         {/if}
