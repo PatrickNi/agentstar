@@ -13,14 +13,25 @@
 <body>
 <form method="post" name="form1" action="" target="_self">
 <input type="hidden" name="aid" value="{$aid}">
+<input type="hidden" name="is_amb" value="{$is_global_ambassador}">
 <table align="center" class="graybordertable" width="100%" border="0" cellpadding="1" cellspacing="1" >
 	<tr align="left"  class="bordered_2">
 	  <td colspan="4">
-	  	<input name="button" type="button" style="font-weight:bolder;" onClick="this.form.action='agent_add.php';this.form.submit();" value="Go back to the agent detail">
-		&nbsp;&nbsp;&nbsp;&nbsp;
-	   <input type="button" style="font-weight:bold" onClick="printPage();"value="Print">
+	  	{if $is_global_ambassador}
+			<span class="highyellow">Agent: {$agent_arr[$aid].name}</span>&nbsp;&nbsp;
+        </select>        
+	  	{else}
+	  		<input name="button" type="button" style="font-weight:bolder;" onClick="this.form.action='agent_add.php';this.form.submit();" value="Go back to the agent detail">
+			&nbsp;&nbsp;&nbsp;&nbsp;
+	   		<input type="button" style="font-weight:bold" onClick="printPage();"value="Print">
+	  	{/if}
 	  </td>
 	  <td align="right" colspan="8">
+	  		Staff: &nbsp;&nbsp;
+        	<select name="t_staff" onChange="this.form.submit();">
+          		{foreach key=user_id item=user_name from=$slUsers}
+            		<option value="{$user_id}" {if $staffid eq $user_id} selected {/if}>{$user_name}</option>
+          		{/foreach}
 	 		<strong>From: &nbsp;</strong><input type="text"	 name="t_fdate" id="t_fdate" value="{$from}" onChange="audit_date(this)">	  
             &nbsp;&nbsp;
 			<strong>To: &nbsp;</strong><input type="text"	 name="t_tdate" id="t_tdate" value="{$to}" onChange="audit_date(this)">&nbsp;&nbsp;
@@ -46,7 +57,7 @@
 	{foreach key=id item=arr from=$student_arr}
 	<tr align="center" class="{cycle values='rowodd,roweven'}">
 		<td>{$arr.coedate}</td>
-		<td colspan="2" style="cursor:pointer;text-decoration:underline"onClick="openExModel('client_course.php?cid={$arr.cid}',800,600,'NO', 'form1')">{$arr.lname} {$arr.fname}</td>
+		<td colspan="2" style="cursor:pointer;text-decoration:underline"onClick="window.open('client_course.php?cid={$arr.cid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7);">{$arr.lname} {$arr.fname}</td>
 		<td>{if $arr.offer gt 0}yes{else}no{/if}</td>
 		<td>{if $arr.coe gt 0}yes{else}no{/if}</td>
 		<td>{$schools[$arr.school]}</td>

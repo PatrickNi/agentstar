@@ -50,7 +50,7 @@
 	{foreach key=id item=arr from=$student_arr}
 	<tr align="center" class="{cycle values='rowodd,roweven'}">
 		<td>{$arr.coedate}</td>
-		<td colspan="2" style="cursor:pointer;text-decoration:underline"onClick="openExModel('client_course.php?cid={$arr.cid}',800,600,'NO', 'form1')">{$arr.lname} {$arr.fname}</td>
+		<td colspan="2" style="cursor:pointer;text-decoration:underline"onClick="window.open('client_course_detail.php?cid={$arr.cid}&courseid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7);">{$arr.lname} {$arr.fname}</td>
 		<td>{if $arr.offer gt 0}yes{else}no{/if}</td>
 		<td>{if $arr.coe gt 0}yes{else}no{/if}</td>
 		<td>{$courses[$arr.course]}</td>

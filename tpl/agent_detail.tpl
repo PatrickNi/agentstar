@@ -8,6 +8,7 @@
 <body>
 <form name="form1" action="" target="_self" method="post">
 <input type="hidden" name="aid" value="{$aid}">
+<input type="hidden" name="t_type" value="{if $dt_arr.type}{$dt_arr.type}{else}{$exType}{/if}">
 <table align="center" width="100%"  class="graybordertable">
 	<tr align="left"  class="bordered_2">
 		<td colspan="2">
@@ -26,14 +27,7 @@
 	</tr>
 	<tr>
 		<td width="58%" align="center"  valign="top">
-			<table width="100%" cellspacing="1" cellpadding="3"border="0">
-				<tr>
-					<td width="12%" height="30" align="left" class="rowodd"><strong>Type:</strong>&nbsp;&nbsp;</td>
-					<td align="left" width="88%" class="roweven">
-						<input type="radio" name="t_type" value="top" {if $dt_arr.type eq 'top' || $exType eq 'top'} checked {/if}>Top-Agent &nbsp;&nbsp;&nbsp;
-						<input type="radio" name="t_type" value="sub" {if $dt_arr.type eq 'sub' || $exType eq 'sub'} checked {/if}>Sub-Agent
-					</td>
-				</tr>		
+			<table width="100%" cellspacing="1" cellpadding="3"border="0">		
 				<tr>
 					<td width="12%" height="30" align="left" class="rowodd" style=" color:#FF0000"><strong>Category:</strong>&nbsp;&nbsp;</td>
 					<td align="left" width="88%" class="roweven">

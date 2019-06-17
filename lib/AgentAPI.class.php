@@ -32,16 +32,25 @@ class AgentAPI extends MysqlDB{
         return false;
     }
     
-    function getAgentList($rAgentID=0, $type=""){
+    function getAgentList($rAgentID=0, $type="", $cate=""){
         $sql = "select ID, ID, Name, Country, Contact, Phone, Fax, Email, Address, Note, Form, StatusID, City, Web, isVerify, CATE_NAME, REFCODE from agent ";
         if($rAgentID > 0){
             $sql .= "Where ID = {$rAgentID}";
         }elseif($type != ""){
         	$sql .= "Where Form = '{$type}' ";
         }
+
+        if ($cate != "") {
+            if ($cate == 'other')
+                $sql .= " AND (CATE_NAME = '' OR CATE_NAME = 'other') ";
+            else
+                $sql .= " AND CATE_NAME = '{$cate}' ";
+        }
+
        	
         $sql .= " Order by lower(Name) asc";
         $this->query($sql);
+
         $_arr = array();
         while($this->fetch()){
             $_arr[$this->ID]['name']    = $this->Name;
@@ -72,8 +81,9 @@ class AgentAPI extends MysqlDB{
 								left join (select CCID, Sum(RComm) as RComm, Sum(CoComm) as PComm from client_course_sem  group by CCID) as c on(c.CCID = a.ID)											  
 						where d.AgentID <> 0 ";
 	    		if ($userid > 0) {
-	    			$sql .= " AND d.CourseUser = {$userid} ";
-	    		}
+	    			//$sql .= " AND d.CourseUser = {$userid} ";
+	    		     $sql .= " AND a.ConsultantID = {$userid} ";
+                }
 	    		$sql .= " Group by d.AgentID  ";
 		}
 		elseif ($type == 'top'){
@@ -83,8 +93,9 @@ class AgentAPI extends MysqlDB{
 												 left join client_info d on(d.CID = a.CID)
 							where a.AgentID <> 0 ";
 				if ($userid > 0) {
-					$sql .= " AND d.CourseUser = {$userid} ";
-				}
+					//$sql .= " AND d.CourseUser = {$userid} ";
+				    $sql .= " AND a.ConsultantID = {$userid} ";
+                }
 				$sql .= " Group by a.AgentID  ";
     	}
     	
@@ -221,7 +232,7 @@ class AgentAPI extends MysqlDB{
 	
 	function countStudent($from, $to, $aid, $userid=0){
 		if ($aid > 0){
-			$sql = "select a.ID, b.CID, b.LName, b.FName, a.IID, a.QualID, a.MajorID, b.CourseUser, a.IsActive, a.Refuse, e.StartDate,
+			$sql = "select a.ID, b.CID, b.LName, b.FName, a.IID, a.QualID, a.MajorID, b.CourseUser, a.IsActive, a.Refuse, if(e.StartDate is null, '0000-00-00', e.StartDate) as StartDate,
 							if(CoeCnt is null, 0, OfferCnt) as OfferCnt, 
 							if(CoeCnt is null, 0, CoeCnt) as CoeCnt, 
 							if(cocomm is null,0.00, cocomm) as cocomm, 
@@ -242,9 +253,11 @@ class AgentAPI extends MysqlDB{
 				$sql .= " AND  a.SEM1Date >= '{$from}' AND a.SEM1Date <= '{$to}' ";
 			}
 			if ($userid > 0) {
-				$sql .= " AND b.CourseUser = {$userid} ";
-			}
+				//$sql .= " AND b.CourseUser = {$userid} ";
+			    $sql .= " AND a.ConsultantID = {$userid} ";
+            }
             $sql .= " order by  CoeCnt desc, e.StartDate desc, b.LName asc, b.FName asc, a.IsActive asc ";//Group BY a.CID
+            
 			$_arr = array();
 			$this->query($sql);
 			while ($this->fetch()){
@@ -285,8 +298,9 @@ class AgentAPI extends MysqlDB{
 				$sql .= " AND a.Sem1Date >= '{$from}' AND a.Sem1Date <= '{$to}' ";
 			}
 			if ($userid > 0) {
-				$sql .= " AND d.CourseUser = {$userid} ";
-			}
+				//$sql .= " AND d.CourseUser = {$userid} ";
+			     $sql .= " AND a.ConsultantID = {$userid} ";
+            }
 			$this->query($sql);
 			$_arr = array('total'=>0, 'offer'=>0, 'coe'=>0);
 			while ($this->fetch()){

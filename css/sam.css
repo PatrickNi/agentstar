@@ -185,7 +185,7 @@ a.home:active, a.home:hover { color: #d2691e; text-decoration: underline }
 .menuTitle { margin-top:0px; text-align: center; font-weight: bold; }
 .menuSub { padding: 0 1px 1px; margin: 3px 0 3px 10px; font: 12px Verdana, sans-serif; background: gray; width: 180px; }
 .menuSub li { list-style: none;	margin: 0; border-top: 1px solid gray; text-align: left; }
-.menuSub li a { height: 16px; display: block; padding: 3px 10px 3px 10px; border-left: 12px solid #fff; background: #fafafa; text-decoration: none; }
+.menuSub li a { height: auto; display: block; padding: 3px 10px 3px 10px; border-left: 12px solid #fff; background: #fafafa; text-decoration: none; }
 .menuSub li a:link { color: #667; }
 .menuSub li a:visited { color: #667; }
 .menuSub li a:hover { border-color: #fafafa; color: #c60; background: #e9eded; text-decoration: underline }

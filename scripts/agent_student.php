@@ -1,5 +1,7 @@
 <?php
 require_once('../etc/const.php');
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 require_once(__LIB_PATH.'Template.class.php');
 require_once(__LIB_PATH.'AgentAPI.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
@@ -40,17 +42,19 @@ $from_date = isset($_REQUEST['t_fdate'])? trim($_REQUEST['t_fdate']) : "";
 $to_date  = isset($_REQUEST['t_tdate'])? trim($_REQUEST['t_tdate']) : "";
 $agent_id = isset($_REQUEST['aid'])? trim($_REQUEST['aid']) : 0;
 
+$is_global_ambassador = isset($_REQUEST['is_amb'])? trim($_REQUEST['is_amb']) : 0;
 
-# get user position
-$view_all = 0;
-if ($ugs['seeall']['v'] == 0){
-	$view_all = $user_id;
+$staff_id = $user_id;
+if (isset($_REQUEST['t_staff']) && $_REQUEST['t_staff'] > 0) {
+    $staff_id = $_REQUEST['t_staff'];
 }
 
+
+
 $student_arr = array();
-$student_arr = $o_a->countStudent($from_date, $to_date, $agent_id, $view_all);
-$totals  = $o_a->countStudentNumRows($from_date, $to_date, $agent_id, $view_all);
-$o_page =  new PageDistribute($self_url, $totals['total'], $page_size, $page_offset, $page, "&aid={$agent_id}&t_fdate={$from_date}&t_tdate={$to_date}");
+$student_arr = $o_a->countStudent($from_date, $to_date, $agent_id, $staff_id);
+$totals  = $o_a->countStudentNumRows($from_date, $to_date, $agent_id, $staff_id);
+$o_page =  new PageDistribute($self_url, $totals['total'], $page_size, $page_offset, $page, "&aid={$agent_id}&t_fdate={$from_date}&t_tdate={$to_date}&is_amb={$is_global_ambassador}");
 
 # set smarty tpl
 $o_tpl = new Template;
@@ -66,6 +70,19 @@ $o_tpl->assign('page_url', $o_page->ShowPageLink());
 $o_tpl->assign('student_arr', $student_arr);
 $o_tpl->assign('totals', $totals);
 $o_tpl->assign('ugs', $ugs);
+
+$o_tpl->assign('is_global_ambassador', $is_global_ambassador);
+$o_tpl->assign('staffid', $staff_id);
+# get user position
+if (isset($ugs['seeall']) && $ugs['seeall']['v'] == 1){
+    $o_tpl->assign('slUsers', $o_g->getUserNameArr());
+}else {
+    $o_tpl->assign('slUsers', $o_g->getUserNameArr($staff_id));
+}
+if ($agent_id > 0) {
+    $o_tpl->assign("agent_arr", $o_a->getAgentList($agent_id));
+}
+
 $o_tpl->display('agent_student.tpl');
 
 ?>

@@ -154,7 +154,8 @@ class SchoolAPI extends MysqlDB{
 				$sql .= " AND b.CourseUser = {$userid} ";
 			}
 			
-			$sql .= " order by e.StartDate desc, CoeCnt desc, b.LName asc, b.FName asc, a.IsActive asc ";//Group BY a.CID
+			$sql .= " order by CoeCnt desc, StartDate desc , b.LName asc, b.FName asc, a.IsActive asc ";//Group BY a.CID
+			//echo $sql."\n";
 			$_arr = array();
 			$this->query($sql);
 			while ($this->fetch()){

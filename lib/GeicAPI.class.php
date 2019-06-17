@@ -3,6 +3,8 @@ require_once('MysqlDB.class.php');
 
 class GeicAPI extends MysqlDB {
 
+    private $user_orders = array(29,3,86,37,79,80,58,67,57,81,84,82);
+
     function GeicAPI($host, $user, $pswd, $database, $debug) {
     	 $this->MysqlDB($host, $user, $pswd, $database, $debug);
     }
@@ -61,6 +63,7 @@ class GeicAPI extends MysqlDB {
 		if($func_id > 0){
 			$sql .= " Where ID = {$func_id} ";
 		}
+        $sql .= "Order by ID asc ";
 		$this->query($sql);		
 		$_arr = array();
 		while ($this->fetch()) {
@@ -119,11 +122,19 @@ class GeicAPI extends MysqlDB {
 			$sql .= " Where ID = {$userid} ";
 		}    	
 		$this->query($sql);
+
 		$_arr = array();
 		while($this->fetch()){
-			$_arr[$this->ID] = $this->UserName;
+			$_arr[$this->ID] = ucwords($this->UserName);
 		}
-		return $_arr;    	
+
+        $rtn = array();
+        foreach ($this->user_orders as $uid) {
+            $rtn[$uid] = $_arr[$uid];
+            unset($_arr[$uid]);
+        }
+
+		return $rtn;    	
     }
     	
 	function getUserMark($userId){
@@ -339,7 +350,7 @@ class GeicAPI extends MysqlDB {
 	
     function getUserFuncList($user_id=0){
     	if($user_id > 0){
-    		$sql = "select a.FUNC, a.ID, b.UserID from sys_func a left join sys_userfunc_rs b on(a.ID = b.FuncID and b.UserID = {$user_id})";
+    		$sql = "select a.FUNC, a.ID, b.UserID from sys_func a left join sys_userfunc_rs b on(a.ID = b.FuncID and b.UserID = {$user_id}) order by a.ID asc ";
     		$this->query($sql);
     		$_arr = array();
     		while($this->fetch()){

@@ -19,54 +19,14 @@
     <tr  class="bordered_2" >
 
       <td colspan="11">
-        {if $form eq 'top'}
-          <strong>Top-Agent</strong>
-        {elseif $form eq 'sub'}
-          <strong>Sub-Agent</strong>
-        {/if}
-          <input type="hidden" name="t_form" value="{$form}" />
-        {if $ugs.a_top.v eq 1 && $form eq 'top'}
-        <input type="button" value="Add Top-agent" onClick="javascript:this.form.status.value='top';this.form.action='agent_add.php';this.form.submit();" style="font-weight:bold;">
-        &nbsp;&nbsp;
-        {/if}
-        {if $ugs.a_sub.v eq 1  && $form eq 'sub'}
-        <input type="button" value="Add Sub-agent" onClick="javascript:this.form.status.value='sub';this.form.action='agent_add.php';this.form.submit();" style="font-weight:bold;">
-        &nbsp;&nbsp;
-        {/if}
         {if $ugs.a_del.v eq 1}
         <input type="button" value="Remove" onClick="remove_confirm(this.form);" style="font-weight:bold;">
-        {/if}	
+        {/if}   
         &nbsp;&nbsp;&nbsp;&nbsp;
         <input type="button" style="font-weight:bold" onClick="printPage();"value="Print">
       </td>
     </tr>
-    <tr class="bordered_2">
-      <td colspan="11" style="padding-top:10px"><strong>[First semester start date] From: &nbsp;</strong>
-        <input type="text"	 id="t_fdate" name="t_fdate" value="{$from}"onChange="audit_date(this)">           
-        &nbsp;&nbsp; <strong>To: &nbsp;</strong>
-        <input type="text"	id="t_tdate"  name="t_tdate" value="{$to}" onChange="audit_date(this)">             
-        &nbsp;&nbsp;
-        <input type="submit" value="Query" name="qSubmit" style="font-weight:bold;" >
-        &nbsp;&nbsp;&nbsp;&nbsp;
-       </td>
-    </tr>
-    {if $ugs.export.v eq 1}
-    <tr class="bordered_2">
-      <td colspan="11" style="padding-top:10px">
-          <input type="submit" value="Export Emails" name="bt_export" styple="font-weight:bold;">
-          <strong>By:</strong>  
-          <select name="t_cate">
-            {foreach key=cateid item=v from=$totals}
-              <option value="{$cateid}">{$v.n}</option>
-            {/foreach}
-          </select>
-      </td>
-    </tr>
-    {/if}
-    <p/>
-    <tr align="left" class="greybg">
-      <td colspan="11" class="highyellow">Student: {$totals.total}&nbsp;&nbsp;&nbsp;&nbsp;Offer: {$totals.offer}&nbsp;&nbsp;&nbsp;&nbsp;Coe: {$totals.coe}</td>
-    </tr>      
+    <p/>    
     <tr class="totalrowodd">
       <td width="2%"  align="center" class="border_1"><input type="checkbox" name="toggleAll" onClick="rowToggleAll(this);"></td>
       <td align="left" class="border_1" width="15%" nowrap="nowrap">Name</td>
@@ -95,7 +55,7 @@
       <td onClick="rowToggle({$id});" align="center" class="border_1"><input type="checkbox" id="box_{$id}" onClick="toggleRow(this);" name="agentId[]" value="{$id}">
       </td>
       <!--<td align="center" class="border_1" nowrap="nowrap">{if $agent_arr[$id].verify eq 1}<span style="font-size:18px;font-weight: bolder; color: #FF0000">&radic;</span>{else}&nbsp;&nbsp;{/if}</td>-->
-      <td align="left" class="border_1" nowrap="nowrap"><a href="agent_add.php?aid={$id}" target="_self">{$agent_arr[$id].name}</a></td>
+      <td align="left" class="border_1" nowrap="nowrap"><a href="agent_student.php?aid={$id}&is_amb=1" target="_self">{$agent_arr[$id].name}</a></td>
       <td align="left"class="border_1" nowrap="nowrap">{$agent_arr[$id].city|truncate:15}</td>
       <td align="left"class="border_1" nowrap="nowrap">{$agent_arr[$id].cn}</td>
       <td align="left"class="border_1" nowrap="nowrap">{$agent_arr[$id].sn}</td>
@@ -109,7 +69,7 @@
     {/foreach}
     <!--
    <tr >
-   	<td align="right" colspan="6">{$page_url}</td>
+    <td align="right" colspan="6">{$page_url}</td>
    </tr>
    -->
   </form>
@@ -117,12 +77,12 @@
 
 {literal}
 <script type="text/javascript">
-	function remove_confirm(form) {	
-		if(confirm("Please confirm you want to remove")){form.qflag.value='remove';form.submit();}	
-	}
-	$('#t_fdate').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });        
-	$('#t_tdate').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });
+    function remove_confirm(form) { 
+        if(confirm("Please confirm you want to remove")){form.qflag.value='remove';form.submit();}  
+    }
+    $('#t_fdate').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });        
+    $('#t_tdate').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });
 </script>
-{/literal}	
+{/literal}  
 </body>
 </html>
