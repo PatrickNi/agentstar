@@ -35,12 +35,9 @@ foreach ($g_user_grants as $item){
     }
 }
 
-# get user position
-$view_all = 0;
-$isCeo = 1;
-if ($ugs['seeall']['v'] == 0){
-    $view_all = $user_id;
-    $isCeo = 0;
+$staff_id = $user_id;
+if (isset($_REQUEST['t_staff']) && $_REQUEST['t_staff'] > 0) {
+    $staff_id = $_REQUEST['t_staff'];
 }
 
 # get group
@@ -49,14 +46,18 @@ $country = $o_c->getCountry();
 $status  = $o_s->getAgentStatus();
 if($form != ""){
     $agent_arr = $o_a->getAgentList(0, $form, $t_cate);
-    $stats = $o_a->countAgent($form, $view_all, $fromDay, $toDay);
+    $stats = $o_a->countAgent($form, $staff_id, $fromDay, $toDay);
 
     foreach ($agent_arr as $aid => $v) {
         $k = isset($cates[$v['cate']])? $v['cate'] : 'other';
 
-        array_push($cates[$k]['aid'], $aid);    
-        if (!isset($stats[$aid]))
+           
+        if (!isset($stats[$aid]) || $stats[$aid]['stdcnt'] == 0) {
+            unset($agent_arr[$aid]);
             continue;
+        }
+
+        array_push($cates[$k]['aid'], $aid);
     
 
         $cates[$k]['s' ] += $stats[$aid]['stdcnt'];         
@@ -68,15 +69,24 @@ if($form != ""){
         $agent_arr[$aid]['cn'] = isset($country[$v['country']])? $country[$v['country']] : '';
         $agent_arr[$aid]['sn'] = isset($status[$v['stid']])? $status[$v['stid']] : '';      
     }
+
+    if (isset($_REQUEST['bt_export']) && strtoupper($_REQUEST['bt_export']) == strtoupper("Export Emails")){
+        $o_ept = new ExportAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, true);
+        $mailArr = array();
+        foreach ($agent_arr as $id => $v){
+            if ($v['cate'] != $t_cate)
+                continue;
+            
+            array_push($mailArr, $v['email']);
+        }
+        $o_ept->exportAgentEmail($mailArr, $form);
+    }
 }
 
 
 
 # output
 $o_tpl = new Template;
-$o_tpl->assign('isCeo', $isCeo);
-//$o_tpl->assign('country_arr', $o_c->getCountry());
-//$o_tpl->assign('status_arr', $o_s->getAgentStatus());
 $o_tpl->assign("agent_arr", $agent_arr);
 if(isset($stats)){
     $o_tpl->assign("stats", $stats);
@@ -84,6 +94,13 @@ if(isset($stats)){
 $o_tpl->assign("totals", $cates);
 $o_tpl->assign("form", $form);
 $o_tpl->assign("ugs", $ugs);
+$o_tpl->assign('staffid', $staff_id);
+# get user position
+if (isset($ugs['seeall']) && $ugs['seeall']['v'] == 1){
+    $o_tpl->assign('slUsers', $o_g->getUserNameArr());
+}else {
+    $o_tpl->assign('slUsers', $o_g->getUserNameArr($staff_id));
+}
 
 $o_tpl->display("agent_sub.tpl");
 

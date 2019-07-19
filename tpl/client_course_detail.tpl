@@ -197,14 +197,6 @@
             <td colspan="2"><hr></td>
           </tr>
           <tr>
-            <td width="28%" align="left" class="rowodd"><strong>Key Point:</strong>&nbsp;&nbsp;</td>
-            <td align="left" width="72%" class="roweven"><textarea name="t_key" style="width:350px; height:150px ">{$dt_arr.key}</textarea>
-            </td>
-          </tr>
-          <tr>
-            <td colspan="2"><hr></td>
-          </tr>
-          <tr>
             <td width="28%" align="left" class="rowodd"><strong>Apply Fee :</strong>&nbsp;&nbsp;</td>
             <td align="left" width="72%" class="roweven"><input type="text" name="t_appfee" value="{$dt_arr.appfee}" size="30" onChange="audit_money(this)"></td>
           </tr>
@@ -238,7 +230,7 @@
     <td width="65%" align="left" valign="top">
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
             <tr class="bordered_2">
-              <td colspan="4" class="whitetext" align="center">Process</td>
+              <td colspan="3" class="whitetext" align="center">Process</td>
             </tr>
             <tr align="center" class="totalrowodd">
               <td class="border_1" width="26%">Date</td>
@@ -252,6 +244,14 @@
               <td class="border_1"><img src="../images/arr_down.gif" style="cursor:pointer" onClick="window.open('client_course_process.php?courseid={$courseid}&pid={$id}&cid={$cid}&isOther=1', '_blank', 'alwaysRaised=yes,resizable=yes,scrollbars=yes,width=500,height=380')"></td>
             </tr>
             {/foreach}
+          <tr>
+            <td colspan="3"><hr></td>
+          </tr>
+          <tr>
+            <td colspan="1" align="center" class="rowodd"><strong>Key Point:</strong>&nbsp;&nbsp;</td>
+            <td align="center" colspan="2" class="roweven"><textarea name="t_key" style="width:400px; height:200px ">{$dt_arr.key}</textarea>
+            </td>
+          </tr>
           </table>
        </td>      
     </tr>

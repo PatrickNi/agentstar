@@ -19,8 +19,8 @@
 	</tr>			
 	<tr align="center"  class="greybg" >
 		<td class="whitetext" colspan="5" style="padding:3 ">Institute Process 
-			<input type="button" value="add new" style="font-weight:bold;" onClick="openModel('institute_proc_dt.php?&sid={$sid}&isNew=1',500,380,'NO', 'form1')" {if $ugs.i_proc.i eq 0} disabled="disabled"{/if}>&nbsp;
-			<input type="button" value="Attachment" style="font-weight:bold" onClick="openModel('attachment.php?item={$sid}&type={$itemtype}',screen.width*6/7,screen.height*4/7,'NO', 'form1')">
+			<input type="button" value="add new" style="font-weight:bold;" onClick="window.open('institute_proc_dt.php?&sid={$sid}&isNew=1','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth=500,width=380');"{if $ugs.i_proc.i eq 0} disabled="disabled"{/if}>&nbsp;
+			<input type="button" value="Attachment" style="font-weight:bold" onClick="window.open('attachment.php?item={$sid}&type={$itemtype}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*3/7 +',width='+screen.width*2/7);">
 		</td>
 	</tr>
 	<tr align="center" class="totalrowodd">

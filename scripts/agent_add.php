@@ -67,6 +67,11 @@ if ($agent_id > 0){
 	$agent_arr = $o_f->getAgentList($agent_id);
 	$o_tpl->assign("dt_arr", $agent_arr[$agent_id]);
 }
+else {
+    if (isset($_POST['t_cate'])) {
+        $o_tpl->assign("dt_arr", array('cate'=>$_POST['t_cate']));
+    }
+}
 
 $o_tpl->assign('country_arr', $o_c->getCountry());
 

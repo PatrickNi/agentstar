@@ -19,13 +19,34 @@
     <tr  class="bordered_2" >
 
       <td colspan="11">
+        <input type="hidden" name="t_form" value="{$form}" />
+         <input type="button" value="Add Sub-agent" onClick="javascript:this.form.status.value='sub';this.form.action='agent_add.php';this.form.submit();" style="font-weight:bold;">
+        &nbsp;&nbsp;
         {if $ugs.a_del.v eq 1}
         <input type="button" value="Remove" onClick="remove_confirm(this.form);" style="font-weight:bold;">
         {/if}   
         &nbsp;&nbsp;&nbsp;&nbsp;
         <input type="button" style="font-weight:bold" onClick="printPage();"value="Print">
+        Staff: &nbsp;&nbsp;
+          <select name="t_staff" onChange="this.form.submit();">
+              {foreach key=user_id item=user_name from=$slUsers}
+                <option value="{$user_id}" {if $staffid eq $user_id} selected {/if}>{$user_name}</option>
+              {/foreach}
       </td>
     </tr>
+    {if $ugs.export.v eq 1}
+    <tr class="bordered_2">
+      <td colspan="11" style="padding-top:10px">
+          <input type="submit" value="Export Emails" name="bt_export" styple="font-weight:bold;">
+          <strong>By:</strong>  
+          <select name="t_cate">
+            {foreach key=cateid item=v from=$totals}
+              <option value="{$cateid}">{$v.n}</option>
+            {/foreach}
+          </select>
+      </td>
+    </tr>
+    {/if}
     <p/>    
     <tr class="totalrowodd">
       <td width="2%"  align="center" class="border_1"><input type="checkbox" name="toggleAll" onClick="rowToggleAll(this);"></td>

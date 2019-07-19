@@ -19,7 +19,8 @@
 			{if $ugs.a_st.v eq 1}
 			<input style="font-weight:bold;" type="button" value="Student" onClick="javascript:this.form.action='agent_student.php';this.form.submit();">&nbsp;&nbsp;
 			{/if}
-			<input type="button" value="Attachment" style="font-weight:bold" onClick="openModel('attachment.php?item={$aid}&type={$itemtype}',screen.width*6/7,screen.height*4/7,'NO', 'form1')">
+			<input type="button" value="Attachment" style="font-weight:bold"
+			onClick="window.open('attachment.php?item={$aid}&type={$itemtype}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*3/7 +',width='+screen.width*2/7);">
 		</td>
 	</tr>
 	<tr align="center"  class="greybg" >

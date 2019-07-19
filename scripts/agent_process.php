@@ -1,5 +1,8 @@
 <?php
 require_once('../etc/const.php');
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 require_once(__LIB_PATH.'Template.class.php');
 require_once(__LIB_PATH.'AgentAPI.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
@@ -17,7 +20,7 @@ $agent_id = isset($_REQUEST['aid'])? trim($_REQUEST['aid']) : 0;
 $process_id = isset($_REQUEST['pid'])? trim($_REQUEST['pid']) : 0;
 
 $o_s = new AgentAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
-$o_s = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
+$o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
 
 $ugs = array();

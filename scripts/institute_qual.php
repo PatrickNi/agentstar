@@ -13,14 +13,14 @@ if(isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 	}elseif($iid > 0){
 		$o_s->addCourseQual($iid, $qualName);
 	}
-	echo "<script language='javascript'>window.returnValue=1;self.close();</script>";
+	echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
 	exit;
 }elseif(isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "DELETE"){
 	if ($id > 0){
 		$o_s->delCourseQual($id);
 	}
-	echo "<script language='javascript'>window.returnValue=1;self.close();</script>";
-	exit;		
+	echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
+	exit;	
 }
 
 $quals = array();

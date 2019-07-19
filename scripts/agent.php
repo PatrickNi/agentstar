@@ -53,8 +53,9 @@ if ($form == 'top') {
 }
 elseif ($form == 'sub') {
 	unset($cates['company']);
+	unset($cates['student']);
 	$cates['education']['n'] = 'Global Partner';
-	$cates['student'  ]['n'] = 'Global Ambassador';
+	//$cates['student'  ]['n'] = 'Global Ambassador';
 }
 
 # get user position
@@ -70,7 +71,7 @@ $agent_arr = array();
 $country = $o_c->getCountry();
 $status  = $o_s->getAgentStatus();
 if($form != ""){
-	$agent_arr = $o_a->getAgentList(0, $form);
+	$agent_arr = $o_a->getAgentList(0, $form, $t_cate);
 	$stats = $o_a->countAgent($form, $view_all, $fromDay, $toDay);
 
 	foreach ($agent_arr as $aid => $v) {
