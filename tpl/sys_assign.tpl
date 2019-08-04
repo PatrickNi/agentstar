@@ -306,7 +306,7 @@
         </td>
    </tr>        
    <!-- Agent -->  
-   <tr class="rowodd"><td align="left" colspan="2"><li>Agents&nbsp;<input type="checkbox" name="g_a_service[]" value="{$grant.a_service.v}" {if $ugs.a_service.v eq 1} checked="checked" {/if}>&nbsp;&nbsp;[Grants for to-do and urgent list]</li></td></tr>
+   <tr class="rowodd"><td align="left" colspan="2"><li>Top Agents&nbsp;<input type="checkbox" name="g_a_service[]" value="{$grant.a_service.v}" {if $ugs.a_service.v eq 1} checked="checked" {/if}>&nbsp;&nbsp;[Grants for to-do and urgent list]</li></td></tr>
    <tr class="roweven">
 		<td align="left" ><ul>View Top Agents</ul></td>
 		<td align="left">
@@ -349,13 +349,33 @@
 			view&nbsp;<input type="checkbox" name="g_a_rev[]" value="{$grant.a_rev.v}" {if $ugs.a_rev.v eq 1} checked="checked" {/if}>&nbsp;&nbsp;
 		</td>
    </tr>  
+   <tr class="rowodd"><td align="left" colspan="2"><li>Partners (Sub-agents)</li></td></tr>
      <tr class="roweven">
-		<td align="left" ><ul>Agents Remove</ul></td>
+		<td align="left" ><ul>Remove</ul></td>
 		<td align="left">
-			view&nbsp;
-			<input type="checkbox" name="g_a_del[]" value="{$grant.a_del.v}" {if $ugs.a_del.v eq 1} checked="checked" {/if}>&nbsp;&nbsp;
+			<input type="checkbox" name="g_a_delpartner[]" value="{$grant.a_delpartner.v}" {if $ugs.a_delpartner.v eq 1} checked="checked" {/if}>
 		</td>
    </tr>   
+        <tr class="roweven">
+        <td align="left" ><ul>Email Export</ul></td>
+        <td align="left">
+            <input type="checkbox" name="g_a_emailpartner[]" value="{$grant.a_emailpartner.v}" {if $ugs.a_emailpartner.v eq 1} checked="checked" {/if}>
+        </td>
+   </tr>  
+      <tr class="rowodd"><td align="left" colspan="2"><li>Ambassador (Sub-agents)</li></td></tr>
+        <tr class="roweven">
+        <td align="left" ><ul>Remove</ul></td>
+        <td align="left">
+            <input type="checkbox" name="g_a_delambassador[]" value="{$grant.a_delambassador.v}" {if $ugs.a_delambassador.v eq 1} checked="checked" {/if}>
+        </td>
+   </tr>   
+        <tr class="roweven">
+        <td align="left" ><ul>Email Export</ul></td>
+        <td align="left">
+            <input type="checkbox" name="g_a_emailambassador[]" value="{$grant.a_emailambassador.v}" {if $ugs.a_emailambassador.v eq 1} checked="checked" {/if}>
+        </td>
+   </tr>   
+   
    <tr class="rowodd"><td align="left" colspan="2"><li>Staff Performance</li></td></tr>  
    <tr class="roweven">
 		<td align="left" ><ul>Check all staff</ul></td>

@@ -1481,6 +1481,14 @@ class ClientAPI extends MysqlDB {
     	if(!($visa_id > 0)){
     		return false;
     	}
+    	//ignore AAT case
+    	$sql = "SELECT v.id FROM client_visa v,  client_visa_process a left join visa_rs_item c on(a.ItemID = c.ItemID) where v.id = a.cvid and v.id = {$visa_id} and c.item like '%Apply AAT%' and a.done = 1 limit 1";
+    	$this->query($sql);
+    	if ($this->fetch() && $this->id == $visa_id) {
+    		return true;
+    	}
+
+    	//check agreement payments
 		$sql = "select Sum(DueAmount) as totalpay, Sum(b.paid) as paid 
 				from client_account a left join  (select AccountID, SUM(PaidAmount) as paid from client_payment Group by AccountID) b on (a.ID = b.AccountID)
 				Where VisaID = {$visa_id} and ACC_TYPE = 'visa' ";    	

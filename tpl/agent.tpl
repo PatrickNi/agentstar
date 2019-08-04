@@ -30,10 +30,10 @@
         &nbsp;&nbsp;
         {/if}
         {if $ugs.a_sub.v eq 1  && $form eq 'sub'}
-        <input type="button" value="Add Sub-agent" onClick="javascript:this.form.status.value='sub';this.form.action='agent_add.php';this.form.submit();" style="font-weight:bold;">
+        <input type="button" value="Add Partner" onClick="javascript:this.form.status.value='sub';this.form.action='agent_add.php';this.form.submit();" style="font-weight:bold;">
         &nbsp;&nbsp;
         {/if}
-        {if $ugs.a_del.v eq 1}
+        {if $ugs.a_delpartner.v eq 1}
         <input type="button" value="Remove" onClick="remove_confirm(this.form);" style="font-weight:bold;">
         {/if}	
         &nbsp;&nbsp;&nbsp;&nbsp;
@@ -50,7 +50,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;
        </td>
     </tr>
-    {if $ugs.export.v eq 1}
+    {if $ugs.a_emailpartner.v eq 1}
     <tr class="bordered_2">
       <td colspan="11" style="padding-top:10px">
           <input type="submit" value="Export Emails" name="bt_export" styple="font-weight:bold;">

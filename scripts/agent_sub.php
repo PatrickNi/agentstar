@@ -27,6 +27,10 @@ $o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
 $ugs = array();
 $user_grants = $o_g->get_user_grants($user_id);
+array_push($g_user_grants, 'a_delambassador');
+array_push($g_user_grants, 'a_delpartner');
+array_push($g_user_grants, 'a_emailambassador');
+array_push($g_user_grants, 'a_emailpartner');
 foreach ($g_user_grants as $item){
     if (array_key_exists($item, $user_grants)) {
         foreach ($g_user_ops as $key=>$op){
@@ -82,7 +86,6 @@ if($form != ""){
         $o_ept->exportAgentEmail($mailArr, $form);
     }
 }
-
 
 
 # output

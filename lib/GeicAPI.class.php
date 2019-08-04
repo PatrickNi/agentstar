@@ -3,7 +3,7 @@ require_once('MysqlDB.class.php');
 
 class GeicAPI extends MysqlDB {
 
-    private $user_orders = array(29,3,86,37,79,80,58,67,57,81,84,82);
+    private $user_orders = array(29,3,86,37,79,80,58,67,57,81,84,82,50);
 
     function GeicAPI($host, $user, $pswd, $database, $debug) {
     	 $this->MysqlDB($host, $user, $pswd, $database, $debug);
@@ -130,6 +130,9 @@ class GeicAPI extends MysqlDB {
 
         $rtn = array();
         foreach ($this->user_orders as $uid) {
+            if(!isset($_arr[$uid]))
+                continue;
+            
             $rtn[$uid] = $_arr[$uid];
             unset($_arr[$uid]);
         }

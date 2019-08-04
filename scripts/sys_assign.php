@@ -6,6 +6,10 @@ ini_set("display_errors", 1);
 error_reporting(2047);
 
 array_push($g_user_grants, 'todo_alert');
+array_push($g_user_grants, 'a_delambassador');
+array_push($g_user_grants, 'a_delpartner');
+array_push($g_user_grants, 'a_emailambassador');
+array_push($g_user_grants, 'a_emailpartner');
 
 $_userid = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
 

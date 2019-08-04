@@ -33,7 +33,7 @@ class AgentAPI extends MysqlDB{
     }
     
     function getAgentList($rAgentID=0, $type="", $cate=""){
-        $sql = "select ID, ID, Name, Country, Contact, Phone, Fax, Email, Address, Note, Form, StatusID, City, Web, isVerify, CATE_NAME, REFCODE from agent ";
+        $sql = "select ID, Name, Country, Contact, Phone, Fax, Email, Address, Note, Form, StatusID, City, Web, isVerify, CATE_NAME, REFCODE from agent ";
         if($rAgentID > 0){
             $sql .= "Where ID = {$rAgentID}";
         }elseif($type != ""){
@@ -106,7 +106,7 @@ class AgentAPI extends MysqlDB{
     	if ($sql == "") {
     		return array();
     	}	
-
+        //echo $sql."<br/>";
 	    $this->query($sql);
 	    $_arr = array();
 	    while ($this->fetch()){
@@ -252,12 +252,12 @@ class AgentAPI extends MysqlDB{
 			if ($from != "" && $to != ""){
 				$sql .= " AND  a.SEM1Date >= '{$from}' AND a.SEM1Date <= '{$to}' ";
 			}
-			if ($userid > 0) {
+			if ($userid > 0 && strtoupper($this->getAgentType($aid)) == "SUB") {
 				//$sql .= " AND b.CourseUser = {$userid} ";
 			    $sql .= " AND a.ConsultantID = {$userid} ";
             }
             $sql .= " order by  CoeCnt desc, e.StartDate desc, b.LName asc, b.FName asc, a.IsActive asc ";//Group BY a.CID
-            
+            //echo $sql."<br/>";
 			$_arr = array();
 			$this->query($sql);
 			while ($this->fetch()){
@@ -297,7 +297,7 @@ class AgentAPI extends MysqlDB{
 			if ($from != "" && $to != ""){
 				$sql .= " AND a.Sem1Date >= '{$from}' AND a.Sem1Date <= '{$to}' ";
 			}
-			if ($userid > 0) {
+			if ($userid > 0 && strtoupper($this->getAgentType($aid)) == "SUB") {
 				//$sql .= " AND d.CourseUser = {$userid} ";
 			     $sql .= " AND a.ConsultantID = {$userid} ";
             }

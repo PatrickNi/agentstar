@@ -18,11 +18,11 @@
     <input type="hidden" name="status" value="">
     <tr  class="bordered_2" >
 
-      <td colspan="11">
+      <td colspan="12">
         <input type="hidden" name="t_form" value="{$form}" />
-         <input type="button" value="Add Sub-agent" onClick="javascript:this.form.status.value='sub';this.form.action='agent_add.php';this.form.submit();" style="font-weight:bold;">
+         <input type="button" value="Add Ambassador" onClick="javascript:this.form.status.value='sub';this.form.action='agent_add.php';this.form.submit();" style="font-weight:bold;">
         &nbsp;&nbsp;
-        {if $ugs.a_del.v eq 1}
+        {if $ugs.a_delambassador.v eq 1}
         <input type="button" value="Remove" onClick="remove_confirm(this.form);" style="font-weight:bold;">
         {/if}   
         &nbsp;&nbsp;&nbsp;&nbsp;
@@ -34,9 +34,9 @@
               {/foreach}
       </td>
     </tr>
-    {if $ugs.export.v eq 1}
+    {if $ugs.a_emailambassador.v eq 1}
     <tr class="bordered_2">
-      <td colspan="11" style="padding-top:10px">
+      <td colspan="12" style="padding-top:10px">
           <input type="submit" value="Export Emails" name="bt_export" styple="font-weight:bold;">
           <strong>By:</strong>  
           <select name="t_cate">
@@ -50,6 +50,7 @@
     <p/>    
     <tr class="totalrowodd">
       <td width="2%"  align="center" class="border_1"><input type="checkbox" name="toggleAll" onClick="rowToggleAll(this);"></td>
+      <td align="left" class="border_1" width="3%" nowrap="nowrap">ID</td>
       <td align="left" class="border_1" width="15%" nowrap="nowrap">Name</td>
       <td align="left" class="border_1" width="7%" nowrap="nowrap">City</td>
       <td align="left" class="border_1" width="10%" nowrap="nowrap">Country</td>
@@ -60,11 +61,11 @@
       <td align="right" class="border_1" width="7%" nowrap="nowrap">{if $ugs.a_rev.v eq 1}Receivable<br>
         Commossion{/if}</td>
       <td align="right" class="border_1" width="7%" nowrap="nowrap">{if $ugs.a_rev.v eq 1}Paid<br>
-        Commossion{/if}</td>
-    </tr>
+           Commossion{/if}</td>
+    </tr> 
     {foreach key=catid item=v from=$totals}
     <tr class="border_1" style="background-color:{cycle values="#80FF80,#FFFF99,#CA95FF,#6C6CFF,#C78D8D,#7ABCBC"}" colspan="2">
-      <td align="center" class="border_1" colspan="5" style="font-size:14px; font-weight:bolder; font-style:italic">{$v.n}</td>
+      <td align="center" class="border_1" colspan="6" style="font-size:14px; font-weight:bolder; font-style:italic">{$v.n}</td>
       <td align="left" class="border_1"nowrap="nowrap" style="font-size:14px; font-weight:bolder; font-style:italic">{$v.s}</td>
       <td align="right" class="border_1" nowrap="nowrap" style="font-size:14px; font-weight:bolder; font-style:italic">{$v.o}</td>
       <td align="right"class="border_1"nowrap="nowrap" style="font-size:14px; font-weight:bolder; font-style:italic">{$v.c}</td>
@@ -75,6 +76,7 @@
     <tr id="tr_{$id}" onMouseOut="roff({$id});" onMouseOver="ron({$id});">
       <td onClick="rowToggle({$id});" align="center" class="border_1"><input type="checkbox" id="box_{$id}" onClick="toggleRow(this);" name="agentId[]" value="{$id}">
       </td>
+      <td align="center" class="border_1">{$id}</td>
       <!--<td align="center" class="border_1" nowrap="nowrap">{if $agent_arr[$id].verify eq 1}<span style="font-size:18px;font-weight: bolder; color: #FF0000">&radic;</span>{else}&nbsp;&nbsp;{/if}</td>-->
       <td align="left" class="border_1" nowrap="nowrap"><a href="agent_student.php?aid={$id}&is_amb=1" target="_self">{$agent_arr[$id].name}</a></td>
       <td align="left"class="border_1" nowrap="nowrap">{$agent_arr[$id].city|truncate:15}</td>
