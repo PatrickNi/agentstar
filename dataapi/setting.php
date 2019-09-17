@@ -18,25 +18,41 @@ try {
 			while ($db->fetch()) {
 				switch(strtoupper($db->COUNTRY)) {
 					case 'CHINA':
-						$db->COUNTRY = $db->COUNTRY.'(中国)';
+						$db->COUNTRY = $db->COUNTRY.'(脰脨鹿煤)';
 						break;
 					case 'MALAYSIA':
-						$db->COUNTRY = $db->COUNTRY.'(马来西亚)';
+						$db->COUNTRY = $db->COUNTRY.'(脗铆脌麓脦梅脩脟)';
 						break;
 					case 'HONG KONG':
-						$db->COUNTRY = $db->COUNTRY.'(香港)';
+						$db->COUNTRY = $db->COUNTRY.'(脧茫赂脹)';
 						break;
 					case 'TAIWAN':
-						$db->COUNTRY = $db->COUNTRY.'(台湾)';
+						$db->COUNTRY = $db->COUNTRY.'(脤篓脥氓)';
 						break;						
 					case 'MACAO':
-						$db->COUNTRY = $db->COUNTRY.'(澳门)';
+						$db->COUNTRY = $db->COUNTRY.'(掳脛脙脜)';
 						break;						
 						
 				}
 				$arr[$db->ID] = $db->COUNTRY;
 			}		
-			break;			
+			break;	
+		case 'vc2':		
+			$sql = "SELECT CATEID, VISANAME, ZH_NAME FROM visa_category order by (VISANAME+0) asc";
+			$db->query($sql);
+			while ($db->fetch()) {
+				$arr[$db->CATEID]['en'] = $db->VISANAME;
+				$arr[$db->CATEID]['zh'] = $db->ZH_NAME;
+			}		
+			break;
+		case 'aboutus':		
+			$sql = "SELECT ITEM, ITEM_ZH FROM client_from where rank <> 100 order by rank asc";
+			$db->query($sql);
+			while ($db->fetch()) {
+				$arr[$db->ITEM]['en'] = $db->ITEM;
+				$arr[$db->ITEM]['zh'] = $db->ITEM_ZH;
+			}		
+			break;
 		default:
 			throw new Exception ("No action");
 			break;		

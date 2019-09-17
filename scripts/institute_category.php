@@ -34,11 +34,12 @@ switch (strtoupper($action)){
 
 if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
     $cat_name = isset($_REQUEST['t_name'])? trim($_REQUEST['t_name']) : "";
-
+    $cat_rank = isset($_REQUEST['t_rank'])? trim($_REQUEST['t_rank']) : 0;
+    
     if($cat_id > 0){
-        $o_s->setCategory($cat_id, $cat_name);
+        $o_s->setCategory($cat_id, $cat_name, $cat_rank);
     }else{
-        $o_s->addCategory($cat_name);
+        $o_s->addCategory($cat_name, $cat_rank);
     }
     $cat_id = 0;
     $isNone = "none";
@@ -51,7 +52,7 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 $action_arr = array(__ACT_EDIT => "Edit",  __ACT_SUBCLASS => "SubCategory", __ACT_DEL => "Delete");//,
 
 # format array
-$cat_arr = $o_s->getCategory();
+$cat_arr = $o_s->getCategoryWithRank();
 
 
 
@@ -61,7 +62,8 @@ $o_tpl->assign('act_arr', $action_arr);
 $o_tpl->assign('category_arr', $cat_arr);
 
 if($cat_id > 0 && array_key_exists($cat_id, $cat_arr)){
-    $o_tpl->assign('dt_name', $cat_arr[$cat_id]);
+    $o_tpl->assign('dt_name', $cat_arr[$cat_id]['name']);
+    $o_tpl->assign('dt_rank', $cat_arr[$cat_id]['rank']);
 }
 
 $o_tpl->assign('catid', $cat_id);

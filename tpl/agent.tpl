@@ -87,8 +87,8 @@
       <td align="left" class="border_1"nowrap="nowrap" style="font-size:14px; font-weight:bolder; font-style:italic">{$v.s}</td>
       <td align="right" class="border_1" nowrap="nowrap" style="font-size:14px; font-weight:bolder; font-style:italic">{$v.o}</td>
       <td align="right"class="border_1"nowrap="nowrap" style="font-size:14px; font-weight:bolder; font-style:italic">{$v.c}</td>
-      <td align="right" class="border_1"  nowrap="nowrap" style="font-size:14px; font-weight:bolder; font-style:italic">{if $ugs.a_rev.v eq 1}{$v.rc}{/if}</td>
-      <td align="right" class="border_1" nowrap="nowrap" style="font-size:14px; font-weight:bolder; font-style:italic">{if $ugs.a_rev.v eq 1}{$v.pc}{/if}</td>
+      <td align="right" class="border_1"  nowrap="nowrap" style="font-size:14px; font-weight:bolder; font-style:italic">{if $ugs.a_rev.v eq 1}{$v.rc-$v.pc|string_format:"%.2f"}{/if}</td>
+      <td align="right" class="border_1" nowrap="nowrap" style="font-size:14px; font-weight:bolder; font-style:italic">{if $ugs.a_rev.v eq 1}{$v.pc|string_format:"%.2f"}{/if}</td>
     </tr>    
     {foreach item=id from=$v.aid}
     <tr id="tr_{$id}" onMouseOut="roff({$id});" onMouseOver="ron({$id});">
@@ -102,7 +102,7 @@
       <td align="left"class="border_1" nowrap="nowrap">{if $stats[$id].stdcnt gt 0} {$stats[$id].stdcnt} {else}0{/if}</td>
       <td align="right"class="border_1" nowrap="nowrap">{if $stats[$id].offer gt 0} {$stats[$id].offer} {else}0{/if}</td>
       <td align="right"class="border_1" nowrap="nowrap">{if $stats[$id].coe gt 0} {$stats[$id].coe} {else}0{/if}</td>
-      <td align="right"class="border_1" nowrap="nowrap">{if $ugs.a_rev.v eq 1}{if $stats[$id].coe gt 0} {$stats[$id].rcomm|string_format:"%.2f"} {else}0.00{/if}{/if}</td>
+      <td align="right"class="border_1" nowrap="nowrap">{if $ugs.a_rev.v eq 1}{if $stats[$id].coe gt 0} {$stats[$id].rcomm-$stats[$id].pcomm|string_format:"%.2f"}{else}0.00{/if}{/if}</td>
       <td align="right"class="border_1" nowrap="nowrap">{if $ugs.a_rev.v eq 1}{if $stats[$id].coe gt 0} {$stats[$id].pcomm|string_format:"%.2f"} {else}0.00{/if}{/if}</td>
     </tr>
     {/foreach}

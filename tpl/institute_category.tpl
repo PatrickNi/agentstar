@@ -25,10 +25,10 @@
 					<td>Category Name</td>
 					<td>Action</td>
 				</tr>
-				{foreach key=id item=name from=$category_arr}
+				{foreach key=id item=v from=$category_arr}
 				<tr align="center" class="roweven">
 					<!--<td class="border_1">{$id}</td>-->
-					<td>{$name}</td>
+					<td>{$v.name}({$v.rank})</td>
 					<td>
 						<select name="at_{$id}" style="font-size:9px; font-weight:bolder;" {if $arr.done eq 1} disabled {/if}>
 							{foreach key=act_id item=act_name from=$act_arr}
@@ -52,6 +52,10 @@
 		<tr>
 			<td width="50%" align="right" class="rowodd"><strong>Category Name:</strong>&nbsp;&nbsp;</td>
 			<td align="left" width="50%" class="roweven"><input type="text" name="t_name" value="{$dt_name}"></td>
+		</tr>
+		<tr>
+			<td width="50%" align="right" class="rowodd"><strong>Rank:</strong>&nbsp;&nbsp;</td>
+			<td align="left" width="50%" class="roweven"><input type="text" name="t_rank" value="{$dt_rank}"></td>
 		</tr>
 		<tr align="center"  class="greybg" >
 			<td colspan="2">

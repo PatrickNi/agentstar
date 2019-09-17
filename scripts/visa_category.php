@@ -34,11 +34,12 @@ switch (strtoupper($action)){
 
 if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
 	$cat_name = isset($_POST['t_name'])? trim($_POST['t_name']) : "";
+	$cat_zh   = isset($_POST['t_zh'])? trim($_POST['t_zh']) : "";
 
 	if($cat_id > 0){
-		$o_v->setVisaCategory($cat_id, $cat_name);
+		$o_v->setVisaCategory($cat_id, $cat_name, $cat_zh);
 	}else{
-		$o_v->addVisaCategory($cat_name);
+		$o_v->addVisaCategory($cat_name, $cat_zh);
 	}
 	$cat_id = 0;
 	$isNone = "none";
@@ -51,7 +52,7 @@ if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
 $action_arr = array(__ACT_EDIT => "Edit",  __ACT_SUBCLASS => "SubClass", __ACT_DEL => "Delete" );//__ACT_DEL => "Delete",
 
 # format array
-$cat_arr = $o_v->getVisaNameArr();
+$cat_arr = $o_v->getVisas();
 
 
 
@@ -61,7 +62,8 @@ $o_tpl->assign('act_arr', $action_arr);
 $o_tpl->assign('category_arr', $cat_arr);
 
 if($cat_id > 0 && array_key_exists($cat_id, $cat_arr)){
-	$o_tpl->assign('dt_name', $cat_arr[$cat_id]);
+	$o_tpl->assign('dt_name', $cat_arr[$cat_id]['en']);
+	$o_tpl->assign('dt_zh', $cat_arr[$cat_id]['zh']);
 }
 
 $o_tpl->assign('catid', $cat_id);

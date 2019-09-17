@@ -32,8 +32,8 @@ class AgentAPI extends MysqlDB{
         return false;
     }
     
-    function getAgentList($rAgentID=0, $type="", $cate=""){
-        $sql = "select ID, Name, Country, Contact, Phone, Fax, Email, Address, Note, Form, StatusID, City, Web, isVerify, CATE_NAME, REFCODE from agent ";
+    function getAgentList($rAgentID=0, $type="", $cate="", $staff_id=0){
+        $sql = "select ID, Name, Country, Contact, Phone, Fax, Email, Address, Note, Form, StatusID, City, Web, isVerify, CATE_NAME, REFCODE, USER_ID from agent ";
         if($rAgentID > 0){
             $sql .= "Where ID = {$rAgentID}";
         }elseif($type != ""){
@@ -47,9 +47,13 @@ class AgentAPI extends MysqlDB{
                 $sql .= " AND CATE_NAME = '{$cate}' ";
         }
 
+        if ($staff_id > 0 && $type == 'sub') {
+            $sql .= " AND USER_ID = {$staff_id} ";
+        }
        	
         $sql .= " Order by lower(Name) asc";
         $this->query($sql);
+        //echo $sql;
 
         $_arr = array();
         while($this->fetch()){
@@ -68,6 +72,7 @@ class AgentAPI extends MysqlDB{
 			$_arr[$this->ID]['verify']  = $this->isVerify;
             $_arr[$this->ID]['cate']    = $this->CATE_NAME;
             $_arr[$this->ID]['code']    = $this->REFCODE;			
+            $_arr[$this->ID]['uid']     = $this->USER_ID;
         }
         return $_arr;
     }
@@ -75,19 +80,20 @@ class AgentAPI extends MysqlDB{
     function countAgent($type, $userid = 0, $from="", $to=""){
     	$sql = "";	
     	if ($type == 'sub') {
-    			$sql = "select d.AgentID, count(distinct a.CID) as StdCnt, Sum(if(OfferCnt is null, 0, OfferCnt)) as OfferCnt, Sum(if(CoeCnt is null, 0, CoeCnt)) as CoeCnt, Sum(if(RComm is null, 0, RComm)) as RComm, Sum(if(PComm is null, 0, PComm)) as PComm  
+    			$sql = "select d.AgentID, count(distinct a.CID) as StdCnt, Sum(if(OfferCnt is null, 0, OfferCnt)) as OfferCnt, Sum(if(CoeCnt is null, 0, CoeCnt)) as CoeCnt, Sum(if(RComm is null, 0, RComm)) as RComm, Sum(if(PComm is null, 0, PComm)) as PComm, max(a.ConsultantID) as uid  
 						from client_info d left join client_course a  on(d.CID = a.CID) 
 								left join (select CCID, Sum(if(ProcessID = 1, 1, 0)) as OfferCnt, Sum(if(ProcessID = 5, 1, 0)) as CoeCnt from client_course_process where done = 1 group by CCID) as b on(b.CCID = a.ID)
 								left join (select CCID, Sum(RComm) as RComm, Sum(CoComm) as PComm from client_course_sem  group by CCID) as c on(c.CCID = a.ID)											  
 						where d.AgentID <> 0 ";
 	    		if ($userid > 0) {
 	    			//$sql .= " AND d.CourseUser = {$userid} ";
-	    		     $sql .= " AND a.ConsultantID = {$userid} ";
+                    $sql .= " AND a.ConsultantID = {$userid} ";
+
                 }
 	    		$sql .= " Group by d.AgentID  ";
 		}
 		elseif ($type == 'top'){
-				$sql = "select a.AgentID, count(distinct a.CID) as StdCnt, Sum(if(OfferCnt is null, 0, OfferCnt)) as OfferCnt, Sum(if(CoeCnt is null, 0, CoeCnt)) as CoeCnt, Sum(if(RComm is null, 0, RComm)) as RComm, Sum(if(PComm is null, 0, PComm)) as PComm  
+				$sql = "select a.AgentID, count(distinct a.CID) as StdCnt, Sum(if(OfferCnt is null, 0, OfferCnt)) as OfferCnt, Sum(if(CoeCnt is null, 0, CoeCnt)) as CoeCnt, Sum(if(RComm is null, 0, RComm)) as RComm, Sum(if(PComm is null, 0, PComm)) as PComm, max(a.ConsultantID) as uid  
 							from client_course a left join (select CCID, Sum(if(ProcessID = 1, 1, 0)) as OfferCnt, Sum(if(ProcessID = 5, 1, 0)) as CoeCnt from client_course_process where done = 1 group by CCID) as b on(b.CCID = a.ID)
 												 left join (select CCID, Sum(RComm) as RComm, Sum(CoComm) as PComm from client_course_sem  group by CCID) as c on(c.CCID = a.ID)
 												 left join client_info d on(d.CID = a.CID)
@@ -111,10 +117,11 @@ class AgentAPI extends MysqlDB{
 	    $_arr = array();
 	    while ($this->fetch()){
 	    	$_arr[$this->AgentID]['stdcnt'] = $this->StdCnt;
-	    	$_arr[$this->AgentID]['offer'] = $this->OfferCnt;
-	    	$_arr[$this->AgentID]['coe']   = $this->CoeCnt;
-	    	$_arr[$this->AgentID]['rcomm']   = $this->RComm;
-	    	$_arr[$this->AgentID]['pcomm']   = $this->PComm;
+	    	$_arr[$this->AgentID]['offer' ] = $this->OfferCnt;
+	    	$_arr[$this->AgentID]['coe' ]   = $this->CoeCnt;
+	    	$_arr[$this->AgentID]['rcomm' ] = $this->RComm;
+	    	$_arr[$this->AgentID]['pcomm' ] = $this->PComm;
+            $_arr[$this->AgentID]['uid' ]   = $this->uid;   
 	    }
 	    return $_arr;
     }
@@ -136,7 +143,7 @@ class AgentAPI extends MysqlDB{
 		foreach ($sets as &$v){
 			$v = addslashes($v);
 		}        
-        $sql = "Update agent SET Name = '{$sets['name']}', Country = '{$sets['country']}', Contact = '{$sets['contact']}', Phone = '{$sets['tel']}', Fax = '{$sets['fax']}', Email = '{$sets['email']}', Address = '{$sets['add']}', Form = '{$sets['type']}', Note = '{$sets['note']}' , Web = '{$sets['web']}', City = '{$sets['city']}', StatusID = '{$sets['status']}', isVerify = '{$sets['verify']}', CATE_NAME = '{$sets['cate']}'  Where ID = {$agent_id} "; 
+        $sql = "Update agent SET Name = '{$sets['name']}', Country = '{$sets['country']}', Contact = '{$sets['contact']}', Phone = '{$sets['tel']}', Fax = '{$sets['fax']}', Email = '{$sets['email']}', Address = '{$sets['add']}', Form = '{$sets['type']}', Note = '{$sets['note']}' , Web = '{$sets['web']}', City = '{$sets['city']}', StatusID = '{$sets['status']}', isVerify = '{$sets['verify']}', CATE_NAME = '{$sets['cate']}', user_id = '{$sets['uid']}'  Where ID = {$agent_id} "; 
         return $this->query($sql); 
     }
     
@@ -144,8 +151,8 @@ class AgentAPI extends MysqlDB{
 		foreach ($sets as &$v){
 			$v = addslashes($v);
 		}   
-        $sql = "insert into `geic`.`agent` (Name, Country, Contact, Phone, Fax, Email, Address, Note, Form, StatusID, City, Web, isVerify, CATE_NAME) values " .
-                    "('{$sets['name']}', '{$sets['country']}', '{$sets['contact']}', '{$sets['tel']}', '{$sets['fax']}', '{$sets['email']}', '{$sets['add']}', '{$sets['note']}', '{$sets['type']}', '{$sets['status']}', '{$sets['city']}', '{$sets['web']}', '{$sets['verify']}', '{$sets['cate']}') ";
+        $sql = "insert into `geic`.`agent` (Name, Country, Contact, Phone, Fax, Email, Address, Note, Form, StatusID, City, Web, isVerify, CATE_NAME, user_id) values " .
+                    "('{$sets['name']}', '{$sets['country']}', '{$sets['contact']}', '{$sets['tel']}', '{$sets['fax']}', '{$sets['email']}', '{$sets['add']}', '{$sets['note']}', '{$sets['type']}', '{$sets['status']}', '{$sets['city']}', '{$sets['web']}', '{$sets['verify']}', '{$sets['cate']}', '{$sets['uid']}') ";
         $this->query($sql);
         return $this->getLastInsertID();
     }    
@@ -232,7 +239,7 @@ class AgentAPI extends MysqlDB{
 	
 	function countStudent($from, $to, $aid, $userid=0){
 		if ($aid > 0){
-			$sql = "select a.ID, b.CID, b.LName, b.FName, a.IID, a.QualID, a.MajorID, b.CourseUser, a.IsActive, a.Refuse, if(e.StartDate is null, '0000-00-00', e.StartDate) as StartDate,
+			$sql = "select a.ID, b.CID, b.LName, b.FName, a.IID, a.QualID, a.MajorID, a.ConsultantID, a.IsActive, a.Refuse, if(e.StartDate is null, '0000-00-00', e.StartDate) as StartDate,
 							if(CoeCnt is null, 0, OfferCnt) as OfferCnt, 
 							if(CoeCnt is null, 0, CoeCnt) as CoeCnt, 
 							if(cocomm is null,0.00, cocomm) as cocomm, 
@@ -256,7 +263,7 @@ class AgentAPI extends MysqlDB{
 				//$sql .= " AND b.CourseUser = {$userid} ";
 			    $sql .= " AND a.ConsultantID = {$userid} ";
             }
-            $sql .= " order by  CoeCnt desc, e.StartDate desc, b.LName asc, b.FName asc, a.IsActive asc ";//Group BY a.CID
+            $sql .= " order by  CoeCnt desc, OfferCnt desc, e.StartDate desc, b.LName asc, b.FName asc, a.IsActive asc ";//Group BY a.CID
             //echo $sql."<br/>";
 			$_arr = array();
 			$this->query($sql);
@@ -269,7 +276,7 @@ class AgentAPI extends MysqlDB{
 				$_arr[$this->ID]['major'] = $this->MajorID;
 				$_arr[$this->ID]['coe']   = $this->CoeCnt;
 				$_arr[$this->ID]['offer'] = $this->OfferCnt;
-				$_arr[$this->ID]['cuser'] = $this->CourseUser;
+				$_arr[$this->ID]['cuser'] = $this->ConsultantID;
 				$_arr[$this->ID]['active']= $this->IsActive;
 				$_arr[$this->ID]['refuse']= $this->Refuse;
 				$_arr[$this->ID]['pcomm'] = $this->pcomm;

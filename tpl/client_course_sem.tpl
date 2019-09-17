@@ -96,7 +96,7 @@
 							
 							{if $ugs.c_rev.m eq 1}
 								<tr>
-									<td width="28%" align="left" style="color:#CC3300" class="rowodd"> <strong>Potential Commission:</strong>&nbsp;&nbsp;</td>
+									<td width="28%" align="left" style="color:#CC3300" class="rowodd"> <strong>Receivable commission:</strong>&nbsp;&nbsp;</td>
 									<td align="left" width="72%" class="roweven"><input type="text" name="t_rcomm" value="{$sem_arr.rcomm}" size="30" onChange="audit_money(this)" ></td>
 								</tr>
 								<tr>

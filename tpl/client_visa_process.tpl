@@ -29,7 +29,7 @@
 				</table></td></tr>
 				<tr>
 					<td width="19%" align="left" class="rowodd"><strong>Date:</strong>&nbsp;&nbsp;</td>
-					<td align="left" width="81%" class="roweven"><input type="text" name="t_date" id="t_date" value="{$dt_arr.date}"  >                 
+					<td align="left" width="81%" class="roweven"><input type="text" name="t_date" id="t_date" value="{$dt_arr.date}" autocomplete="off">                 
                     </td>
 				</tr>
 				{if $isOther eq 1 || ($dt_arr.itemid eq '0' && $isNew neq 1)}
@@ -62,7 +62,7 @@
 								<span id="epd_span" {if stripos($subject_arr[$dt_arr.itemid], 'grant') === false} style="visibility:hidden;" {/if}>
 								&nbsp;
 								&nbsp;
-								Expire Date: <input type="text" name="t_epdate" id="t_epdate" value="{$visa_rs.epd}" size="20" {if stripos($subject_arr[$dt_arr.itemid], 'grant') === false} disabled="disabled"{/if} >
+								Expire Date: <input type="text" name="t_epdate" id="t_epdate" value="{$visa_rs.epd}" size="20" {if stripos($subject_arr[$dt_arr.itemid], 'grant') === false} disabled="disabled"{/if} autocomplete="off">
 								</span>								
 						</td>
 					</tr>
@@ -73,7 +73,7 @@
 				</tr>
 				<tr>
 					<td width="19%" align="left" class="rowodd"><strong>Due Date:</strong>&nbsp;&nbsp;</td>
-					<td align="left" width="81%" class="roweven"><input type="text" name="t_due" value="{$dt_arr.due}" id="t_due" >
+					<td align="left" width="81%" class="roweven"><input type="text" name="t_due" value="{$dt_arr.due}" id="t_due" autocomplete="off" >
                      
                     </td>
 				</tr>

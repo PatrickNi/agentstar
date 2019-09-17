@@ -7,13 +7,24 @@ class VisaAPI extends MysqlDB {
     }
     
     function getVisaNameArr(){
-    	$sql = "select CateID, VisaName from visa_category order by VisaName asc";
+    	$sql = "select CateID, VisaName from visa_category order by (VisaName+0) asc";
     	$this->query($sql);
     	$_arr = array();
     	while($this->fetch()){
     		$_arr[$this->CateID] = $this->VisaName;
     	}
     	return $_arr;
+    }
+
+    function getVisas(){
+        $sql = "select CateID, VisaName, ZH_NAME from visa_category order by (VisaName+0) asc";
+        $this->query($sql);
+        $_arr = array();
+        while($this->fetch()){
+            $_arr[$this->CateID]['en'] = $this->VisaName;
+            $_arr[$this->CateID]['zh'] = $this->ZH_NAME;
+        }
+        return $_arr;
     }
 
     function getVisaName($catid){
@@ -117,19 +128,21 @@ class VisaAPI extends MysqlDB {
 		return false;
     }
     
-    function addVisaCategory($catname){
+    function addVisaCategory($catname, $zh_name){
     	if ($catname != ""){
     		$catname = addslashes($catname);
-    		$sql = "insert into visa_category (VisaName) values ('{$catname}')";
+            $zh_name = addslashes($zh_name);
+    		$sql = "insert into visa_category (VisaName, ZH_NAME) values ('{$catname}', '{$zh_name}')";
     		return $this->query($sql);
     	}
     	return false;
     }
 
-    function setVisaCategory($catid, $catname){
+    function setVisaCategory($catid, $catname, $zh_name){
     	if ($catname != "" && $catid > 0){
     		$catname = addslashes($catname);
-    		$sql = "Update visa_category SET VisaName = '{$catname}' where CateID = {$catid}";
+            $zh_name = addslashes($zh_name);
+    		$sql = "Update visa_category SET VisaName = '{$catname}', ZH_NAME = '{$zh_name}' where CateID = {$catid}";
     		return $this->query($sql);
     	}
     	return false;

@@ -7,8 +7,10 @@ require_once(__LIB_PATH.'GeicAPI.class.php');
 
 $user_id = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
 
-$filetmp  = isset($_FILES['uploadFile'])? $_FILES['uploadFile']['tmp_name'] : "";
-$filesize = isset($_FILES['uploadFile'])? $_FILES['uploadFile']['size'] : 0;
+$upload_key = isset($_POST['xhr']) && $_POST['xhr'] == 1? 'file' : 'uploadFile';
+
+$filetmp  = isset($_FILES[$upload_key])? $_FILES[$upload_key]['tmp_name'] : "";
+$filesize = isset($_FILES[$upload_key])? $_FILES[$upload_key]['size'] : 0;
 $itemid   = isset($_REQUEST['item'])?  $_REQUEST['item'] : 0;
 $itemtype = isset($_REQUEST['type'])?  $_REQUEST['type'] : 0;
 $msg = "";
@@ -47,18 +49,25 @@ if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "UPLOAD"){
 		$msg = "Error file size";
 		$pass = 0;
 	}
+
 	
-	if (file_exists($dl_path . $_FILES['uploadFile']['name'])) {
-		$msg = "File {$_FILES['uploadFile']['name']} has existed !";
+
+	
+	if (file_exists($dl_path . $_FILES[$upload_key]['name'])) {
+		$msg = "File {$_FILES[$upload_key]['name']} has existed !";
 		$pass = 0;		
 	}
 	if($pass == 1 && $itemid > 0 && $itemtype != ""){
-		if(copy($filetmp, $dl_path . $_FILES['uploadFile']['name'])){
-			$o_g->addAttachment($itemid, $itemtype, $user_dir ."/". $_FILES['uploadFile']['name'], $user_id);			
+		if(copy($filetmp, $dl_path . $_FILES[$upload_key]['name'])){
+			$o_g->addAttachment($itemid, $itemtype, $user_dir ."/". $_FILES[$upload_key]['name'], $user_id);			
 		}else{
 			$msg = "copy failed";
 		}
 	}	
+	if (isset($_POST['xhr']) && $_POST['xhr'] == 1) {
+		echo json_encode(array('succ'=>$pass));
+		exit;
+	}
 }elseif (isset($_POST['Change']) && strtoupper($_POST['Change']) == "CHANGE"){
 	$fid = isset($_POST['id'])? $_POST['id'] : 0;
 	$new_name = isset($_POST['new_'.$fid])? $_POST['new_'.$fid] : "";
@@ -83,8 +92,11 @@ if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "UPLOAD"){
 		# get source name
 		$old_name = $o_g->getAttachmentFileName($fid);
 		if (file_exists(__DOWNLOAD_PATH.$old_name)) {
-			$o_g->delAttachment	($fid);
+			$o_g->delAttachment($fid);
 			unlink(__DOWNLOAD_PATH.$old_name);	
+		}
+		else {
+			$o_g->delAttachment($fid);
 		}		
 	}
 }

@@ -32,6 +32,7 @@
           		{foreach key=user_id item=user_name from=$slUsers}
             		<option value="{$user_id}" {if $staffid eq $user_id} selected {/if}>{$user_name}</option>
           		{/foreach}
+          	</select>
 	 		<strong>From: &nbsp;</strong><input type="text"	 name="t_fdate" id="t_fdate" value="{$from}" onChange="audit_date(this)">	  
             &nbsp;&nbsp;
 			<strong>To: &nbsp;</strong><input type="text"	 name="t_tdate" id="t_tdate" value="{$to}" onChange="audit_date(this)">&nbsp;&nbsp;
@@ -51,8 +52,8 @@
 		<td width="17%">Course</td>
 		<td width="16%">Major</td>
 		<td width="9%">Course Consultant</td>
-		<td width="6%">{if $ugs.a_rev.v eq 1}Payable Co-Comm{/if}</td>
-		<td width="6%">{if $ugs.a_rev.v eq 1}Paid Amount{/if}</td>
+		<td width="6%">{if $ugs.a_rev.v eq 1}Receivable top-comm{/if}</td>
+		<td width="6%">{if $ugs.a_rev.v eq 1}Received top-comm{/if}</td>
 	</tr>
 	{foreach key=id item=arr from=$student_arr}
 	<tr align="center" class="{cycle values='rowodd,roweven'}">

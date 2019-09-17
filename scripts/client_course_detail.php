@@ -39,7 +39,7 @@ $set_course['iid'] = isset($_REQUEST['t_school'])? (string)trim($_REQUEST['t_sch
 $set_course['catid']   = isset($_REQUEST['t_cate'])? (string)trim($_REQUEST['t_cate']) : 0;
 $set_course['qual']   = isset($_REQUEST['t_qual'])? (string)trim($_REQUEST['t_qual']) : 0;
 $set_course['major']  = isset($_REQUEST['t_major'])? (string)trim($_REQUEST['t_major']) : 0;
-$set_course['agent']   = isset($_REQUEST['t_agent'])? (string)trim($_REQUEST['t_agent']) : '';
+$set_course['agent']   = isset($_REQUEST['t_agent'])? (string)trim($_REQUEST['t_agent']) : 0;
 
 
 $set_course['key']     = isset($_REQUEST['t_key'])? (string)trim($_REQUEST['t_key']) : "";
@@ -126,7 +126,11 @@ if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" |
 		}else{
 			$course_id = $o_c->addCourse($user_id, $client_id, $set_course);
 		}
-
+		
+		if($set_course['consultant'] > 0){
+			$o_c->addClientUserRs($client_id, $set_course['consultant'], __COURSE_CONSULTANT);
+		}
+			
 		if($set_course['done'] == 2){
 			$o_c->finishProcessofCourse($course_id);
 

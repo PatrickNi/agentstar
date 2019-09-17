@@ -136,7 +136,7 @@ class SchoolAPI extends MysqlDB{
 	
 	function countStudent($from, $to, $iid, $userid=0){
 		if ($iid > 0){
-			$sql = "select a.ID, b.CID, b.LName, b.FName, a.IID, a.QualID, a.MajorID, b.CourseUser, a.IsActive, a.Refuse, if(e.StartDate is null, a.StartDate, e.StartDate) as StartDate,
+			$sql = "select a.ID, b.CID, b.LName, b.FName, a.IID, a.QualID, a.MajorID, a.ConsultantID, a.IsActive, a.Refuse, if(e.StartDate is null, a.StartDate, e.StartDate) as StartDate,
 							if(CoeCnt is null, 0, OfferCnt) as OfferCnt, 
 							if(CoeCnt is null, 0, CoeCnt) as CoeCnt, 
 							if(rcomm is null,0.00, rcomm) as rcomm, 
@@ -151,7 +151,7 @@ class SchoolAPI extends MysqlDB{
 			}
 			
 			if($userid > 0){
-				$sql .= " AND b.CourseUser = {$userid} ";
+				$sql .= " AND a.ConsultantID = {$userid} ";
 			}
 			
 			$sql .= " order by CoeCnt desc, StartDate desc , b.LName asc, b.FName asc, a.IsActive asc ";//Group BY a.CID
@@ -167,7 +167,7 @@ class SchoolAPI extends MysqlDB{
 				$_arr[$this->ID]['major'] = $this->MajorID;
 				$_arr[$this->ID]['coe']   = $this->CoeCnt;
 				$_arr[$this->ID]['offer'] = $this->OfferCnt;
-				$_arr[$this->ID]['cuser'] = $this->CourseUser;
+				$_arr[$this->ID]['cuser'] = $this->ConsultantID;
 				$_arr[$this->ID]['active']= $this->IsActive;
 				$_arr[$this->ID]['refuse']= $this->Refuse;
 				$_arr[$this->ID]['pcomm'] = $this->pcomm;
@@ -189,7 +189,7 @@ class SchoolAPI extends MysqlDB{
 				$sql .= " AND a.Sem1Date >= '{$from}' AND a.Sem1Date <= '{$to}' ";
 			}
 			if($userid > 0){
-				$sql .= " AND d.CourseUser = {$userid} ";
+				$sql .= " AND a.ConsultantID = {$userid} ";
 			}			
 			$this->query($sql);
 			$_arr = array('total'=>0, 'offer'=>0, 'coe'=>0);
@@ -417,10 +417,11 @@ class SchoolAPI extends MysqlDB{
 	}
 	
 	function getCategory($catid = 0){
-		$sql = "select ID, Category from institute_category ";
+		$sql = "select ID, Category from institute_category";
 		if ($catid > 0){
 			$sql .= " WHERE ID = {$catid} ";
 		}
+		$sql .= " order by rank asc";
 		$this->query($sql);
 		$_arr = array();
 		while ($this->fetch()){
@@ -428,17 +429,32 @@ class SchoolAPI extends MysqlDB{
 		}
 		return $_arr;
 	}
+
+	function getCategoryWithRank($catid = 0){
+		$sql = "select ID, Category, Rank from institute_category ";
+		if ($catid > 0){
+			$sql .= " WHERE ID = {$catid} ";
+		}
+		$sql .= " order by rank asc";
+		$this->query($sql);
+		$_arr = array();
+		while ($this->fetch()){
+			$_arr[$this->ID]['name'] = $this->Category;
+			$_arr[$this->ID]['rank'] = $this->Rank;
+		}
+		return $_arr;
+	}
 	
-	function addCategory($category){
+	function addCategory($category, $rank=0){
 		$category = addslashes($category);
-		$sql = "insert into institute_category (Category) values ('{$category}')";
+		$sql = "insert into institute_category (Category, Rank) values ('{$category}', {$rank})";
 		return $this->query($sql);
 	}
 
-	function setCategory($catid, $catename){
+	function setCategory($catid, $catename, $rank=0){
 		if ($catid > 0 && $catename != ""){
 			$catename = addslashes($catename);
-			$sql = "Update institute_category SET Category = '{$catename}' WHERE ID = {$catid}";
+			$sql = "Update institute_category SET Category = '{$catename}', Rank = {$rank} WHERE ID = {$catid}";
 			return $this->query($sql);
 		}
 		return FALSE;

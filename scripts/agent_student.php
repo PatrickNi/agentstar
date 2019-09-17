@@ -73,7 +73,7 @@ $o_tpl->assign('ugs', $ugs);
 $o_tpl->assign('is_global_ambassador', $is_global_ambassador);
 $o_tpl->assign('staffid', $staff_id);
 # get user position
-if (isset($ugs['seeall']) && $ugs['seeall']['v'] == 1){
+if (isset($ugs['rpt_staff']) && $ugs['rpt_staff']['v'] == 1){
     $o_tpl->assign('slUsers', $o_g->getUserNameArr());
 }else {
     $o_tpl->assign('slUsers', $o_g->getUserNameArr($staff_id));

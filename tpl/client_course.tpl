@@ -176,7 +176,7 @@ function ShowComm() {
                                     <td class="border_1" style="color:#CC3300; visibility:hidden" id="ShowComm">Discount Pay Day</td>
 								{/if}							</tr>
 							{foreach key=semid item=semarr from=$course_sem[$id]}
-							<tr name="{$id}" style="display:block;" class="yellowbg">
+							<tr name="{$id}" class="yellowbg" style="display:block; {if $semarr.done eq 2}background-color: #ceccc5;font-style: italic;{/if}" >
 								<td class="border_1"align="center" ><span style="text-decoration:underline; cursor:pointer;" onClick="{if $show_detail eq 1}window.open('client_course_sem.php?cid={$cid}&courseid={$id}&semid={$semid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,width='+ screen.width*4/5 +',height=' + screen.height*4/5){else}alert('Permission denied');{/if}">semester{$semarr.sem}</span></td>
 								<td class="border_1" align="right">{$semarr.fdate}</td>
 								<td class="border_1" align="right">{$semarr.tdate}</td>

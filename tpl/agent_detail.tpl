@@ -32,7 +32,7 @@
 				<tr>
 					<td width="12%" height="30" align="left" class="rowodd" style=" color:#FF0000"><strong>Category:</strong>&nbsp;&nbsp;</td>
 					<td align="left" width="88%" class="roweven">
-                    	<select name="t_cate">
+                    	<select name="t_cate"{if $ugs.a_delambassador.v eq 0 && $dt_arr.type eq 'sub'}disabled{/if}>
                     		{if $dt_arr.type eq 'top' || $exType eq 'top'}
                         		<option value="education" {if $dt_arr.cate eq "education"} selected {/if}>Education agent</option>
                         		<option value="inactive" {if $dt_arr.cate eq "inactive"} selected {/if}>Inactive agent</option>    
@@ -48,6 +48,9 @@
                         	{/if}                          
                                                                                   
                         </select>
+                        {if $ugs.a_delambassador.v eq 0 && $dt_arr.type eq 'sub'}
+							<input type="hidden" name="t_cate" value="{$dt_arr.cate}">
+                        {/if}
 					</td>
 				</tr>	                	
 				<tr>
@@ -63,6 +66,17 @@
 						{if $aid > 0}
 							<input type="submit" value="Generate Code" name="bt_code" style="font-weight:bold ">
 						{/if}
+					</td>
+				</tr>
+				<tr>
+					<td width="12%" height="30" align="left" class="rowodd" style=" color:#FF0000"><strong>Operator:</strong>&nbsp;&nbsp;</td>
+					<td align="left" width="88%" class="roweven">
+			        	<select name="t_uid">
+			        		<option value="0">select an operator</option>
+			          		{foreach key=user_id item=user_name from=$slUsers}
+			            		<option value="{$user_id}" {if $dt_arr.uid eq $user_id} selected {/if}>{$user_name}</option>
+			          		{/foreach}
+			          	</select>
 					</td>
 				</tr>						
 				<tr>

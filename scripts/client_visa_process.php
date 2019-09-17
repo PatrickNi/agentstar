@@ -27,6 +27,10 @@ $process_item_arr = $o_v->getVisaItemArr($visa_rs_arr['visa'], $visa_rs_arr['cla
 
 $o_t = new TodoAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
+$case_aat = false;
+if (stripos($o_v->getSubclassName($visa_rs_arr['visa'], $visa_rs_arr['class']), 'aat') !== false)
+	$case_aat = true;
+
 
 if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 	$sets['date'] = isset($_REQUEST['t_date'])? trim($_REQUEST['t_date']) : "0000-00-00";
@@ -88,7 +92,12 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 			}
 		}
 	}
-	elseif (isset($process_item_arr[$sets['subject']]) && stripos($process_item_arr[$sets['subject']], 'apply') !== false && $sets['done'] == 1){
+	elseif ($case_aat && isset($process_item_arr[$sets['subject']]) && stripos($process_item_arr[$sets['subject']], 'hearing date') !== false && $sets['done'] == 1){
+		if(!$o_c->checkVisaAmont($visa_id)){
+			$error = "<script language='javascript'>alert('Unfinished Agreement! Plesas check payments');</script>";     		
+		}
+	}
+	elseif (!$case_aat && isset($process_item_arr[$sets['subject']]) && stripos($process_item_arr[$sets['subject']], 'apply') !== false && $sets['done'] == 1){
 		if(!$o_c->checkVisaAmont($visa_id)){
 			$error = "<script language='javascript'>alert('Unfinished Agreement! Plesas check payments');</script>";     		
 		}		 

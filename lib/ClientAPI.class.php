@@ -1481,12 +1481,6 @@ class ClientAPI extends MysqlDB {
     	if(!($visa_id > 0)){
     		return false;
     	}
-    	//ignore AAT case
-    	$sql = "SELECT v.id FROM client_visa v,  client_visa_process a left join visa_rs_item c on(a.ItemID = c.ItemID) where v.id = a.cvid and v.id = {$visa_id} and c.item like '%Apply AAT%' and a.done = 1 limit 1";
-    	$this->query($sql);
-    	if ($this->fetch() && $this->id == $visa_id) {
-    		return true;
-    	}
 
     	//check agreement payments
 		$sql = "select Sum(DueAmount) as totalpay, Sum(b.paid) as paid 
@@ -1688,7 +1682,7 @@ function getSpand($aid){
     }
 
     function getSemByCourse($client_id = 0){
-        $sql = "select ID, CCID, SEM, TFee, StartDate, FinishDate, RComm, InvoicDate, Duration, CoComm, RedComm, RedDate, CoDate, Discount, DiscountDate from client_course_sem ";
+        $sql = "select ID, CCID, SEM, TFee, StartDate, FinishDate, RComm, InvoicDate, Duration, CoComm, RedComm, RedDate, CoDate, Discount, DiscountDate, IsActive from client_course_sem ";
         if ($client_id > 0){
         		$sql .= " where CCID in(select ID from client_course where CID = {$client_id}) ";
         }
@@ -1709,6 +1703,8 @@ function getSpand($aid){
             $_arr[$this->CCID][$this->ID]['due']    = $this->Duration;
             $_arr[$this->CCID][$this->ID]['discount']    = $this->Discount;
             $_arr[$this->CCID][$this->ID]['discountdate']    = $this->DiscountDate;
+         	$_arr[$this->CCID][$this->ID]['done']    = $this->IsActive;
+               
         }
         return $_arr;
     }
@@ -2138,7 +2134,7 @@ function getSpand($aid){
     }
 
     function getClientFrom() {
-        $sql = "SELECT item from client_from order by item";
+        $sql = "SELECT item from client_from order by rank";
         $this->query($sql);
         $arr = array();
         while ($this->fetch()){
@@ -2147,10 +2143,32 @@ function getSpand($aid){
         return $arr;
     }
 
-    function addClientFrom($about){
+    function getClientAboutus() {
+        $sql = "SELECT item, item_zh, rank from client_from order by rank";
+        $this->query($sql);
+        $arr = array();
+        while ($this->fetch()){
+            $arr[$this->item]['name'] = $this->item;
+            $arr[$this->item]['zh'  ] = $this->item_zh;
+            $arr[$this->item]['rank'] = $this->rank;
+        }
+        return $arr;
+    }
+
+    function addClientFrom($about,$zh,$rank){
         if($about != ""){
             $about = addslashes($about);
-            $sql = "insert into client_from (Item) value('{$about}')";
+            $zh = addslashes($zh);
+            $sql = "insert into client_from (Item, Item_ZH, Rank) value('{$about}', '{$zh}', '{$rank}')";
+            $this->query($sql);
+        }
+    }
+
+    function setClientFrom($about,$zh,$rank){
+        if($about != ""){
+            $about = addslashes($about);
+            $zh = addslashes($zh);
+            $sql = "update client_from SET rank = {$rank}, Item_ZH = '{$zh}' where item = '{$about}'";
             $this->query($sql);
         }
     }

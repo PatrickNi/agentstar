@@ -6,6 +6,7 @@ require_once(__LIB_PATH.'GeicAPI.class.php');
 require_once(__LIB_PATH.'pagedivide.class.php');
 require_once(__LIB_PATH.'ExportAPI.class.php');
 
+
 $user_id = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
 
 if (!($user_id > 0)) {
@@ -92,6 +93,8 @@ $o_tpl->assign('status_arr', $o_s->getAgentStatus());
 //category combain
 $sub_arr     = $o_s->getSubCategory();
 $cate_arr    = $o_s->getCategory();
+$cate_arr[0] = 'Unassigned Category';
+
 $catelvl_arr = array();
 foreach ($cate_arr as $cateid => $name){
 	if (isset($sub_arr[$cateid])){

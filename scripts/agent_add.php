@@ -20,6 +20,10 @@ $agent_id = isset($_REQUEST['aid'])? trim($_REQUEST['aid']) : 0;
 
 $ugs = array();
 $user_grants = $o_g->get_user_grants($user_id);
+array_push($g_user_grants, 'a_delambassador');
+array_push($g_user_grants, 'a_delpartner');
+array_push($g_user_grants, 'a_emailambassador');
+array_push($g_user_grants, 'a_emailpartner');
 foreach ($g_user_grants as $item){
 	if (array_key_exists($item, $user_grants)) {
 		foreach ($g_user_ops as $key=>$op){
@@ -46,6 +50,7 @@ if(isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
     $sets['city']    = isset($_POST['t_city'])? trim($_POST['t_city']) : "";
 	$sets['verify']  = isset($_POST['t_verify'])? trim($_POST['t_verify']) : 0;
     $sets['cate']    = isset($_POST['t_cate'])? trim($_POST['t_cate']) : '';	
+    $sets['uid']  = isset($_POST['t_uid'])? trim($_POST['t_uid']) : 0;
 
     if ($agent_id > 0){
     	$o_f->setAgent($agent_id, $sets);	
@@ -81,6 +86,13 @@ $o_tpl->assign("exType", $exType);
 $o_tpl->assign("aid", $agent_id);
 $o_tpl->assign("ugs", $ugs);
 $o_tpl->assign("itemtype", __FILE_AGENT);
+# get user position
+if (isset($ugs['rpt_staff']) && $ugs['rpt_staff']['v'] == 1){
+    $o_tpl->assign('slUsers', $o_g->getUserNameArr());
+}else {
+    $o_tpl->assign('slUsers', $o_g->getUserNameArr($staff_id));
+}
+
 $o_tpl->display("agent_detail.tpl");
 
 ?>

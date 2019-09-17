@@ -49,26 +49,26 @@ $agent_arr = array();
 $country = $o_c->getCountry();
 $status  = $o_s->getAgentStatus();
 if($form != ""){
-    $agent_arr = $o_a->getAgentList(0, $form, $t_cate);
+    $agent_arr = $o_a->getAgentList(0, $form, $t_cate, $staff_id);
     $stats = $o_a->countAgent($form, $staff_id, $fromDay, $toDay);
 
     foreach ($agent_arr as $aid => $v) {
         $k = isset($cates[$v['cate']])? $v['cate'] : 'other';
 
-           
+        /*   
         if (!isset($stats[$aid]) || $stats[$aid]['stdcnt'] == 0) {
             unset($agent_arr[$aid]);
             continue;
         }
-
+        */
         array_push($cates[$k]['aid'], $aid);
     
 
-        $cates[$k]['s' ] += $stats[$aid]['stdcnt'];         
-        $cates[$k]['o' ] += $stats[$aid]['offer'];
-        $cates[$k]['c' ] += $stats[$aid]['coe'];
-        $cates[$k]['rc'] += $stats[$aid]['rcomm'];
-        $cates[$k]['pc'] += $stats[$aid]['pcomm'];      
+        @$cates[$k]['s' ] += $stats[$aid]['stdcnt'];         
+        @$cates[$k]['o' ] += $stats[$aid]['offer'];
+        @$cates[$k]['c' ] += $stats[$aid]['coe'];
+        @$cates[$k]['rc'] += $stats[$aid]['rcomm'];
+        @$cates[$k]['pc'] += $stats[$aid]['pcomm'];      
 
         $agent_arr[$aid]['cn'] = isset($country[$v['country']])? $country[$v['country']] : '';
         $agent_arr[$aid]['sn'] = isset($status[$v['stid']])? $status[$v['stid']] : '';      
@@ -99,7 +99,7 @@ $o_tpl->assign("form", $form);
 $o_tpl->assign("ugs", $ugs);
 $o_tpl->assign('staffid', $staff_id);
 # get user position
-if (isset($ugs['seeall']) && $ugs['seeall']['v'] == 1){
+if (isset($ugs['rpt_staff']) && $ugs['rpt_staff']['v'] == 1){
     $o_tpl->assign('slUsers', $o_g->getUserNameArr());
 }else {
     $o_tpl->assign('slUsers', $o_g->getUserNameArr($staff_id));

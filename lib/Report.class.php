@@ -616,7 +616,7 @@ class ReportAPI extends MysqlDB {
 		if ($fromDay != "" && $toDay  != "") {
 			$sql .= " AND BeginDate >= '{$fromDay}' and BeginDate <= '{$toDay}' ";
         }
-
+        //echo $sql;
 		$this->query($sql);
 		$_arr = array();
 		while ($this->fetch()) {

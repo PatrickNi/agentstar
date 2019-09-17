@@ -2,7 +2,40 @@
 require_once('../etc/const.php');
 require_once(__LIB_PATH.'MysqlDB.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
+require_once(__LIB_PATH.'AgentAPI.class.php');
+require_once(__LIB_PATH.'GeicAPI.class.php');
+require_once(__LIB_PATH.'ClientAPI.class.php');
 
+$o_a = new AgentAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
+$o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
+$db = new MysqlDB(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
+
+$t_cate = 'education';
+$form = 'sub';
+$agent_arr = $o_a->getAgentList(0, $form, $t_cate);
+$stats = $o_a->countAgent($form, $staff_id, $fromDay, $toDay);
+$staff_id = 0;
+
+$users = $o_g->getUserNameArr();
+foreach ($agent_arr as $aid => $v) {
+    if (!isset($stats[$aid]) || $stats[$aid]['stdcnt'] == 0) {
+        continue;
+    }
+
+    //echo $aid."---->".$stats[$aid]['uid']."----------->".$users[$stats[$aid]['uid']]."<br/>";
+    $user_id = $stats[$aid]['uid'];
+    $user_id = $user_id == 45? 3 : $user_id;
+    $sql = "Update agent SET USER_ID = {$user_id} where id = {$aid}";
+    echo $sql."<br/>";
+    $db->query($sql);
+}
+
+
+
+
+
+
+exit;
 $db = new MysqlDB(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 $sql = "select distinct c.CVID from client_visa_process as c, visa_rs_item i, (select VisaID, Sum(DueAmount) as totalpay, Sum(b.paid) as paid from client_account a left join  (select AccountID, SUM(PaidAmount) as paid from client_payment Group by AccountID) b on (a.ID = b.AccountID) where ACC_TYPE = 'visa' Group by VisaID having totalpay > paid) d where c.cvid = d.visaid and c.itemid = i.itemid and i.item like 'apply%' ";
 $db->query($sql);

@@ -311,7 +311,7 @@
       </td>
       <td width="30%" valign="top">
           <strong>Notes:</strong><br/>
-          <textarea style="width:100%; height:300px;" name="t_note">{$arr.note}</textarea>
+          <textarea style="width:100%; height:800px;" name="t_note">{$arr.note}</textarea>
       </td>
     </tr>    
      

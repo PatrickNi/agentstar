@@ -58,8 +58,8 @@
       <td align="right"><span style="font-size:14px; font-weight:bolder; font-style:italic">{$v.student}</span></td>
       <td align="right"><span style="font-size:14px; font-weight:bolder; font-style:italic">{$v.offer}</span></td>
       <td align="right"><span style="font-size:14px; font-weight:bolder; font-style:italic">{$v.coe}</span></td>
-      <td align="right"><span style="font-size:14px; font-weight:bolder; font-style:italic">{if $ugs.i_rev.v eq 1}{$v.potrev}{/if}</span></td>
-      <td align="right"><span style="font-size:14px; font-weight:bolder; font-style:italic">{if $ugs.i_rev.v eq 1}{$v.redrev}{/if}</span></td>
+      <td align="right"><span style="font-size:14px; font-weight:bolder; font-style:italic">{if $ugs.i_rev.v eq 1}{$v.potrev-$v.redrev|string_format:"%.2f"}{/if}</span></td>
+      <td align="right"><span style="font-size:14px; font-weight:bolder; font-style:italic">{if $ugs.i_rev.v eq 1}{$v.redrev|string_format:"%.2f"}{/if}</span></td>
     </tr>
     {foreach key=id item=arr from=$school_arr[$catid]}
     <tr id="tr_{$id}" onMouseOut="roff({$id});" onMouseOver="ron({$id});">
@@ -69,7 +69,7 @@
       <td align="right"class="border_1">{if $stats[$id].num neq ''} {$stats[$id].num} {else}0{/if}</td>
       <td align="right"class="border_1">{if $stats[$id].s2 neq ''} {$stats[$id].s2} {else}0{/if}</td>
       <td align="right"class="border_1">{if $stats[$id].s3 neq ''} {$stats[$id].s3} {else}0{/if}</td>
-      <td align="right"class="border_1">{if $ugs.i_rev.v eq 1}{if $stats[$id].a1 neq ''} {$stats[$id].a1} {else}0.00{/if}{/if}</td>
+      <td align="right"class="border_1">{if $ugs.i_rev.v eq 1}{if $stats[$id].a1 neq ''} {$stats[$id].a1-$stats[$id].a2|string_format:"%.2f"} {else}0.00{/if}{/if}</td>
       <td align="right"class="border_1">{if $ugs.i_rev.v eq 1}{if $stats[$id].a2 neq ''} {$stats[$id].a2} {else}0.00{/if}{/if}</td>
     </tr>
     {/foreach}

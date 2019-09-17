@@ -69,17 +69,34 @@
   </tr>
 
   <tr align="right" class="roweven" >
-    <td><span onClick="openinSatff('d1_{$week}');" style="text-decoration:underline; cursor:pointer;">
+    <td>
+        <span onClick="openinSatff('d1_all_{$week}');" style="text-decoration:underline; cursor:pointer;">
         {$courses[$week].cnt} 
-        <br/>(New clients: {$courses[$week].cnt_new})
-      </span>
+        </span>
+        <br/>
+        <span onClick="openinSatff('d1_{$week}');" style="text-decoration:underline; cursor:pointer;">
+        (New clients: {$courses[$week].cnt_new})
+        </span>
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:300px" id="d1_{$week}">
         <ul>
           {foreach key=id item=name from=$courses[$week].name_new}
-          <li><span style="text-decoration:underline; cursor:pointer; {if $courses[$week].apo.$id eq 0}color:#0000FF{elseif $courses[$week].num.$id eq $courses[$week].refuse.$id}color:#999999;{/if}" onClick="openModel('client_course.php?cid={$id}',screen.width*4/5,screen.height*4/5,'NO', 'form1')">{$name}</span>
+          <li><span style="text-decoration:underline; cursor:pointer; {if $courses[$week].apo.$id eq 0}color:#0000FF{elseif $courses[$week].num.$id eq $courses[$week].refuse.$id}color:#999999;{/if}" onClick="window.open('client_course.php?cid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
             {/foreach}
         </ul>
-        <span style="font-size:16px; font-weight:bolder; cursor:pointer;" onClick="d1_{$week}.style.display='none'">&times;</span> </div></td>
+        <span style="font-size:16px; font-weight:bolder; cursor:pointer;" onClick="d1_{$week}.style.display='none'">&times;</span> 
+      </div>
+
+      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:300px" id="d1_all_{$week}">
+        <ul>
+          {foreach key=id item=name from=$courses[$week].name}
+          <li><span style="text-decoration:underline; cursor:pointer; {if $courses[$week].apo.$id eq 0}color:#0000FF{elseif $courses[$week].num.$id eq $courses[$week].refuse.$id}color:#999999;{/if}" onClick="window.open('client_course.php?cid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
+            {/foreach}
+        </ul>
+        <span style="font-size:16px; font-weight:bolder; cursor:pointer;" onClick="d1_all_{$week}.style.display='none'">&times;</span> 
+      </div>
+
+
+    </td>
     <td>
           {$courseprocs[$week].apocnt}
           <br/><span onClick="openinSatff('d2_old_{$week}');"  style="text-decoration:underline; cursor:pointer;">{$courseprocs[$week].apocnt_st} old students</span> 
@@ -89,16 +106,18 @@
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:500px" id="d2_old_{$week}">
         <ul>
           {foreach key=id item=name from=$courseprocs[$week].aponame_old}
-          <li><span style="text-decoration:underline; cursor:pointer; {if $courseprocs[$week].reo.$id eq 0}color:#0000FF{elseif $courseprocs[$week].reo_st.$id eq -1}color:#999999;{/if}" onClick="openModel('client_course_detail.php?cid={$courseprocs.$week.apocid.$id}&courseid={$id}',screen.width*4/5,screen.height*4/5,'NO', 'form1')">{$name}</span>
+          <li><span style="text-decoration:underline; cursor:pointer; {if $courseprocs[$week].reo.$id eq 0}color:#0000FF{elseif $courseprocs[$week].reo_st.$id eq -1}color:#999999;{/if}" onClick="window.open('client_course_detail.php?cid={$courseprocs.$week.apocid.$id}&courseid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
             {/foreach}
         </ul>
+
         <span style="font-weight:bolder; cursor:pointer;" onClick="d2_old_{$week}.style.display='none'">&times;</span> </div>
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:500px" id="d2_new_{$week}">
         <ul>
           {foreach key=id item=name from=$courseprocs[$week].aponame_new}
-          <li><span style="text-decoration:underline; cursor:pointer; {if $courseprocs[$week].reo.$id eq 0}color:#0000FF{elseif $courseprocs[$week].reo_st.$id eq -1}color:#999999;{/if}" onClick="openModel('client_course_detail.php?cid={$courseprocs.$week.apocid.$id}&courseid={$id}',screen.width*4/5,screen.height*4/5,'NO', 'form1')">{$name}</span>
+          <li><span style="text-decoration:underline; cursor:pointer; {if $courseprocs[$week].reo.$id eq 0}color:#0000FF{elseif $courseprocs[$week].reo_st.$id eq -1}color:#999999;{/if}" onClick="window.open('client_course_detail.php?cid={$courseprocs.$week.apocid.$id}&courseid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
             {/foreach}
         </ul>
+
         <span style="font-weight:bolder; cursor:pointer;" onClick="d2_new_{$week}.style.display='none'">&times;</span> </div>
     </td>  
 
@@ -111,16 +130,18 @@
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:500px" id="d3_old_{$week}">
         <ul>
           {foreach key=id item=name from=$courseprocs[$week].reoname_old}
-          <li><span style="text-decoration:underline; cursor:pointer; {if $courseprocs[$week].reo_st.$id eq 0}color:#0000FF{elseif $courseprocs[$week].reo_st.$id eq -1}color:#999999;{/if}" onClick="openModel('client_course_detail.php?cid={$courseprocs.$week.reocid.$id}&courseid={$id}',screen.width*4/5,screen.height*4/5,'NO', 'form1')">{$name}</span>
+          <li><span style="text-decoration:underline; cursor:pointer; {if $courseprocs[$week].reo_st.$id eq 0}color:#0000FF{elseif $courseprocs[$week].reo_st.$id eq -1}color:#999999;{/if}" onClick="window.open('client_course_detail.php?cid={$courseprocs.$week.reocid.$id}&courseid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
             {/foreach}
         </ul>
+
         <span style="font-weight:bolder; cursor:pointer;" onClick="d3_old_{$week}.style.display='none'">&times;</span> </div>
         <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:500px" id="d3_new_{$week}">
         <ul>
           {foreach key=id item=name from=$courseprocs[$week].reoname_new}
-          <li><span style="text-decoration:underline; cursor:pointer; {if $courseprocs[$week].reo_st.$id eq 0}color:#0000FF{elseif $courseprocs[$week].reo_st.$id eq -1}color:#999999;{/if}" onClick="openModel('client_course_detail.php?cid={$courseprocs.$week.reocid.$id}&courseid={$id}',screen.width*4/5,screen.height*4/5,'NO', 'form1')">{$name}</span>
+          <li><span style="text-decoration:underline; cursor:pointer; {if $courseprocs[$week].reo_st.$id eq 0}color:#0000FF{elseif $courseprocs[$week].reo_st.$id eq -1}color:#999999;{/if}" onClick="window.open('client_course_detail.php?cid={$courseprocs.$week.reocid.$id}&courseid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
             {/foreach}
         </ul>
+
         <span style="font-weight:bolder; cursor:pointer;" onClick="d3_new_{$week}.style.display='none'">&times;</span> </div>
       </td>   
 
@@ -133,16 +154,18 @@
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:500px" id="d4_old_{$week}">
         <ul>
           {foreach key=id item=name from=$courseprocs[$week].recname_old}
-          <li><span style="text-decoration:underline; cursor:pointer;" onClick="openModel('client_course_detail.php?cid={$courseprocs.$week.reccid.$id}&courseid={$id}',screen.width*4/5,screen.height*4/5,'NO', 'form1')">{$name}</span>
+          <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_course_detail.php?cid={$courseprocs.$week.reccid.$id}&courseid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
             {/foreach}
         </ul>
+
         <span style="font-weight:bolder; cursor:pointer;" onClick="d4_old_{$week}.style.display='none'">&times;</span> </div>
      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:500px" id="d4_new_{$week}">
         <ul>
           {foreach key=id item=name from=$courseprocs[$week].recname_new}
-          <li><span style="text-decoration:underline; cursor:pointer;" onClick="openModel('client_course_detail.php?cid={$courseprocs.$week.reccid.$id}&courseid={$id}',screen.width*4/5,screen.height*4/5,'NO', 'form1')">{$name}</span>
+          <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_course_detail.php?cid={$courseprocs.$week.reccid.$id}&courseid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
             {/foreach}
         </ul>
+        
         <span style="font-weight:bolder; cursor:pointer;" onClick="d4_new_{$week}.style.display='none'">&times;</span> </div>
     </td>  
     <td>
@@ -158,8 +181,9 @@
         <table width="100%">
         <tr><td>Name</td><td  align="right">Comm($)</td></tr>
           {foreach key=id item=name from=$coursepots[$week].name}
-          <tr><td align="center"><span style="text-decoration:underline; cursor:pointer;" onClick="openModel('client_course_sem.php?cid={$coursepots.$week.client.$id}&courseid={$coursepots.$week.course.$id}&semid={$coursepots.$week.sem.$id}',screen.width*4/5,screen.height*4/5,'NO', 'form1')">{$name}</span></td><td align="right" {if $coursepots[$week].commfail[$id] eq 1}style="color:#0000CC"{/if}>{$coursepots[$week].comm[$id]}</td></tr>{/foreach}
+          <tr><td align="center"><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_course_sem.php?cid={$coursepots.$week.client.$id}&courseid={$coursepots.$week.course.$id}&semid={$coursepots.$week.sem.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span></td><td align="right" {if $coursepots[$week].commfail[$id] eq 1}style="color:#0000CC"{/if}>{$coursepots[$week].comm[$id]}</td></tr>{/foreach}
           </table>
+
         <span style="font-weight:bolder; cursor:pointer;" onClick="d5_{$week}.style.display='none'">&times;</span> 
       </div>
       {/if}
@@ -177,8 +201,9 @@
         <table width="100%">
         <tr><td>Name</td><td align="right">Comm($)</td></tr>
           {foreach key=id item=name from=$coursesems[$week].bonusname}
-          <tr><td align="center"><span style="text-decoration:underline; cursor:pointer;" onClick="openModel('client_course_sem.php?cid={$coursesems.$week.client.$id}&courseid={$coursesems.$week.course.$id}&semid={$coursesems.$week.sem.$id}',screen.width*4/5,screen.height*4/5,'NO', 'form1')">{$name}</span></td><td align="right" {if $coursesems[$week].bonusfail[$id] eq 1}style="color:#0000CC"{/if}>{$coursesems[$week].bonuscomm[$id]}</td></tr>{/foreach}
+          <tr><td align="center"><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_course_sem.php?cid={$coursesems.$week.client.$id}&courseid={$coursesems.$week.course.$id}&semid={$coursesems.$week.sem.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span></td><td align="right" {if $coursesems[$week].bonusfail[$id] eq 1}style="color:#0000CC"{/if}>{$coursesems[$week].bonuscomm[$id]}</td></tr>{/foreach}
         </table>
+
         <span style="font-weight:bolder; cursor:pointer;" onClick="d11_{$week}.style.display='none'">&times;</span>  
         </div>
         {/if}
@@ -202,8 +227,9 @@
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:400px" id="d6_{$week}">
         <ul>
           {foreach key=id item=name from=$visavisits[$week].pname}
-          <li><span style="text-decoration:underline; cursor:pointer; {if $visavisits.$week.decline.$id > 0}color:#999999;{elseif $visavisits.$week.sign.$id eq 0}color:#0000FF;{/if}" onClick="openModel('client_visa_detail.php?cid={$visavisits.$week.client.$id}&vid={$visavisits.$week.visa.$id}',screen.width*4/5,screen.height*4/5,'NO', 'form1')">{$name}</span> {/foreach}
+          <li><span style="text-decoration:underline; cursor:pointer; {if $visavisits.$week.decline.$id > 0}color:#999999;{elseif $visavisits.$week.sign.$id eq 0}color:#0000FF;{/if}" onClick="window.open('client_visa_detail.php?cid={$visavisits.$week.client.$id}&vid={$visavisits.$week.visa.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span> {/foreach}
         </ul>
+
         <span style="font-weight:bolder; cursor:pointer;" onClick="d6_{$week}.style.display='none'">&times;</span> </div></td>
      
      <td><span onClick="openinSatff('d66_{$week}');" style="text-decoration:underline; cursor:pointer;">{$visavisits[$week].totalcfee}</span>
@@ -211,10 +237,10 @@
         <ul>
           {foreach key=id item=name from=$visavisits[$week].pname}
            {if $visavisits.$week.cfee.$id > 0}
-            <li><span style="text-decoration:underline; cursor:pointer;" onClick="openModel('client_visa_detail.php?cid={$visavisits.$week.client.$id}&vid={$visavisits.$week.visa.$id}',screen.width*4/5,screen.height*4/5,'NO', 'form1')">{$name} </span></li>
+            <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visavisits.$week.client.$id}&vid={$visavisits.$week.visa.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name} </span></li>
             {/if}
             {/foreach}
-              
+            
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="d66_{$week}.style.display='none'">&times;</span> </div></td> 
 

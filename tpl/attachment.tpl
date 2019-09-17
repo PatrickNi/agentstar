@@ -4,8 +4,12 @@
 <meta http-equiv="pragma" content="no-cache">
 <title>Agent Star -Client Management</title>
 </head>
-<link rel="stylesheet" href="../css/sam.css">
+<link rel="stylesheet" href="/css/sam.css">
+<link href="/css/dropzone.css" type="text/css" rel="stylesheet" />
+
+
 {literal}
+
 <script language="javascript">
 		function setNameBox(id, obj)
 		{
@@ -71,5 +75,33 @@
 	</td></tr>
 </table>
 </form>	
+
+<form action="/scripts/attachment.php" class="dropzone" id="upload-dropzone">
+  <input type="hidden" name="item" value="{$itemid}">
+  <input type="hidden" name="type" value="{$itemtype}">
+  <input type="hidden" name="bt_name" value="UPLOAD">
+  <input type="hidden" name="xhr" value="1">
+  <div class="dz-message needsclick">
+    Drop files here or click to upload.
+  </div>
+</form>
+
 </body>
+<script src="https://code.jquery.com/jquery-1.9.1.min.js" ></script>
+<script src="/js/dropzone.js" ></script>
+{literal}
+<script language="javascript">
+	Dropzone.autoDiscover = false;
+	Dropzone.maxFilesize = 5;
+$(function() {
+  // Now that the DOM is fully loaded, create the dropzone, and setup the
+  // event listeners
+  var myDropzone = new Dropzone("#upload-dropzone");
+  myDropzone.on("complete", function(file) {
+    location.href = location.href;
+
+  });
+})
+</script>	
+{/literal}	
 </html>
