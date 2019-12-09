@@ -94,25 +94,22 @@ switch ($viewWhat){
 				$staff_id = 0;
 			}
 		}
-        /*
-        $staff_id = $_REQUEST['cUid'];
-        $slCourseViewer = array();
-        $sys_course_viewers = $o_g->get_course_viewer($user_id);
-        foreach ($o_g->getUserNameArr() as $k => $v) {
-            if ($ugs['todo_course']['v'] == 1 || isset($sys_course_viewers[$k])) {
-                $slCourseViewer[$k] = $v;
+        $sort_col_arr = array(1=>'ClientName',2=>'Name',3=>'Qual',4=>'Major',5=>'ProcessName', 6=>'SortDue');
+        
+        $reports = $o_r->getUrgentCourse($staff_id,getSortList($sort_list, $sort_col_arr, $sort_ord_arr), $only_course, $cdu);
+        break;
+    case "vm":
+        if (isset($ugs['todo_visa']) && $ugs['todo_visa']['v'] == 1){
+            if(isset($_REQUEST['vmUid'])) {
+                $staff_id = $_REQUEST['vmUid'];
+            }
+            else {
+                $staff_id = 0;
             }
         }
-        if (!$staff_id) {
-            $staff_id = key($slCourseViewer);
-        }
-*/
         $sort_col_arr = array(1=>'ClientName',2=>'Name',3=>'Qual',4=>'Major',5=>'ProcessName', 6=>'SortDue');
-        //if ($staff_id > 0) {
-            $reports = $o_r->getUrgentCourse($staff_id,getSortList($sort_list, $sort_col_arr, $sort_ord_arr), $only_course, $cdu);
-        //}
-//		$reports = array_merge($o_r->getUrgentCourse($view_all, $sort_col, $sort_ord), $o_r->getTodoCourse($view_all, $sort_col, $sort_ord));
-		break;
+        $reports = $o_r->getUrgentVerifyMigration($staff_id,getSortList($sort_list, $sort_col_arr, $sort_ord_arr));
+        break;
 	case "i":
         $sort_col_arr = array(1=>'Name',2=>'Subject',3=>'SortDue');
         $reports = $o_r->getUrgentInstitute(getSortList($sort_list, $sort_col_arr, $sort_ord_arr), $idu);

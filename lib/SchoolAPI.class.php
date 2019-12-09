@@ -140,7 +140,8 @@ class SchoolAPI extends MysqlDB{
 							if(CoeCnt is null, 0, OfferCnt) as OfferCnt, 
 							if(CoeCnt is null, 0, CoeCnt) as CoeCnt, 
 							if(rcomm is null,0.00, rcomm) as rcomm, 
-							if(pcomm is null, 0.00, pcomm) as pcomm 
+							if(pcomm is null, 0.00, pcomm) as pcomm,
+							if(CoeCnt > 0, 1, 0) as hascode 
 					from client_course a left join client_info b on(a.CID = b.CID) 
 								left join (select CCID, Sum(if(ProcessID = 2, 1, 0)) as OfferCnt, Sum(if(ProcessID = 5, 1, 0)) as CoeCnt from client_course_process where done = 1 group by CCID) as c on(c.CCID = a.ID)
 								left join (select CCID, sum(if(RComm is null, 0, RComm)) as rcomm, sum(if(RedComm is null, 0, RedComm)) as pcomm from client_course_sem Group by CCID) as d on(d.CCID = a.ID)
@@ -154,7 +155,7 @@ class SchoolAPI extends MysqlDB{
 				$sql .= " AND a.ConsultantID = {$userid} ";
 			}
 			
-			$sql .= " order by CoeCnt desc, StartDate desc , b.LName asc, b.FName asc, a.IsActive asc ";//Group BY a.CID
+			$sql .= " order by hascode desc, StartDate desc , b.LName asc, b.FName asc, a.IsActive asc ";//Group BY a.CID
 			//echo $sql."\n";
 			$_arr = array();
 			$this->query($sql);

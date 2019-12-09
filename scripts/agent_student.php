@@ -22,6 +22,7 @@ $o_s = new SchoolAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 //user grants
 $ugs = array();
 $user_grants = $o_g->get_user_grants($user_id);
+include_once dirname(__FILE__).'/init_grants.php';
 foreach ($g_user_grants as $item){
 	if (array_key_exists($item, $user_grants)) {
 		foreach ($g_user_ops as $key=>$op){
@@ -79,7 +80,8 @@ if (isset($ugs['rpt_staff']) && $ugs['rpt_staff']['v'] == 1){
     $o_tpl->assign('slUsers', $o_g->getUserNameArr($staff_id));
 }
 if ($agent_id > 0) {
-    $o_tpl->assign("agent_arr", $o_a->getAgentList($agent_id));
+    $tmp = $o_a->getAgentList($agent_id);
+    $o_tpl->assign("agent_arr", $tmp);
 }
 
 $o_tpl->display('agent_student.tpl');

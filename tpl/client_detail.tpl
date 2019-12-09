@@ -252,22 +252,36 @@
                 <td colspan="2"><hr></td>
               </tr>
               <tr>
-                <td width="28%" align="left" class="rowodd"><strong>SubAgent:</strong>&nbsp;&nbsp;</td>
-                <td align="left" width="72%" class="roweven"> {if $ugs.b_suba.v eq 1 && $ugs.b_suba.m eq 0 && ($cid gt 0 || $ugs.b_suba.i eq 0)}
-                  <input type="hidden" name="t_agent" value="{$arr.agent}">
+                <td width="28%" align="left" class="rowodd"><strong>Global Partner:</strong>&nbsp;&nbsp;</td>
+                <td align="left" width="72%" class="roweven"> 
+                  {if $ugs.b_suba.v eq 1 && $ugs.b_suba.m eq 0 && ($cid gt 0 || $ugs.b_suba.i eq 0)}
+                      <input type="hidden" name="t_agent_p" value="{$arr.agent}">
                   {/if}
-                  <select name="t_agent" onChange="changeClientFrom(this,this.form.t_about);changeAboutInput(this.form.t_about.value,this.form.t_aboutTxt)" {if $ugs.a_sub.v eq 0} style="visibility:hidden"{/if} {if $ugs.b_suba.v eq 1 && $ugs.b_suba.m eq 0 && ($cid gt 0 || $ugs.b_suba.i eq 0)} disabled {/if}>
-                  {foreach key=ag_id item=ag_name from=$agent_arr}
-                  <option value="{$ag_id}" {if $ag_id eq $arr.agent} selected {/if}>{$ag_name}</option>
-                  {/foreach}
-                  {if  $arr.agent lt 1}
-                  <option value="0" selected>select an agent</option>
-                  {/if}
+                  <select id="t_agent_p" name="t_agent_p" onChange="changeClientFrom(this,this.form.t_about,'t_agent_a');changeAboutInput(this.form.t_about.value,this.form.t_aboutTxt);" {if $ugs.b_suba.v eq 1 && $ugs.b_suba.m eq 0 && ($cid gt 0 || $ugs.b_suba.i eq 0)} disabled {/if}>
+                    <option value="0">choose a global partner</option>
+                    {foreach key=ag_id item=v from=$agent_partner}
+                        <option value="{$ag_id}" {if $ag_id eq $arr.agent} selected {/if}>{$v.name}</option>
+                    {/foreach}
+                    
                   </select>
-                  {if $ugs.a_sub.v eq 1}
-                      <a href="#" onClick="openModel('./agent_student.php?aid={$arr.agent}',screen.width*4/7,screen.height*3/7,'NO','form1')">Display</a></td>
-                  {/if}
+                </td>
               </tr>    
+              <tr>
+                <td width="28%" align="left" class="rowodd"><strong>Global Ambasasador:</strong>&nbsp;&nbsp;</td>
+                <td align="left" width="72%" class="roweven"> 
+                  {if $ugs.b_suba.v eq 1 && $ugs.b_suba.m eq 0 && ($cid gt 0 || $ugs.b_suba.i eq 0)}
+                      <input type="hidden" name="t_agent_a" value="{$arr.agent}">
+                  {/if}
+                  <select id="t_agent_a" name="t_agent_a" onChange="changeClientFrom(this,this.form.t_about,'t_agent_p');changeAboutInput(this.form.t_about.value,this.form.t_aboutTxt)" {if $ugs.b_suba.v eq 1 && $ugs.b_suba.m eq 0 && ($cid gt 0 || $ugs.b_suba.i eq 0)} disabled {/if}>
+                  <option value="0">chose a global ambassador</option>
+                  {foreach key=ag_id item=v from=$agent_ambassador}
+                      <option value="{$ag_id}" {if $ag_id eq $arr.agent} selected {/if}>{$v.name}</option>
+                  {/foreach}
+                  
+
+                  </select>
+                </td>
+              </tr> 
               <tr>
                 <td width="28%"  align="left" class="rowodd"><strong>Where do you know about us:</strong>&nbsp;&nbsp;</td>
                 <td align="left" width="72%" class="roweven"><!--internet, Australian Newspaper,Education Seminar£¬Passby, Friends, other-->
@@ -322,10 +336,11 @@
 </form>
 {literal}
 <script type="text/javascript">
-	 function changeClientFrom(obj1,obj2){
+	 function changeClientFrom(obj1,obj2,obj_id){
 		if(obj1.value>0){
 			obj2.value='SubAgent';
 		}
+    $('#'+obj_id).val(0);
 	 }
 	 
 	 function changeAboutInput(str,obj1){

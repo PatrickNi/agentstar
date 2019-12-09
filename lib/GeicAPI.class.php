@@ -126,6 +126,9 @@ class GeicAPI extends MysqlDB {
 		$_arr = array();
 		while($this->fetch()){
 			$_arr[$this->ID] = ucwords($this->UserName);
+            if (!in_array($this->ID,$this->user_orders)) {
+                array_push($this->user_orders, $this->ID);
+            }
 		}
 
         $rtn = array();
@@ -853,6 +856,17 @@ class GeicAPI extends MysqlDB {
         }
 
         return $_arr;   
+    }
+
+    function get_migration_agents() {
+        $arr = $this->getUserNameArr();
+        $agents = array();
+        foreach (array(3,29,57,67,81) as $uid) {
+            if(isset($arr[$uid])) {
+                $agents[$uid] = $arr[$uid];
+            }
+        }
+        return $agents;
     }	
 }
 ?>

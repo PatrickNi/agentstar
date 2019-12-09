@@ -30,7 +30,7 @@ class ReportAPI extends MysqlDB {
 		else{
             $sql .= " Order by sortdue asc, Name asc, Item desc";	
 		}
-		
+		//$sql .= " limit 200 ";
         //$sql .= " LIMIT ".($page - 1)*$page_size .", {$page_size} " 
 
 		$this->query($sql);
@@ -126,6 +126,7 @@ class ReportAPI extends MysqlDB {
         else{
             $sql .= " Order by sortdue asc, ClientName asc ";   
         }
+        //$sql .= " limit 200 ";
 		//echo $sql."<br>";
 		$this->query($sql);
 		
@@ -146,6 +147,41 @@ class ReportAPI extends MysqlDB {
 		return $_arr;
 	}
 
+    function getUrgentVerifyMigration($userid = 0, $sort_list, $null_du = 1){
+        $_arr = array();
+        $sql = "select a.ID, concat(LName, ' ', FName) as ClientName, Qual, Major, e.Name, DueDate, BeginDate, if(p.ID is not null, p.Process, ExItem) as ProcessName, f.CID, CCID,
+            if(((a.DueDate >= Date(NOW()) and a.DueDate < Date(NOW()) + INTERVAL 7 Day) or a.DueDate < Date(NOW()))and a.DueDate <> '0000-00-00',0,1) as isTodo,
+                if(a.DueDate = '0000-00-00', '9999-99-99', a.DueDate) as sortdue, if(p.ID > 0, p.ID, 0) AS ProcessID  
+                    from client_course_process a left join course_process p on (a.ProcessID = p.ID), client_course  b,  institute_qual c,  institute_major d, institute e, client_info f
+                    where b.CID = f.CID and a.Done = 0 and a.CCID = b.ID and b.QualID = c.ID and b.MajorID = d.ID and b.IID = e.ID  AND a.DueDate <> '0000-00-00' and verify_migration_agent = {$userid} and a.ExItem = 'verify migration course' ";
+
+        if ($sort_list != ''){
+            $sql .= " Order by {$sort_list}";
+        }
+        else{
+            $sql .= " Order by sortdue asc, ClientName asc ";   
+        }
+        //$sql .= " limit 200 ";
+        //echo $sql."<br>";
+        $this->query($sql);
+        
+        global $course_process_arr;
+        while ($this->fetch()){
+            $_arr[$this->ID]['name']  = $this->ClientName;
+            $_arr[$this->ID]['qual']   = $this->Qual;
+            $_arr[$this->ID]['major']  = $this->Major;
+            $_arr[$this->ID]['school'] = $this->Name;
+            $_arr[$this->ID]['begin']  = $this->BeginDate;
+            $_arr[$this->ID]['due']    = $this->DueDate;
+            $_arr[$this->ID]['item']   = $this->ProcessName;//($this->ProcessID > 0 && array_key_exists($this->ProcessID, $course_process_arr))? $course_process_arr[$this->ProcessID] : $this->ExItem;
+            $_arr[$this->ID]['clientid'] = $this->CID;
+            $_arr[$this->ID]['courseid'] = $this->CCID;
+            $_arr[$this->ID]['isTodo'] = $this->isTodo;
+            $_arr[$this->ID]['isColor'] = ($this->ProcessID == __C_RECEIVE_OFFER || $this->ProcessID == __C_PASS_OFFER || $this->ProcessID == __C_GET_COE || ($this->ProcessID == 0 && stripos($this->ProcessName, 'p:') === 0))? 1 : 0;
+        }
+        return $_arr;
+    }
+
 	function getUrgentInstitute($sort_list, $null_du = 1){
 		$_arr = array();
 		$sql = "select a.ID, a.Subject, a.BeginDate, a.DueDate, a.InstID, b.Name,
@@ -163,7 +199,7 @@ class ReportAPI extends MysqlDB {
         else{
             $sql .= " Order by sortdue desc, Name asc ";   
         }
-        
+        //$sql .= " limit 200 ";
 		$this->query($sql);		
 		while ($this->fetch()) {
 			$_arr[$this->ID]['school'] = $this->Name;
@@ -196,7 +232,7 @@ class ReportAPI extends MysqlDB {
             $sql .= " Order by sortdue desc, Name asc ";   
         }
         		
-		
+		//$sql .= " limit 200 ";
 		$this->query($sql);		
 		while ($this->fetch()) {
 			$_arr[$this->ID]['agent'] = $this->Name;
@@ -1677,8 +1713,9 @@ class ReportAPI extends MysqlDB {
 	
 	function getAllOfVisaProcByUser($fromDay, $toDay, $userid){
 		
+        //and (b.Item not like '%assessment' or b.Item is null) 
 		$sql  = "select if(b.Item is null, a.ExItem, b.Item) AS Item, c.AFee, concat(LName, ' ', FName) as Name, d.CID, c.ID, c.r_Status from client_visa_process a left join visa_rs_item b on (a.ItemID = b.ITEMID), client_visa c, client_info d
-		         where a.CVID  = c.ID and c.CID = d.CID and (b.Item not like '%assessment' or b.Item is null) and a.Done = 1 ";
+		         where a.CVID  = c.ID and c.CID = d.CID and b.Item is not null and a.Done = 1 ";
 		if ($userid > 0) {
 			$sql .= " AND c.VUserID = {$userid} ";
 		}

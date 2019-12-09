@@ -76,10 +76,13 @@
       <td align="left" class="border_1" width="5%" nowrap="nowrap">Studnets</td>
       <td align="right" class="border_1" width="5%" nowrap="nowrap">Offer Get</td>
       <td align="right"class="border_1" width="5%" nowrap="nowrap">COE</td>
-      <td align="right" class="border_1" width="7%" nowrap="nowrap">{if $ugs.a_rev.v eq 1}Receivable<br>
-        Commossion{/if}</td>
-      <td align="right" class="border_1" width="7%" nowrap="nowrap">{if $ugs.a_rev.v eq 1}Paid<br>
-        Commossion{/if}</td>
+      {if ($form eq 'top' && $ugs.a_rev.v eq 1) || ($form eq 'sub' && $cate eq 'education' && $ugs.ap_ppc.v eq 1) || ($form eq 'sub' && $cate eq 'student' && $ugs.aa_ppc.v eq 1)}
+      <td align="right" class="border_1" width="7%" nowrap="nowrap">Receivable<br>Commossion</td>
+      <td align="right" class="border_1" width="7%" nowrap="nowrap">Paid<br>Commossion</td>
+      {else}
+      <td align="right" class="border_1" width="7%" nowrap="nowrap"></td>
+      <td align="right" class="border_1" width="7%" nowrap="nowrap"></td>
+      {/if}
     </tr>
     {foreach key=catid item=v from=$totals}
     <tr class="border_1" style="background-color:{cycle values="#80FF80,#FFFF99,#CA95FF,#6C6CFF,#C78D8D,#7ABCBC"}" colspan="2">
@@ -87,8 +90,14 @@
       <td align="left" class="border_1"nowrap="nowrap" style="font-size:14px; font-weight:bolder; font-style:italic">{$v.s}</td>
       <td align="right" class="border_1" nowrap="nowrap" style="font-size:14px; font-weight:bolder; font-style:italic">{$v.o}</td>
       <td align="right"class="border_1"nowrap="nowrap" style="font-size:14px; font-weight:bolder; font-style:italic">{$v.c}</td>
-      <td align="right" class="border_1"  nowrap="nowrap" style="font-size:14px; font-weight:bolder; font-style:italic">{if $ugs.a_rev.v eq 1}{$v.rc-$v.pc|string_format:"%.2f"}{/if}</td>
-      <td align="right" class="border_1" nowrap="nowrap" style="font-size:14px; font-weight:bolder; font-style:italic">{if $ugs.a_rev.v eq 1}{$v.pc|string_format:"%.2f"}{/if}</td>
+      {if ($form eq 'top' && $ugs.a_rev.v eq 1) || ($form eq 'sub' && $cate eq 'education' && $ugs.ap_ppc.v eq 1) || ($form eq 'sub' && $cate eq 'student' && $ugs.aa_ppc.v eq 1)}
+        <td align="right" class="border_1"  nowrap="nowrap" style="font-size:14px; font-weight:bolder; font-style:italic">{$v.rc-$v.pc|string_format:"%.2f"}</td>
+        <td align="right" class="border_1" nowrap="nowrap" style="font-size:14px; font-weight:bolder; font-style:italic">{$v.pc|string_format:"%.2f"}</td>
+      {else}
+        <td align="right" class="border_1"  nowrap="nowrap" style="font-size:14px; font-weight:bolder; font-style:italic"></td>
+        <td align="right" class="border_1" nowrap="nowrap" style="font-size:14px; font-weight:bolder; font-style:italic"></td>
+      {/if}
+      
     </tr>    
     {foreach item=id from=$v.aid}
     <tr id="tr_{$id}" onMouseOut="roff({$id});" onMouseOver="ron({$id});">

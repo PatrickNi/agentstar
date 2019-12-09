@@ -13,14 +13,16 @@
 	<tr align="left"  class="bordered_2">
 		<td colspan="2">
 			<input style="font-weight:bold;" type="button" value="Agent Detail" onClick="javascript:this.form.action='agent_add.php';this.form.submit();">&nbsp;&nbsp;
-			{if $ugs.a_proc.v eq 1}
+			{if $aid > 0 && (($exType eq 'top' && $ugs.a_proc.v eq 1) || ($exType eq 'sub' && $dt_arr.cate eq 'education' && $ugs.ap_pa.v eq 1) || ($exType eq 'sub' && $dt_arr.cate eq "student" && $ugs.aa_pa.v eq 1))}
 			<input style="font-weight:bold;" type="button" value="Process" onClick="javascript:this.form.action='agent_process.php';this.form.submit();">&nbsp;&nbsp;
 			{/if}
-			{if $ugs.a_st.v eq 1}
+			{if $aid > 0 && (($exType eq 'top' && $ugs.a_st.v eq 1) || ($exType eq 'sub' && $dt_arr.cate eq 'education' && $ugs.ap_st.v eq 1) || ($exType eq 'sub' && $dt_arr.cate eq "student" && $ugs.aa_st.v eq 1))}
 			<input style="font-weight:bold;" type="button" value="Student" onClick="javascript:this.form.action='agent_student.php';this.form.submit();">&nbsp;&nbsp;
 			{/if}
+			{if $aid > 0 && ($exType eq 'top' || ($exType eq 'sub' && $dt_arr.cate eq 'education' && $ugs.ap_pa.v eq 1) || ($exType eq 'sub' && $dt_arr.cate eq "student" && $ugs.aa_pa.v eq 1))}
 			<input type="button" value="Attachment" style="font-weight:bold"
 			onClick="window.open('attachment.php?item={$aid}&type={$itemtype}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*3/7 +',width='+screen.width*2/7);">
+			{/if}
 		</td>
 	</tr>
 	<tr align="center"  class="greybg" >
@@ -33,10 +35,10 @@
 					<td width="12%" height="30" align="left" class="rowodd" style=" color:#FF0000"><strong>Category:</strong>&nbsp;&nbsp;</td>
 					<td align="left" width="88%" class="roweven">
                     	<select name="t_cate"{if $ugs.a_delambassador.v eq 0 && $dt_arr.type eq 'sub'}disabled{/if}>
-                    		{if $dt_arr.type eq 'top' || $exType eq 'top'}
+                    		{if $exType eq 'top'}
                         		<option value="education" {if $dt_arr.cate eq "education"} selected {/if}>Education agent</option>
                         		<option value="inactive" {if $dt_arr.cate eq "inactive"} selected {/if}>Inactive agent</option>    
-                        	{elseif $dt_arr.type eq 'sub' || $exType eq 'sub'}
+                        	{elseif $exType eq 'sub'}
 							    <option value="education" {if $dt_arr.cate eq "education"} selected {/if}>Global Partner</option>
                         		<option value="student" {if $dt_arr.cate eq "student"} selected {/if}>Global Ambassador</option>  
                         		<option value="inactive" {if $dt_arr.cate eq "inactive"} selected {/if}>Inactive agent</option>    

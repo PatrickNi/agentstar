@@ -46,7 +46,9 @@ define("__C_PASS_OFFER", 3);
 define("__C_PAY_TUITION_FEE", 4);
 define("__C_GET_COE", 5);
 define("__C_PASS_COE", 6);
-$course_process_arr = array(__C_APPLY_OFFER=>"Collect Document", __C_RECEIVE_OFFER=>"Apply Offer", __C_PASS_OFFER=>"Receive Offer", __C_PAY_TUITION_FEE=>"Pay tuition fee", __C_GET_COE=>"Get COE", __C_PASS_COE=>"Student Visa Extension");
+define("__C_BIRTHDAY", 7);
+
+$course_process_arr = array(__C_APPLY_OFFER=>"Collect Document", __C_RECEIVE_OFFER=>"Apply Offer", __C_PASS_OFFER=>"Receive Offer", __C_PAY_TUITION_FEE=>"Pay tuition fee", __C_GET_COE=>"Get COE", __C_PASS_COE=>"Student Visa Extension", __C_BIRTHDAY=>"Birthday");
 
 # user right configuration
 $position_arr = array('E'=>'Employee', 'M'=>'Manager', 'C'=>'CEO');

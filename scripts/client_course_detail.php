@@ -69,6 +69,9 @@ $set_course['refuse']  = $set_course['refuse'] != ""? $set_course['refuse'] : ""
 
 $set_course['unit']  = isset($_REQUEST['t_unit'])? (string)trim($_REQUEST['t_unit']) : "year";
 
+$set_course['vma']  = isset($_REQUEST['t_vma'])? (string)trim($_REQUEST['t_vma']) : 0;
+$set_course['vms']  = isset($_REQUEST['t_vms'])? (string)trim($_REQUEST['t_vms']) : "none";
+
 $apodue = isset($_REQUEST['t_apodue'])? (string)trim($_REQUEST['t_apodue']) : "0000-00-00";
 $apodue = $apodue != ''? $apodue : "0000-00-00";
 
@@ -123,7 +126,8 @@ if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" |
 
 		if($course_id > 0){
 			$o_c->setCourse($course_id, $set_course);
-		}else{
+		}
+		else{
 			$course_id = $o_c->addCourse($user_id, $client_id, $set_course);
 		}
 		
@@ -160,7 +164,12 @@ if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" |
     	        $sets['done']    = 0;
         	    $o_c->autoCourseProcess($course_id, $sets, 1);
 				 */
-        	}        
+        	}
+
+        	//check verify migration agents
+        	if ($course_id > 0 && $set_course['vma'] > 0) {
+				$o_c->verifyMigration($course_id, $set_course['vma']);
+			}        
 	    }
 		
 		if(strtoupper($_REQUEST['bt_name']) == "SAVE") {
@@ -265,5 +274,6 @@ $o_tpl->assign("itemtype", __FILE_APPLY_COURSE);
 $o_tpl->assign("ugs", $ugs);
 $o_tpl->assign('client', $o_c->getOneClientInfo($client_id));
 $o_tpl->assign('apodue', $apodue);
+$o_tpl->assign('agent_users', $o_g->get_migration_agents());
 $o_tpl->display('client_course_detail.tpl');
 ?>

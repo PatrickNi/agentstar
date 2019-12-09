@@ -13,32 +13,15 @@ try {
 			}		
 			break;
 		case 'co':
-			$sql = "SELECT ID, COUNTRY FROM country order by country asc";
+			$sql = "SELECT ID, COUNTRY, ZH_NAME FROM country order by country asc";
 			$db->query($sql);
 			while ($db->fetch()) {
-				switch(strtoupper($db->COUNTRY)) {
-					case 'CHINA':
-						$db->COUNTRY = $db->COUNTRY.'(ÖÐ¹ú)';
-						break;
-					case 'MALAYSIA':
-						$db->COUNTRY = $db->COUNTRY.'(ÂíÀ´Î÷ÑÇ)';
-						break;
-					case 'HONG KONG':
-						$db->COUNTRY = $db->COUNTRY.'(Ïã¸Û)';
-						break;
-					case 'TAIWAN':
-						$db->COUNTRY = $db->COUNTRY.'(Ì¨Íå)';
-						break;						
-					case 'MACAO':
-						$db->COUNTRY = $db->COUNTRY.'(°ÄÃÅ)';
-						break;						
-						
-				}
-				$arr[$db->ID] = $db->COUNTRY;
-			}		
+				$arr[$db->ID]['en'] = $db->COUNTRY;
+				$arr[$db->ID]['zh'] = $db->ZH_NAME;
+			}
 			break;	
 		case 'vc2':		
-			$sql = "SELECT CATEID, VISANAME, ZH_NAME FROM visa_category order by (VISANAME+0) asc";
+			$sql = "SELECT CATEID, VISANAME, ZH_NAME FROM visa_category where CATEID NOT IN (33, 34,17) order by (VISANAME+0) asc";
 			$db->query($sql);
 			while ($db->fetch()) {
 				$arr[$db->CATEID]['en'] = $db->VISANAME;

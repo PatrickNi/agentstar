@@ -97,7 +97,67 @@ function setSortOrd(col, ord){
 				 </tr>
 				{/foreach}	
 			</table>
-	</td></tr>{/if}{/if}	
+	</td></tr>{/if}
+
+	<tr><td class="menu"  align="left" style="cursor:pointer" onClick="document.getElementById('sort_list').value='';document.getElementById('t_view').value='vm';form1.submit();">
+    		Verify Migration Course List&nbsp;&nbsp;
+      </td></tr>
+	{if $viewWhat eq 'vm'}
+	<tr><td>
+			<table width="100%" cellpadding="1" cellspacing="1" border="0">
+				<tr align="left" class="title">
+					<td colspan="6">
+              	        <select name="vmUid" onChange="sort_list.value='';t_view.value='vm';form1.submit();">
+                        {foreach key=user_id item=user_name from=$slUsers}
+                          	<option value="{$user_id}" {if $staffid eq $user_id} selected {/if}>{$user_name}</option>  
+                        {/foreach}                    			          
+                        {if $ugs.todo_course.v eq 1}				
+                          <option value="0" {if $staffid eq '0'} selected {/if}>All Staff</option>  
+                        {/if}	            		
+                    </select>
+                    </td>
+                 </tr>
+   				<tr align="center" class="title">
+					<td align="left" width="100px">Client Name &nbsp;&nbsp;
+						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="t_view.value='c';setSortOrd(1,0);form1.submit();"/>&nbsp;&nbsp;
+						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="t_view.value='c';setSortOrd(1,1);form1.submit();"/>					
+					</td>	
+					<td align="left" width="100px">Institute &nbsp;&nbsp;
+						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="t_view.value='c';setSortOrd(2,0);form1.submit();"/>&nbsp;&nbsp;
+						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="t_view.value='c';setSortOrd(2,1);;form1.submit();"/>										
+					</td>
+					<td align="left" width="100px">Qualification&nbsp;&nbsp;
+						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="t_view.value='c';setSortOrd(3,0);form1.submit();"/>&nbsp;&nbsp;
+						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="t_view.value='c';setSortOrd(3,1);form1.submit();"/>									
+					</td>
+					<td align="left" width="100px">Major&nbsp;&nbsp;
+						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="t_view.value='c';setSortOrd(4,0);form1.submit();"/>&nbsp;&nbsp;
+						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="t_view.value='c';setSortOrd(4,1);form1.submit();"/>										
+					</td>		
+					<td align="left"width="300px">Process &nbsp;&nbsp;
+						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="t_view.value='c';setSortOrd(5,0);form1.submit();"/>&nbsp;&nbsp;
+						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="t_view.value='c';setSortOrd(5,1);form1.submit();"/>							
+					</td>
+					<td width="100px">Due Date&nbsp;&nbsp;
+						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="t_view.value='c';setSortOrd(6,0);form1.submit();"/>&nbsp;&nbsp;
+						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="t_view.value='c';setSortOrd(6,1);form1.submit();"/>			
+						<br/><input type="checkbox" name="cdu" value="1" {if $cdu eq 1} checked {/if} onChange="t_view.value='v';form1.submit()"/> ex(0000-00-00)							
+					</td>
+				</tr>
+				 {foreach key=id item=arr from=$urgent_arr}
+				 <tr align="center" class="{cycle values='rowodd,roweven'}">
+					<td align="left">{$arr.name}</td>
+					<td align="left">{$arr.school}</td>
+					<td align="left">{$arr.qual}</td>
+					<td align="left">{$arr.major}</td>
+					<td style="cursor:pointer; text-decoration:underline; {if $arr.isColor eq 1}color:#0000FF{/if}"  onClick="window.open('client_course_detail.php?cid={$arr.clientid}&courseid={$arr.courseid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$arr.item}</td>
+					<td nowrap="nowrap" {if $arr.isTodo neq 1}style="color:#660000; font-weight:bold"{/if}>{$arr.due}</td>
+				 </tr>
+				 {/foreach}
+			</table>
+	</td></tr>{/if}
+
+	{/if}	
 	{if $ugs.c_service.v eq 1}
 	<tr><td class="menu"  align="left" style="cursor:pointer" onClick="document.getElementById('sort_list').value='';document.getElementById('t_view').value='c';form1.submit();">Course List&nbsp;&nbsp;</td></tr>
 	{if $viewWhat eq 'c'}

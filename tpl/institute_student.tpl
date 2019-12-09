@@ -45,7 +45,7 @@
 		<td width="12%">Major</td>
 		<td width="9%">Course Consultant</td>
 		<td width="8%">{if $ugs.i_rev.v eq 1}Receviable Comm{/if}</td>
-		<td width="6%">{if $ugs.i_rev.v eq 1}Paid Comm{/if}</td>
+		<td width="6%">{if $ugs.i_rev.v eq 1}Received Comm{/if}</td>
 	</tr>
 	{foreach key=id item=arr from=$student_arr}
 	<tr align="center" class="{cycle values='rowodd,roweven'}">

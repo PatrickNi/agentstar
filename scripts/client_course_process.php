@@ -16,6 +16,7 @@ if (!($user_id > 0)) {
 $o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 $o_t = new TodoAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
+
 $ugs = array();
 $user_grants = $o_g->get_user_grants($user_id);
 foreach ($g_user_grants as $item){
@@ -86,6 +87,9 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 				$o_t->setDueDate('course', $process_id, $sets['due']);			
 		}
 
+		$o_c->syncDoB2CourseProcess($client_id);
+		$o_c->syncMainVisa2CourseProcess($client_id);
+		
 		echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
 		exit;
 	}

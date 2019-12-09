@@ -596,7 +596,7 @@ class ClientAPI extends MysqlDB {
 		return 0;
 	}
 	function getCourseByUser($course_id=0, $client_id=0){
-		$sql = "select a.ID, b.Name, a.IID, b.CateID, d.Qual, e.Major, AppFee, ToUsDate, ToSchoolDate, UserID, AgentID, IsActive, StartDate, EndDate, TFee, Duration, a.QualID, MethodID, a.MajorID, Unit, KeyPoint, Refuse, ConsultantID, ConsultantDate 
+		$sql = "select a.ID, b.Name, a.IID, b.CateID, d.Qual, e.Major, AppFee, ToUsDate, ToSchoolDate, UserID, AgentID, IsActive, StartDate, EndDate, TFee, Duration, a.QualID, MethodID, a.MajorID, Unit, KeyPoint, Refuse, ConsultantID, ConsultantDate, verify_migration_agent, verify_migration_status 
 						from client_course a left join institute b on(a.IID = b.ID) 
 							 left join institute_category c on(a.IID = c.ID)
 							 left join institute_qual d on(a.QualID = d.ID) 
@@ -635,12 +635,14 @@ class ClientAPI extends MysqlDB {
 			$_arr[$this->CateID][$this->ID]['refuse'] 	 = $this->Refuse;
 			$_arr[$this->CateID][$this->ID]['consultant'] 	 = $this->ConsultantID;
 			$_arr[$this->CateID][$this->ID]['consultant_date'] 	 = $this->ConsultantDate;
+			$_arr[$this->CateID][$this->ID]['vma'] 	 = $this->verify_migration_agent;
+			$_arr[$this->CateID][$this->ID]['vms'] 	 = $this->verify_migration_status;
 		}
 		return $_arr;
 	}
 	
 	function getCourseByUserV2($course_id=0, $client_id=0){
-		$sql = "select a.ID, b.Name, a.IID, b.CateID, d.Qual, e.Major, AppFee, ToUsDate, ToSchoolDate, UserID, AgentID, IsActive, StartDate, EndDate, TFee, Duration, a.QualID, MethodID, a.MajorID, Unit, KeyPoint, Refuse, ConsultantID, ConsultantDate 
+		$sql = "select a.ID, b.Name, a.IID, b.CateID, d.Qual, e.Major, AppFee, ToUsDate, ToSchoolDate, UserID, AgentID, IsActive, StartDate, EndDate, TFee, Duration, a.QualID, MethodID, a.MajorID, Unit, KeyPoint, Refuse, ConsultantID, ConsultantDate,verify_migration_agent, verify_migration_status 
 						from client_course a left join institute b on(a.IID = b.ID) 
 							 left join institute_category c on(a.IID = c.ID)
 							 left join institute_qual d on(a.QualID = d.ID) 
@@ -679,7 +681,9 @@ class ClientAPI extends MysqlDB {
 			$_arr[$this->ID]['refuse'] 	 = $this->Refuse;
 			$_arr[$this->ID]['cate']     = $this->CateID;
 			$_arr[$this->ID]['consultant'] 	 = $this->ConsultantID;
-			$_arr[$this->ID]['consultant_date'] 	 = $this->ConsultantDate;			
+			$_arr[$this->ID]['consultant_date'] 	 = $this->ConsultantDate;	
+			$_arr[$this->ID]['vma'] 	 = $this->verify_migration_agent;
+			$_arr[$this->ID]['vms'] 	 = $this->verify_migration_status;		
 		}
 		return $_arr;
 	}
@@ -723,8 +727,8 @@ class ClientAPI extends MysqlDB {
 			$v = addslashes($v);
 		}
 		
-		$sql = "insert into `client_course` (CID, IID, MajorID, QualID, AppFee, ToUsDate, ToSchoolDate, UserID, AgentID, MethodID, StartDate, EndDate, Duration, TFee, IsActive, Refuse, Unit, KeyPoint, ConsultantID, ConsultantDate) values ";
-		$sql .= "('{$cid}', '{$sets['iid']}', '{$sets['major']}', '{$sets['qual']}', '{$sets['appfee']}', '{$sets['tusdate']}', '{$sets['tsdate']}', '{$user_id}', '{$sets['agent']}',  '{$sets['method']}',  '{$sets['start']}',  '{$sets['end']}',  '{$sets['due']}',  '{$sets['fee']}',  '{$sets['done']}',  '{$sets['refuse']}', '{$sets['unit']}', '{$sets['key']}', '{$sets['consultant']}', '{$sets['consultant_date']}')";
+		$sql = "insert into `client_course` (CID, IID, MajorID, QualID, AppFee, ToUsDate, ToSchoolDate, UserID, AgentID, MethodID, StartDate, EndDate, Duration, TFee, IsActive, Refuse, Unit, KeyPoint, ConsultantID, ConsultantDate, verify_migration_agent, verify_migration_status) values ";
+		$sql .= "('{$cid}', '{$sets['iid']}', '{$sets['major']}', '{$sets['qual']}', '{$sets['appfee']}', '{$sets['tusdate']}', '{$sets['tsdate']}', '{$user_id}', '{$sets['agent']}',  '{$sets['method']}',  '{$sets['start']}',  '{$sets['end']}',  '{$sets['due']}',  '{$sets['fee']}',  '{$sets['done']}',  '{$sets['refuse']}', '{$sets['unit']}', '{$sets['key']}', '{$sets['consultant']}', '{$sets['consultant_date']}', '{$sets['vma']}', '{$sets['vms']}')";
 		$this->query($sql);
 		return $this->getLastInsertID();
 	}
@@ -733,7 +737,7 @@ class ClientAPI extends MysqlDB {
 		foreach($sets as &$v){
 			$v = addslashes($v);
 		}
-		$sql = "update client_course SET IID = '{$sets['iid']}', MajorID = '{$sets['major']}', QualID = '{$sets['qual']}', AppFee = '{$sets['appfee']}', ToUsDate = '{$sets['tusdate']}', ToSchoolDate = '{$sets['tsdate']}', AgentID = '{$sets['agent']}', MethodID = '{$sets['method']}', StartDate = '{$sets['start']}', EndDate = '{$sets['end']}', Duration = '{$sets['due']}', TFee = '{$sets['fee']}', IsActive = {$sets['done']}, Refuse = '{$sets['refuse']}', Unit = '{$sets['unit']}', KeyPoint = '{$sets['key']}', ConsultantID = '{$sets['consultant']}', ConsultantDate = '{$sets['consultant_date']}' where ID = {$course_id}";
+		$sql = "update client_course SET IID = '{$sets['iid']}', MajorID = '{$sets['major']}', QualID = '{$sets['qual']}', AppFee = '{$sets['appfee']}', ToUsDate = '{$sets['tusdate']}', ToSchoolDate = '{$sets['tsdate']}', AgentID = '{$sets['agent']}', MethodID = '{$sets['method']}', StartDate = '{$sets['start']}', EndDate = '{$sets['end']}', Duration = '{$sets['due']}', TFee = '{$sets['fee']}', IsActive = {$sets['done']}, Refuse = '{$sets['refuse']}', Unit = '{$sets['unit']}', KeyPoint = '{$sets['key']}', ConsultantID = '{$sets['consultant']}', ConsultantDate = '{$sets['consultant_date']}', verify_migration_agent = '{$sets['vma']}', verify_migration_status = '{$sets['vms']}' where ID = {$course_id}";
 		return $this->query($sql);
 	}
 	
@@ -922,7 +926,14 @@ class ClientAPI extends MysqlDB {
 	}
 	
     function getNextCourseProcessID($pid){
+    	$sql = "select id as cpid from course_process where id > {$pid} order by id asc limit 1";
+    	$this->query($sql);
+    	if($this->fetch())
+    		return $this->cpid; 
+    	return 0;
+    	/*
     	global $course_process_arr;
+    	$course_process[6]
     	if ($pid >= 0){
 			$pid += 1;
 			if(array_key_exists($pid, $course_process_arr)){
@@ -930,6 +941,7 @@ class ClientAPI extends MysqlDB {
 			}
     	}
     	return 0;
+    	*/
     }	
 
 
@@ -1794,12 +1806,31 @@ function getSpand($aid){
 		}
 		return $_arr;
 	}
+
+	function getCountryZH() {
+		$sql = "select ID, Country, ZH_NAME from country order by Country asc";
+		$this->query($sql);
+		$_arr = array();
+		while ($this->fetch()){
+			$_arr[$this->ID]['en'] = $this->Country;
+			$_arr[$this->ID]['zh'] = $this->ZH_NAME;
+		}
+		return $_arr;		
+	}
 	
-	function addCountry($country){
+	function addCountry($country, $zh='',$id=0){
 		$country = addslashes($country);
-		$sql = "insert into country (Country) values ('{$country}')";
+		$zh = addslashes($zh);
+		
+		if ($id > 0){
+			$sql = "update country SET country = '{$country}', zh_name = '{$zh}' where id = {$id}";
+		}
+		else {
+			$sql = "insert into country (Country, ZH_NAME) values ('{$country}', '{$zh}')";
+		}
 		return $this->query($sql);
 	}			
+
 
 	function delCountry($id){
 		if ($id > 0){
@@ -2187,6 +2218,82 @@ function getSpand($aid){
 
     	$sql = "UPDATE client_info SET VISAID = '{$arr['visa']}', VISACLASSID = '{$arr['class']}', EXPIRDATE = '{$arr['epd']}' WHERE CID = {$client_id} ";
     	return $this->query($sql);
+    }
+
+    function syncDoB2CourseProcess($cid, $date='0000-00-00') {
+    	if ($cid == 0)
+    		return false;
+
+    	$sql = "select id as cpid from course_process where process = 'Birthday'";
+    	$this->query($sql);
+    	$this->fetch();
+    	$pid = $this->cpid;
+    	if (!$pid)
+    		return false;
+
+    	if (!$date || $date == '0000-00-00') {
+    		$sql = "select DoB from client_info where CID = {$cid}";
+    		$this->query($sql);
+    		$this->fetch();
+    		$date = $this->DoB;
+    	}
+
+    	$date = preg_replace('/^[\d]+-(.*)$/',date('Y').'-$1', $date);
+
+
+
+    	$sql = "update client_course_process ccp SET duedate = '{$date}' WHERE  ccp.done = 0 and ccp.processid = {$pid} and exists (select 'x' from client_course cc where ccp.CCID = cc.id and cc.cid = {$cid}) ";
+    	$this->query($sql);
+
+    }
+
+    function syncMainVisa2CourseProcess($cid, $date='0000-00-00') {
+    	if ($cid == 0)
+    		return false;
+
+    	$sql = "select id as cpid from course_process where process = 'Student visa extension'";
+    	$this->query($sql);
+    	$this->fetch();
+    	$pid = $this->cpid;
+    	if (!$pid)
+    		return false;
+
+    	if (!$date || $date == '0000-00-00') {
+    		$sql = "select ExpirDate from client_info where CID = {$cid}";
+    		$this->query($sql);
+    		$this->fetch();
+    		$date = $this->ExpirDate;
+    	}
+
+
+
+    	$sql = "update client_course_process ccp SET duedate = '{$date}' WHERE  ccp.done = 0 and ccp.processid = {$pid} and exists (select 'x' from client_course cc where ccp.CCID = cc.id and cc.cid = {$cid}) ";
+    	$this->query($sql);
+    }
+
+    function verifyMigration($courseid, $vma) {
+    	if ($courseid == 0 || $vma == 0)
+    		return false;
+
+    	$item = 'Verify migration course';
+    	//check process 
+    	$sql = "select ID from client_course_process where ccid = {$courseid} and ExItem = '{$item}'";
+    	$this->query($sql);
+    	$this->fetch();
+
+    	if (!$this->ID) {
+    		$sets['order'] = $this->getCourseProcessOrder(0, $courseid);
+			//$this->resetCourseProcessOrder($course_id, $sets['order']);
+			$sets['order'] = $sets['order'] + 1;
+    		$sets['subject'] = 0;
+			$sets['done']    = 0;
+			$sets['detail']  = "";
+			$sets['add']     = $item;
+			$sets['date']    = date("Y-m-d");
+			$sets['due']     = date("Y-m-d");
+			$sets['isAuto']  = 1;
+			$this->addCourseProcess($courseid, $sets);
+    	}
     }
 
 }

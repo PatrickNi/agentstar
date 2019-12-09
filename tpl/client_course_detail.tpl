@@ -143,6 +143,35 @@
               </select>
             </td>
           </tr>
+          {if $courseid > 0}
+          <tr>
+            <td width="28%" align="left"class="rowodd"><strong>Verify Migration Agents:</strong></td>
+            <td align="left" width="72%" class="roweven">
+              <select name="t_vma">
+                  <option value="0">choose an agent</option>  
+                  {foreach key=id item=name from=$agent_users} 
+                      <option value="{$id}" {if $id eq $dt_arr.vma} selected {/if}>{$name}</option>
+                  {/foreach}
+                                
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td width="28%" align="left"class="rowodd"><strong>Verify Migration Result:</strong></td>
+            <td align="left" width="72%" class="roweven">
+              {if $dt_arr.vma eq $user_id}
+                <select name="t_vms">
+                      <option value="none" {if $dt_arr.vms == "none"} selected {/if}>n/a</option> 
+                      <option value="yes" {if $dt_arr.vms == "yes"} selected {/if}>Yes</option> 
+                      <option value="no" {if $dt_arr.vms == "no"} selected {/if}>No</option>   
+                </select>
+              {else}
+                <input type="hidden" name="t_vms" value="{$dt_arr.vms}">
+                {$dt_arr.vms|ucwords}
+              {/if}
+            </td>
+          </tr>
+          {/if}
           {if $ugs.i_tta.v eq 1}
           <tr>
             <td width="28%" align="left" class="rowodd"><strong>To top-agent :</strong>&nbsp;&nbsp;</td>

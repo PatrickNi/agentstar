@@ -155,6 +155,12 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 					        }					        
 			        }	 
 	        }
+	        //Cancel status
+	        if ($sems['done'] == 2 ) {
+	        	$sems['rcomm'] = 0;
+	        	$sems['redcomm'] = 0;
+	        	$sems['fee'] = 0;
+	        }
 	        $o_c->setCourseSem($sem_id, $ugs['i_rev']['v'], $sems);
 	        if ($o_c->getCourseSemOrder($sem_id) == 1) {
 	        	$o_c->setSem1Date($course_id,  $sems['fdate']);

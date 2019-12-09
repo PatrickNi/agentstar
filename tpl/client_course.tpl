@@ -120,6 +120,7 @@ function ShowComm() {
 					<td class="border_1" width="5%">Qualification</td>
 					<td class="border_1" width="5%">Major</td>
 					<td class="border_1" width="5%">Consultant</td>
+					<td class="border_1" width="5%">Verify<br>Migration</td>
 					<td class="border_1" width="5%">Consultant Date</td>							
 					<td class="border_1" width="5%">Course Start<br> Date</td>
 					<td class="border_1" width="5%">Course Complete<br>  Date</td>
@@ -142,6 +143,7 @@ function ShowComm() {
 					<td class="border_1">{$arr.qualname}</td>
 					<td class="border_1">{$arr.majorname}</td>
 					<td class="border_1">{$user_arr[$arr.consultant]}</td>
+					<td class="border_1">{$user_arr[$arr.vma]},{$arr.vms|ucwords}</td>
 					<td class="border_1">{$arr.consultant_date}</td>
 					<td class="border_1">{$arr.start}</td>
 					<td class="border_1">{$arr.end}</td>	

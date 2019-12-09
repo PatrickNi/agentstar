@@ -69,7 +69,18 @@ $sets['class']  = $sets['class'] == ""? 0 : $sets['class'];
 	$sets['add']    = isset($_REQUEST['t_add'])? (string)trim($_REQUEST['t_add']) : "";
 	$sets['country']= isset($_REQUEST['t_country'])? (string)trim($_REQUEST['t_country']) : "";
 	$sets['type']   = isset($_REQUEST['t_type'])? $_REQUEST['t_type'] : array();
-	$sets['agent']  = isset($_REQUEST['t_agent'])? (string)trim($_REQUEST['t_agent']) : 0;
+	
+	if (isset($_REQUEST['t_agent_p']) && (string)trim($_REQUEST['t_agent_p']) > "0") {
+		$sets['agent']  = (string)trim($_REQUEST['t_agent_p']);
+	}
+	elseif (isset($_REQUEST['t_agent_a']) && (string)trim($_REQUEST['t_agent_a']) > "0") {
+		$sets['agent']  = (string)trim($_REQUEST['t_agent_a']) ;
+	}
+	else {
+		$sets['agent']  = 0;
+	}
+
+
 	$sets['note']   = isset($_REQUEST['t_note'])? (string)trim($_REQUEST['t_note']) : "";
 //	$sets['cuser']    = isset($_REQUEST['t_cuser'])? (string)trim($_REQUEST['t_cuser']) : 0;
 	$sets['sign']  = isset($_REQUEST['t_sign'])  && $_REQUEST['t_sign'] != '' ? (string)trim($_REQUEST['t_sign']) : "0000-00-00";
@@ -135,7 +146,11 @@ if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" |
 			if (strtoupper($_REQUEST['bt_name']) == "APPROVED") {
 				$sets['status'] = 'approved';
 			}
-	    	$o_c->setClientInfo($client_id, $sets);
+
+	    	if($o_c->setClientInfo($client_id, $sets)){
+	    		$o_c->syncDoB2CourseProcess($client_id, $sets['dob']);
+	    		$o_c->syncMainVisa2CourseProcess($client_id, $sets['epdate']);
+	    	}
 	    } 
 		else {
 			if ($o_c->checkSimilarClient($sets) > 0) {
@@ -194,8 +209,22 @@ $country_arr = array();
 $country_arr = $o_c->getCountry();
 
 # get agent name
-$agent_arr = array();
-$agent_arr = $o_a->getAgent('sub');
+//$agent_arr = array();
+//$agent_arr = $o_a->getAgent('sub');
+//get global partner
+$agent_partner = $o_a->getAgentList(0,'sub','education');
+foreach ($agent_partner as $aid => $v) {
+	if ($aid != $client_arr['agent'] && $aid != $sets['agent'] && $v['uid'] != $user_id)
+		unset($agent_partner[$aid]);
+}
+
+//get global ambassador
+$agent_ambassador = $o_a->getAgentList(0,'sub','student');
+foreach ($agent_ambassador as $aid => $v) {
+	if ($aid != $client_arr['agent'] && $aid != $sets['agent'] && $v['uid'] != $user_id)
+		unset($agent_ambassador[$aid]);
+}
+
 
 //# get user
 //$user_arr = array();
@@ -217,7 +246,9 @@ $o_tpl->assign('cid', $client_id);
 $o_tpl->assign('catid', $sets['visa']);
 $o_tpl->assign('classid', $sets['class']);
 $o_tpl->assign('all_types', $client_type_arr);
-$o_tpl->assign('agent_arr', $agent_arr);
+//$o_tpl->assign('agent_arr', $agent_arr);
+$o_tpl->assign('agent_partner', $agent_partner);
+$o_tpl->assign('agent_ambassador', $agent_ambassador);
 $o_tpl->assign('country_arr', $country_arr);
 //$o_tpl->assign('user_arr', $user_arr);
 $o_tpl->assign('cid', $client_id);

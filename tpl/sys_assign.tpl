@@ -49,7 +49,7 @@
    </tr>
    <tr class="roweven">
 		<td width="21%" align="left" valign="middle"><ul>Forbid cut/copy on client detail</ul></td>
-		<td width="79%" align="left">on&nbsp;<input type="checkbox" name="g_b_nocp[]" value="{$grant.b_nocp.v}" {if $ugs.no_cp.v eq 1} checked="checked" {/if}>&nbsp;&nbsp;</td>
+		<td width="79%" align="left">on&nbsp;<input type="checkbox" name="g_b_nocp[]" value="{$grant.b_nocp.v}" {if $ugs.b_nocp.v eq 1} checked="checked" {/if}>&nbsp;&nbsp;</td>
    </tr>
    <tr class="roweven">
 		<td width="21%" align="left" valign="middle"><ul>Show abouts percentage</ul></td>
@@ -313,12 +313,14 @@
 			view&nbsp;<input type="checkbox" name="g_a_top[]" value="{$grant.a_top.v}" {if $ugs.a_top.v eq 1} checked="checked" {/if}>&nbsp;&nbsp;
 		</td>
    </tr>
+   <!--
    <tr class="roweven">
 		<td align="left" ><ul>View Sub Agents</ul></td>
 		<td align="left">
 			view&nbsp;<input type="checkbox" name="g_a_sub[]" value="{$grant.a_sub.v}" {if $ugs.a_sub.v eq 1} checked="checked" {/if}>&nbsp;&nbsp;
 		</td>
    </tr>   
+-->
    <tr class="roweven">
 		<td align="left" ><ul>Details</ul></td>
 		<td align="left">
@@ -344,18 +346,42 @@
 		</td>
    </tr>
    <tr class="roweven">
-		<td align="left" ><ul>Receivable and Paid commission</ul></td>
+		<td align="left" ><ul>Receivable and received commission</ul></td>
 		<td align="left">
 			view&nbsp;<input type="checkbox" name="g_a_rev[]" value="{$grant.a_rev.v}" {if $ugs.a_rev.v eq 1} checked="checked" {/if}>&nbsp;&nbsp;
 		</td>
    </tr>  
    <tr class="rowodd"><td align="left" colspan="2"><li>Partners (Sub-agents)</li></td></tr>
      <tr class="roweven">
+        <td align="left" ><ul>Details</ul></td>
+        <td align="left">
+            <input type="checkbox" name="g_ap_d[]" value="{$grant.ap_d.v}" {if $ugs.ap_d.v eq 1} checked="checked" {/if}>
+        </td>
+     </tr> 
+     <tr class="roweven">
+        <td align="left" ><ul>Progress/Attachment</ul></td>
+        <td align="left">
+            <input type="checkbox" name="g_ap_pa[]" value="{$grant.ap_pa.v}" {if $ugs.ap_pa.v eq 1} checked="checked" {/if}>
+        </td>
+     </tr> 
+     <tr class="roweven">
+        <td align="left" ><ul>Students</ul></td>
+        <td align="left">
+            <input type="checkbox" name="g_ap_st[]" value="{$grant.ap_st.v}" {if $ugs.ap_st.v eq 1} checked="checked" {/if}>
+        </td>
+     </tr> 
+     <tr class="roweven">
+        <td align="left" ><ul>Payable and paid commission</ul></td>
+        <td align="left">
+            <input type="checkbox" name="g_ap_ppc[]" value="{$grant.ap_ppc.v}" {if $ugs.ap_ppc.v eq 1} checked="checked" {/if}>
+        </td>
+     </tr> 
+     <tr class="roweven">
 		<td align="left" ><ul>Remove</ul></td>
 		<td align="left">
 			<input type="checkbox" name="g_a_delpartner[]" value="{$grant.a_delpartner.v}" {if $ugs.a_delpartner.v eq 1} checked="checked" {/if}>
 		</td>
-   </tr>   
+     </tr>   
         <tr class="roweven">
         <td align="left" ><ul>Email Export</ul></td>
         <td align="left">
@@ -363,6 +389,30 @@
         </td>
    </tr>  
       <tr class="rowodd"><td align="left" colspan="2"><li>Ambassador (Sub-agents)</li></td></tr>
+     <tr class="roweven">
+        <td align="left" ><ul>Details</ul></td>
+        <td align="left">
+            <input type="checkbox" name="g_aa_d[]" value="{$grant.aa_d.v}" {if $ugs.aa_d.v eq 1} checked="checked" {/if}>
+        </td>
+     </tr> 
+     <tr class="roweven">
+        <td align="left" ><ul>Progress/Attachment</ul></td>
+        <td align="left">
+            <input type="checkbox" name="g_aa_pa[]" value="{$grant.aa_pa.v}" {if $ugs.aa_pa.v eq 1} checked="checked" {/if}>
+        </td>
+     </tr> 
+     <tr class="roweven">
+        <td align="left" ><ul>Students</ul></td>
+        <td align="left">
+            <input type="checkbox" name="g_aa_st[]" value="{$grant.aa_st.v}" {if $ugs.aa_st.v eq 1} checked="checked" {/if}>
+        </td>
+     </tr> 
+     <tr class="roweven">
+        <td align="left" ><ul>Payable and paid commission</ul></td>
+        <td align="left">
+            <input type="checkbox" name="g_aa_ppc[]" value="{$grant.aa_ppc.v}" {if $ugs.aa_ppc.v eq 1} checked="checked" {/if}>
+        </td>
+     </tr> 
         <tr class="roweven">
         <td align="left" ><ul>Remove</ul></td>
         <td align="left">

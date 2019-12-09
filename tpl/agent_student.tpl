@@ -52,8 +52,14 @@
 		<td width="17%">Course</td>
 		<td width="16%">Major</td>
 		<td width="9%">Course Consultant</td>
-		<td width="6%">{if $ugs.a_rev.v eq 1}Receivable top-comm{/if}</td>
-		<td width="6%">{if $ugs.a_rev.v eq 1}Received top-comm{/if}</td>
+		{if ($agent_arr[$aid].type eq 'top' && $ugs.a_rev.v eq 1) || ($agent_arr[$aid].type eq 'sub' && $agent_arr[$aid].cate eq 'education' && $ugs.ap_ppc.v eq 1) || ($agent_arr[$aid].type eq 'sub' && $agent_arr[$aid].cate eq 'student' && $ugs.aa_ppc.v eq 1)}
+			<td width="6%">Receivable Commissions</td>
+			<td width="6%">Received Commissions</td>
+		{else}
+			<td width="6%"></td>
+			<td width="6%"></td>				
+		{/if}
+	
 	</tr>
 	{foreach key=id item=arr from=$student_arr}
 	<tr align="center" class="{cycle values='rowodd,roweven'}">
@@ -65,8 +71,13 @@
 		<td>{$courses[$arr.school][$arr.course]}</td>
 		<td>{$majors[$arr.course][$arr.major]}</td>
 		<td>{$users[$arr.cuser]}</td>
-		<td>{if $ugs.a_rev.v eq 1}{$arr.ccomm}{/if}</td>
-		<td>{if $ugs.a_rev.v eq 1}{$arr.pcomm}{/if}</td>					
+		{if ($agent_arr[$aid].type eq 'top' && $ugs.a_rev.v eq 1) || ($agent_arr[$aid].type eq 'sub' && $agent_arr[$aid].cate eq 'education' && $ugs.ap_ppc.v eq 1) || ($agent_arr[$aid].type eq 'sub' && $agent_arr[$aid].cate eq 'student' && $ugs.aa_ppc.v eq 1)}
+			<td>{$arr.ccomm}</td>
+			<td>{$arr.pcomm}</td>
+		{else}
+			<td></td>
+			<td></td>			
+		{/if}					
 	</tr>
 	{/foreach}
 </table>

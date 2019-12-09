@@ -3,9 +3,10 @@ require_once('../etc/const.php');
 require_once(__LIB_PATH.'ClientAPI.class.php');
 
 # get course id
-$id      = isset($_REQUEST['id'])? trim($_REQUEST['id']) : "";
-$country = isset($_REQUEST['t_name'])? trim($_REQUEST['t_name']) : "";
-$button  = isset($_REQUEST['bt_name'])? strtoupper($_REQUEST['bt_name']) : "";
+$coid  = isset($_REQUEST['coid'])? trim($_REQUEST['coid']) : 0;
+$en_co = isset($_REQUEST['en_co'])? trim($_REQUEST['en_co']) : "";
+$zh_co = isset($_REQUEST['zh_co'])? trim($_REQUEST['zh_co']) : "";
+$button = isset($_REQUEST['bt_name'])? strtoupper($_REQUEST['bt_name']) : "";
 
 
 
@@ -15,7 +16,7 @@ $group_arr = array();
 
 switch($button){
 	case "SAVE":
-		$o_c->addCountry($country);
+		$o_c->addCountry($en_co, $zh_co, $coid);
 		echo "<script language='javascript'>window.returnValue=1;self.close();</script>";
 		break;
 	case "DELETE":
@@ -28,8 +29,7 @@ switch($button){
 		break;
 }
 
-$country_arr = array();
-$country_arr = $o_c->getCountry();
+$country_arr = $o_c->getCountryZH();
 ?>
 <html>
 <head>
@@ -39,36 +39,43 @@ $country_arr = $o_c->getCountry();
 <link rel="stylesheet" href="../css/sam.css">
 <script language="javascript" src="../js/audit.js"></script>
 <body>
-<form method="post" name="form1" action="" target="_self" onSubmit="return form_audit('form1')">
 <input type="hidden" name="hCancel" value="0">
-			<table border="0" width="100%" cellpadding="3">
-				<tr class="greybg">
-					<td colspan="3"align="center" class="whitetext">
-							Country &nbsp;
-					</td>
-				</tr>	
-				<tr>	  
-				  <td align="left" width="83%">
-					   <select name="t_cate" >
-					   <?php
-					   	 foreach($country_arr as $id => $name){
-					   	 	echo "<option value={$id}>{$name}</option>";
-					   	 }
-					   ?>
-				      </select>
-				  </td>    
-				  <td width="17%" align="left">
-						<input type="submit" value="Delete" name="bt_name" style="font-weight:bold" onClick="this.form.hCancel.value=1">				  
-				  </td>
-				</tr>
-				<tr>
-					<td align="left" width="83%"><input type="text" name="t_name" size="30" value=""></td>
-					<td width="17%" align="left"><input type="submit" value="Save" name="bt_name" style="font-weight:bold ">&nbsp;&nbsp;&nbsp;&nbsp;</td>
-				</tr>																		
-				<tr align="center"  class="greybg" >
-				  <td colspan="2">&nbsp;</td>
-				</tr>									
-			</table>	
-</form>			
+<table border="0" width="100%" cellpadding="3">
+	<tr class="greybg">
+		<td colspan="3"align="center" class="whitetext">
+				Country &nbsp;
+		</td>
+	</tr>			
+	<tr>	  
+	  <td align="left" width="83%">
+	  	<form method="get" name="form1" action="" target="_self">
+		   <select name="coid" onchange="this.form.submit();">
+		   <option value="0" >Add new / Chonse one</option>	
+		   <?php
+		   	 foreach($country_arr as $id => $v){
+		   	 	echo "<option value={$id} ".($id == $coid? "selected" : "").">{$v['en']}</option>";
+		   	 }
+		   ?>
+		   
+	      </select>
+	     </form>
+	  </td>    
+	</tr>
+	<tr>
+		<td width="100%"><hr/></td>	
+	</tr>
+	<tr>
+		<form method="post" name="form2" target="_self">
+		<input type="hidden" name="coid" value="<?php echo $coid; ?>">
+		<td width="100%">
+			EN: <input type="text" name="en_co" value="<?php echo isset($country_arr[$coid])? $country_arr[$coid]['en'] : "" ; ?>"/><br/>
+			ZH: <input type="text" name="zh_co" value="<?php echo isset($country_arr[$coid])? $country_arr[$coid]['zh'] : "" ; ?>"/><br/>
+			<p/>
+			<input type="submit" value="Save" name="bt_name" style="font-weight:bold">
+			<input type="submit" value="Delete" name="bt_name" style="font-weight:bold">
+		</td>
+		</form>
+	</tr>
+</table>
 </body>
 </html>
