@@ -184,7 +184,7 @@
             </td>
           </tr>
           {else}
-            <input type="hidden" name="t_agent" value="0">
+            <input type="hidden" name="t_agent" value="{$dt_arr.agent}">
           {/if}
           <tr>
             <td colspan="2"><hr></td>

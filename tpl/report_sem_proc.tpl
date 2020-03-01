@@ -8,6 +8,12 @@
 <body>
 <form name="form1" action="">
 <table border="0" width="100%" cellpadding="1" cellspacing="1">
+	<tr align="left"  class="bordered_2" >
+		<td>
+	   		<input type="submit" name="btn" value="Sort by Students">&nbsp;
+	   		<input type="submit" name="btn" value="Sort by Top-agents">&nbsp;
+		</td>
+	</tr>
 	<tr align="center"  class="bordered_2" >
 		<td class="whitetext" style="padding:3 ">Commission
 		&nbsp;&nbsp;&nbsp;&nbsp;
@@ -24,7 +30,10 @@
 	{foreach key=ccid item=procs from=$arr.course}
 	{foreach key=procid item=darr from=$procs}
 	<tr class="roweven">
-		<td><span  style="padding-left:40; cursor:pointer;{if $darr.key eq $step2}color:#33FF00;{/if}" onClick="window.open('redir.php?t=comm&semid={$procid}&ccid={$ccid}&cid={$cid}','','height='+screen.width*4/5+','+'width='+screen.width*4/5)">{$darr.desc}</span></td>
+		<td><span  style="padding-left:40; cursor:pointer;{if $darr.key eq $step2}color:#33FF00;{/if}" onClick="window.open('redir.php?t=comm&semid={$procid}&ccid={$ccid}&cid={$darr.cid}','','height='+screen.width*4/5+','+'width='+screen.width*4/5)">
+		{if $is_agent eq 1}{$darr.client}&nbsp;&nbsp;{/if}{$darr.desc}
+
+		</span></td>
 	</tr>
 	{/foreach}
 	{/foreach}

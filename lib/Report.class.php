@@ -2080,6 +2080,7 @@ class ReportAPI extends MysqlDB {
 			$_arr[$this->CID]['name'] = $this->Name;
 			$_arr[$this->CID]['course'][$this->CourseID][$this->SemID]['desc'] = $this->Detail;
 			$_arr[$this->CID]['course'][$this->CourseID][$this->SemID]['key'] = $this->KeyPoint;
+            $_arr[$this->CID]['course'][$this->CourseID][$this->SemID]['cid'] = $this->CID;
 		}
 		return $_arr;
 	}
@@ -2102,6 +2103,53 @@ class ReportAPI extends MysqlDB {
 		return 0;
 	}
 
+
+    function getCommissionByTopAgent($userid, $page=0, $page_size=0){
+        $sql = "select concat(LName, ' ', FName) as Name, if(ag.Name is null, '*n/a', ag.Name) as NameAgent, b.AgentID, a.CID, b.ID as CourseID, c.ID as SemID, d.Detail, d.KeyPoint from client_info a 
+                left join client_course b on(a.CID = b.CID) 
+                left join client_course_sem c on(b.ID = c.CCID) 
+                left join client_course_sem_process d on(c.ID = d.SemID and d.KeyPoint <> '' and Done = 0) 
+                left join agent ag on (ag.ID = b.AgentID and ag.Form = 'top')
+                where d.ID is not null and a.ClientType like '%study%' and c.StartDate <= NOW() and b.AgentID > 0 "; //a.CID in ($id_str) and 
+        if ($userid > 0) {
+            $sql .= " AND a.CourseUser = {$userid} ";
+        }
+        
+        $sql .= " Order by NameAgent asc, Name asc ";//d.OrderID
+        
+        if ($page > 0 && $page_size > 0) {
+            $sql .= " Limit ".($page-1)*$page_size.", ".$page_size;
+        }       
+        $_arr = array();
+        $this->query($sql);//echo $sql."<p/>";
+        while ($this->fetch()) {
+            $_arr[$this->AgentID]['name'] = $this->NameAgent;
+            $_arr[$this->AgentID]['course'][$this->CourseID][$this->SemID]['desc'] = $this->Detail;
+            $_arr[$this->AgentID]['course'][$this->CourseID][$this->SemID]['key'] = $this->KeyPoint;
+            $_arr[$this->AgentID]['course'][$this->CourseID][$this->SemID]['cid'] = $this->CID;
+            $_arr[$this->AgentID]['course'][$this->CourseID][$this->SemID]['client'] = $this->Name;
+        }
+        return $_arr;
+    }
+    
+    function getNumOfCommissionsByTopAgent($userid){
+        $sql = "select count(*) as cnt from client_info a 
+                left join client_course b on(a.CID = b.CID) 
+                left join client_course_sem c on(b.ID = c.CCID) 
+                left join client_course_sem_process d on(c.ID = d.SemID and d.KeyPoint <> '' and Done = 0) 
+                left join agent ag on (ag.ID = b.AgentID and ag.Form = 'top')
+                where d.ID is not null and a.ClientType like '%study%' and c.StartDate <= NOW() and b.AgentID > 0"; //a.CID in ($id_str) and 
+        if ($userid > 0) {
+            $sql .= " AND a.CourseUser = {$userid} ";
+        }
+        
+        $sql .= " Order by d.OrderID asc ";
+        $this->query($sql);//echo $sql."<p/>";
+        while ($this->fetch() && $this->cnt > 0) {
+            return $this->cnt;
+        }
+        return 0;
+    }
 
 	function getCoCommissionByUser($userid, $page=0, $page_size=0){
 		/*$sql = "select concat(LName, ' ', FName) as Name, a.CID, b.ID as CourseID, c.ID as SemID, d.Detail, IF(NotifyDate is null or NotifyDate = '0000-00-00','', NotifyDate) as NotifyDate, DoB from client_info a 

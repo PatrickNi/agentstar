@@ -139,7 +139,7 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 			if ($sets['due'] > '0000-00-00')
 				$o_t->setDueDate('visa', $process_id, $sets['due']);
 
-			if ($change_visa_status == 'grant' && $sets['done'] == 1) {
+			if ($change_visa_status && $sets['done'] == 1) {
 				$o_c->setApplyVisaStatus($visa_id, $change_visa_status);
 			}
 			echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";

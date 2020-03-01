@@ -926,10 +926,17 @@ class ClientAPI extends MysqlDB {
 	}
 	
     function getNextCourseProcessID($pid){
-    	$sql = "select id as cpid from course_process where id > {$pid} order by id asc limit 1";
+    	//currenct rank
+    	$sql = "select rank from course_process where id = {$pid}";
     	$this->query($sql);
-    	if($this->fetch())
-    		return $this->cpid; 
+    	$rank = 0;
+    	if ($this->fetch() && $this->rank > 0) {
+    		$sql = "select id as cpid from course_process where rank > {$rank} order by rank asc limit 1";
+    		$this->query($sql);
+    		if($this->fetch())
+    			return $this->cpid; 
+    	}
+
     	return 0;
     	/*
     	global $course_process_arr;
@@ -2291,6 +2298,38 @@ function getSpand($aid){
 			$sets['add']     = $item;
 			$sets['date']    = date("Y-m-d");
 			$sets['due']     = date("Y-m-d");
+			$sets['isAuto']  = 1;
+			$this->addCourseProcess($courseid, $sets);
+    	}
+    }
+
+    function alarmAddSemester($courseid, $cpid) {
+    	if ($courseid == 0 || $cpid == 0)
+    		return false;
+
+    	$sql = "select Process from course_process where id = '{$cpid}' ";
+    	$this->query($sql);
+    	$this->fetch();
+    	if (strtolower($this->Process) != 'get coe') {
+    		return false;
+    	}
+
+    	$item = 'Add new semester';
+    	//check process 
+    	$sql = "select ID from client_course_process where ccid = {$courseid} and ExItem = '{$item}'";
+    	$this->query($sql);
+    	$this->fetch();
+
+    	if (!$this->ID) {
+    		$sets['order'] = $this->getCourseProcessOrder(0, $courseid);
+			//$this->resetCourseProcessOrder($course_id, $sets['order']);
+			$sets['order'] = $sets['order'] + 1;
+    		$sets['subject'] = 0;
+			$sets['done']    = 0;
+			$sets['detail']  = "";
+			$sets['add']     = $item;
+			$sets['date']    = '0000-00-00';
+			$sets['due']     = '0000-00-00';
 			$sets['isAuto']  = 1;
 			$this->addCourseProcess($courseid, $sets);
     	}

@@ -41,15 +41,26 @@ if ($ugs['seeall']['v'] == 0){
 }
 
 $semprocs = array();
-$semprocs = $o_r->getCommissionByUser($view_all, $page, $page_size);
-$rows_num = $o_r->getNumOfCommissionsByUser($view_all);
-$o_page =  new PageDistribute($page_url, $rows_num, $page_size, $page_offset, $page, '');
+if (isset($_REQUEST['btn']) && $_REQUEST['btn'] == 'Sort by Top-agents') {
+    $semprocs = $o_r->getCommissionByTopAgent($view_all, $page, $page_size);
+    $rows_num = $o_r->getNumOfCommissionsByTopAgent($view_all);    
+    $o_page =  new PageDistribute($page_url, $rows_num, $page_size, $page_offset, $page, '&btn='.urlencode($_REQUEST['btn']));
+    $is_agent = 1;
+}
+else {
+    $is_agent = 0;
+    $semprocs = $o_r->getCommissionByUser($view_all, $page, $page_size);
+    $rows_num = $o_r->getNumOfCommissionsByUser($view_all);
+    $o_page =  new PageDistribute($page_url, $rows_num, $page_size, $page_offset, $page, '');
+}
+
 //print_r($semprocs);
 //echo $rows_num."<p/>";
 
 
 # set smarty tpl
 $o_tpl = new Template;
+$o_tpl->assign('is_agent', $is_agent);
 $o_tpl->assign('semprocs', $semprocs);
 $o_tpl->assign('step2', __SEM_START.__SEM_INVOICE);
 $o_tpl->assign('page_url', $o_page->ShowPageLink());

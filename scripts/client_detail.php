@@ -147,10 +147,13 @@ if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" |
 				$sets['status'] = 'approved';
 			}
 
+			
+
 	    	if($o_c->setClientInfo($client_id, $sets)){
-	    		$o_c->syncDoB2CourseProcess($client_id, $sets['dob']);
-	    		$o_c->syncMainVisa2CourseProcess($client_id, $sets['epdate']);
+	    		//$o_c->syncDoB2CourseProcess($client_id, $sets['dob']);
+	    		//$o_c->syncMainVisa2CourseProcess($client_id, $sets['epdate']);
 	    	}
+
 	    } 
 		else {
 			if ($o_c->checkSimilarClient($sets) > 0) {

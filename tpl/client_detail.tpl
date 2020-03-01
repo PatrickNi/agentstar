@@ -191,6 +191,7 @@
                           <option value="married" {if $arr.married == 'married'} selected {/if}>Ω·ªÈ(Married)</option>
                           <option value="divorce" {if $arr.married == 'divorce'} selected {/if}>¿ÎªÈ(Divorce)</option>
                           <option value="never_married" {if $arr.married == 'never_married'} selected {/if}>Œ¥ªÈ(Never Married)</option>
+                          <option value="separated" {if $arr.married == 'separated'} selected {/if}>∑÷æ”(Separated)</option>
                           <option value="defacto" {if $arr.married == 'defacto'} selected {/if}>Õ¨æ”(Defacto Relationship)</option>
                         </select> 
                 </td>
@@ -267,7 +268,7 @@
                 </td>
               </tr>    
               <tr>
-                <td width="28%" align="left" class="rowodd"><strong>Global Ambasasador:</strong>&nbsp;&nbsp;</td>
+                <td width="28%" align="left" class="rowodd"><strong>Global Ambassador:</strong>&nbsp;&nbsp;</td>
                 <td align="left" width="72%" class="roweven"> 
                   {if $ugs.b_suba.v eq 1 && $ugs.b_suba.m eq 0 && ($cid gt 0 || $ugs.b_suba.i eq 0)}
                       <input type="hidden" name="t_agent_a" value="{$arr.agent}">
