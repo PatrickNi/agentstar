@@ -4,6 +4,7 @@ require_once(__LIB_PATH.'Template.class.php');
 require_once(__LIB_PATH.'SchoolAPI.class.php');
 require_once(__LIB_PATH.'ClientAPI.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
+require_once(__LIB_PATH.'AgentAPI.class.php');
 
 $user_id = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
 
@@ -14,6 +15,7 @@ if (!($user_id > 0)) {
 $o_s = new SchoolAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 $o_v = new ClientAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 $o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
+$o_a = new AgentAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
 
 //user grants
@@ -37,10 +39,9 @@ $set_arr['agent']  = isset($_REQUEST['t_agent'])? trim($_REQUEST['t_agent']) : 0
 $set_arr['note']   = isset($_REQUEST['t_note'])? trim($_REQUEST['t_note']) : "";
 $set_arr['cate']   = isset($_REQUEST['t_cate'])? trim($_REQUEST['t_cate']) : 0;
 $set_arr['subcate']= isset($_REQUEST['t_subcate'])? trim($_REQUEST['t_subcate']) : 0;
-
+$set_arr['topagent'] = isset($_REQUEST['t_agent_top'])? trim($_REQUEST['t_agent_top']) : 0;
 
 if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE") {
-
 	if ($school_id > 0){
 		$o_s->setSchoolInfo($school_id, $set_arr);
 	} else{
@@ -87,6 +88,7 @@ if($ugs['i_nocp']['v'] == 1) {
 
 $o_tpl->assign('subcate_arr', $subcate_arr);
 $o_tpl->assign('category_arr', $cate_arr);
+$o_tpl->assign('top_agents', $o_a->getAgentList(0, 'top'));
 $o_tpl->assign('forbid_sl', FORBID_SELECT);
 $o_tpl->assign('forbid_rc', FORBID_RIGHTCLK);
 $o_tpl->assign('forbid_cp', FORBID_COPY);

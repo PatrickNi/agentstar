@@ -20,18 +20,20 @@
 
       <td colspan="12">
         <input type="hidden" name="t_form" value="{$form}" />
-         <input type="button" value="Add Ambassador" onClick="javascript:this.form.status.value='sub';this.form.action='agent_add.php';this.form.submit();" style="font-weight:bold;">
+         <input type="button" value="Add Assistant" onClick="javascript:this.form.status.value='sub';this.form.action='agent_add.php';this.form.submit();" style="font-weight:bold;">
         &nbsp;&nbsp;
         {if $ugs.a_delambassador.v eq 1}
         <input type="button" value="Remove" onClick="remove_confirm(this.form);" style="font-weight:bold;">
         {/if}   
         &nbsp;&nbsp;&nbsp;&nbsp;
         <input type="button" style="font-weight:bold" onClick="printPage();"value="Print">
+        <!--
         Staff: &nbsp;&nbsp;
           <select name="t_staff" onChange="this.form.submit();">
               {foreach key=user_id item=user_name from=$slUsers}
                 <option value="{$user_id}" {if $staffid eq $user_id} selected {/if}>{$user_name}</option>
               {/foreach}
+            -->
       </td>
     </tr>
     {if $ugs.a_emailambassador.v eq 1}

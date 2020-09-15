@@ -21,17 +21,17 @@
         &nbsp;&nbsp;&nbsp;&nbsp; <strong>Staff:</strong>&nbsp;&nbsp;
         <select name="t_staff" onChange="this.form.bt_name.focus();">
           
-				{foreach key=user_id item=user_name from=$slUsers}
-					
+                {foreach key=user_id item=user_name from=$slUsers}
+                    
           <option value="{$user_id}" {if $staffid eq $user_id} selected {/if}>{$user_name}</option>
           
-				{/foreach}
-				{if $ugs.rpt_staff.v eq 1}
-					
+                {/foreach}
+                {if $ugs.rpt_staff.v eq 1}
+                    
           <option value="all" {if $staffid eq 'all'} selected {/if}>All Staff</option>
           
-				{/if}
-			
+                {/if}
+            
         </select>
         &nbsp;&nbsp;&nbsp;&nbsp; </td>
     </tr>
@@ -43,6 +43,12 @@
         </select>
         &nbsp;&nbsp;&nbsp;
         <input type="submit" name="bt_name" value="create report" style="font-weight:bold ">
+
+        {if $from_archive}
+          <strong>Reporting data from Archive</strong>
+        {else}
+          <input type="submit" name="bt_archive" value="archive report" style="font-weight:bold ">
+        {/if}
         &nbsp;&nbsp;&nbsp;&nbsp;
         <!--<input type="button" style="font-weight:bold" onclick="printPage();"value="Print">-->
         <input type="button" style="font-weight:bold" value="Print" onClick="document.all.WebBrowser.ExecWB(6,1)">
@@ -480,9 +486,9 @@
 </table>
 {literal}
 <script type="text/javascript">
-	$('#t_fdate').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });        
-	$('#t_tdate').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });
+    $('#t_fdate').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });        
+    $('#t_tdate').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });
 </script>
-{/literal}	
+{/literal}  
 </body>
 </html>

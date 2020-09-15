@@ -265,7 +265,7 @@
             {foreach key=id item=arr from=$process_arr}
             <tr align="left" class="roweven">
               <td class="border_1" nowrap="nowrap"><span style="font-size:16px;font-weight:bolder; color:#990000">{if $arr.done eq 1}&radic;{else}?{/if}</span> {$arr.date} </td>
-              <td class="border_1"><span style="cursor:pointer; text-decoration:underline;"  onClick="window.open('client_course_process.php?courseid={$courseid}&pid={$id}&cid={$cid}','_blank', 'alwaysRaised=yes,resizable=yes,scrollbars=yes,width=500,height=380')">{if $arr.subject eq 0}{$arr.add}{else}{if $arr.auto eq 1}AUTO:{/if}{$item_arr[$arr.subject].name}{/if}</span></td>
+              <td class="border_1" onClick="window.open('client_course_process.php?courseid={$courseid}&pid={$id}&cid={$cid}','_blank', 'alwaysRaised=yes,resizable=yes,scrollbars=yes,width=500,height=380')"><span style="cursor:pointer; text-decoration:underline;">{if $arr.subject eq 0}{$arr.add}{else}{if $arr.auto eq 1}AUTO:{/if}{$item_arr[$arr.subject].name}{/if}</span></td>
               <td class="border_1"><img src="../images/arr_down.gif" style="cursor:pointer" onClick="window.open('client_course_process.php?courseid={$courseid}&pid={$id}&cid={$cid}&isOther=1', '_blank', 'alwaysRaised=yes,resizable=yes,scrollbars=yes,width=500,height=380')"></td>
             </tr>
             {/foreach}

@@ -106,6 +106,9 @@ $sets['class']  = $sets['class'] == ""? 0 : $sets['class'];
 	$sets['bank']  = isset($_REQUEST['t_bank'])? (string)trim($_REQUEST['t_bank']) : "";
 //	$sets['epdate']  = $sets['epdate'] == ""? "0000-00-00" : $sets['epdate']; //date("Y-m-d")
 
+	$sets['wechatid']  = isset($_REQUEST['t_wechat_id'])? (string)trim($_REQUEST['t_wechat_id']) : "";
+	$sets['wechatphone']  = isset($_REQUEST['t_wechat_phone'])? (string)trim($_REQUEST['t_wechat_phone']) : "";
+	$sets['wechatemail']  = isset($_REQUEST['t_wechat_email'])? (string)trim($_REQUEST['t_wechat_email']) : "";
 
 if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" || strtoupper($_REQUEST['bt_name']) == "APPROVED")) {
 
@@ -147,13 +150,7 @@ if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" |
 				$sets['status'] = 'approved';
 			}
 
-			
-
-	    	if($o_c->setClientInfo($client_id, $sets)){
-	    		//$o_c->syncDoB2CourseProcess($client_id, $sets['dob']);
-	    		//$o_c->syncMainVisa2CourseProcess($client_id, $sets['epdate']);
-	    	}
-
+			$o_c->setClientInfo($client_id, $sets);
 	    } 
 		else {
 			if ($o_c->checkSimilarClient($sets) > 0) {
@@ -223,10 +220,12 @@ foreach ($agent_partner as $aid => $v) {
 
 //get global ambassador
 $agent_ambassador = $o_a->getAgentList(0,'sub','student');
+/*
 foreach ($agent_ambassador as $aid => $v) {
 	if ($aid != $client_arr['agent'] && $aid != $sets['agent'] && $v['uid'] != $user_id)
 		unset($agent_ambassador[$aid]);
 }
+*/
 
 
 //# get user

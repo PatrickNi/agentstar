@@ -19,17 +19,12 @@
     <tr  class="bordered_2" >
 
       <td colspan="11">
-        {if $form eq 'top'}
-          <strong>Top-Agent</strong>
-        {elseif $form eq 'sub'}
-          <strong>Sub-Agent</strong>
-        {/if}
           <input type="hidden" name="t_form" value="{$form}" />
         {if $ugs.a_top.v eq 1 && $form eq 'top'}
         <input type="button" value="Add Top-agent" onClick="javascript:this.form.status.value='top';this.form.action='agent_add.php';this.form.submit();" style="font-weight:bold;">
         &nbsp;&nbsp;
         {/if}
-        {if $ugs.a_sub.v eq 1  && $form eq 'sub'}
+        {if $ugs.ap_d.v eq 1  && $form eq 'sub'}
         <input type="button" value="Add Partner" onClick="javascript:this.form.status.value='sub';this.form.action='agent_add.php';this.form.submit();" style="font-weight:bold;">
         &nbsp;&nbsp;
         {/if}

@@ -49,6 +49,13 @@ foreach ($g_user_grants as $item){
 }
 
 
+if (isset($_REQUEST['act']) && $_REQUEST['act'] == 'check_dob') {
+    $o_r->checkYearDob($_REQUEST['cid'], $_REQUEST['dob'], $user_id);
+    echo json_encode(array('succ'=>1));
+    exit;
+}
+
+
 $viewWhat = isset($_REQUEST['t_view'])? trim($_REQUEST['t_view']) : "";
 $sort_list = isset($_REQUEST['sort_list'])? trim($_REQUEST['sort_list']) : "";
 
@@ -116,18 +123,26 @@ switch ($viewWhat){
 //		$reports = array_merge($o_r->getUrgentInstitute($sort_col, $sort_ord), $o_r->getTodoInstitute($sort_col, $sort_ord));
 		break;			
 	case "s":
+        if (isset($ugs['todo_course']) && $ugs['todo_course']['v'] == 1){
+            if(isset($_REQUEST['cUid'])) {
+                $staff_id = $_REQUEST['cUid'];
+            }
+            else {
+                $staff_id = 0;
+            }
+        }
         $sort_col_arr = array(1=>'ClientName',2=>'Subject',3=>'SortDue');
-        $reports = $o_r->getUrgentService($view_all,getSortList($sort_list, $sort_col_arr, $sort_ord_arr), $sdu);
+        $reports = $o_r->getUrgentService($staff_id,getSortList($sort_list, $sort_col_arr, $sort_ord_arr), $sdu);
 //		$reports = array_merge($o_r->getUrgentService($view_all, $sort_col, $sort_ord), $o_r->getTodoService($view_all, $sort_col, $sort_ord));
 		break;		
 	case "asub":
         $sort_col_arr = array(1=>'Name',2=>'Subject',3=>'SortDue');
-        $reports = $o_r->getUrgentAgent(getSortList($sort_list, $sort_col_arr, $sort_ord_arr), $asubdu);
+        $reports = $o_r->getUrgentAgent(getSortList($sort_list, $sort_col_arr, $sort_ord_arr), 'sub');
 //		$reports = array_merge($o_r->getUrgentAgent($sort_col, $sort_ord), $o_r->getTodoAgent($sort_col, $sort_ord));
 		break;
 	case "atop":
         $sort_col_arr = array(1=>'Name',2=>'Subject',3=>'SortDue');
-        $reports = $o_r->getUrgentAgent(getSortList($sort_list, $sort_col_arr, $sort_ord_arr), $atopdu);
+        $reports = $o_r->getUrgentAgent(getSortList($sort_list, $sort_col_arr, $sort_ord_arr), 'top');
 //		$reports = array_merge($o_r->getUrgentAgent($sort_col, $sort_ord), $o_r->getTodoAgent($sort_col, $sort_ord));
 		break;			
 }
@@ -136,6 +151,7 @@ switch ($viewWhat){
 $o_tpl = new Template;
 $o_tpl->assign('urgent_arr', $reports);
 $o_tpl->assign('viewWhat', $viewWhat);
+$o_tpl->assign('view_show', $viewWhat == ""? 0 : $viewWhat);
 $o_tpl->assign('ugs', $ugs);
 $o_tpl->assign('sort_list', $sort_list);
 $o_tpl->assign('staffid', $staff_id);
@@ -146,7 +162,7 @@ $o_tpl->assign('cdu', $cdu);
 $o_tpl->assign('sdu', $sdu);
 $o_tpl->assign('atopdu', $atopdu);
 $o_tpl->assign('asubdu', $asubdu);
-if ((isset($ugs['todo_visa']) && $ugs['todo_visa']['v'] == 1 && $viewWhat == 'v') || (isset($ugs['todo_course']) && $ugs['todo_course']['v'] == 1 && $viewWhat == 'c')){
+if ((isset($ugs['todo_visa']) && $ugs['todo_visa']['v'] == 1 && $viewWhat == 'v') || (isset($ugs['todo_course']) && $ugs['todo_course']['v'] == 1 && ($viewWhat == 'c' || $viewWhat == 's'))){
 	$o_tpl->assign('slUsers', $o_g->getUserNameArr());
 }else {
 	$o_tpl->assign('slUsers', $o_g->getUserNameArr($staff_id));

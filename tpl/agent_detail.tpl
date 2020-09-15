@@ -12,7 +12,7 @@
 <table align="center" width="100%"  class="graybordertable">
 	<tr align="left"  class="bordered_2">
 		<td colspan="2">
-			<input style="font-weight:bold;" type="button" value="Agent Detail" onClick="javascript:this.form.action='agent_add.php';this.form.submit();">&nbsp;&nbsp;
+			<input style="font-weight:bold;" type="button" value="{if $dt_arr.cate eq 'student'}Assistant{else}Agent{/if} Detail" onClick="javascript:this.form.action='agent_add.php';this.form.submit();">&nbsp;&nbsp;
 			{if $aid > 0 && (($exType eq 'top' && $ugs.a_proc.v eq 1) || ($exType eq 'sub' && $dt_arr.cate eq 'education' && $ugs.ap_pa.v eq 1) || ($exType eq 'sub' && $dt_arr.cate eq "student" && $ugs.aa_pa.v eq 1))}
 			<input style="font-weight:bold;" type="button" value="Process" onClick="javascript:this.form.action='agent_process.php';this.form.submit();">&nbsp;&nbsp;
 			{/if}
@@ -26,7 +26,7 @@
 		</td>
 	</tr>
 	<tr align="center"  class="greybg" >
-		<td class="whitetext" colspan="2">Agent Detail</td>
+		<td class="whitetext" colspan="2">{if $dt_arr.cate eq 'student'}Assistant{else}Agent{/if} Detail</td>
 	</tr>
 	<tr>
 		<td width="58%" align="center"  valign="top">
@@ -40,12 +40,12 @@
                         		<option value="inactive" {if $dt_arr.cate eq "inactive"} selected {/if}>Inactive agent</option>    
                         	{elseif $exType eq 'sub'}
 							    <option value="education" {if $dt_arr.cate eq "education"} selected {/if}>Global Partner</option>
-                        		<option value="student" {if $dt_arr.cate eq "student"} selected {/if}>Global Ambassador</option>  
+                        		<option value="student" {if $dt_arr.cate eq "student"} selected {/if}>Global Assistant</option>  
                         		<option value="inactive" {if $dt_arr.cate eq "inactive"} selected {/if}>Inactive agent</option>    
 							{else}
                         		<option value="education" {if $dt_arr.cate eq "education"} selected {/if}>Education agent</option>
                         		<option value="company" {if $dt_arr.cate eq "company"} selected {/if}>Company agent</option>
-                        		<option value="student" {if $dt_arr.cate eq "student"} selected {/if}>Student ambassador</option>  
+                        		<option value="student" {if $dt_arr.cate eq "student"} selected {/if}>Student Assistant</option>  
                         		<option value="inactive" {if $dt_arr.cate eq "inactive"} selected {/if}>Inactive agent</option>    
                         	{/if}                          
                                                                                   
@@ -82,21 +82,22 @@
 					</td>
 				</tr>						
 				<tr>
-					<td width="12%" height="31" align="left" class="rowodd"><strong>Name:</strong>&nbsp;&nbsp;</td>
+					<td width="12%" height="31" align="left" class="rowodd"><strong>Company Name:</strong>&nbsp;&nbsp;</td>
 					<td align="left" width="88%" class="roweven"><input type="text" style=" width:500px;" name="t_name" value="{$dt_arr.name}"></td>
 				</tr>			
 				<tr>
-					<td width="12%" height="31" align="left" class="rowodd"><strong>Tel:</strong>&nbsp;&nbsp;</td>
+					<td width="12%" height="31" align="left" class="rowodd"><strong>Mobile:</strong>&nbsp;&nbsp;</td>
 					<td align="left" width="88%" class="roweven"><input type="text" name="t_tel" value="{$dt_arr.tel}" size="30"></td>
 				</tr>
 				<tr>
+					<td width="12%" height="31" align="left" class="rowodd"><strong>Wechat ID:</strong>&nbsp;&nbsp;</td>
+					<td align="left" width="88%" class="roweven"><input type="text" name="t_wechatid" value="{$dt_arr.wechatid}" size="30"></td>
+				</tr>
+				<!--
+				<tr>
 					<td width="12%" height="31" align="left" class="rowodd"><strong>Fax:</strong>&nbsp;&nbsp;</td>
 					<td align="left" width="88%" class="roweven"><input type="text" name="t_fax" value="{$dt_arr.fax}" size="30"></td>
-				</tr>
-				<tr>
-					<td width="12%" height="31" align="left" class="rowodd"><strong>Email:</strong>&nbsp;&nbsp;</td>
-					<td align="left" width="88%"  class="roweven"><input type="text" name="t_email" value="{$dt_arr.email}" style=" width:500px;"></td>
-				</tr>								
+				</tr>-->								
 				<tr>
 					<td width="12%" height="30" align="left" class="rowodd"><strong>Web Site:</strong>&nbsp;&nbsp;</td>
 					<td align="left" width="88%" class="roweven"><input type="text" name="t_web" value="{$dt_arr.web}" style=" width:500px;"></td>
@@ -104,6 +105,10 @@
 				<tr>
 					<td width="12%" height="31" align="left"  class="rowodd"><strong>Address:</strong>&nbsp;&nbsp;</td>
 					<td align="left" width="88%" class="roweven"><input type="text" name="t_add" value="{$dt_arr.add}" style=" width:500px;"></td>
+				</tr>
+				<tr> 
+					<td width="12%" height="31" align="left"  class="rowodd">  <strong>State:</strong>&nbsp;&nbsp;</td>
+					<td align="left" width="88%" class="roweven"><input type="text" name="t_state" value="{$dt_arr.state}" style=" width:500px;"></td>
 				</tr>
 				<tr> 
 					<td width="12%" height="31" align="left"  class="rowodd">  <strong>City:</strong>&nbsp;&nbsp;</td>
@@ -126,7 +131,15 @@
 				<tr>
 					<td width="12%" height="31" align="left"  class="rowodd"><strong>Contact:</strong>&nbsp;&nbsp;</td>
 					<td align="left" width="88%" class="roweven"><input type="text" name="t_contact" value="{$dt_arr.contact}" style=" width:500px;"></td>
-				</tr>																
+				</tr>	
+				<tr>
+					<td width="12%" height="31" align="left"  class="rowodd"><strong>Position:</strong>&nbsp;&nbsp;</td>
+					<td align="left" width="88%" class="roweven"><input type="text" name="t_pos" value="{$dt_arr.pos}" style=" width:500px;"></td>
+				</tr>
+				<tr>
+					<td width="12%" height="31" align="left" class="rowodd"><strong>Email:</strong>&nbsp;&nbsp;</td>
+					<td align="left" width="88%"  class="roweven"><input type="text" name="t_email" value="{$dt_arr.email}" style=" width:500px;"></td>
+				</tr>															
 				<tr>
 					<td width="12%" height="30" align="left"  class="rowodd"><strong>Agent Status:</strong>&nbsp;&nbsp;</td>
 					<td align="left" width="81%" class="roweven">

@@ -34,13 +34,13 @@ if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
 		}else{
 			$o_s->setProcess($process_id, $sets);
 		}
-		echo "<script language='javascript'>window.returnValue=1;self.close();</script>";
-		exit;		
+    	echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
+    	exit;    	
 	}
 }elseif(isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "DELETE"){
 	$o_s->delProcess($process_id);	
-	echo "<script language='javascript'>window.returnValue=1;self.close();</script>";
-	exit;
+    	echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
+    	exit;    
 }
 
 

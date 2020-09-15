@@ -23,6 +23,9 @@ class ReportAPI extends MysqlDB {
 		if ($userid > 0){
 			$sql .= " AND b.VUserID = {$userid} "; //(b.AUserID = {$userid} or 
 		}
+        elseif ($userid == -1) {
+            $sql .= " AND b.VUSERID = 0 ";
+        }
 
 		if ($sort_list != ''){
 	        $sql .= " Order by {$sort_list}";
@@ -32,7 +35,7 @@ class ReportAPI extends MysqlDB {
 		}
 		//$sql .= " limit 200 ";
         //$sql .= " LIMIT ".($page - 1)*$page_size .", {$page_size} " 
-
+        //echo $sql."<br/>";
 		$this->query($sql);
 		while ($this->fetch()){
 			$_arr[$this->ID]['name'] = $this->ClientName;
@@ -119,6 +122,7 @@ class ReportAPI extends MysqlDB {
 		
 		if ($null_du)
 			$sql .= " AND a.DueDate <> '0000-00-00' ";	
+        //$sql .= " AND a.DueDate > '0000-00-00' AND a.DueDate <= NOW() + INTERVAL 30 DAY ";  
 
 	    if ($sort_list != ''){
             $sql .= " Order by {$sort_list}";
@@ -184,24 +188,25 @@ class ReportAPI extends MysqlDB {
 
 	function getUrgentInstitute($sort_list, $null_du = 1){
 		$_arr = array();
-		$sql = "select a.ID, a.Subject, a.BeginDate, a.DueDate, a.InstID, b.Name,
+		$sql = "select a.ID, a.Subject, a.BeginDate, a.DueDate, a.InstID, b.Name, if(ic.Category is not null, ic.Category, 'Unkonwn') as cate,
             if(((a.DueDate >= Date(NOW()) and a.DueDate < Date(NOW()) + INTERVAL 7 Day) or a.DueDate < Date(NOW()))and a.DueDate <> '0000-00-00',0,1) as isTodo ,
                  if(a.DueDate = '0000-00-00', '9999-99-99', a.DueDate) as sortdue
-		        from institute_process a, institute b
+		        from institute_process a, institute b left join institute_category ic on (b.CateID = ic.ID)
 				where a.Done = 0 and a.InstID = b.ID 
 				";
 		if ($null_du)
 			$sql .= " AND a.DueDate <> '0000-00-00' ";	
 
 	    if ($sort_list != ''){
-            $sql .= " Order by {$sort_list}";
+            $sql .= " Order by cate asc, {$sort_list}";
         }
         else{
-            $sql .= " Order by sortdue desc, Name asc ";   
+            $sql .= " Order by cate asc,  sortdue desc, Name asc ";   
         }
         //$sql .= " limit 200 ";
 		$this->query($sql);		
 		while ($this->fetch()) {
+            $_arr[$this->ID]['cate'] = $this->cate;
 			$_arr[$this->ID]['school'] = $this->Name;
 			$_arr[$this->ID]['begin'] = $this->BeginDate;
 			$_arr[$this->ID]['due'] = $this->DueDate;
@@ -231,7 +236,8 @@ class ReportAPI extends MysqlDB {
         else{
             $sql .= " Order by sortdue desc, Name asc ";   
         }
-        		
+        
+        //echo $sql."<br/>";
 		//$sql .= " limit 200 ";
 		$this->query($sql);		
 		while ($this->fetch()) {
@@ -245,40 +251,61 @@ class ReportAPI extends MysqlDB {
 		return $_arr;
 	}
 	
-	/*
+
+    function checkYearDob($cid, $year_dob, $user_id) {
+        $sql = "insert ignore into birthday_mention (cid, year_dob, created, user_id) values ('{$cid}', '{$year_dob}', NOW(), '{$user_id}')";
+        return $this->query($sql);
+    }
+	
     function getUrgentService($userid, $sort_list, $null_du=1){
 		$_arr = array();
-    	$sql = "select a.ID, concat(LName, ' ', FName) as ClientName, a.Subject, DueDate, a.Date, a.CID, 
-            if(((a.DueDate >= Date(NOW()) and a.DueDate < Date(NOW()) + INTERVAL 7 Day) or a.DueDate < Date(NOW()))and a.DueDate <> '0000-00-00',0,1) as isTodo,
-                 if(a.DueDate = '0000-00-00', '9999-99-99', a.DueDate) as sortdue
-    				from client_service a, client_info b  
-					where a.Done = 0 and a.CID = b.CID and a.VisaCateID = 0 and VisaSubClassID = 0 ";
-		if ($userid > 0){
-			$sql .= " AND b.CourseUser = {$userid} ";
-		}
-
-		if ($null_du)
-			$sql .= " AND a.DueDate <> '0000-00-00' ";			
-
-        if ($sort_list != ''){
-            $sql .= " Order by {$sort_list}";
-        }
-        else
-            $sql .= " Order by sortdue desc, ClientName asc, Subject asc";   
+        $year = date('Y');
+        $month_day  = date('m-d');
+        $sql = "SELECT CID, DOB, concat(LName, ' ', FName) as ClientName FROM client_info WHERE DOB like '%{$month_day}' order by ClientName";
+        $this->query($sql);
+        while ($this->fetch()) {
+            $_arr[$this->CID]['name'] = $this->ClientName;
+            $_arr[$this->CID]['item']  = "Birthday at {$year}-{$month_day}";
+            $_arr[$this->CID]['begin'] = $year.'-'.$month_day;
+            $_arr[$this->CID]['due']   = $year.'-'.$month_day;
+            $_arr[$this->CID]['clientid'] = $this->CID;
+            $_arr[$this->CID]['isTodo']   = 1;  
         }
 
-		$this->query($sql);
-		while ($this->fetch()){
-			$_arr[$this->ID]['name'] = $this->ClientName;
-			$_arr[$this->ID]['item']  = $this->Subject;
-			$_arr[$this->ID]['begin'] = $this->Date;
-			$_arr[$this->ID]['due']   = $this->DueDate;
-			$_arr[$this->ID]['clientid']   = $this->CID;
-			$_arr[$this->ID]['isTodo']   = $this->isTodo;
-		}
-		return $_arr;
+        if ($userid > 0 && count($_arr) > 0) {
+            $sql = "SELECT distinct CID FROM client_course WHERE ConsultantID = {$userid} and CID in (".implode(',', array_keys($_arr)).")";
+            $this->query($sql);
+            while ($this->fetch()) {
+                $_arr[$this->CID]['keep'] = 1;
+            }
+
+            $sql = "SELECT distinct CID FROM client_visa WHERE AUserID = {$userid} and CID in (".implode(',', array_keys($_arr)).")";
+            $this->query($sql);
+            while ($this->fetch()) {
+                $_arr[$this->CID]['keep'] = 1;
+            }
+
+            foreach ($_arr as $cid => $v) {
+                if (!isset($v['keep']))
+                    unset($_arr[$cid]);
+            }
+        }
+
+        if (count($_arr) > 0) {
+            $sql = "SELECT CID, YEAR_DOB FROM birthday_mention WHERE CID in (".implode(',', array_keys($_arr)).")";
+            $this->query($sql);
+            while ($this->fetch()) {
+                if (isset($_arr[$this->CID]) && $_arr[$this->CID]['due'] == $this->YEAR_DOB)
+                    $_arr[$this->CID]['isTodo'] = 0;
+            }
+        }
+
+
+        return $_arr;
     }	
-	*/
+
+
+	
     function getTodoVisa($userid, $sort_key, $sort_ord){
 		$_arr = array();
 		$condition = "";
@@ -930,6 +957,7 @@ class ReportAPI extends MysqlDB {
         }
 
         $sql .= " Order by wk, Name, a.SEM ";
+        //echo $sql."\n";
 		$this->query($sql);
 		$_arr = array();
 		$i = $rcomm = $bonus = 0;
@@ -2066,7 +2094,7 @@ class ReportAPI extends MysqlDB {
 				left join client_course_sem_process d on(c.ID = d.SemID and d.KeyPoint <> '' and Done = 0) 
 				where d.ID is not null and a.ClientType like '%study%' and c.StartDate <= NOW()"; //a.CID in ($id_str) and 
 		if ($userid > 0) {
-			$sql .= " AND a.CourseUser = {$userid} ";
+			$sql .= " AND b.ConsultantID = {$userid} ";
 		}
 		
 		$sql .= " Order by Name asc ";//d.OrderID
@@ -2092,7 +2120,7 @@ class ReportAPI extends MysqlDB {
 				left join client_course_sem_process d on(c.ID = d.SemID and d.KeyPoint <> '' and Done = 0) 
 				where d.ID is not null and a.ClientType like '%study%' and c.StartDate <= NOW()"; //a.CID in ($id_str) and 
 		if ($userid > 0) {
-			$sql .= " AND a.CourseUser = {$userid} ";
+			$sql .= " AND b.ConsultantID = {$userid} ";
 		}
 		
 		$sql .= " Order by d.OrderID asc ";
@@ -2112,7 +2140,7 @@ class ReportAPI extends MysqlDB {
                 left join agent ag on (ag.ID = b.AgentID and ag.Form = 'top')
                 where d.ID is not null and a.ClientType like '%study%' and c.StartDate <= NOW() and b.AgentID > 0 "; //a.CID in ($id_str) and 
         if ($userid > 0) {
-            $sql .= " AND a.CourseUser = {$userid} ";
+            $sql .= " AND b.ConsultantID = {$userid} ";
         }
         
         $sql .= " Order by NameAgent asc, Name asc ";//d.OrderID
@@ -2140,10 +2168,104 @@ class ReportAPI extends MysqlDB {
                 left join agent ag on (ag.ID = b.AgentID and ag.Form = 'top')
                 where d.ID is not null and a.ClientType like '%study%' and c.StartDate <= NOW() and b.AgentID > 0"; //a.CID in ($id_str) and 
         if ($userid > 0) {
-            $sql .= " AND a.CourseUser = {$userid} ";
+            $sql .= " AND b.ConsultantID = {$userid} ";
         }
         
         $sql .= " Order by d.OrderID asc ";
+        $this->query($sql);//echo $sql."<p/>";
+        while ($this->fetch() && $this->cnt > 0) {
+            return $this->cnt;
+        }
+        return 0;
+    }
+
+
+    function getCommissionBySchool($userid, $page=0, $page_size=0){
+        $sql = "select concat(LName, ' ', FName) as Name, if(i.Name is null, '*n/a', i.Name) as NameSchool, b.IID, a.CID, b.ID as CourseID, c.ID as SemID, d.Detail, d.KeyPoint from client_info a 
+                left join client_course b on(a.CID = b.CID)
+                left join client_course_sem c on(b.ID = c.CCID) 
+                left join client_course_sem_process d on(c.ID = d.SemID and d.KeyPoint <> '' and Done = 0) 
+                left join institute i on (b.iid = i.id) 
+                where d.ID is not null and a.ClientType like '%study%' and c.StartDate <= NOW() and b.IID > 0 "; //a.CID in ($id_str) and 
+        if ($userid > 0) {
+            $sql .= " AND b.ConsultantID = {$userid} ";
+        }
+        
+        $sql .= " Order by NameSchool asc, Name asc ";//d.OrderID
+        
+        if ($page > 0 && $page_size > 0) {
+            $sql .= " Limit ".($page-1)*$page_size.", ".$page_size;
+        }       
+        $_arr = array();
+        $this->query($sql);//echo $sql."<p/>";
+        while ($this->fetch()) {
+            $_arr[$this->IID]['name'] = $this->NameSchool;
+            $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['desc'] = $this->Detail;
+            $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['key'] = $this->KeyPoint;
+            $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['cid'] = $this->CID;
+            $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['client'] = $this->Name;
+        }
+        return $_arr;
+    }
+    
+    function getNumOfCommissionsBySchool($userid){
+        $sql = "select count(*) as cnt from client_info a 
+                left join client_course b on(a.CID = b.CID) 
+                left join client_course_sem c on(b.ID = c.CCID) 
+                left join client_course_sem_process d on(c.ID = d.SemID and d.KeyPoint <> '' and Done = 0) 
+                left join institute i on (b.iid = i.id) 
+                where d.ID is not null and a.ClientType like '%study%' and c.StartDate <= NOW() and b.IID > 0"; //a.CID in ($id_str) and 
+        if ($userid > 0) {
+            $sql .= " AND b.ConsultantID = {$userid} ";
+        }
+        
+        $this->query($sql);//echo $sql."<p/>";
+        while ($this->fetch() && $this->cnt > 0) {
+            return $this->cnt;
+        }
+        return 0;
+    }
+
+
+    function getCommissionByAccount($userid, $page=0, $page_size=0){
+        $sql = "select concat(LName, ' ', FName) as Name, if(i.Name is null, '*n/a', i.Name) as NameSchool, b.IID, a.CID, b.ID as CourseID, c.ID as SemID, d.Subject, d.KeyPoint from client_info a 
+                left join client_course b on(a.CID = b.CID)
+                left join client_course_sem c on(b.ID = c.CCID) 
+                left join client_course_sem_process d on(c.ID = d.SemID and d.KeyPoint = '' and Done = 0) 
+                left join institute i on (b.iid = i.id) 
+                where d.ID is not null and a.ClientType like '%study%' and c.StartDate <= NOW() and b.IID > 0 and d.KeyPoint = '' "; //a.CID in ($id_str) and 
+        if ($userid > 0) {
+            $sql .= " AND b.ConsultantID = {$userid} ";
+        }
+        
+        $sql .= " Order by NameSchool asc, Name asc ";//d.OrderID
+        
+        if ($page > 0 && $page_size > 0) {
+            $sql .= " Limit ".($page-1)*$page_size.", ".$page_size;
+        }       
+        $_arr = array();
+        $this->query($sql);//echo $sql."<p/>";
+        while ($this->fetch()) {
+            $_arr[$this->IID]['name'] = $this->NameSchool;
+            $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['desc'] = $this->Subject;
+            $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['key'] = $this->KeyPoint;
+            $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['cid'] = $this->CID;
+            $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['client'] = $this->Name;
+        }
+        return $_arr;
+    }
+    
+    function getNumOfCommissionsByAccount($userid){
+        $sql = "select count(*) as cnt from client_info a 
+                left join client_course b on(a.CID = b.CID) 
+                left join client_course_sem c on(b.ID = c.CCID) 
+                left join client_course_sem_process d on(c.ID = d.SemID and d.KeyPoint = '' and Done = 0) 
+                left join institute i on (b.iid = i.id) 
+                where d.ID is not null and a.ClientType like '%study%' and c.StartDate <= NOW() and b.IID > 0 and d.KeyPoint = ''"; //a.CID in ($id_str) and 
+        if ($userid > 0) {
+            $sql .= " AND b.ConsultantID = {$userid} ";
+        }
+        
         $this->query($sql);//echo $sql."<p/>";
         while ($this->fetch() && $this->cnt > 0) {
             return $this->cnt;
@@ -2158,11 +2280,11 @@ class ReportAPI extends MysqlDB {
 				left join client_course_sem_process d on(c.ID = d.SemID and d.subject like 'AUTO: Course Started%' and done = 1) 
 				where d.id is not null and  (a.ClientType = 'Study' or ClientType = 'all') and c.StartDate <= NOW() AND LName like 'SUB%' AND (RedDate is not null and RedDate != '0000-00-00') AND (CoDate is null or CoDate = '0000-00-00') "; //a.CID in ($id_str) and   d.ID is not null and
 		 */
-		$sql = "SELECT  a.AgentID, concat(LName, ' ', FName) as Name, a.CID, b.ID as CourseID, c.ID as SemID, d.NAME AS SchoolName, c.SEM, RedDate, IF(NotifyDate is null or NotifyDate = '0000-00-00','', NotifyDate) as NotifyDate, DoB  
+		$sql = "SELECT  a.AgentID, concat(LName, ' ', FName) as Name, a.CID, b.ID as CourseID, c.ID as SemID, d.NAME AS SchoolName, c.SEM, RedDate, IF(NotifyDate is null or NotifyDate = '0000-00-00','', NotifyDate) as NotifyDate, DoB, c.CoComm  
 				FROM client_info a, client_course b, client_course_sem c, institute d 
 				WHERE a.CID = b.CID AND b.ID = c.CCID AND b.IID = d.ID AND a.ClientType like '%study%' and c.StartDate <= NOW() AND LName like 'SUB%' AND (RedDate is not null and RedDate != '0000-00-00') AND (CoDate is null or CoDate = '0000-00-00') ";
 		if ($userid > 0) {
-			$sql .= " AND a.CourseUser = {$userid} ";
+			$sql .= " AND b.ConsultantID = {$userid} ";
 		}
 		
 		$sql .= " Order by Name asc ";//d.OrderID
@@ -2177,9 +2299,9 @@ class ReportAPI extends MysqlDB {
 			$_arr[$this->AgentID][$this->CID]['dob' ] = $this->DoB;			
 
 			if ($this->NotifyDate != '') 
-				$_arr[$this->AgentID][$this->CID]['course'][$this->CourseID][$this->SemID]['desc'] = "SEM *{$this->SEM}: in {$this->SchoolName} co-com notify date {$this->NotifyDate}";
+				$_arr[$this->AgentID][$this->CID]['course'][$this->CourseID][$this->SemID]['desc'] = "SEM *{$this->SEM}: in {$this->SchoolName} co-com notify date {$this->NotifyDate}, Co-Comm: {$this->CoComm}";
 			else
-				$_arr[$this->AgentID][$this->CID]['course'][$this->CourseID][$this->SemID]['desc'] = "SEM *{$this->SEM}: in {$this->SchoolName} Commission Received {$this->RedDate}";
+				$_arr[$this->AgentID][$this->CID]['course'][$this->CourseID][$this->SemID]['desc'] = "SEM *{$this->SEM}: in {$this->SchoolName} Commission Received {$this->RedDate}, Co-Comm: {$this->CoComm}";
 
 			$_arr[$this->AgentID][$this->CID]['course'][$this->CourseID][$this->SemID]['date'] = $this->NotifyDate;
 		}
@@ -2190,7 +2312,7 @@ class ReportAPI extends MysqlDB {
 		$sql = "select count(*) as cnt FROM client_info a, client_course b, client_course_sem c, institute d 
 				WHERE a.CID = b.CID AND b.ID = c.CCID AND b.IID = d.ID AND a.ClientType like '%study%' and c.StartDate <= NOW() AND LName like 'SUB%' AND (RedDate is not null and RedDate != '0000-00-00') AND (CoDate is null or CoDate = '0000-00-00') "; //a.CID in ($id_str) and 
 		if ($userid > 0) {
-			$sql .= " AND a.CourseUser = {$userid} ";
+			$sql .= " AND b.ConsultantID = {$userid} ";
 		}
 		
 		$this->query($sql);//echo $sql."<p/>";
@@ -2491,6 +2613,44 @@ class ReportAPI extends MysqlDB {
         	
         }
         return $_arr;
+    }
+
+    function getStaffArchive($staff_id, $rpt_type) {
+        $sql = "SELECT * FROM report_staff where staff_id = '{$staff_id}' and rpt_type = '{$rpt_type}' ";
+
+        $this->query($sql);
+        $rtn = array();
+        while($this->fetch()) {
+            $rtn = json_decode($this->filtering, true);
+
+            $rtn['courses'] = json_decode($this->courses, true);
+            $rtn['courseprocs'] = json_decode($this->courseprocs, true);
+            $rtn['coursesems'] = json_decode($this->coursesems, true);
+            $rtn['coursepots'] = json_decode($this->coursepots, true);
+            $rtn['visaagrees'] = json_decode($this->visaagrees, true);
+            $rtn['visaprocs'] = json_decode($this->visaprocs, true);
+            $rtn['visavisits'] = json_decode($this->visavisits, true);
+            $rtn['homeloan'] = json_decode($this->homeloan, true);
+            $rtn['homeloan_fee'] = json_decode($this->homeloan_fee, true);
+        }
+
+        return $rtn;
+    }
+
+    function doStaffArchive($staff_id, $rpt_type, $filter, $courses, $courseprocs, $coursesems, $coursepots, $visaagrees, $visaprocs, $visavisits, $homeloan, $homeloan_fee) {
+        $courses = addslashes(json_encode($courses));
+        $courseprocs = addslashes(json_encode($courseprocs));
+        $coursesems = addslashes(json_encode($coursesems));
+        $coursepots = addslashes(json_encode($coursepots));
+        $visaagrees = addslashes(json_encode($visaagrees));
+        $visaprocs = addslashes(json_encode($visaprocs));
+        $visavisits = addslashes(json_encode($visavisits));
+        $homeloan = addslashes(json_encode($homeloan));
+        $homeloan_fee = addslashes(json_encode($homeloan_fee));
+        $filter = addslashes(json_encode($filter));
+
+        $sql = "replace into report_staff (staff_id,rpt_type, filtering,courses,courseprocs,coursesems,coursepots,visaagrees,visaprocs,visavisits,homeloan,homeloan_fee) values ('{$staff_id}', '{$rpt_type}', '{$filter}', '{$courses}','{$courseprocs}','{$coursesems}','{$coursepots}','{$visaagrees}','{$visaprocs}','{$visavisits}','{$homeloan}','{$homeloan_fee}') ";
+	   return $this->query($sql);
     }    		
 }
 ?>

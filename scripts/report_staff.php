@@ -5,7 +5,7 @@ require_once(__LIB_PATH.'Report.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
 ini_set("display_errors", 1);
 error_reporting(2047);
-
+set_time_limit(0);
 
 # check valid user
 $user_id = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
@@ -44,8 +44,20 @@ $coursepots = array();
 $visapaids = array();
 $homeloan  = array();
 $homeloan_fee  = array();
+
+$from_archive = false;
+
 if ($from_day != "" && $to_day != "" && $is_all != "") {
-	#format date range
+
+	//Check archive
+	$archive = $o_r->getStaffArchive($staff_id, $is_all);
+	if (count($archive) > 0) {
+		$from_archive = true;
+		$is_all   = $archive['is_all'];
+		$from_day = $archive['from_day'];
+		$to_day   = $archive['to_day'];
+	}
+	
 	if ($is_all == "d") {
 			
 		$weeks   = array();
@@ -67,18 +79,31 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
 			$weeks[$wk] = $_begin .'~'. $_end;
 		}
 		
-	
-		$courses    = $o_r->getNumOfCourseClientByUser($from_day, $to_day, $staff_id);
-		$courseprocs= $o_r->getNumOfCourseProcessByUser($from_day, $to_day, $staff_id);
-		$coursesems = $o_r->getAmountOfCourseCommByUser($from_day, $to_day, $staff_id);
-   		$coursepots = $o_r->getAmountOfCoursePotCommByUser($from_day, $to_day, $staff_id);
-		$visaagrees = $o_r->getNumOfAgreementByUser($from_day, $to_day, $staff_id);	
-		$visaprocs  = $o_r->getNumOfVisaProcByUser($from_day, $to_day, $staff_id);
-		//$visapaids  = $o_r->getAmountofVisaByUser($from_day, $to_day, $staff_id);
-		$visavisits = $o_r->getNumOfVisitByUser($from_day, $to_day, $staff_id);
-		$homeloan   = $o_r->getNumOfHomeLoan($from_day, $to_day, $staff_id);
-		$homeloan_fee   = $o_r->getNumOfHomeLoanFee($from_day, $to_day, $staff_id);
-	
+		if (count($archive) > 0) {
+			$courses    = $archive['courses'];
+			$courseprocs= $archive['courseprocs'];
+			$coursesems = $archive['coursesems'];
+	   		$coursepots = $archive['coursepots'];
+			$visaagrees = $archive['visaagrees'];
+			$visaprocs  = $archive['visaprocs'];
+			//$visapaids  = $o_r->getAmountofVisaByUser($from_day, $to_day, $staff_id);
+			$visavisits = $archive['visavisits'];
+			$homeloan   = $archive['homeloan'];
+			$homeloan_fee   = $archive['homeloan_fee'];	
+		}
+		else {
+
+			$courses    = $o_r->getNumOfCourseClientByUser($from_day, $to_day, $staff_id);
+			$courseprocs= $o_r->getNumOfCourseProcessByUser($from_day, $to_day, $staff_id);
+			$coursesems = $o_r->getAmountOfCourseCommByUser($from_day, $to_day, $staff_id);
+	   		$coursepots = $o_r->getAmountOfCoursePotCommByUser($from_day, $to_day, $staff_id);
+			$visaagrees = $o_r->getNumOfAgreementByUser($from_day, $to_day, $staff_id);	
+			$visaprocs  = $o_r->getNumOfVisaProcByUser($from_day, $to_day, $staff_id);
+			//$visapaids  = $o_r->getAmountofVisaByUser($from_day, $to_day, $staff_id);
+			$visavisits = $o_r->getNumOfVisitByUser($from_day, $to_day, $staff_id);
+			$homeloan   = $o_r->getNumOfHomeLoan($from_day, $to_day, $staff_id);
+			$homeloan_fee   = $o_r->getNumOfHomeLoanFee($from_day, $to_day, $staff_id);
+		}
 	}
 	elseif($is_all == "s"){
 		//cal weeks
@@ -95,17 +120,39 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
 		}
 
 		$weeks['all'] = $from_day ."~". $to_day ." ({$w} weeks)";
-		$courses    = $o_r->getAllOfCourseClientByUser($from_day, $to_day, $staff_id);
-		$courseprocs= $o_r->getAllOfCourseProcessByUser($from_day, $to_day, $staff_id);
-        $coursesems = $o_r->getAllOfCourseCommByUser($from_day, $to_day, $staff_id);
-        $coursepots = $o_r->getAllOfCoursePotCommByUser($from_day, $to_day, $staff_id);
-		$visaagrees = $o_r->getAllOfAgreementByUser($from_day, $to_day, $staff_id);	
-		$visaprocs  = $o_r->getAllOfVisaProcByUser($from_day, $to_day, $staff_id);
-		//$visapaids  = $o_r->getTotalAmountofVisaByUser($from_day, $to_day, $staff_id);
-		$visavisits = $o_r->getAllOfVisitByUser($from_day, $to_day, $staff_id);
-		$homeloan   = $o_r->getAllOfHomeLoan($from_day, $to_day, $staff_id);		
-		$homeloan_fee   = $o_r->getAllOfHomeLoanFee($from_day, $to_day, $staff_id);	
+
+		if (count($archive) > 0) {
+			$courses    = $archive['courses'];
+			$courseprocs= $archive['courseprocs'];
+			$coursesems = $archive['coursesems'];
+	   		$coursepots = $archive['coursepots'];
+			$visaagrees = $archive['visaagrees'];
+			$visaprocs  = $archive['visaprocs'];
+			//$visapaids  = $o_r->getAmountofVisaByUser($from_day, $to_day, $staff_id);
+			$visavisits = $archive['visavisits'];
+			$homeloan   = $archive['homeloan'];
+			$homeloan_fee   = $archive['homeloan_fee'];	
+		}
+		else {
+			$courses    = $o_r->getAllOfCourseClientByUser($from_day, $to_day, $staff_id);
+			$courseprocs= $o_r->getAllOfCourseProcessByUser($from_day, $to_day, $staff_id);
+	        $coursesems = $o_r->getAllOfCourseCommByUser($from_day, $to_day, $staff_id);
+	        $coursepots = $o_r->getAllOfCoursePotCommByUser($from_day, $to_day, $staff_id);
+			$visaagrees = $o_r->getAllOfAgreementByUser($from_day, $to_day, $staff_id);	
+			$visaprocs  = $o_r->getAllOfVisaProcByUser($from_day, $to_day, $staff_id);
+			//$visapaids  = $o_r->getTotalAmountofVisaByUser($from_day, $to_day, $staff_id);
+			$visavisits = $o_r->getAllOfVisitByUser($from_day, $to_day, $staff_id);
+			$homeloan   = $o_r->getAllOfHomeLoan($from_day, $to_day, $staff_id);		
+			$homeloan_fee   = $o_r->getAllOfHomeLoanFee($from_day, $to_day, $staff_id);	
+		}
 	}
+
+	if (isset($_POST['bt_archive']) && $_POST['bt_archive'] == 'archive report' && !$from_archive) {
+		$filter = array('is_all'=>$is_all, 'from_day'=>$from_day, 'to_day'=>$to_day);
+		$o_r->doStaffArchive($staff_id, $is_all, $filter, $courses, $courseprocs, $coursesems, $coursepots, $visaagrees, $visaprocs, $visavisits, $homeloan, $homeloan_fee);
+	}
+
+
 }
 
 # set smarty tpl
@@ -125,6 +172,8 @@ $o_tpl->assign('fromDay', $from_day);
 $o_tpl->assign('toDay', $to_day);
 $o_tpl->assign('staffid', $staff_id);
 $o_tpl->assign('isAll', $is_all);
+$o_tpl->assign('from_archive', $from_archive);
+
 
 # get user position
 if (isset($ugs['rpt_staff']) && $ugs['rpt_staff']['v'] == 1){

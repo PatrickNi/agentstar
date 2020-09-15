@@ -5,52 +5,77 @@
 </head>
 <link rel="stylesheet" href="../css/sam.css">
 <script language="javascript" src="../js/RolloverTable.js"></script>
+<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
 <script language="javascript" src="../js/audit.js"></script>
 {literal}
 <script language="javascript">
-function setSortOrd(col, ord){
-     var cols = document.getElementById('sort_list').value;
-//	 alert(cols);
-	 if(cols == ''){
-	 	document.getElementById('sort_list').value = col+':'+ord;
-//		alert('N1=>'+document.getElementById('sort_list').value);
-	 }
-	 else {
-	 	var flag = false;
-		var colarr = cols.split('|');
-		for(var i=0; i<colarr.length; i++){
-			var co = colarr[i].split(':');
-			if(co.length == 2 && col == co[0]){
-				colarr[i] = col+':'+ord;
-				flag = true;
+	function setSortOrd(col, ord){
+	     var cols = document.getElementById('sort_list').value;
+	//	 alert(cols);
+		 if(cols == ''){
+		 	document.getElementById('sort_list').value = col+':'+ord;
+	//		alert('N1=>'+document.getElementById('sort_list').value);
+		 }
+		 else {
+		 	var flag = false;
+			var colarr = cols.split('|');
+			for(var i=0; i<colarr.length; i++){
+				var co = colarr[i].split(':');
+				if(co.length == 2 && col == co[0]){
+					colarr[i] = col+':'+ord;
+					flag = true;
+				}
 			}
+			if(!flag){
+			   colarr[i] = col+':'+ord;
+			}
+			
+		 	document.getElementById('sort_list').value = colarr.join('|');
+	//		alert('N2=>'+document.getElementById('sort_list').value);
+			
+		 }
+	}
+
+	function trigger_list(view_mod,obj,view_id) {
+		if (document.getElementById('view_show').value == view_mod) {
+			document.getElementById('view_show').value = '';
+			$('#'+view_id).css('visibility','collapse');
+
 		}
-		if(!flag){
-		   colarr[i] = col+':'+ord;
-		}
-		
-	 	document.getElementById('sort_list').value = colarr.join('|');
-//		alert('N2=>'+document.getElementById('sort_list').value);
-		
-	 }
-}
+		else {
+			document.getElementById('sort_list').value='';
+			document.getElementById('t_view').value=view_mod;
+			obj.submit();
+		}	
+	}
+
+	function birthday_done(cid, dob,obj) {
+		 $.post('/scripts/urgent_review.php', '&act=check_dob&cid='+cid+'&dob='+dob, function(data){
+            rtn = $.parseJSON(data);
+            if(rtn.succ==1) {
+            	$(obj).remove();
+            }
+        });
+	}
 </script>
 {/literal}
 <body>
 <form name="form1" id="form1" target="_self">
 <input type="hidden" id="t_view" name="t_view" value="">
 <input type="hidden" id="sort_list" name="sort_list" value="{$sort_list}">
+<input type="hidden" id="view_show" value="{$view_show}">
+
 <table align="center" width="100%"  class="graybordertable" cellpadding="1" cellspacing="1" border="0">
 	<tr><td align="center" class="title" style="font-size:14px; padding:3">
 		Urgent List&nbsp;&nbsp;&nbsp;&nbsp;
 	   <!--<input type="button" style="font-weight:bold" onClick="printPage();"value="Print">-->
 	</td></tr>
 	{if $ugs.v_service.v eq 1}
-	<tr><td class="menu"  align="left" style="cursor:pointer" onClick="document.getElementById('sort_list').value='';document.getElementById('t_view').value='v';form1.submit();">
+	<tr><td class="menu"  align="left" style="cursor:pointer" onClick="trigger_list('v',form1,'view_v');">
     		Visa List&nbsp;&nbsp;
       </td></tr>
 	{if $viewWhat eq 'v'}
-	<tr><td>
+	<tr id="view_v"><td>
 			<table width="100%" cellpadding="1" cellspacing="1" border="0">
 				<tr align="center" class="title">
 					<td width="5%">
@@ -60,6 +85,7 @@ function setSortOrd(col, ord){
                         {/foreach}
                         {if $ugs.todo_visa.v eq 1}				
                           <option value="0" {if $staffid eq '0'} selected {/if}>All Staff</option>  
+                           <option value="-1" {if $staffid eq '-1'} selected {/if}>Unassigned</option>  
                         {/if}		
                     </select>
                     </td>
@@ -99,11 +125,11 @@ function setSortOrd(col, ord){
 			</table>
 	</td></tr>{/if}
 
-	<tr><td class="menu"  align="left" style="cursor:pointer" onClick="document.getElementById('sort_list').value='';document.getElementById('t_view').value='vm';form1.submit();">
+	<tr><td class="menu"  align="left" style="cursor:pointer" onClick="trigger_list('vm',form1,'view_vm');">
     		Verify Migration Course List&nbsp;&nbsp;
       </td></tr>
 	{if $viewWhat eq 'vm'}
-	<tr><td>
+	<tr id="view_vm"><td>
 			<table width="100%" cellpadding="1" cellspacing="1" border="0">
 				<tr align="left" class="title">
 					<td colspan="6">
@@ -159,9 +185,9 @@ function setSortOrd(col, ord){
 
 	{/if}	
 	{if $ugs.c_service.v eq 1}
-	<tr><td class="menu"  align="left" style="cursor:pointer" onClick="document.getElementById('sort_list').value='';document.getElementById('t_view').value='c';form1.submit();">Course List&nbsp;&nbsp;</td></tr>
+	<tr><td class="menu"  align="left" style="cursor:pointer" onClick="trigger_list('c',form1,'view_c');">Course List&nbsp;&nbsp;</td></tr>
 	{if $viewWhat eq 'c'}
-	<tr><td>
+	<tr id="view_c"><td>
 			<table width="100%" cellpadding="1" cellspacing="1" border="0">
 				<tr align="left" class="title">
 					<td colspan="6">
@@ -215,12 +241,13 @@ function setSortOrd(col, ord){
 			</table>
 	</td></tr>{/if}{/if}
 	{if $ugs.i_proc.v eq 1}	
-	<tr><td class="menu"  align="left" style="cursor:pointer" onClick="document.getElementById('sort_list').value='';document.getElementById('t_view').value='i';form1.submit();">Institute List&nbsp;&nbsp;</td></tr>
+	<tr><td class="menu"  align="left" style="cursor:pointer" onClick="trigger_list('i',form1,'view_i');">Institute List&nbsp;&nbsp;</td></tr>
 	{if $viewWhat eq 'i'}
-	<tr><td>
+	<tr id="view_i"><td>
 			<table width="100%" cellpadding="1" cellspacing="1" border="0">
 				<tr align="center" class="title">
 					<td width="2%">&nbsp;</td>
+					<td align="left">Category</td>
 					<td align="left" nowrap="nowrap">Institute&nbsp;&nbsp;
 						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="t_view.value='i';setSortOrd(1,0);form1.submit();"/>&nbsp;&nbsp;
 						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="t_view.value='i';setSortOrd(1,1);form1.submit();"/>										
@@ -238,6 +265,7 @@ function setSortOrd(col, ord){
 				 {foreach key=id item=arr from=$urgent_arr}
 				 <tr align="center" class="{cycle values='rowodd,roweven'}">
 				 	<td width="2%"><input type="checkbox"></td>
+					<td align="left" width="10%" >{$arr.cate}</td>
 					<td align="left" >{$arr.school}</td>
 					<td align="left" style="cursor:pointer; text-decoration:underline" onClick="window.open('institute_process.php?sid={$arr.iid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$arr.item}</td>
 					<td nowrap="nowrap" {if $arr.isTodo neq 1}style="color:#660000; font-weight:bold"{/if}>{$arr.due}</td>
@@ -246,9 +274,9 @@ function setSortOrd(col, ord){
 			</table>	
 	</td></tr>{/if}{/if}
 	{if $ugs.a_service.v eq 1}
-	<tr><td class="menu"  align="left" style="cursor:pointer" onClick="t_view.value='asub';sort_list.valaue='';form1.submit();">Sub Agent List&nbsp;&nbsp;</td></tr>		
+	<tr><td class="menu"  align="left" style="cursor:pointer" onClick="trigger_list('asub',form1,'view_asub');">Sub Agent List&nbsp;&nbsp;</td></tr>		
 	{if $viewWhat eq 'asub'}
-	<tr><td>
+	<tr id="view_asub"><td>
 			<table width="100%" cellpadding="1" cellspacing="1" border="0">
 				<tr align="center" class="title">
 					<td width="2%">&nbsp;</td>
@@ -277,9 +305,9 @@ function setSortOrd(col, ord){
 			</table>
 	</td></tr>{/if}	
 
-	<tr><td class="menu"  align="left" style="cursor:pointer" onClick="t_view.value='atop';sort_list.valaue='';form1.submit();">Top Agent List&nbsp;&nbsp;</td></tr>		
+	<tr><td class="menu"  align="left" style="cursor:pointer" onClick="trigger_list('atop',form1,'view_atop')">Top Agent List&nbsp;&nbsp;</td></tr>		
 	{if $viewWhat eq 'atop'}
-	<tr><td>
+	<tr id="view_atop"><td>
 			<table width="100%" cellpadding="1" cellspacing="1" border="0">
 				<tr align="center" class="title">
 					<td width="2%">&nbsp;</td>
@@ -312,25 +340,32 @@ function setSortOrd(col, ord){
 
 	{/if}
 	{if $ugs.b_service.v eq 1}
-	<tr><td class="menu"  align="left" style="cursor:pointer" onClick="t_view.value='s';sort_list.value='';form1.submit();">Services List&nbsp;&nbsp;</td></tr>
+	<tr><td class="menu"  align="left" style="cursor:pointer" onClick="trigger_list('s',form1,'view_s')">Birthday List&nbsp;&nbsp;</td></tr>
 	{if $viewWhat eq 's'}
-	<tr><td>
+	<tr id="view_s"><td>
 			<table width="100%" cellpadding="1" cellspacing="1" border="0">
+				<tr align="left" class="title">
+					<td colspan="6">
+              	        <select name="cUid" onChange="sort_list.value='';t_view.value='s';form1.submit();">
+                        {foreach key=user_id item=user_name from=$slUsers}
+                          	<option value="{$user_id}" {if $staffid eq $user_id} selected {/if}>{$user_name}</option>  
+                        {/foreach}                    			          
+                        {if $ugs.todo_course.v eq 1}			
+                          <option value="0" {if $staffid eq '0'} selected {/if}>All Staff</option>  
+                        {/if}	            		
+                    </select>
+                    </td>
+                 </tr>
 				<tr align="center" class="title">
 					<td width="2%">&nbsp;</td>
-					<td align="left" nowrap="nowrap">ClientName&nbsp;&nbsp;
-						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="t_view.value='s';setSortOrd(1,0);form1.submit();"/>&nbsp;&nbsp;
-						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="t_view.value='s';setSortOrd(1,1);form1.submit();"/>																	
+					<td align="left" nowrap="nowrap">ClientName															
 					</td>	
-					<td align="left"nowrap="nowrap" width="40%">Process&nbsp;&nbsp;
-						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="t_view.value='s';setSortOrd(2,0);form1.submit();"/>&nbsp;&nbsp;
-						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="t_view.value='s';setSortOrd(2,1);form1.submit();"/>																				
+					<td align="left"nowrap="nowrap" width="40%">Process
+																									
 					</td>
-					<td nowrap="nowrap">Due Date&nbsp;&nbsp;
-						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="t_view.value='s';setSortOrd(3,0);form1.submit();"/>&nbsp;&nbsp;
-						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="t_view.value='s';setSortOrd(3,1);form1.submit();"/>			
-						<br/><input type="checkbox" name="sdu" value="1" {if $sdu eq 1} checked {/if} onChange="t_view.value='v';form1.submit()"/> ex(0000-00-00)																							
+					<td nowrap="nowrap">Due Date
 					</td>
+					<td>Link</td>
 				</tr>
 				 {foreach key=id item=arr from=$urgent_arr}
 				 <tr align="center" class="{cycle values='rowodd,roweven'}">
@@ -339,6 +374,7 @@ function setSortOrd(col, ord){
 					<!--onClick="openModel('institute_process.php?pid={$id}&cid={$arr.clientid}&courseid={$arr.courseid}',700,400,'NO', 'form1')"-->
 					<td align="left" style="cursor:pointer; text-decoration:underline" onClick="openClientPage({$arr.clientid});window.open('redir.php?t=ser&pid={$id}&cid={$arr.clientid}','','height='+screen.width*3/5+','+'width='+screen.width*4/5)">{$arr.item}</td>
 					<td nowrap="nowrap" {if $arr.isTodo neq 1}style="color:#660000; font-weight:bold"{/if}>{$arr.due}</td>
+					<td>{if $arr.isTodo eq 1}<input type="button" value="Done" onClick="birthday_done('{$arr.clientid}','{$arr.due}', this)">{/if}</td>
 				 </tr>
 				 {/foreach}
 			</table>					

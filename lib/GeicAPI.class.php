@@ -154,7 +154,7 @@ class GeicAPI extends MysqlDB {
 
 
 	function getUserList($rUserID=0){
-		$sql = "Select ID, UserName, UserPassword, Position, Email, Mobile, Telephone, Address, Mark, Advance, StartDate from sys_user";
+		$sql = "Select ID, UserName, UserPassword, Position, Email, Mobile, Telephone, Address, Mark, Advance, StartDate, LeaveDate from sys_user";
 		if($rUserID > 0){
 			$sql .= " Where ID = {$rUserID}";
 		}
@@ -171,6 +171,7 @@ class GeicAPI extends MysqlDB {
 			$_arr[$this->ID]['add']    = $this->Address;
 			$_arr[$this->ID]['adv']    = $this->Advance;
 			$_arr[$this->ID]['startdate']    = $this->StartDate;
+            $_arr[$this->ID]['leavedate']    = $this->LeaveDate;
 		}
 		return $_arr;
 	}
@@ -225,7 +226,7 @@ class GeicAPI extends MysqlDB {
     }
     
     	
-    function addUser($rName, $rPassword, $rEmail, $rMobile, $rPhone, $rAddress, $rPosition, $rMark, $rAdv, $rStartDate){
+    function addUser($rName, $rPassword, $rEmail, $rMobile, $rPhone, $rAddress, $rPosition, $rMark, $rAdv, $rStartDate, $rLeaveDate){
     	if($this->checkUser($rName)){
     		return false;
     	}
@@ -238,12 +239,13 @@ class GeicAPI extends MysqlDB {
     	$rMobile 	= addslashes($rMobile);
     	$rAddress 	= addslashes($rAddress);
     	$rStartDate = addslashes($rStartDate);
-		$sql = "insert into `sys_user`(UserName, UserPassword, Position, Email, Mobile, Telephone, Address, Mark, Advance, StartDate)values ('{$rName}', '{$rPassword}', '{$rPosition}', '{$rEmail}', '{$rMobile}', '{$rPhone}', '{$rAddress}', '{$rMark}', '{$rAdv}', '{$rStartDate}')";
+        $rLeaveDate = addslashes($rLeaveDate);
+		$sql = "insert into `sys_user`(UserName, UserPassword, Position, Email, Mobile, Telephone, Address, Mark, Advance, StartDate)values ('{$rName}', '{$rPassword}', '{$rPosition}', '{$rEmail}', '{$rMobile}', '{$rPhone}', '{$rAddress}', '{$rMark}', '{$rAdv}', '{$rStartDate}', '{$rLeaveDate}')";
  		return $this->query($sql);
  	}
  	
 
-	function setUser($rUserID, $rName, $rPassword, $rEmail, $rMobile, $rPhone, $rAddress, $rPosition, $rMark, $rAdv, $rStartDate){
+	function setUser($rUserID, $rName, $rPassword, $rEmail, $rMobile, $rPhone, $rAddress, $rPosition, $rMark, $rAdv, $rStartDate, $rLeaveDate){
     	$rName 		= addslashes($rName);
     	$rPassword 	= addslashes($rPassword);
     	$rEmail 	= addslashes($rEmail);
@@ -251,8 +253,9 @@ class GeicAPI extends MysqlDB {
     	$rPosition 	= addslashes($rPosition);
     	$rMobile 	= addslashes($rMobile);
     	$rAddress 	= addslashes($rAddress);
-    	$rStartDate = addslashes($rStartDate);		
-		$sql = "Update sys_user SET UserName = '{$rName}', UserPassword = '{$rPassword}', Position = '{$rPosition}', Email = '{$rEmail}', Mobile = '{$rMobile}', Telephone = '{$rPhone}', Address = '{$rAddress}', Mark = '{$rMark}', Advance = {$rAdv}, StartDate = '{$rStartDate}' where ID = {$rUserID} ";
+    	$rStartDate = addslashes($rStartDate);
+        $rLeaveDate = addslashes($rLeaveDate);	
+		$sql = "Update sys_user SET UserName = '{$rName}', UserPassword = '{$rPassword}', Position = '{$rPosition}', Email = '{$rEmail}', Mobile = '{$rMobile}', Telephone = '{$rPhone}', Address = '{$rAddress}', Mark = '{$rMark}', Advance = {$rAdv}, StartDate = '{$rStartDate}', LeaveDate = '{$rLeaveDate}'  where ID = {$rUserID} ";
 		return $this->query($sql);
 	}
 	
@@ -661,7 +664,7 @@ class GeicAPI extends MysqlDB {
 	function getAttachment($itemid, $itemtype){
 		if ($itemid > 0 && $itemtype != "" ){
 			$itemtype = addslashes($itemtype);
-			$sql = "select ItemID, ItemType, ID, File, UploadTime from attachment where ItemID = '{$itemid}' and ItemType = '{$itemtype}' ";
+			$sql = "select ItemID, ItemType, ID, File, UploadTime from attachment where ItemID = '{$itemid}' and ItemType = '{$itemtype}' order by UploadTime desc ";
 			$this->query($sql);
 			$_arr = array();
 			while ($this->fetch()){

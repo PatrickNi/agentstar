@@ -10,68 +10,56 @@ $o_a = new AgentAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 $o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 $db = new MysqlDB(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
-$t_cate = 'education';
-$form = 'sub';
-$agent_arr = $o_a->getAgentList(0, $form, $t_cate);
-$stats = $o_a->countAgent($form, $staff_id, $fromDay, $toDay);
-$staff_id = 0;
-
-$users = $o_g->getUserNameArr();
-foreach ($agent_arr as $aid => $v) {
-    if (!isset($stats[$aid]) || $stats[$aid]['stdcnt'] == 0) {
-        continue;
-    }
-
-    //echo $aid."---->".$stats[$aid]['uid']."----------->".$users[$stats[$aid]['uid']]."<br/>";
-    $user_id = $stats[$aid]['uid'];
-    $user_id = $user_id == 45? 3 : $user_id;
-    $sql = "Update agent SET USER_ID = {$user_id} where id = {$aid}";
-    echo $sql."<br/>";
-    $db->query($sql);
-}
-
-
-
-
-
-
-exit;
-$db = new MysqlDB(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
-$sql = "select distinct c.CVID from client_visa_process as c, visa_rs_item i, (select VisaID, Sum(DueAmount) as totalpay, Sum(b.paid) as paid from client_account a left join  (select AccountID, SUM(PaidAmount) as paid from client_payment Group by AccountID) b on (a.ID = b.AccountID) where ACC_TYPE = 'visa' Group by VisaID having totalpay > paid) d where c.cvid = d.visaid and c.itemid = i.itemid and i.item like 'apply%' ";
+set_time_limit(0);
+/*
+$sql = "select userid, ID FROM client_course";
 $db->query($sql);
-$visas = array();
-while ($db->fetch()) {
-    $visas[$db->CVID] = array();
+while($db->fetch()) {
+    echo $db->userid."\t".$db->ID."\n";
 }
+    SELECT d.username, RedDate as wk, concat(LName, ' ', FName) as Name, c.CID, a.ID, a.CCID, c.DOB, ConsultantDate, c.AgentID, 
+    IF(CoComm > 0 OR Discount > 0, RComm-CoComm-Discount,RedComm-Discount) as bonus, 
+    IF(CoComm > 0 OR Discount > 0, RComm-CoComm-Discount, 0) as bonus_r1,
+    IF(CoComm > 0 OR Discount > 0, 0, RedComm-Discount)as bonus_r2,
+    t1.BeginDate as GET_CODE_BEGINDATE, 
+    d.StartDate as USER_START_DATE,
+    Discount as bonus_discount,
+    RedComm as bonus_redcomm,
+    RComm as bonus_rcomm,
+    CoComm as bonus_cocomm,
+    0 as nobonus 
+FROM client_course_sem a left join client_course_process t1 on (a.CCID = t1.CCID AND t1.Done = 1 and t1.ProcessID = 5) , client_course b,client_info c, sys_user d WHERE a.CCID = b.ID AND b.CID = c.CID AND b.ConsultantID = d.ID AND RedDate >= '2010-01-01' AND RedDate <= '2020-05-18' and b.ConsultantID = {$_REQUEST['uid']} Order by wk, Name, a.SEM
 
-$sql = "SELECT v.id, cateid, subclassid, lname, fname, v.cid, VUserID from client_visa v, client_info c where v.cid = c.cid and v.id in (".implode(',', array_keys($visas)).")";
+*/
+select count(*) from client_course a where exists (select 'x' from client_course_process b where a.ID = b.CCID and b.Done = 1 and b.ProcessID = 5) and ConsultantID = 80
+
+
+$sql = <<<EOF
+    SELECT if(d.id is not null, d.username, b.ConsultantID) as username, RedDate as wk, concat(LName, ' ', FName) as Name, c.CID, a.ID, a.CCID, c.DOB, ConsultantDate, c.AgentID, 
+    IF(CoComm > 0 OR Discount > 0, RComm-CoComm-Discount,RedComm-Discount) as bonus, 
+    IF(CoComm > 0 OR Discount > 0, RComm-CoComm-Discount, 0) as bonus_r1,
+    IF(CoComm > 0 OR Discount > 0, 0, RedComm-Discount)as bonus_r2,
+    t1.BeginDate as GET_CODE_BEGINDATE, 
+   if(d.id is not null, d.StartDate, 'n/a') as USER_START_DATE,
+    Discount as bonus_discount,
+    RedComm as bonus_redcomm,
+    RComm as bonus_rcomm,
+    CoComm as bonus_cocomm,
+    0 as nobonus 
+FROM client_course_sem a left join client_course_process t1 on (a.CCID = t1.CCID AND t1.Done = 1 and t1.ProcessID = 5) , client_course b left join sys_user d on (b.ConsultantID = d.id), client_info c WHERE a.CCID = b.ID AND b.CID = c.CID AND RedDate >= '2010-01-01' AND RedDate <= '2020-05-18' Order by wk, Name, a.SEM
+
+EOF;
+
 $db->query($sql);
-while ($db->fetch()) {
-    $results[$db->VUserID][$db->id]['name'] = $db->fname." ".$db->lname;
-    $results[$db->VUserID][$db->id]['visa'] = $db->cateid."\t".$db->subclassid;
-    $results[$db->VUserID][$db->id]['cid' ] = $db->cid;
+$bonus = 0;
+while($db->fetch()) {
+    //echo $db->bonus."\n";
+    echo $db->username."\t".$db->wk."\t".$db->Name."\t".$db->CID."\t".$db->ID."\t".$db->CCID."\t".$db->DOB."\t".$db->ConsultantDate."\t".$db->AgentID."\t".$db->bonus."\t".$db->bonus_r1."\t".$db->bonus_r2."\t".$db->GET_CODE_BEGINDATE."\t".$db->USER_START_DATE."\t".$db->bonus_discount."\t".$db->bonus_redcomm."\t".$db->bonus_rcomm."\t".$db->bonus_cocomm."\t".$db->nobonus."\n";
 }
-
-$sql = "SELECT a.cateid, a.visaname, b.subclassid, b.classname FROM visa_category a, visa_subclass b where a.cateid = b.cateid ";
-$db->query($sql);
-$visa_names = array();
-while ($db->fetch()) {
-    $visa_names[$db->cateid."\t".$db->subclassid] = $db->visaname." ".$db->classname;
-}
+//var_dump($bonus);
 
 
-# get user
-$o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1); 
-$user_arr = $o_g->getUserNameArr();
 
-echo "<dl>";
-foreach ($results as $paperwork => $vv) {
-    echo "<dt>Paperwork: {$user_arr[$paperwork]}</dt>";
-    foreach ($vv as $id => $v) {
-        echo '<dd><a href="http://60.229.252.229:8080/scripts/client_visa_detail.php'."?cid={$v['cid']}&vid={$id}".'" target="_blank">'."{$v['name']} ({$visa_names[$v['visa']]})".'</a></dd>';
-    }
-}
-echo "</dl>";
 exit;
 //require_once('../etc/const.php');
 require_once('class.phpmailer.php');

@@ -27,6 +27,11 @@ $o_c = new ClientAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
 
 if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
+	if($ugs['c_rev']['m'] == 0){
+		echo "<script language='javascript'>alert('permission denied');</script>";
+		exit;
+	}   
+
 	$sets['date']    = isset($_REQUEST['t_date'])? (string)trim($_REQUEST['t_date']) : "0000-00-00";
 	$sets['date']    = $sets['date'] == ""? "0000-00-00" : $sets['date'];
 	

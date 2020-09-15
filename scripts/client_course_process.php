@@ -87,10 +87,6 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 			if ($sets['due'] > '0000-00-00')
 				$o_t->setDueDate('course', $process_id, $sets['due']);			
 		}
-
-		//$o_c->syncDoB2CourseProcess($client_id);
-		//$o_c->syncMainVisa2CourseProcess($client_id);
-		
 		echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
 		exit;
 	}

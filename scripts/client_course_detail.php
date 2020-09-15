@@ -172,6 +172,8 @@ if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" |
 			}        
 	    }
 		
+		$o_c->autoDobService($client_id, $set_course['consultant']);
+		
 		if(strtoupper($_REQUEST['bt_name']) == "SAVE") {
 			echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
 			exit;

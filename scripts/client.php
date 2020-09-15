@@ -14,7 +14,7 @@ if (!($user_id > 0)) {
 }
 
 #define serach filed
-$columns = array('l'=>'LName', 'f'=>'FName', 'e'=>'EName', 't'=>'ClientType', 'm'=>'Email');
+$columns = array('l'=>'LName', 'f'=>'FName', 'e'=>'EName', 't'=>'ClientType', 'm'=>'Email', 'c'=>'TOKEN', 'dob'=>'Dob');
 $o_c = new ClientAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, true);
 $o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, true);
 

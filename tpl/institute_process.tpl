@@ -23,6 +23,7 @@
 			<input type="button" value="Attachment" style="font-weight:bold" onClick="window.open('attachment.php?item={$sid}&type={$itemtype}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*3/7 +',width='+screen.width*2/7);">
 		</td>
 	</tr>
+
 	<tr align="center" class="totalrowodd">
 		<td width="10%">Date</td>
 		<td width="30%">Subject</td>
@@ -33,10 +34,10 @@
 	{foreach key=id item=arr from=$process_arr}
 	<tr align="center" class="roweven">
 		<td><span style="font-size:16px;font-weight:bolder; color:#990000">{if $arr.done eq 1}&radic;{else}?{/if}</span>{$arr.date}</td>
-		<td><span style="cursor:pointer; text-decoration:underline;" onClick="{if $ugs.i_proc.m eq 1}openModel('institute_proc_dt.php?pid={$id}&sid={$sid}',500,380,'NO', 'form1'){else}alert('Permission denied'){/if}">{$arr.subject}</span></td>
+		<td><span style="cursor:pointer; text-decoration:underline;" onClick="{if $ugs.i_proc.m eq 1}	window.open('institute_proc_dt.php?pid={$id}&sid={$sid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth=500,width=380'){else}alert('Permission denied'){/if}">{$arr.subject}</span></td>
 		<td>{$arr.detail|truncate:20:"...":true}</td>
 		<td>{$arr.due}</td>
-		<td><img src="../images/arr_down.gif" style="cursor:pointer" onClick="{if $ugs.i_proc.i eq 1}openModel('institute_proc_dt.php?pid={$id}&sid={$sid}&isNew=1',500,380,'NO', 'form1'){else}alert('Permission denied'){/if}"></td>
+		<td><img src="../images/arr_down.gif" style="cursor:pointer" onClick="{if $ugs.i_proc.i eq 1}	window.open('institute_proc_dt.php?pid={$id}&sid={$sid}&isNew=1','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth=500,width=380'){else}alert('Permission denied'){/if}"></td>
 	</tr>
 	{/foreach}
 </table>

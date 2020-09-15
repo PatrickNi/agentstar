@@ -92,6 +92,23 @@
 					</td>
 				</tr>
 				<tr>
+					<td width="19%" height="30" align="left" class="rowodd"><strong>Top Agent:</strong>&nbsp;&nbsp;</td>
+					<td align="left" width="81%" class="roweven">
+						 {if ($dt_arr.topagent gt 0 && $ugs.i_tta.m eq 0) || ($ugs.i_tta.i eq 0 && $ugs.i_tta.m eq 0)}
+						 	{$top_agents[$dt_arr.topagent].name}
+							<input type="hidden" name="t_agent_top" value="{$dt_arr.topagent}"/>
+						 {else}
+							<select name="t_agent_top" onChange="this.form.t_note.focus();">
+							<option value="0" selected>n/a</option>
+							{foreach key=id item=ta from=$top_agents}
+								<option value="{$id}" {if $id eq $dt_arr.topagent} selected {/if}>{$ta.name}</option>
+							{/foreach}
+							</select>
+						 {/if}
+						
+					</td>
+				</tr>
+				<tr>
 					<td width="19%" align="left" class="rowodd"><strong>Note:</strong>&nbsp;&nbsp;</td>
 					<td align="left" width="81%" class="roweven"><textarea name="t_note" rows="3" style=" width:500px; height:200px ">{$dt_arr.note}</textarea></td>
 				</tr>														

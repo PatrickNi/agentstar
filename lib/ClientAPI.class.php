@@ -20,9 +20,14 @@ class ClientAPI extends MysqlDB {
 	}
 
 	
-	function _register ($email) {
+	function _register ($email,$lname='',$fname='',$phone='',$wechat_id='',$client_type='',$version=1) {
 		$email = addslashes($email);
 		$pass  = md5('12345');
+		$lname = addslashes($lname);
+		$fname = addslashes($fname);
+		$phone = addslashes($phone);
+		$wechat_id = addslashes($wechat_id);
+		$client_type = addslashes($client_type);
 
 		if ($email == '')
 			return 0;
@@ -33,9 +38,18 @@ class ClientAPI extends MysqlDB {
 		if ($this->CID > 0)
 			return 0;
 
-		$sql = "INSERT INTO client_info (EMAIL, STATUS,TOKEN, VisaClassTxt) VALUES ('{$email}', 'pending', '{$pass}', '')";
+		$sql = "INSERT INTO client_info (EMAIL, STATUS,TOKEN, VisaClassTxt, LName,FName,Mobile,Wechat_ID, ClientType,CreateTime) VALUES ('{$email}', 'new', '{$pass}', '', '{$lname}', '{$fname}', '{$phone}', '{$wechat_id}', '{$client_type}', NOW())";
 		$this->query($sql);
-		return $this->getLastInsertID();		
+		if ($version == 2) {
+			$client_id = $this->getLastInsertID();
+			$client_code = strtoupper(dechex($client_id));
+			$sql = "update client_info SET TOKEN = '".md5($client_code)."' where cid = {$client_id}";	
+			$this->query($sql);
+			return array('id'=>$client_id, 'code'=>$client_code);
+		}
+		else {
+			return $this->getLastInsertID();
+		}	
 	}
 
 
@@ -66,7 +80,7 @@ class ClientAPI extends MysqlDB {
 	}
 
 	function getClientInfo($page, $page_size, $cid = 0, $user_id=0, $col_f="", $col_v="", $from="", $to="", $only_course=0, $status=''){
-		$sql = " select SQL_CALC_FOUND_ROWS CID, LName, FName, Gender, DoB, EName, Email, HTel, Mobile, CurResiAdd, CNCT_PName, CNCT_HTel, CNCT_Mobile, CNCT_Add, VisaID, VisaClassID, ExpirDate, ClientType, CreateTime, STATUS, MaritalStatus, VisaClassTxt, ActiveMem, ActiveMem_Date, Bank from client_info where 1";
+		$sql = " select SQL_CALC_FOUND_ROWS CID, LName, FName, Gender, DoB, EName, Email, HTel, Mobile, CurResiAdd, CNCT_PName, CNCT_HTel, CNCT_Mobile, CNCT_Add, VisaID, VisaClassID, ExpirDate, ClientType, CreateTime, STATUS, MaritalStatus, VisaClassTxt, ActiveMem, ActiveMem_Date, Bank, Wechat_ID, Wechat_Phone, Wechat_Email from client_info where 1";
 		
 		if ($user_id > 0){
 			$sql .= " AND CID in (select distinct CID from client_user where UID = {$user_id}) ";
@@ -79,7 +93,10 @@ class ClientAPI extends MysqlDB {
 		if ($cid > 0){
 			$sql .= " AND CID = {$cid} ";
 		} elseif($col_f != "" && $col_v != ""){
-			$sql .= " AND {$col_f} like '{$col_v}%' ";
+			if ($col_f == 'TOKEN')
+				$sql .= " AND {$col_f} = '".md5($col_v)."' ";
+			else
+				$sql .= " AND {$col_f} like '{$col_v}%' ";
 		}
 		
 		if ($from != "" && $to != ""){
@@ -111,7 +128,10 @@ class ClientAPI extends MysqlDB {
 			$_arr[$this->CID]['classtxt'] = $this->VisaClassTxt;
 			$_arr[$this->CID]['actm'] = $this->ActiveMem;
 			$_arr[$this->CID]['d_actm`'] = $this->ActiveMem_Date;
-			$_arr[$this->CID]['bank'] = $this->Bank;			
+			$_arr[$this->CID]['bank'] = $this->Bank;
+			$_arr[$this->CID]['wechatid'] = $this->Wechat_ID;
+			$_arr[$this->CID]['wechatphone'] = $this->Wechat_Phone;
+			$_arr[$this->CID]['wechatemail'] = $this->Wechat_Email;			
 			if ($this->CNCT_PName != ""){
 				$_arr[$this->CID]['hasCT'] = true;
 			}
@@ -185,7 +205,7 @@ class ClientAPI extends MysqlDB {
 			$v = addslashes($v);
 		}
 		
-		$sql = "Update client_info SET LName = '{$set_arr['lname']}', FName = '{$set_arr['fname']}', DoB = '{$set_arr['dob']}', Gender = '{$set_arr['gender']}', EName = '{$set_arr['ename']}', Email = '{$set_arr['email']}', HTel = '{$set_arr['tel']}', Mobile = '{$set_arr['mobile']}', CurResiAdd = '{$set_arr['add']}', Country = '{$set_arr['country']}', VisaID = '{$set_arr['visa']}', VisaClassID = '{$set_arr['class']}', ExpirDate = '{$set_arr['epdate']}', Note = '{$set_arr['note']}', ClientType = '{$set_arr['type']}', AgentID = '{$set_arr['agent']}', About = '{$set_arr['about']}', CreateTime = '{$set_arr['sign']}', MaritalStatus = '{$set_arr['married']}', VisaClassTxt = '{$set_arr['classtxt']}', ActiveMem = '{$set_arr['actm']}', ActiveMem_Date = '{$set_arr['d_actm']}', Bank = '{$set_arr['bank']}'";
+		$sql = "Update client_info SET LName = '{$set_arr['lname']}', FName = '{$set_arr['fname']}', DoB = '{$set_arr['dob']}', Gender = '{$set_arr['gender']}', EName = '{$set_arr['ename']}', Email = '{$set_arr['email']}', HTel = '{$set_arr['tel']}', Mobile = '{$set_arr['mobile']}', CurResiAdd = '{$set_arr['add']}', Country = '{$set_arr['country']}', VisaID = '{$set_arr['visa']}', VisaClassID = '{$set_arr['class']}', ExpirDate = '{$set_arr['epdate']}', Note = '{$set_arr['note']}', ClientType = '{$set_arr['type']}', AgentID = '{$set_arr['agent']}', About = '{$set_arr['about']}', CreateTime = '{$set_arr['sign']}', MaritalStatus = '{$set_arr['married']}', VisaClassTxt = '{$set_arr['classtxt']}', ActiveMem = '{$set_arr['actm']}', ActiveMem_Date = '{$set_arr['d_actm']}', Bank = '{$set_arr['bank']}', Wechat_ID = '{$set_arr['wechatid']}', Wechat_Phone = '{$set_arr['wechatphone']}', Wechat_Email = '{$set_arr['wechatemail']}' ";
 		if (isset($set_arr['c_name']) && $set_arr['c_name'] != ""){
 			$sql .= ", CNCT_PName = '{$set_arr['c_name']}', CNCT_HTel = '{$set_arr['c_tel']}', CNCT_Mobile = '{$set_arr['c_mobile']}', CNCT_ADD = '{$set_arr['c_add']}', CNCT_Email = '{$set_arr['c_email']}', CNCT_RTU = '{$set_arr['c_rtu']}' ";
 		}
@@ -220,10 +240,10 @@ class ClientAPI extends MysqlDB {
 			$v = addslashes($v);
 		}
 		if (isset($set_arr['c_name']) && $set_arr['c_name'] != ""){
-			$sql = "insert into `geic`.`client_info` (STATUS, LName, FName, Gender, DoB, EName, Email, HTel, Mobile, CurResiAdd, Country, VisaID, VisaClassID, ExpirDate, UserID, CNCT_PName, CNCT_HTel, CNCT_Mobile, CNCT_Add, ClientType, Note, About, AgentID, CreateTime, MaritalStatus, TOKEN, VisaClassTxt, CNCT_RTU, ActiveMem, ActiveMem_Date, Bank) values ('{$set_arr['status']}','{$set_arr['lname']}', '{$set_arr['fname']}', '{$set_arr['gender']}', '{$set_arr['dob']}', '{$set_arr['ename']}', '{$set_arr['email']}', '{$set_arr['tel']}', '{$set_arr['mobile']}', '{$set_arr['add']}', '{$set_arr['country']}', '{$set_arr['visa']}', '{$set_arr['class']}', '{$set_arr['epdate']}', {$userid}, '{$set_arr['c_name']}', '{$set_arr['c_tel']}', '{$set_arr['c_mobile']}', '{$set_arr['c_add']}', '{$set_arr['type']}', '{$set_arr['note']}', '{$set_arr['about']}', '{$set_arr['agent']}', '{$set_arr['sign']}', '{$set_arr['married']}', '{$password}', '{$set_arr['classtxt']}', '{$set_arr['c_rtu']}', '{$set_arr['actm']}', '{$set_arr['d_actm']}', '{$set_arr['bank']}') ";
+			$sql = "insert into `geic`.`client_info` (STATUS, LName, FName, Gender, DoB, EName, Email, HTel, Mobile, CurResiAdd, Country, VisaID, VisaClassID, ExpirDate, UserID, CNCT_PName, CNCT_HTel, CNCT_Mobile, CNCT_Add, ClientType, Note, About, AgentID, CreateTime, MaritalStatus, TOKEN, VisaClassTxt, CNCT_RTU, ActiveMem, ActiveMem_Date, Bank, Wechat_ID, Wechat_Phone, Wechat_Email) values ('{$set_arr['status']}','{$set_arr['lname']}', '{$set_arr['fname']}', '{$set_arr['gender']}', '{$set_arr['dob']}', '{$set_arr['ename']}', '{$set_arr['email']}', '{$set_arr['tel']}', '{$set_arr['mobile']}', '{$set_arr['add']}', '{$set_arr['country']}', '{$set_arr['visa']}', '{$set_arr['class']}', '{$set_arr['epdate']}', {$userid}, '{$set_arr['c_name']}', '{$set_arr['c_tel']}', '{$set_arr['c_mobile']}', '{$set_arr['c_add']}', '{$set_arr['type']}', '{$set_arr['note']}', '{$set_arr['about']}', '{$set_arr['agent']}', '{$set_arr['sign']}', '{$set_arr['married']}', '{$password}', '{$set_arr['classtxt']}', '{$set_arr['c_rtu']}', '{$set_arr['actm']}', '{$set_arr['d_actm']}', '{$set_arr['bank']}', '{$set_arr['wechatid']}', '{$set_arr['wechatphone']}', '{$set_arr['wechatemail']}') ";
 		}
 		else{
-			$sql = "insert into `geic`.`client_info` (STATUS, LName, FName, Gender, DoB, EName, Email, HTel, Mobile, CurResiAdd, Country, VisaID, VisaClassID, ExpirDate, UserID, ClientType, Note, About, AgentID, CreateTime, MaritalStatus, TOKEN, VisaClassTxt, ActiveMem, ActiveMem_Date, Bank)values ('{$set_arr['status']}','{$set_arr['lname']}', '{$set_arr['fname']}', '{$set_arr['gender']}', '{$set_arr['dob']}', '{$set_arr['ename']}', '{$set_arr['email']}', '{$set_arr['tel']}', '{$set_arr['mobile']}', '{$set_arr['add']}', '{$set_arr['country']}', '{$set_arr['visa']}', '{$set_arr['class']}', '{$set_arr['epdate']}', {$userid}, '{$set_arr['type']}', '{$set_arr['note']}', '{$set_arr['about']}', '{$set_arr['agent']}', '{$set_arr['sign']}', '{$set_arr['married']}', '{$password}', '{$set_arr['classtxt']}', '{$set_arr['actm']}', '{$set_arr['d_actm']}', '{$set_arr['bank']}') ";
+			$sql = "insert into `geic`.`client_info` (STATUS, LName, FName, Gender, DoB, EName, Email, HTel, Mobile, CurResiAdd, Country, VisaID, VisaClassID, ExpirDate, UserID, ClientType, Note, About, AgentID, CreateTime, MaritalStatus, TOKEN, VisaClassTxt, ActiveMem, ActiveMem_Date, Bank, Wechat_ID, Wechat_Phone, Wechat_Email)values ('{$set_arr['status']}','{$set_arr['lname']}', '{$set_arr['fname']}', '{$set_arr['gender']}', '{$set_arr['dob']}', '{$set_arr['ename']}', '{$set_arr['email']}', '{$set_arr['tel']}', '{$set_arr['mobile']}', '{$set_arr['add']}', '{$set_arr['country']}', '{$set_arr['visa']}', '{$set_arr['class']}', '{$set_arr['epdate']}', {$userid}, '{$set_arr['type']}', '{$set_arr['note']}', '{$set_arr['about']}', '{$set_arr['agent']}', '{$set_arr['sign']}', '{$set_arr['married']}', '{$password}', '{$set_arr['classtxt']}', '{$set_arr['actm']}', '{$set_arr['d_actm']}', '{$set_arr['bank']}', '{$set_arr['wechatid']}', '{$set_arr['wechatphone']}', '{$set_arr['wechatemail']}') ";
 		}
 		return $this->query($sql);		
 	}	
@@ -327,7 +347,7 @@ class ClientAPI extends MysqlDB {
 			return $_arr;
 		}
 		
-		$sql = " select CID, LName, FName, Gender, DoB, EName, Email, HTel, Mobile, CurResiAdd, Country, CNCT_PName, CNCT_HTel, CNCT_Mobile, CNCT_Email, CNCT_Add, CNCT_RTU, VisaID, if(VisaName is null, 'n/a', VisaName) as VisaName, VisaClassID, if(ClassName is null, 'n/a', ClassName) as ClassName, ExpirDate, UserID, Note, ClientType, AgentID, About, CreateTime, CourseUser, CourseVisitDate, STATUS, MaritalStatus, VisaClassTxt, ActiveMem_Date, ActiveMem, Bank  from client_info  a left join visa_category b on(a.VisaID = b.CateID) left join visa_subclass c on(a.VisaClassID = c.SubClassID)  where CID = {$cid} ";
+		$sql = " select CID, LName, FName, Gender, DoB, EName, Email, HTel, Mobile, CurResiAdd, Country, CNCT_PName, CNCT_HTel, CNCT_Mobile, CNCT_Email, CNCT_Add, CNCT_RTU, VisaID, if(VisaName is null, 'n/a', VisaName) as VisaName, VisaClassID, if(ClassName is null, 'n/a', ClassName) as ClassName, ExpirDate, UserID, Note, ClientType, AgentID, About, CreateTime, CourseUser, CourseVisitDate, STATUS, MaritalStatus, VisaClassTxt, ActiveMem_Date, ActiveMem, Bank, Wechat_ID, Wechat_Phone, Wechat_Email  from client_info  a left join visa_category b on(a.VisaID = b.CateID) left join visa_subclass c on(a.VisaClassID = c.SubClassID)  where CID = {$cid} ";
 		$this->query($sql);
 		while($this->fetch()){
 			$_arr['lname']   = $this->LName;
@@ -364,7 +384,10 @@ class ClientAPI extends MysqlDB {
 			$_arr['d_actm'] = $this->ActiveMem_Date;
 			$_arr['bank'] = $this->Bank;		
 			$_arr['visa_n'] = $this->VisaName;
-			$_arr['class_n'] = $this->ClassName;							
+			$_arr['class_n'] = $this->ClassName;
+			$_arr['wechatid'] = $this->Wechat_ID;
+			$_arr['wechatphone'] = $this->Wechat_Phone;
+			$_arr['wechatemail'] = $this->Wechat_Email;								
 		}
 		return $_arr;
 	}
@@ -741,12 +764,15 @@ class ClientAPI extends MysqlDB {
 		return $this->query($sql);
 	}
 	
-	function getCourseProcess($course_id){
+	function getCourseProcess($course_id, $chase_fee=false){
 		$sql = "select ID, CCID, BeginDate, ProcessID, Detail, DueDate, Done, isAuto, ExItem 
 				from client_course_process 
 				WHERE BeginDate <> '0000-00-00' AND BeginDate <> '' ";
 		if ($course_id > 0){
 			$sql .= " AND CCID = {$course_id}";
+		}
+		if (!$chase_fee) {
+			$sql .= " AND ExItem NOT LIKE 'Chase tuition on SEM%' ";
 		}
 		$sql .= " order by BeginDate ASC ";
 		$this->query($sql);
@@ -767,7 +793,9 @@ class ClientAPI extends MysqlDB {
 		if ($course_id > 0){
 			$sql .= " AND CCID = {$course_id}";
 		}
-		
+		if (!$chase_fee) {
+			$sql .= " AND ExItem NOT LIKE 'Chase tuition on SEM%' ";
+		}
 		$this->query($sql);
 		while ($this->fetch()){
 			$_arr[$this->ID]['date']    = $this->BeginDate;
@@ -914,6 +942,25 @@ class ClientAPI extends MysqlDB {
 		return true;
 	}
 	
+
+	function checkCourseProcessByItem($courseid, $exitem){
+		if ($courseid > 0 && $exitem != ''){
+			$sql = "select ID, BeginDate, ExItem, Done, DueDate from client_course_process where CCID = '{$courseid}' and ExItem = '{$exitem}' ";
+			$this->query($sql);
+			$arr = array();
+			while($this->fetch()){
+				$arr['date'] = $this->BeginDate;
+				$arr['done'] = $this->Done;
+				$arr['due' ] = $this->DueDate;
+				$arr['subject'] = $this->ExItem;
+				$arr['id'] = $this->ID;
+ 			}
+ 			if (count($arr) > 0)
+ 				return $arr;
+		}
+		return false;
+	}
+
 	function getMaxCourseProcess($courseid=0){
 		if ($courseid > 0){
 			$sql = "select max(ProcessID) as id from client_course_process where CCID = {$courseid}";
@@ -930,12 +977,15 @@ class ClientAPI extends MysqlDB {
     	$sql = "select rank from course_process where id = {$pid}";
     	$this->query($sql);
     	$rank = 0;
-    	if ($this->fetch() && $this->rank > 0) {
-    		$sql = "select id as cpid from course_process where rank > {$rank} order by rank asc limit 1";
-    		$this->query($sql);
-    		if($this->fetch())
-    			return $this->cpid; 
+    	$this->fetch();
+    	if ($this->rank > 0) {
+    		$rank = $this->rank;
     	}
+    	
+    	$sql = "select id as cpid from course_process where ID <> 7 and rank > {$rank} order by rank asc limit 1";
+    	$this->query($sql);
+    	if($this->fetch())
+    		return $this->cpid; 
 
     	return 0;
     	/*
@@ -1002,6 +1052,13 @@ class ClientAPI extends MysqlDB {
 			$sql = "Update client_course_process SET BeginDate = '{$sets['date']}', ProcessID = '{$sets['subject']}', Detail = '{$sets['detail']}', DueDate = '{$sets['due']}', Done = '{$sets['done']}', ExItem = '{$sets['add']}', isAuto = 0 where ID = {$pid}";
 			return $this->query($sql);
 		} 
+	}
+
+	function setCourseProcessDue($pid, $due){
+		if (!$pid || !$due)
+			return false;
+		$sql = "update client_course_process Set DueDate = '{$due}' where id = {$pid}";
+		return $this->query($sql);
 	}
 		
 	function delApplyVisaByID($vid){
@@ -1973,6 +2030,47 @@ function getSpand($aid){
 	    return $this->query($sql);
     }
     
+
+    function autoDobService($client_id, $user_id){
+    	if($client_id == "" || $user_id == ""){//$subclassid == 0 
+    		return false;
+    	}
+
+    	//get DOB
+    	$sql = "select DoB from client_info where CID = {$client_id}";
+    	$this->query($sql);
+    	$this->fetch();
+    	if ($this->DoB == "")
+    		return false;
+
+    	$upds = array();
+    	$date = preg_replace('/^[\d]+-(.*)$/',date('Y').'-$1', $this->DoB);
+    	if (date('Y-m-d', strtotime('+1 month')) < $date) {
+    		$upds[$date] = "Birthday mention at {$date}";
+    	}
+
+    	$date = date('Y-m-d', strtotime('+1 year', strtotime($date)));
+    	$upds[$date] = "Birthday mention at {$date}"; 
+
+    	foreach ($upds as $date => $subject) {
+	    	$serviceid = 0;
+	    	#check existed service
+	    	$sql = "select ID from client_service where CID = '{$client_id}' and ConsultantID = '{$user_id}' and subject = '{$subject}'";
+	    	$this->query($sql);
+	    	while ($this->fetch()){
+				$serviceid = $this->ID;
+	    	}
+			
+	    	if($serviceid == 0){
+		    	$sql = "insert into `client_service`(CID, Date, Subject, DueDate, Done, ConsultantID) values ('{$client_id}', Date(Now()), '{$subject}', '{$date}'- Interval 30 Day, 0, {$user_id})";
+		    	//echo $sql;
+		    	$this->query($sql);
+
+		    }
+		    
+	    }
+    }
+
     function getIetls($client_id=0){
     	if ($client_id > 0){
     		$sql = "select `Mod`, TestDate, PlanDate, Overall, Listening, Reading, Writing, Speaking from client_ielts where CID = {$client_id}";

@@ -51,7 +51,7 @@
 			{/foreach}
 			{if $dt_arr.country lt 1}<option value="0" selected>select a country</option>{/if}
 			</select>
-			<span style="text-decoration:underline; color:#0000CC; cursor:pointer; font-weight:bold" onClick="openModel('country.php',300,300,'NO', 'form1')">Add new country</span>
+			<span style="text-decoration:underline; color:#0000CC; cursor:pointer; font-weight:bold" onClick="window.open('/scripts/country.php','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,heigth=300,width=300')">Add new country</span>
 		</td>
 	</tr>
 	<tr>
@@ -70,7 +70,7 @@
 	</tr>    	
 	<tr>
 		<td width="22%" align="left" class="rowodd"><strong>Note:</strong>&nbsp;&nbsp;</td>
-		<td align="left" width="78%" class="roweven"><textarea style="width:300px; height:100px;" name="t_note">{$dt_arr.note}</textarea></td>
+		<td align="left" width="78%" class="roweven"><textarea style="width:100%; height:100%;" rows="10" name="t_note">{$dt_arr.note}</textarea></td>
 	</tr>								
 	<tr class="greybg"><td colspan="2">&nbsp;</td></tr>							
 </table>

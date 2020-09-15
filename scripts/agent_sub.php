@@ -7,10 +7,11 @@ require_once(__LIB_PATH.'GeicAPI.class.php');
 require_once(__LIB_PATH.'ClientAPI.class.php');
 require_once(__LIB_PATH.'ExportAPI.class.php');
 
+set_time_limit(-1);
 $user_id = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
  
 
-$cates['student'] = array('n'=>'Global Ambassador', 's'=>0, 'o'=>0, 'c'=>0, 'rc'=>0, 'pc'=>0, 'aid'=>array());
+$cates['student'] = array('n'=>'Global Assistant', 's'=>0, 'o'=>0, 'c'=>0, 'rc'=>0, 'pc'=>0, 'aid'=>array());
 $t_cate = 'student';
 $form = 'sub';
 

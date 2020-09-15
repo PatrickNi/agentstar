@@ -43,7 +43,7 @@
 				<tr>
 					<td width="24%" align="left" class="rowodd"><strong>Additional Step:</strong>&nbsp;&nbsp;</td>
 					<td align="left" width="76%" class="roweven">						
-						<input type="text" name="t_add" value="{if $dt_arr.add == ''}p:{else}{$dt_arr.add}{/if}" size="30">
+						<input type="text" name="t_add" value="{$dt_arr.add}" size="30">
 					</td>
 				</tr>
 			{else}	

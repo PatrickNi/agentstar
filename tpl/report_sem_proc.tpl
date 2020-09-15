@@ -12,6 +12,8 @@
 		<td>
 	   		<input type="submit" name="btn" value="Sort by Students">&nbsp;
 	   		<input type="submit" name="btn" value="Sort by Top-agents">&nbsp;
+	   		<input type="submit" name="btn" value="Sort by Institutes">&nbsp;
+	   		<input type="submit" name="btn" value="Account todo">&nbsp;
 		</td>
 	</tr>
 	<tr align="center"  class="bordered_2" >
@@ -30,8 +32,9 @@
 	{foreach key=ccid item=procs from=$arr.course}
 	{foreach key=procid item=darr from=$procs}
 	<tr class="roweven">
-		<td><span  style="padding-left:40; cursor:pointer;{if $darr.key eq $step2}color:#33FF00;{/if}" onClick="window.open('redir.php?t=comm&semid={$procid}&ccid={$ccid}&cid={$darr.cid}','','height='+screen.width*4/5+','+'width='+screen.width*4/5)">
+		<td><span  style="padding-left:40; cursor:pointer;{if $darr.key eq $step2}color:#33FF00;{/if}" onClick="window.open('client_course_sem.php?courseid={$ccid}&cid={$darr.cid}&semid={$procid}','','height='+screen.width*4/5+','+'width='+screen.width*4/5)">
 		{if $is_agent eq 1}{$darr.client}&nbsp;&nbsp;{/if}{$darr.desc}
+
 
 		</span></td>
 	</tr>

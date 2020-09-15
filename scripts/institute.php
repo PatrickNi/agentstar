@@ -41,6 +41,7 @@ $cateid	  = isset($_REQUEST['t_cate'])? trim($_REQUEST['t_cate']) : 1;
 
 $fromDay  = isset($_REQUEST['t_fdate'])? trim($_REQUEST['t_fdate']) : "";
 $toDay    = isset($_REQUEST['t_tdate'])? trim($_REQUEST['t_tdate']) : "";
+$show_static = isset($_REQUEST['show_static'])? trim($_REQUEST['show_static']) : 0;
 
 //if (strtoupper($t_button) == "DELETE"){
 //	$o_s->delSchoold($_POST['school']);
@@ -66,7 +67,9 @@ if ($ugs['seeall']['v'] == 0){
 }
 
 $stats = array();
-$stats = $o_s->countSchool($view_all, $fromDay, $toDay);
+if ($show_static)
+    $stats = $o_s->countSchool($view_all, $fromDay, $toDay);
+
 $all['total'] = $all['offer'] = $all['coe'] = $all['potrev']  = $all['redrev'] =0;
 $suball = array();
 foreach ($stats as $v){
@@ -149,6 +152,7 @@ $o_tpl->assign('cateid', $cateid);
 $o_tpl->assign('ugs', $ugs);
 $o_tpl->assign('redir_url', $redir_url . "?sid=");
 $o_tpl->assign('msg', $msg );
+$o_tpl->assign('show_static', $show_static);
 $o_tpl->display('institute.tpl');
 
 ?>

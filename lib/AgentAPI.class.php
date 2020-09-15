@@ -5,6 +5,39 @@ class AgentAPI extends MysqlDB{
     	 $this->MysqlDB($host, $user, $pswd, $database, $debug);
     }
     
+    function _register() {
+        $sets['name']    = isset($_REQUEST['t_name'])? trim($_REQUEST['t_name']) : '';
+        $sets['web']     = isset($_REQUEST['t_web'])? trim($_REQUEST['t_web']) : '';
+        $sets['tel']     = isset($_POST['t_tel'])? trim($_POST['t_tel']) : "";
+        //$sets['fax']     = isset($_POST['t_fax'])? trim($_POST['t_fax']) : "";
+        $sets['email']   = isset($_POST['t_email'])? trim($_POST['t_email']) : "";
+        $sets['add']     = isset($_POST['t_add'])? trim($_POST['t_add']) : "";
+        $sets['country'] = isset($_POST['t_country'])? trim($_POST['t_country']) : 0;
+        $sets['contact'] = isset($_POST['t_contact'])? trim($_POST['t_contact']) : "";
+        $sets['type']    = isset($_POST['t_type'])? trim($_POST['t_type']) : "sub";
+        $sets['note']    = isset($_POST['t_note'])? trim($_POST['t_note']) : "";
+        $sets['status']  = isset($_POST['t_status'])? trim($_POST['t_status']) : 0;
+        $sets['city']    = isset($_POST['t_city'])? trim($_POST['t_city']) : "";
+        $sets['verify']  = isset($_POST['t_verify'])? trim($_POST['t_verify']) : 0;
+        $sets['cate']    = isset($_POST['t_cate'])? trim($_POST['t_cate']) : '';    
+        $sets['uid']  = isset($_POST['t_uid'])? trim($_POST['t_uid']) : 0;
+        $sets['wechatid']  = isset($_POST['t_wechatid'])? trim($_POST['t_wechatid']) : '';
+        $sets['pos']  = isset($_POST['t_pos'])? trim($_POST['t_pos']) : '';
+        $sets['state']  = isset($_POST['t_state'])? trim($_POST['t_state']) : '';
+
+        if ($sets['name'] == '' || $sets['email'] == '')
+            return array('err'=>1, 'msg'=>'no company name or no email');
+
+        $agent_id = $this->addAgent($sets);
+        if ($agent_id > 0) {
+            return array('err'=>0, 'msg'=>'succ');
+        }
+
+        return array('err'=>1, 'msg'=>'add failed');
+    }
+
+
+
     function getAgent($type = ""){
     	$sql = "select ID, Name from agent ";
     	if ($type != ""){
@@ -33,7 +66,7 @@ class AgentAPI extends MysqlDB{
     }
     
     function getAgentList($rAgentID=0, $type="", $cate="", $staff_id=0){
-        $sql = "select ID, Name, Country, Contact, Phone, Fax, Email, Address, Note, Form, StatusID, City, Web, isVerify, CATE_NAME, REFCODE, USER_ID from agent ";
+        $sql = "select ID, Name, Country, Contact, Phone, Fax, Email, Address, Note, Form, StatusID, City, Web, isVerify, CATE_NAME, REFCODE, USER_ID, WECHAT_ID, STATE, POSITION from agent ";
         if($rAgentID > 0){
             $sql .= "Where ID = {$rAgentID}";
         }elseif($type != ""){
@@ -46,11 +79,11 @@ class AgentAPI extends MysqlDB{
             else
                 $sql .= " AND CATE_NAME = '{$cate}' ";
         }
-
+/*
         if ($staff_id > 0 && $type == 'sub') {
             $sql .= " AND USER_ID = {$staff_id} ";
         }
-       	
+*/       	
         $sql .= " Order by lower(Name) asc";
         $this->query($sql);
         //echo $sql;
@@ -73,6 +106,9 @@ class AgentAPI extends MysqlDB{
             $_arr[$this->ID]['cate']    = $this->CATE_NAME;
             $_arr[$this->ID]['code']    = $this->REFCODE;			
             $_arr[$this->ID]['uid']     = $this->USER_ID;
+            $_arr[$this->ID]['wechatid']= $this->WECHAT_ID;
+            $_arr[$this->ID]['pos']     = $this->POSITION;
+            $_arr[$this->ID]['state']   = $this->STATE;
         }
         return $_arr;
     }
@@ -85,11 +121,14 @@ class AgentAPI extends MysqlDB{
 								left join (select CCID, Sum(if(ProcessID = 1, 1, 0)) as OfferCnt, Sum(if(ProcessID = 5, 1, 0)) as CoeCnt from client_course_process where done = 1 group by CCID) as b on(b.CCID = a.ID)
 								left join (select CCID, Sum(RComm) as RComm, Sum(CoComm) as PComm from client_course_sem  group by CCID) as c on(c.CCID = a.ID)											  
 						where d.AgentID <> 0 ";
-	    		if ($userid > 0) {
+	    		
+                /*
+                if ($userid > 0) {
 	    			//$sql .= " AND d.CourseUser = {$userid} ";
                     $sql .= " AND a.ConsultantID = {$userid} ";
 
                 }
+                */
 	    		$sql .= " Group by d.AgentID  ";
 		}
 		elseif ($type == 'top'){
@@ -98,10 +137,12 @@ class AgentAPI extends MysqlDB{
 												 left join (select CCID, Sum(RComm) as RComm, Sum(CoComm) as PComm from client_course_sem  group by CCID) as c on(c.CCID = a.ID)
 												 left join client_info d on(d.CID = a.CID)
 							where a.AgentID <> 0 ";
+                /*            
 				if ($userid > 0) {
 					//$sql .= " AND d.CourseUser = {$userid} ";
 				    $sql .= " AND a.ConsultantID = {$userid} ";
                 }
+                */
 				$sql .= " Group by a.AgentID  ";
     	}
     	
@@ -143,7 +184,7 @@ class AgentAPI extends MysqlDB{
 		foreach ($sets as &$v){
 			$v = addslashes($v);
 		}        
-        $sql = "Update agent SET Name = '{$sets['name']}', Country = '{$sets['country']}', Contact = '{$sets['contact']}', Phone = '{$sets['tel']}', Fax = '{$sets['fax']}', Email = '{$sets['email']}', Address = '{$sets['add']}', Form = '{$sets['type']}', Note = '{$sets['note']}' , Web = '{$sets['web']}', City = '{$sets['city']}', StatusID = '{$sets['status']}', isVerify = '{$sets['verify']}', CATE_NAME = '{$sets['cate']}', user_id = '{$sets['uid']}'  Where ID = {$agent_id} "; 
+        $sql = "Update agent SET Name = '{$sets['name']}', Country = '{$sets['country']}', Contact = '{$sets['contact']}', Phone = '{$sets['tel']}', Email = '{$sets['email']}', Address = '{$sets['add']}', Form = '{$sets['type']}', Note = '{$sets['note']}' , Web = '{$sets['web']}', City = '{$sets['city']}', StatusID = '{$sets['status']}', isVerify = '{$sets['verify']}', CATE_NAME = '{$sets['cate']}', user_id = '{$sets['uid']}', WECHAT_ID = '{$sets['wechatid']}', STATE = '{$sets['state']}', POSITION = '{$sets['pos']}'  Where ID = {$agent_id} "; 
         return $this->query($sql); 
     }
     
@@ -151,8 +192,8 @@ class AgentAPI extends MysqlDB{
 		foreach ($sets as &$v){
 			$v = addslashes($v);
 		}   
-        $sql = "insert into `geic`.`agent` (Name, Country, Contact, Phone, Fax, Email, Address, Note, Form, StatusID, City, Web, isVerify, CATE_NAME, user_id) values " .
-                    "('{$sets['name']}', '{$sets['country']}', '{$sets['contact']}', '{$sets['tel']}', '{$sets['fax']}', '{$sets['email']}', '{$sets['add']}', '{$sets['note']}', '{$sets['type']}', '{$sets['status']}', '{$sets['city']}', '{$sets['web']}', '{$sets['verify']}', '{$sets['cate']}', '{$sets['uid']}') ";
+        $sql = "insert into `geic`.`agent` (Name, Country, Contact, Phone, Email, Address, Note, Form, StatusID, City, Web, isVerify, CATE_NAME, user_id, WECHAT_ID, POSITION, STATE) values " .
+                    "('{$sets['name']}', '{$sets['country']}', '{$sets['contact']}', '{$sets['tel']}', '{$sets['email']}', '{$sets['add']}', '{$sets['note']}', '{$sets['type']}', '{$sets['status']}', '{$sets['city']}', '{$sets['web']}', '{$sets['verify']}', '{$sets['cate']}', '{$sets['uid']}', '{$sets['wechatid']}', '{$sets['pos']}', '{$sets['state']}') ";
         $this->query($sql);
         return $this->getLastInsertID();
     }    
@@ -259,10 +300,12 @@ class AgentAPI extends MysqlDB{
 			if ($from != "" && $to != ""){
 				$sql .= " AND  a.SEM1Date >= '{$from}' AND a.SEM1Date <= '{$to}' ";
 			}
-			if ($userid > 0 && strtoupper($this->getAgentType($aid)) == "SUB") {
+            /*
+			if ($userid > 0 ) {//&& strtoupper($this->getAgentType($aid)) == "SUB"
 				//$sql .= " AND b.CourseUser = {$userid} ";
 			    $sql .= " AND a.ConsultantID = {$userid} ";
             }
+            */
             $sql .= " order by  CoeCnt desc, OfferCnt desc, e.StartDate desc, b.LName asc, b.FName asc, a.IsActive asc ";//Group BY a.CID
             //echo $sql."<br/>";
 			$_arr = array();
@@ -304,10 +347,12 @@ class AgentAPI extends MysqlDB{
 			if ($from != "" && $to != ""){
 				$sql .= " AND a.Sem1Date >= '{$from}' AND a.Sem1Date <= '{$to}' ";
 			}
+            /*
 			if ($userid > 0 && strtoupper($this->getAgentType($aid)) == "SUB") {
 				//$sql .= " AND d.CourseUser = {$userid} ";
 			     $sql .= " AND a.ConsultantID = {$userid} ";
             }
+            */
 			$this->query($sql);
 			$_arr = array('total'=>0, 'offer'=>0, 'coe'=>0);
 			while ($this->fetch()){

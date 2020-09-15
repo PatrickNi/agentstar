@@ -13,7 +13,7 @@
 <script language="javascript" src="../js/audit.js"></script>
 
 <body>
-<form name="form1" target="_self" method="get">
+<form name="form1" target="_self" method="get" onkeydown="{literal}if(event.keyCode==13){return false;}{/literal}">
   <table align="center" width="100%"  class="graybordertable" cellpadding="0" cellspacing="0">
     <tr >
       <td colspan="9" align="center"  class="bordered_2"><table width="100%" cellpadding="1" cellspacing="1">
@@ -38,8 +38,10 @@
                 <option value="l" {if $srchtype eq 'l'} selected {/if}>Last Name</option>
                 <option value="f" {if $srchtype eq 'f'} selected {/if}>First Name</option>
                 <option value="e" {if $srchtype eq 'e'} selected {/if}>English Name</option>
-                <option value="t" {if $srchtype eq 't'} selected {/if}> Client Type</option>
-                <option value="m" {if $srchtype eq 'm'} selected {/if}> Email</option>
+                <option value="t" {if $srchtype eq 't'} selected {/if}>Client Type</option>
+                <option value="m" {if $srchtype eq 'm'} selected {/if}>Email</option>
+                <option value="c" {if $srchtype eq 'c'} selected {/if}>Client Code</option>
+                <option value="dob" {if $srchtype eq 'dob'} selected {/if}>Dob</option>
               </select>
               &nbsp;&nbsp;
               <input type="text" name="srchTxt" size="20" value="{$srchtxt}">
@@ -65,7 +67,7 @@
       <td>Client Type</td>
     </tr>
     {foreach key=cid item=arr from=$client_arr}
-    <tr class="{if $arr.status == 'new'}yellowbg{else}rowodd{/if}">
+    <tr class="{if $arr.status == 'new'}yellowbg{else}{cycle values='rowodd,roweven'}{/if}">
       <td align="center" class="border_1" nowrap="nowrap">{$arr.sign}</td>
       <td align="center" class="border_1"><a href="{$redir_url|cat:$cid}" target="_self">{if $arr.lname != ''}{$arr.lname|wordwrap:1}{else}n/a{/if}</a></td>
       <td align="center" class="border_1">{$arr.fname}</td>

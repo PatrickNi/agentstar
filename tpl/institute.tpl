@@ -25,7 +25,11 @@
               	&nbsp;&nbsp;&nbsp;                    
                 <input type="button" style="font-weight:bold" onClick="printPage();"value="Print">
             </td>
-            <td colspan="3" align="right"><strong>[First semester start date]</strong>&nbsp;&nbsp; <strong>From: &nbsp;</strong>
+            <td colspan="3" align="right">
+              {if $ugs.i_st.v eq 1}
+                <input type="checkbox" name="show_static" value="1" {if $show_static eq 1}checked{/if}>show static&nbsp;&nbsp;
+              {/if}  
+              <strong>[First semester start date]</strong>&nbsp;&nbsp; <strong>From: &nbsp;</strong>
               <input type="text"	 name="t_fdate" id="t_fdate" value="{$from}">
               
               &nbsp;&nbsp; <strong>To: &nbsp;</strong>

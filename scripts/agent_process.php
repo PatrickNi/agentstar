@@ -44,6 +44,7 @@ $o_tpl->assign('process_arr', $process_arr);
 
 $o_tpl->assign('aid', $agent_id);
 $o_tpl->assign('pid', $process_id);
+$o_tpl->assign("ugs", $ugs);
 $o_tpl->display('agent_process.tpl');
 ?>
 

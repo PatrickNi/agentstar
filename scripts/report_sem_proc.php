@@ -47,6 +47,18 @@ if (isset($_REQUEST['btn']) && $_REQUEST['btn'] == 'Sort by Top-agents') {
     $o_page =  new PageDistribute($page_url, $rows_num, $page_size, $page_offset, $page, '&btn='.urlencode($_REQUEST['btn']));
     $is_agent = 1;
 }
+elseif (isset($_REQUEST['btn']) && $_REQUEST['btn'] == 'Sort by Institutes')  {
+    $is_agent = 1;
+    $semprocs = $o_r->getCommissionBySchool($view_all, $page, $page_size);
+    $rows_num = $o_r->getNumOfCommissionsBySchool($view_all);
+    $o_page =  new PageDistribute($page_url, $rows_num, $page_size, $page_offset, $page, '&btn='.urlencode($_REQUEST['btn']));
+}
+elseif (isset($_REQUEST['btn']) && $_REQUEST['btn'] == 'Account todo')  {
+    $is_agent = 1;
+    $semprocs = $o_r->getCommissionByAccount($view_all, $page, $page_size);
+    $rows_num = $o_r->getNumOfCommissionsByAccount($view_all);
+    $o_page =  new PageDistribute($page_url, $rows_num, $page_size, $page_offset, $page, '&btn='.urlencode($_REQUEST['btn']));
+}
 else {
     $is_agent = 0;
     $semprocs = $o_r->getCommissionByUser($view_all, $page, $page_size);

@@ -21,18 +21,20 @@
 			<span class="highyellow">Agent: {$agent_arr[$aid].name}</span>&nbsp;&nbsp;
         </select>        
 	  	{else}
-	  		<input name="button" type="button" style="font-weight:bolder;" onClick="this.form.action='agent_add.php';this.form.submit();" value="Go back to the agent detail">
+	  		<input name="button" type="button" style="font-weight:bolder;" onClick="this.form.action='agent_add.php';this.form.submit();" value="Go back to the {if $agent_arr[$aid].cate eq 'student'}assistant{else}agent{/if} detail">
 			&nbsp;&nbsp;&nbsp;&nbsp;
 	   		<input type="button" style="font-weight:bold" onClick="printPage();"value="Print">
 	  	{/if}
 	  </td>
 	  <td align="right" colspan="8">
+	  		<!--
 	  		Staff: &nbsp;&nbsp;
         	<select name="t_staff" onChange="this.form.submit();">
           		{foreach key=user_id item=user_name from=$slUsers}
             		<option value="{$user_id}" {if $staffid eq $user_id} selected {/if}>{$user_name}</option>
           		{/foreach}
           	</select>
+          -->
 	 		<strong>From: &nbsp;</strong><input type="text"	 name="t_fdate" id="t_fdate" value="{$from}" onChange="audit_date(this)">	  
             &nbsp;&nbsp;
 			<strong>To: &nbsp;</strong><input type="text"	 name="t_tdate" id="t_tdate" value="{$to}" onChange="audit_date(this)">&nbsp;&nbsp;

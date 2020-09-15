@@ -33,7 +33,10 @@ if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
 	$sets['paid'] = isset($_POST['t_paid'])? $_POST['t_paid'] : 0;
     $sets['remark'] = isset($_POST['t_remark'])? $_POST['t_remark'] : '';	
 
-	if ($pid > 0 && $isNew == 0){
+    if ($sets['paid'] < 0 ){
+    	echo "<script language='javascript'>alert('Negative paid amount');</script>";
+    }
+	elseif ($pid > 0 && $isNew == 0){
 		# check valid user
 		$user_id = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
 		if($ugs['p_h']['m'] == 1){

@@ -67,7 +67,7 @@
 					</td>
 				</tr>
 				<tr>
-					<td width="25%" align="left" class="rowodd"><strong>3rd Party:</strong>&nbsp;&nbsp;</td>
+					<td width="25%" align="left" class="rowodd"><strong>Deduction:</strong>&nbsp;&nbsp;</td>
 				  	<td align="left" width="75%" class="roweven">
 				  		<input type="text" name="t_party" id="t_party" value="{$dt_arr.party}" size="30">
 				  		<!--
@@ -80,14 +80,14 @@
 					</td>
 				</tr>
 				<tr>
-					<td width="25%" align="left" class="rowodd"><strong>3rd Party GST:</strong>&nbsp;&nbsp;</td>
+					<td width="25%" align="left" class="rowodd"><strong>Deduction GST:</strong>&nbsp;&nbsp;</td>
 					<td align="left" width="75%" class="roweven">
 				  		<input type="radio" name="t_gst_3rd" value="1" {if $dt_arr.gst_3rd_chk eq 1} checked {/if}>YES &nbsp;&nbsp;
 				  		<input type="radio" name="t_gst_3rd" value="0" {if $dt_arr.gst_3rd_chk eq 0} checked {/if}>NO
 					</td>
 				</tr>
 <tr>
-					<td width="25%" align="left" class="rowodd"><strong>3rd Party Amount:</strong>&nbsp;&nbsp;</td>
+					<td width="25%" align="left" class="rowodd"><strong>Deduction Amount:</strong>&nbsp;&nbsp;</td>
 					<td align="left" width="75%" class="roweven">
 				  	{if $ugs.v_pay.v eq 1 && $ugs.v_pay.m eq 0 && ($dt_arr.dueamt_3rd gt 0 || $ugs.v_pay.i eq 0)}
 						<input type="hidden" name="t_dueamt_3rd" value="{$dt_arr.dueamt_3rd}">

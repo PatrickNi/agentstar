@@ -236,8 +236,8 @@
 		          		<td>Due<br/>Amount</td>
 		          		<td>GST</td>
 		          		<td>Total<br/>Received</td>
-		          		<td>3rd Party</td>
-		          		<td>3rd Party<br/>Amount</td>
+		          		<td>Deduction</td>
+		          		<td>Deduction<br/>Amount</td>
 		          		<td>GST</td>
 		          		<td>Total Paid</td>
 		          		<td>Profit</td>

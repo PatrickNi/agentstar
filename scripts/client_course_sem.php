@@ -5,7 +5,7 @@ require_once(__LIB_PATH.'ClientAPI.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
 require_once(__LIB_PATH.'SchoolAPI.class.php');
 ini_set("display_errors", 1);
-error_reporting(2047);
+error_reporting(E_ALL);
 # check valid user
 $user_id = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
 
@@ -117,7 +117,7 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
         if (!$o_c->auditSemStartDate($course_id, $sem_id, $sems['fdate'])){
             echo "<script language='javascript'>alert('Error sem start date!');</script>";       	
 		}
-		elseif ($sems['rcomm'] > 0 && $sems['ccomm'] == 0 && stripos($client_name, 'sub-') !== false){
+		elseif (isset($sems['rcomm']) && $sems['rcomm'] > 0 && $sems['ccomm'] == 0 && stripos($client_name, 'sub-') !== false){
             echo "<script language='javascript'>alert('Co-potential comm amount CANNOT BE BLANK');</script>";       			
 		}
 		else{
@@ -140,7 +140,7 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 						$step_1 = $o_c->addSemProcess($sem_id, $sets);	
 					}
 			        #set process of invoice sent
-			        if ($step_1 > 0 && $sems['ivdate'] != "" && $sems['ivdate'] != "0000-00-00") {		
+			        if ($step_1 > 0 && isset($sems['ivdate']) && $sems['ivdate'] != "" && $sems['ivdate'] != "0000-00-00") {		
 			        		#get course category
 			        		$sets['detail']  = "Invoice sent on {$sems['ivdate']}. \n";  									
 							$step_2 = $o_c->checkSemProcess($sem_id, __SEM_START.__SEM_INVOICE);
@@ -154,6 +154,29 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 								$o_c->doneSemProcess($step_1, __SEM_START.__SEM_INVOICE.__SEM_COMM, $sets['done']);							
 					        }					        
 			        }	 
+
+
+			        //Check "chase tuition process"
+			        if ($semOrder > 1){
+				        $chase_due = date('Y-m-d', strtotime('-21 day', strtotime($sems['fdate'])));
+	  					$course_process['subject'] = 0;
+				        $course_process['detail'] = '';
+				        $course_process['done'] = 0;
+				        $course_process['date'] = '0000-00-00';
+				        $course_process['due']  = $chase_due;
+				        $course_process['add']  = "Chase tuition on SEM *{$semOrder}";
+				        $chase = $o_c->checkCourseProcessByItem($course_id, $course_process['add']);	
+				        if (!$chase && $chase_due >= date('Y-m-d')) {
+					        $course_process['order'] = $o_c->getCourseProcessOrder(0, $course_id);
+							$o_c->resetCourseProcessOrder($course_id, $course_process['order']);
+							$course_process['order'] = $course_process['order'] + 1; 
+							$course_process['isAuto'] = 0;
+							$o_c->addCourseProcess($course_id, $course_process);
+						}
+						elseif (isset($chase['id']) && $chase['id'] > 0) {
+							$o_c->setCourseProcessDue($chase['id'], $chase_due);
+						}
+					}
 	        }
 	        //Cancel status
 	        if ($sems['done'] == 2 ) {
@@ -183,6 +206,7 @@ $sem_arr = $o_c->getCourseSem($course_id);
 $o_tpl = new Template;
 if($sem_id > 0 && array_key_exists($sem_id, $sem_arr)){
 	$o_tpl->assign('sem_arr', $sem_arr[$sem_id]);
+	$o_tpl->assign('chase', $o_c->checkCourseProcessByItem($course_id, "Chase tuition on SEM *{$sem_arr[$sem_id]['sem']}"));
 }
 
 # check has sub agents
@@ -207,5 +231,6 @@ $o_tpl->assign('courseid', $course_id);
 $o_tpl->assign('cid', $client_id);
 $o_tpl->assign('ugs', $ugs);
 $o_tpl->assign('isapprove', ($o_c->getCourseConsult($course_id) == $user_id) || ($ugs['i_rev']['v'] == 1) || (isset($ugs['c_track']['v']) && $ugs['c_track']['v'] == 1)? 1 :  0);
+$o_tpl->assign('client', $o_c->getOneClientInfo($client_id));
 $o_tpl->display('client_course_sem.tpl');
 ?>

@@ -39,7 +39,7 @@ if(isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
 	$sets['name']    = isset($_REQUEST['t_name'])? trim($_REQUEST['t_name']) : 0;
 	$sets['web']     = isset($_REQUEST['t_web'])? trim($_REQUEST['t_web']) : 0;
 	$sets['tel']     = isset($_POST['t_tel'])? trim($_POST['t_tel']) : "";
-	$sets['fax']     = isset($_POST['t_fax'])? trim($_POST['t_fax']) : "";
+	//$sets['fax']     = isset($_POST['t_fax'])? trim($_POST['t_fax']) : "";
 	$sets['email']   = isset($_POST['t_email'])? trim($_POST['t_email']) : "";
 	$sets['add']     = isset($_POST['t_add'])? trim($_POST['t_add']) : "";
 	$sets['country'] = isset($_POST['t_country'])? trim($_POST['t_country']) : 0;
@@ -51,6 +51,9 @@ if(isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
 	$sets['verify']  = isset($_POST['t_verify'])? trim($_POST['t_verify']) : 0;
     $sets['cate']    = isset($_POST['t_cate'])? trim($_POST['t_cate']) : '';	
     $sets['uid']  = isset($_POST['t_uid'])? trim($_POST['t_uid']) : 0;
+    $sets['wechatid']  = isset($_POST['t_wechatid'])? trim($_POST['t_wechatid']) : '';
+    $sets['pos']  = isset($_POST['t_pos'])? trim($_POST['t_pos']) : '';
+    $sets['state']  = isset($_POST['t_state'])? trim($_POST['t_state']) : '';
 
     if (($sets['type'] == 'sub' && $sets['cate'] == 'education' && $ugs['ap_d']['v'] != 1) || ($sets['type'] == 'sub' && $sets['cate'] == 'student' && $ugs['aa_d']['v'] != 1) || ($sets['type'] == 'top' && $ugs['a_dt']['v'] != 1)) {
 
@@ -81,7 +84,7 @@ if ($agent_id > 0){
 }
 else {
     if (isset($_POST['t_cate'])) {
-        $o_tpl->assign("dt_arr", array('cate'=>$_POST['t_cate']));
+        $o_tpl->assign("dt_arr", array('cate'=>$_POST['t_cate'], 'uid'=>$user_id));
     }
     $exType = isset($_REQUEST['status'])? $_REQUEST['status'] : "";
     $o_tpl->assign("exType", $exType);
@@ -99,7 +102,7 @@ $o_tpl->assign("itemtype", __FILE_AGENT);
 if (isset($ugs['rpt_staff']) && $ugs['rpt_staff']['v'] == 1){
     $o_tpl->assign('slUsers', $o_g->getUserNameArr());
 }else {
-    $o_tpl->assign('slUsers', $o_g->getUserNameArr($staff_id));
+    $o_tpl->assign('slUsers', $o_g->getUserNameArr($user_id));
 }
 
 $o_tpl->display("agent_detail.tpl");

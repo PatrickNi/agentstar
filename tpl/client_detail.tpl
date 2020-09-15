@@ -118,6 +118,27 @@
                 <td colspan="2"><hr></td>
               </tr>
               <tr>
+                <td width="28%"  align="left" class="rowodd"><strong>Wechat ID:</strong>&nbsp;&nbsp;</td>
+                <td align="left" width="72%" class="roweven">
+                  <input id='t_wechat_id' type="text" name="t_wechat_id" value="{$arr.wechatid}"  size="50">
+                 </td>
+              </tr> 
+              <tr>
+                <td width="28%"  align="left" class="rowodd"><strong>Wechat Linked Phone:</strong>&nbsp;&nbsp;</td>
+                <td align="left" width="72%" class="roweven">
+                  <input id='t_wechat_phone' type="text" name="t_wechat_phone" value="{$arr.wechatphone}"  size="50">
+                 </td>
+              </tr>
+              <tr>
+                <td width="28%"  align="left" class="rowodd"><strong>Wechat Linked Email:</strong>&nbsp;&nbsp;</td>
+                <td align="left" width="72%" class="roweven">
+                  <input id='t_wechat_email' type="text" name="t_wechat_email" value="{$arr.wechatemail}"  size="50">
+                 </td>
+              </tr> 
+              <tr>
+                <td colspan="2"><hr></td>
+              </tr>
+              <tr>
                 <td width="28%"  align="left" class="rowodd"><strong>Country of passport:</strong>&nbsp;&nbsp;</td>
                 <td align="left" width="72%" class="roweven"><select name="t_country" onChange="this.form.t_sign.focus();">
                   
@@ -268,13 +289,13 @@
                 </td>
               </tr>    
               <tr>
-                <td width="28%" align="left" class="rowodd"><strong>Global Ambassador:</strong>&nbsp;&nbsp;</td>
+                <td width="28%" align="left" class="rowodd"><strong>Global Assistant:</strong>&nbsp;&nbsp;</td>
                 <td align="left" width="72%" class="roweven"> 
                   {if $ugs.b_suba.v eq 1 && $ugs.b_suba.m eq 0 && ($cid gt 0 || $ugs.b_suba.i eq 0)}
                       <input type="hidden" name="t_agent_a" value="{$arr.agent}">
                   {/if}
                   <select id="t_agent_a" name="t_agent_a" onChange="changeClientFrom(this,this.form.t_about,'t_agent_p');changeAboutInput(this.form.t_about.value,this.form.t_aboutTxt)" {if $ugs.b_suba.v eq 1 && $ugs.b_suba.m eq 0 && ($cid gt 0 || $ugs.b_suba.i eq 0)} disabled {/if}>
-                  <option value="0">chose a global ambassador</option>
+                  <option value="0">chose a global assistant</option>
                   {foreach key=ag_id item=v from=$agent_ambassador}
                       <option value="{$ag_id}" {if $ag_id eq $arr.agent} selected {/if}>{$v.name}</option>
                   {/foreach}

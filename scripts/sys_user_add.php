@@ -23,16 +23,17 @@ $user_phone  = isset($_POST['u_phone'])? trim($_POST['u_phone']) : "";
 $user_add    = isset($_POST['u_add'])? trim($_POST['u_add']) : "";
 $user_adv    = isset($_POST['u_adv'])? trim($_POST['u_adv']) : 0;
 $user_startdate  = isset($_POST['u_startdate'])? trim($_POST['u_startdate']) : "";
+$user_leavedate  = isset($_POST['u_leavedate'])? trim($_POST['u_leavedate']) : "0000-00-00";
 
 if(isset($_POST['qflag']) && strtoupper($_POST['qflag']) == "NEW"){	
-	$o_f->addUser($user_name, $user_pswd, $user_email, $user_mobile, $user_phone, $user_add, $user_pos, $user_mark, $user_adv, $user_startdate);
+	$o_f->addUser($user_name, $user_pswd, $user_email, $user_mobile, $user_phone, $user_add, $user_pos, $user_mark, $user_adv, $user_startdate,$user_leavedate);
 	echo "<script language='javascript'>self.location.href='sys_user.php';</script>";
 	exit;
 }
 
 
 if($user_id > 0 && isset($_POST['qflag']) && strtoupper($_POST['qflag']) == "EDIT"){
-	$o_f->setUser($user_id, $user_name, $user_pswd, $user_email, $user_mobile, $user_phone, $user_add, $user_pos, $user_mark, $user_adv, $user_startdate);
+	$o_f->setUser($user_id, $user_name, $user_pswd, $user_email, $user_mobile, $user_phone, $user_add, $user_pos, $user_mark, $user_adv, $user_startdate, $user_leavedate);
 	echo "<script language='javascript'>self.location.href='sys_user.php';</script>";
 	exit;
 }
@@ -53,6 +54,7 @@ if($user_id > 0){
 		$user_pos    = $user_arr[$user_id]['pos'];
 		$u_adv       = $user_arr[$user_id]['adv'];
 		$user_startdate = $user_arr[$user_id]['startdate'];
+		$user_leavedate = $user_arr[$user_id]['leavedate'];
 	}
 	$_tag = "Edit";
 }else{
@@ -137,7 +139,11 @@ if($user_id > 0){
     <tr>
         <td align="left"><strong>Official Start Date: </strong>&nbsp;&nbsp;</td>
         <td align="left" width="86%"><input type="text" size="30" name="u_startdate" value="<?php echo $user_startdate;?>" onDblClick="calendar()" onChange="audit_date(this)" ></td>
-    </tr>								
+    </tr>	
+    <tr>
+        <td align="left"><strong>Official Leave Date: </strong>&nbsp;&nbsp;</td>
+        <td align="left" width="86%"><input type="text" size="30" name="u_leavedate" value="<?php echo $user_leavedate;?>" onDblClick="calendar()" onChange="audit_date(this)" ></td>
+    </tr>							
 	<tr>
 		<td class="title" colspan="2" align="center">			
 			<input type="submit" style="font-weight:bold;" value="<?php echo $_tag;?>">&nbsp;&nbsp;

@@ -28,8 +28,15 @@
 						</td>
 					</tr>
 				</table></td></tr>
+				<tr align="center"  class="greybg" >
+      				<td align="left" style="font-size:16px " colspan="2" >
+      					<span class="highyellow">Client: {$client.lname} {$client.fname}</span>&nbsp;&nbsp; 
+      					<span class="highyellow">DoB: {$client.dob}</span>&nbsp;&nbsp;
+      					<span class="highyellow">Main Visa: {$client.visa_n}-{$client.class_n}, expr: {$client.epdate}</span>
+      				</td>
+    			</tr>
 				<tr>
-					<td width="80%"><table border="0" width="100%" cellpadding="3" cellspacing="1">
+					<td width="80%" valign="top"><table border="0" width="100%" cellpadding="3" cellspacing="1">
 							<tr>
 								<td width="28%" align="left" class="rowodd"><strong>School Name:</strong>&nbsp;&nbsp;</td>
 								<td align="left" width="72%" class="roweven">{$dt_arr.school}&nbsp;&nbsp;
@@ -154,27 +161,49 @@
 							{/if}
 				  </table></td>
 					
-					<td width="20%" align="left" valign="top"><div style="width:500px; height:300px; overflow-X:auto; overflow-Y:auto;">
-						<table border="0" cellpadding="0" cellspacing="0" width="100%">
-							<tr class="greybg">
-									<td colspan="4" class="whitetext" align="center">Process &nbsp;
-										{if $semid gt 0}<input type="button" value="add new" style="font-weight:bold "onClick="window.open('client_course_sem_proc.php?semid={$semid}&isNew=1','_blank', 'alwaysRaised=yes,resizable=yes,scrollbars=yes,width=500,height=380')" {if $isapprove eq 0} disabled {/if}>{/if}
-									</td>				
-							</tr>							
-							<tr align="center" class="totalrowodd">
-								<td class="border_1" width="32%">Date</td>
-								<td class="border_1" width="59%">Subject</td>
-								<td class="border_1" width="9%">Insert</td>
-							</tr>
-							{foreach key=id item=arr from=$process_arr}
-							<tr align="center" class="roweven">
-								<td class="border_1" align="left"><span style="font-size:16px;font-weight:bolder; color:#990000">{if $arr.done eq 1}&radic;{else}?{/if}</span>{$arr.date}</td>
-								<td class="border_1" align="left"><span style="cursor:pointer; text-decoration:underline;" onClick="openModel('client_course_sem_proc.php?semid={$semid}&pid={$id}&cid={$cid}',500,380,'NO', 'form1')">{$arr.subject}</span></td>
-								<td class="border_1"><img src="../images/arr_down.gif" style="cursor:pointer" onClick="window.open('client_course_sem_proc.php?semid={$semid}&pid={$id}&isNew=1','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,width=500,height=380')"></td>
-							</tr>
-							{/foreach}
-						</table>
-					</div></td>	
+					<td width="20%" align="left" valign="top">
+						<div style="width:500px; height:300px; overflow-X:auto; overflow-Y:auto;">
+							<table border="0" cellpadding="0" cellspacing="0" width="100%">
+								<tr class="greybg">
+										<td colspan="4" class="whitetext" align="center">Account Process &nbsp;
+											{if $semid gt 0}<input type="button" value="add new" style="font-weight:bold "onClick="window.open('client_course_sem_proc.php?semid={$semid}&isNew=1','_blank', 'alwaysRaised=yes,resizable=yes,scrollbars=yes,width=500,height=380')" {if $isapprove eq 0} disabled {/if}>{/if}
+										</td>				
+								</tr>							
+								<tr align="center" class="totalrowodd">
+									<td class="border_1" width="32%">Date</td>
+									<td class="border_1" width="59%">Subject</td>
+									<td class="border_1" width="9%">Insert</td>
+								</tr>
+								{foreach key=id item=arr from=$process_arr}
+								<tr align="center" class="roweven">
+									<td class="border_1" align="left"><span style="font-size:16px;font-weight:bolder; color:#990000">{if $arr.done eq 1}&radic;{else}?{/if}</span>{$arr.date}</td>
+									<td class="border_1" align="left"><span style="cursor:pointer; text-decoration:underline;" onClick="window.open('client_course_sem_proc.php?semid={$semid}&pid={$id}&cid={$cid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,width=500,height=380')">{$arr.subject}</span></td>
+									<td class="border_1"><img src="../images/arr_down.gif" style="cursor:pointer" onClick="window.open('client_course_sem_proc.php?semid={$semid}&pid={$id}&isNew=1','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,width=500,height=380')"></td>
+
+
+								</tr>
+								{/foreach}
+							</table>
+							<p/>
+							<table border="0" cellpadding="0" cellspacing="0" width="100%">
+								<tr class="greybg">
+									<td colspan="4" class="whitetext" align="center">Consultant Process</td>				
+								</tr>							
+								<tr align="center" class="totalrowodd">
+									<td class="border_1" width="32%">Date</td>
+									<td class="border_1" width="59%">Subject</td>
+									<td class="border_1" width="9%">Due</td>
+								</tr>
+								{if $chase.id > 0}
+									<tr align="center" class="roweven">
+										<td class="border_1" align="left"><span style="font-size:16px;font-weight:bolder; color:#990000">{if $chase.done eq 1}&radic;{else}?{/if}</span>{$chase.date}</td>
+										<td class="border_1" align="left"><span style="cursor:pointer; text-decoration:underline;" onClick="window.open('client_course_process.php?courseid={$courseid}&pid={$chase.id}&cid={$cid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,width=500,height=380')">{$chase.subject}</span></td>
+										<td class="border_1">{$chase.due}</td>
+									</tr>
+								{/if}
+							</table>
+						</div>
+				    </td>	
 				</tr>
 				<tr><td colspan="2" class="greybg">&nbsp;</td></tr>																																																								
 			</table>		

@@ -303,6 +303,10 @@
         <td align="left">
             view&nbsp;
             <input type="checkbox" name="g_i_tta[]" value="{$grant.i_tta.v}" {if $ugs.i_tta.v eq 1} checked="checked" {/if}>&nbsp;&nbsp;
+            insert&nbsp;
+            <input type="checkbox" name="g_i_tta[]" value="{$grant.i_tta.i}" {if $ugs.i_tta.i eq 1} checked="checked" {/if}>&nbsp;&nbsp;
+            modify&nbsp;
+            <input type="checkbox" name="g_i_tta[]" value="{$grant.i_tta.m}" {if $ugs.i_tta.m eq 1} checked="checked" {/if}>&nbsp;&nbsp;
         </td>
    </tr>        
    <!-- Agent -->  

@@ -36,11 +36,18 @@ elseif (isset($_REQUEST['reg']) && $_REQUEST['reg'] == 1) {
 	echo serialize($o_c->_register($_REQUEST['email']));
 	exit;
 }
+elseif (isset($_REQUEST['reg']) && $_REQUEST['reg'] == 2) {	
+	echo serialize($o_c->_register($_REQUEST['t_email'],$_REQUEST['t_lname'],$_REQUEST['t_fname'],$_REQUEST['t_phone'],$_REQUEST['t_wechatid'],$_REQUEST['t_ctype'],2));
+	exit;
+}
 elseif (isset($_REQUEST['cfm']) && $_REQUEST['cfm'] == 1) {	
 	echo serialize($o_c->_confirm($client_id));
 	exit;
 }
-
+elseif (isset($_REQUEST['reg']) && $_REQUEST['reg'] == 'partner') {	
+	echo serialize($o_a->_register());
+	exit;
+}
 
 
 $sets['visa']  = isset($_REQUEST['t_visa'])? (string)trim($_REQUEST['t_visa']) : 0;

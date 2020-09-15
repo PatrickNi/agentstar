@@ -91,7 +91,7 @@
 	</tr>	        					
 	<tr>
 		<td width="25%" align="left" class="rowodd"><strong>Note:</strong>&nbsp;&nbsp;</td>
-		<td align="left" width="75%" class="roweven"><textarea style="width:300px; height:100px;" name="t_note">{$dt_arr.note}</textarea></td>
+		<td align="left" width="75%" class="roweven"><textarea style="width:100%; height:100%;" rows="10" name="t_note">{$dt_arr.note}</textarea></td>
 	</tr>								
 	<tr class="greybg"><td colspan="2">&nbsp;</td></tr>									
 </table>		

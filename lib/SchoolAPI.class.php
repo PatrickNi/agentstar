@@ -42,7 +42,7 @@ class SchoolAPI extends MysqlDB{
     
     
 	function getSchoolList($sc_id, $column, $value, $page = 1, $page_size = 50, $cateid = 0){
-		$sql = "select a.ID, Name, Note, b.AgentStatus, StatusID, WebSite, CateID, SubCateID from Institute a left join institute_status b on(a.StatusID = b.ID)";
+		$sql = "select a.ID, Name, Note, b.AgentStatus, StatusID, WebSite, CateID, SubCateID, TopAgentID from Institute a left join institute_status b on(a.StatusID = b.ID)";
 
 		if ($sc_id > 0){
 			$sql .= "where a.ID = {$sc_id}";	
@@ -63,6 +63,7 @@ class SchoolAPI extends MysqlDB{
 			$_arr[$this->ID]['web']    = $this->WebSite;
 			$_arr[$this->ID]['cate']   = $this->CateID;
 			$_arr[$this->ID]['subcate']   = $this->SubCateID;
+			$_arr[$this->ID]['topagent'] = $this->TopAgentID;
 		}
 		return $_arr;
 	}
@@ -209,7 +210,7 @@ class SchoolAPI extends MysqlDB{
 				$v = addslashes($v);
 			}
 			
-			$sql = "Update institute SET Name = '{$set_arr['school']}', WebSite = '{$set_arr['web']}', StatusID = '{$set_arr['agent']}', Note = '{$set_arr['note']}', CateID = '{$set_arr['cate']}', SubCateID = '{$set_arr['subcate']}' where ID = {$sid}";
+			$sql = "Update institute SET Name = '{$set_arr['school']}', WebSite = '{$set_arr['web']}', StatusID = '{$set_arr['agent']}', Note = '{$set_arr['note']}', CateID = '{$set_arr['cate']}', SubCateID = '{$set_arr['subcate']}', TopAgentID = '{$set_arr['topagent']}' where ID = {$sid}";
 			return $this->query($sql);
 		}
 		return false;
@@ -221,7 +222,7 @@ class SchoolAPI extends MysqlDB{
 				$v = addslashes($v);
 			}
 			
-			$sql = "insert into institute (Name, WebSite, StatusID, Note, CateID, SubCateID) values ('{$set_arr['school']}', '{$set_arr['web']}', '{$set_arr['agent']}', '{$set_arr['note']}', '{$set_arr['cate']}', '{$set_arr['subcate']}')";
+			$sql = "insert into institute (Name, WebSite, StatusID, Note, CateID, SubCateID, TopAgentID) values ('{$set_arr['school']}', '{$set_arr['web']}', '{$set_arr['agent']}', '{$set_arr['note']}', '{$set_arr['cate']}', '{$set_arr['subcate']}','{$set_arr['topagent']}')";
 			return $this->query($sql);
 		}
 		return false;
