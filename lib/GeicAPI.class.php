@@ -240,7 +240,7 @@ class GeicAPI extends MysqlDB {
     	$rAddress 	= addslashes($rAddress);
     	$rStartDate = addslashes($rStartDate);
         $rLeaveDate = addslashes($rLeaveDate);
-		$sql = "insert into `sys_user`(UserName, UserPassword, Position, Email, Mobile, Telephone, Address, Mark, Advance, StartDate)values ('{$rName}', '{$rPassword}', '{$rPosition}', '{$rEmail}', '{$rMobile}', '{$rPhone}', '{$rAddress}', '{$rMark}', '{$rAdv}', '{$rStartDate}', '{$rLeaveDate}')";
+		$sql = "insert into `sys_user`(UserName, UserPassword, Position, Email, Mobile, Telephone, Address, Mark, Advance, StartDate, LeaveDate)values ('{$rName}', '{$rPassword}', '{$rPosition}', '{$rEmail}', '{$rMobile}', '{$rPhone}', '{$rAddress}', '{$rMark}', '{$rAdv}', '{$rStartDate}', '{$rLeaveDate}')";
  		return $this->query($sql);
  	}
  	
