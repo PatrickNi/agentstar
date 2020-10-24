@@ -41,6 +41,7 @@
         <input name="button" type="button" style="font-weight:bold;" onClick="javascript:this.form.action='client_legal.php';this.form.submit();" value="Legal Service">
         &nbsp;&nbsp; 
         {/if}  
+        <input name="button" type="button" style="font-weight:bold;" onClick="javascript:this.form.action='client_coach.php';this.form.submit();" value="Coach Service">
       </td>
     </tr>
     <tr>
