@@ -20,7 +20,7 @@
 
       <td colspan="12">
         <input type="hidden" name="t_form" value="{$form}" />
-         <input type="button" value="Add Assistant" onClick="javascript:this.form.status.value='sub';this.form.action='agent_add.php';this.form.submit();" style="font-weight:bold;">
+         <input type="button" value="Add Ambassador" onClick="javascript:this.form.status.value='sub';this.form.action='agent_add.php';this.form.submit();" style="font-weight:bold;">
         &nbsp;&nbsp;
         {if $ugs.a_delambassador.v eq 1}
         <input type="button" value="Remove" onClick="remove_confirm(this.form);" style="font-weight:bold;">
@@ -84,7 +84,7 @@
 
     </tr>    
     {foreach item=id from=$v.aid}
-    <tr id="tr_{$id}" onMouseOut="roff({$id});" onMouseOver="ron({$id});">
+    <tr id="tr_{$id}" class="{if $agent_arr[$id].sn == 'New'}yellowbg{else}{cycle values='rowodd,roweven'}{/if}">
       <td onClick="rowToggle({$id});" align="center" class="border_1"><input type="checkbox" id="box_{$id}" onClick="toggleRow(this);" name="agentId[]" value="{$id}">
       </td>
       <td align="center" class="border_1">{$id}</td>

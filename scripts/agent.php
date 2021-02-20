@@ -83,6 +83,14 @@ if($form != ""){
 		$k = isset($cates[$v['cate']])? $v['cate'] : 'other';
 
 		array_push($cates[$k]['aid'], $aid);	
+		$agent_arr[$aid]['cn'] = isset($country[$v['country']])? $country[$v['country']] : '';
+		if ($form == 'sub') {
+			$agent_arr[$aid]['sn'] = $v['verify'] == 1 ? 'Approved' : 'New';    
+		}
+		else {
+			$agent_arr[$aid]['sn'] = isset($status[$v['stid']])? $status[$v['stid']] : '';				
+		}
+
 		if (!isset($stats[$aid]))
 			continue;
 	
@@ -93,8 +101,7 @@ if($form != ""){
 		$cates[$k]['rc'] += $stats[$aid]['rcomm'];
 		$cates[$k]['pc'] += $stats[$aid]['pcomm'];		
 
-		$agent_arr[$aid]['cn'] = isset($country[$v['country']])? $country[$v['country']] : '';
-		$agent_arr[$aid]['sn'] = isset($status[$v['stid']])? $status[$v['stid']] : '';		
+
 	}
 	
 	if (isset($_REQUEST['bt_export']) && strtoupper($_REQUEST['bt_export']) == strtoupper("Export Emails")){
@@ -110,7 +117,6 @@ if($form != ""){
 	}
 	//print_r($cates);
 }
-
 
 
 # output

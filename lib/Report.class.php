@@ -2503,6 +2503,96 @@ class ReportAPI extends MysqlDB {
         return $_arr;        
     }
 
+
+    function getAllOfCoach($fromDay, $toDay, $userid){
+        $sql = "select concat(LName, ' ', FName) as Name, itemid, ci.title, DeliverHours, cc.id as COACHID, cc.CID from client_coach cc, coach_item ci, client_info c where cc.itemid = ci.id and c.CID = cc.CID and StartDate between '{$fromDay}' AND '{$toDay}' ";
+
+        if ($userid > 0) {
+            $sql .= " AND cc.staffid = {$userid} ";
+        }
+
+        $sql .= "Order by ci.title asc";  
+        $this->query($sql);
+        $_arr = array();
+        $coaches = array();
+        while ($this->fetch()) {
+            if (!isset($_arr['all']) || !isset($_arr['all'][$this->itemid]))
+                $_arr['all'][$this->itemid] = array('title'=>'', 'hour'=>0, 'client'=>0, 'list'=>array());   
+
+            $_arr['all'][$this->itemid]['title'] = $this->title;
+            $_arr['all'][$this->itemid]['hour']  += round($this->DeliverHours/60, 2);
+            $_arr['all'][$this->itemid]['client']++;
+            $_arr['all'][$this->itemid]['list'][$this->COACHID] = array('name'=>$this->Name, 'cid'=>$this->CID);
+            $_arr['all'][$this->itemid]['sale'] = 0;
+            $_arr['all'][$this->itemid]['paid'] = 0;
+        
+            $coaches[$this->COACHID] = $this->itemid;
+        }
+
+        //calc payment
+        if (count($coaches) > 0) {
+            $sql = "select VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD from client_account a Where VisaID IN (".implode(',', array_keys($coaches)).") AND ACC_TYPE = 'coach'";
+            $this->query($sql);   
+            while ($this->fetch()){
+                //paperwork profit
+                $_arr['all'][$coaches[$this->VisaID]]['sale'] += ($this->GST == 1? $this->DueAmount/1.1 : $this->DueAmount) - ($this->GST_3RD == 1? $this->AMOUNT_3RD/1.1 : $this->AMOUNT_3RD);
+            }
+
+            $sql = "select a.VisaID, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a,  client_payment b where a.ID = b.AccountID and VisaID IN (".implode(',', array_keys($coaches)).") AND ACC_TYPE = 'coach' group by a.VisaID";
+            $this->query($sql);
+            while ($this->fetch()) {
+                $_arr['all'][$coaches[$this->VisaID]]['paid'] += $this->paid;
+            }
+        }
+
+        return $_arr;        
+    }
+
+
+    function getNumOfCoach($fromDay, $toDay, $userid){
+        $sql = "select date_format(StartDate, '%Y%u') as Week, concat(LName, ' ', FName) as Name, itemid, ci.title, DeliverHours, cc.id as COACHID, cc.CID from client_coach cc, coach_item ci, client_info c where cc.itemid = ci.id and c.CID = cc.CID and StartDate between '{$fromDay}' AND '{$toDay}' ";
+
+        if ($userid > 0) {
+            $sql .= " AND cc.staffid = {$userid} ";
+        }
+
+        $sql .= "Order by ci.title asc";  
+        $this->query($sql);
+        $_arr = array();
+        $coaches = array();
+        while ($this->fetch()) {
+            if (!isset($_arr[$this->Week]) || !isset($_arr[$this->Week][$this->itemid]))
+                $_arr[$this->Week][$this->itemid] = array('title'=>'', 'hour'=>0, 'client'=>0, 'list'=>array());   
+
+            $_arr[$this->Week][$this->itemid]['title'] = $this->title;
+            $_arr[$this->Week][$this->itemid]['hour']  += round($this->DeliverHours/60, 2);
+            $_arr[$this->Week][$this->itemid]['client']++;
+            $_arr[$this->Week][$this->itemid]['list'][$this->COACHID] = array('name'=>$this->Name, 'cid'=>$this->CID);
+            $_arr[$this->Week][$this->itemid]['sale'] = 0;
+            $_arr[$this->Week][$this->itemid]['paid'] = 0;
+        
+            $coaches[$this->COACHID] = array('item_id'=>$this->itemid, 'week'=>$this->Week);
+        }
+
+        //calc payment
+        if (count($coaches) > 0) {
+            $sql = "select VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD from client_account a Where VisaID IN (".implode(',', array_keys($coaches)).") AND ACC_TYPE = 'coach'";
+            $this->query($sql);   
+            while ($this->fetch()){
+                //paperwork profit
+                $_arr[$coaches[$this->VisaID]['week']][$coaches[$this->VisaID]['item_id']]['sale'] += ($this->GST == 1? $this->DueAmount/1.1 : $this->DueAmount) - ($this->GST_3RD == 1? $this->AMOUNT_3RD/1.1 : $this->AMOUNT_3RD);
+            }
+
+            $sql = "select a.VisaID, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a,  client_payment b where a.ID = b.AccountID and VisaID IN (".implode(',', array_keys($coaches)).") AND ACC_TYPE = 'coach' group by a.VisaID";
+            $this->query($sql);
+            while ($this->fetch()) {
+                $_arr[$coaches[$this->VisaID]['week']][$coaches[$this->VisaID]['item_id']]['paid'] += $this->paid;
+            }
+        }
+
+        return $_arr;        
+    }
+
 	function getVisaReviewByUser($fromDay, $toDay, $userid){
 		$sql = "select CateID, SubClassID, Sum(if(r_Status='active',1,0)) as OpenCase,  Sum(if(r_Status<>'active', 1, 0)) as CloseCase 
 				from client_visa 
@@ -2616,6 +2706,27 @@ class ReportAPI extends MysqlDB {
     }
 
     function getStaffArchive($staff_id, $rpt_type) {
+        $rtn = array();
+        $file = __DOWNLOAD_PATH.'reportstaff/'.$rpt_type.$staff_id.'.dat';
+        if (!file_exists($file))
+            return $rtn;
+
+        $fp = fopen($file, 'r');
+        if (!$fp)
+            return $rtn;
+            
+        while(!feof($fp)) {
+            $lr = explode("#####", trim(fgets($fp)));
+            if ($lr[0] == 'filter') {
+                $rtn = json_decode($lr[1], true);
+            }
+            elseif(isset($lr[1])) {
+                $rtn[$lr[0]] = json_decode($lr[1], true);
+            }
+        }
+        fclose($fp);
+        
+        /*
         $sql = "SELECT * FROM report_staff where staff_id = '{$staff_id}' and rpt_type = '{$rpt_type}' ";
 
         $this->query($sql);
@@ -2633,11 +2744,35 @@ class ReportAPI extends MysqlDB {
             $rtn['homeloan'] = json_decode($this->homeloan, true);
             $rtn['homeloan_fee'] = json_decode($this->homeloan_fee, true);
         }
-
+        */
         return $rtn;
     }
 
-    function doStaffArchive($staff_id, $rpt_type, $filter, $courses, $courseprocs, $coursesems, $coursepots, $visaagrees, $visaprocs, $visavisits, $homeloan, $homeloan_fee) {
+    function doStaffArchive($staff_id, $rpt_type, $filter, $courses, $courseprocs, $coursesems, $coursepots, $visaagrees, $visaprocs, $visavisits, $homeloan, $homeloan_fee, $coaches) {
+        $path = __DOWNLOAD_PATH.'reportstaff/';
+        if (!is_dir($path)) {
+            mkdir($path) or die("Cannot create user dir!");
+        }	
+
+        $fw = fopen($path.$rpt_type.$staff_id.'.dat', 'w');
+        if (!$fw)
+            die("Archive file failed");
+
+        fwrite($fw, 'filter#####'.json_encode($filter)."\n");
+        fwrite($fw, 'courses#####'.json_encode($courses)."\n");
+        fwrite($fw, 'courseprocs#####'.json_encode($courseprocs)."\n");
+        fwrite($fw, 'coursesems#####'.json_encode($coursesems)."\n");
+        fwrite($fw, 'coursepots#####'.json_encode($coursepots)."\n");
+        fwrite($fw, 'visaagrees#####'.json_encode($visaagrees)."\n");
+        fwrite($fw, 'visaprocs#####'.json_encode($visaprocs)."\n");
+        fwrite($fw, 'visavisits#####'.json_encode($visavisits)."\n");
+        fwrite($fw, 'homeloan#####'.json_encode($homeloan)."\n");
+        fwrite($fw, 'homeloan_fee#####'.json_encode($homeloan_fee)."\n");
+        fwrite($fw, 'coaches#####'.json_encode($coaches)."\n");
+        fclose($fw);
+
+        return true;
+/*
         $courses = addslashes(json_encode($courses));
         $courseprocs = addslashes(json_encode($courseprocs));
         $coursesems = addslashes(json_encode($coursesems));
@@ -2651,6 +2786,18 @@ class ReportAPI extends MysqlDB {
 
         $sql = "replace into report_staff (staff_id,rpt_type, filtering,courses,courseprocs,coursesems,coursepots,visaagrees,visaprocs,visavisits,homeloan,homeloan_fee) values ('{$staff_id}', '{$rpt_type}', '{$filter}', '{$courses}','{$courseprocs}','{$coursesems}','{$coursepots}','{$visaagrees}','{$visaprocs}','{$visavisits}','{$homeloan}','{$homeloan_fee}') ";
 	   return $this->query($sql);
+*/  
     }    		
+
+    function checkStaffArchive($staff_id) {
+        $path = __DOWNLOAD_PATH.'reportstaff/';
+        if (!file_exists($path.'s'.$staff_id.'.dat')) {
+            return false;
+        }
+        if (!file_exists($path.'d'.$staff_id.'.dat')) {
+            return false;
+        }
+        return true;
+    }
 }
 ?>

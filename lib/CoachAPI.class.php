@@ -5,7 +5,6 @@ class CoachAPI extends MysqlDB{
 
     function __construct($host, $user, $pswd, $database, $debug) {
          $this->MysqlDB($host, $user, $pswd, $database, $debug);
-         $this->query('set names latin1');
     }
 
     function addItem($title, $root_id=0) {
@@ -76,7 +75,10 @@ class CoachAPI extends MysqlDB{
 
     function addCoach($user_id, $cid, $sets) {
         $sets['note'] = addslashes($sets['note']);
-        $sql = "insert into client_coach (CID, StaffID, AddUserId, ItemID, StartDate, EndDate, StartTime, DueHour, FreqWeek, Fee, AddTime, Note) values ('{$cid}','{$sets['staff']}', '{$user_id}', '{$sets['itemid']}', '{$sets['startdate']}','{$sets['enddate']}','{$sets['starttime']}','{$sets['duehour']}','{$sets['freqw']}','{$sets['fee']}', NOW(), '{$sets['note']}')";
+        $deliver_hour = $this->calDeliverHour($sets['startdate'], $sets['enddate'], $sets['freqw'], $sets['duehour']);
+
+        $sql = "insert into client_coach (CID, StaffID, AddUserId, ItemID, StartDate, EndDate, StartTime, DueHour, FreqWeek, Fee, AddTime, Note, SaleID, DeliverHours) values ('{$cid}','{$sets['staff']}', '{$user_id}', '{$sets['itemid']}', '{$sets['startdate']}','{$sets['enddate']}','{$sets['starttime']}','{$sets['duehour']}','{$sets['freqw']}','{$sets['fee']}', NOW(), '{$sets['note']}', '{$sets['sales']}', '{$deliver_hour}')";
+        //var_dump($sql);exit;
         $this->query($sql);
         return $this->getLastInsertID();
     }
@@ -86,7 +88,10 @@ class CoachAPI extends MysqlDB{
             return false;
 
         $sets['note'] = addslashes($sets['note']);
-        $sql = "update client_coach SET AddUserID = '{$user_id}', ItemID = '{$sets['itemid']}', StartDate = '{$sets['startdate']}', EndDate = '{$sets['enddate']}', StaffId = '{$sets['staff']}', StartTime = '{$sets['starttime']}', DueHour = '{$sets['duehour']}', FreqWeek = '{$sets['freqw']}', Fee = '{$sets['fee']}', Note='{$sets['note']}' where id = {$coach_id}";
+        $deliver_hour = $this->calDeliverHour($sets['startdate'], $sets['enddate'], $sets['freqw'], $sets['duehour']);
+
+        $sql = "update client_coach SET AddUserID = '{$user_id}', ItemID = '{$sets['itemid']}', StartDate = '{$sets['startdate']}', EndDate = '{$sets['enddate']}', StaffId = '{$sets['staff']}', StartTime = '{$sets['starttime']}', DueHour = '{$sets['duehour']}', FreqWeek = '{$sets['freqw']}', Fee = '{$sets['fee']}', Note='{$sets['note']}', SaleID = '{$sets['sales']}', DeliverHours = '{$deliver_hour}' where id = {$coach_id}";
+        //var_dump($sql);
         return $this->query($sql);
     }
 
@@ -98,13 +103,20 @@ class CoachAPI extends MysqlDB{
         return $this->query($sql);
     }
 
-    function getCoach($cid, $coach_id=0) {
-        $sql = "SELECT ID, CID, StaffID, AddUserID, ItemID, StartDate, EndDate, StartTime, DueHour, FreqWeek, Fee, AddTime, Note FROM client_coach ";
+    function getCoach($cid, $coach_id=0, $date='', $staff=0) {
+        $sql = "SELECT ID, CID, StaffID, AddUserID, ItemID, StartDate, EndDate, StartTime, DueHour, FreqWeek, Fee, AddTime, Note, SaleID, DeliverHours FROM client_coach WHERE 1 ";
         if ($cid)
-            $sql .= " WHERE CID = {$cid} ";
+            $sql .= " AND CID = {$cid} ";
+
         if ($coach_id > 0) 
             $sql .= " AND ID = {$coach_id} ";
+        
+        if ($date != '') 
+            $sql .= " AND StartDate >= '{$date}' AND EndDate <= '{$date}' ";
 
+        if ($staff > 0)
+            $sql .= " AND StaffID = {$staff} ";
+        //echo $sql."<br/>";
         $this->query($sql);
         $arr = array();
         while($this->fetch()) {
@@ -121,8 +133,26 @@ class CoachAPI extends MysqlDB{
             $arr[$this->ID]['fee'] = $this->Fee;
             $arr[$this->ID]['created'] = $this->AddTime;
             $arr[$this->ID]['note'] = $this->Note;
+            $arr[$this->ID]['sales'] = $this->SaleID;
+            $arr[$this->ID]['deliverhour'] = $this->DeliverHours;
         }
         return $arr;
+    }
+
+    function calDeliverHour($startdate, $enddate, $freq_weeks, $duehour) {
+        if (!$startdate || $startdate == '0000-00-00' || !$enddate || $enddate == '0000-00-00' || !$freq_weeks || !$duehour)
+            return 0;
+
+        $freq_weeks = explode(',', $freq_weeks);
+        $count = 0;
+        do {
+            if(in_array(date('D', strtotime($startdate)), $freq_weeks))
+                $count++;
+
+            $startdate = date("Y-m-d", strtotime('+1 day', strtotime($startdate)));
+        }while($startdate <= $enddate);
+        
+        return $duehour*$count;
     }
 }
 ?>

@@ -47,14 +47,14 @@ class MysqlDB {
      	if(!$this->m_linkID){
      		# create connection
      		if($this->m_plink == 1){
-     			$this->m_linkID = @mysql_pconnect($this->m_host, $this->m_user, $this->m_pswd);
+     			$this->m_linkID = @mysqli_connect('p:'.$this->m_host, $this->m_user, $this->m_pswd);
      		}else{
-     			$this->m_linkID = @mysql_connect($this->m_host, $this->m_user, $this->m_pswd);
+     			$this->m_linkID = @mysqli_connect($this->m_host, $this->m_user, $this->m_pswd);
      		}
     		
      		# check connection
      		if (!$this->m_linkID){	
-				$this->errorProcess("Error code" . mysql_errno() . ", Error info: ". mysql_error());
+				$this->errorProcess("Error code" . mysqli_errno($this->m_LinkID) . ", Error info: ". mysqli_error($this->m_LinkID));
 				return false;
 			}
 			
@@ -69,8 +69,8 @@ class MysqlDB {
 			$this->m_database = $database;	
 		}
 		
-		if (!@mysql_select_db($this->m_database, $this->m_linkID)){
-			$this->errorProcess("Error code" . mysql_errno($this->m_linkID) . ", Error info: ". mysql_error($this->m_linkID));
+		if (!@mysqli_select_db($this->m_linkID, $this->m_database)){
+			$this->errorProcess("Error code" . mysqli_errno($this->m_linkID) . ", Error info: ". mysqli_error($this->m_linkID));
 			return false;			
 		}
 		return true;
@@ -78,14 +78,14 @@ class MysqlDB {
 
 
 	function query($sql=""){
-		if (!$this->m_linkID || !@mysql_ping($this->m_linkID)){
+		if (!$this->m_linkID || !@mysqli_ping($this->m_linkID)){
 			$this->connect();
 		}
 		
 		$this->freeObj();
-		$this->m_res = @mysql_query($sql, $this->m_linkID);
+		$this->m_res = @mysqli_query($this->m_linkID, $sql);
 		if (!$this->m_res){
-			$this->errorProcess("Error code" . mysql_errno($this->m_linkID) . ", Error info: ". mysql_error($this->m_linkID), $sql);
+			$this->errorProcess("Error code" . mysqli_errno($this->m_linkID) . ", Error info: ". mysqli_error($this->m_linkID), $sql);
 			return false;								
 		}
 		return true;
@@ -93,7 +93,7 @@ class MysqlDB {
 	
 	function fetch_array() {
         if($this->m_res){
-            return mysql_fetch_assoc($this->m_res); 
+            return mysqli_fetch_array($this->m_res, MYSQLI_ASSOC); 
         }
         else{
             return false;
@@ -102,7 +102,7 @@ class MysqlDB {
 
 	function fetch(){
 		if($this->m_res){
-			$_arr = mysql_fetch_assoc($this->m_res); 
+			$_arr = mysqli_fetch_array($this->m_res, MYSQLI_ASSOC); 
 			return $this->res2obj($_arr);
 		}else{
 			return false;
@@ -135,7 +135,7 @@ class MysqlDB {
 
 	function getSelectNum(){
 		if($this->m_res){
-			return @mysql_num_rows($this->m_res);
+			return @mysqli_num_rows($this->m_res);
 		}
 		return 0;
 	}
@@ -143,19 +143,19 @@ class MysqlDB {
 
 	function getAffectNum(){
 		if($this->m_res){
-			return @mysql_affected_rows($this->m_res);
+			return @mysqli_affected_rows($this->m_res);
 		}
 		return 0;
 	}
 
 	function getLastInsertID(){
 		if($this->m_linkID){
-			return @mysql_insert_id($this->m_linkID);
+			return @mysqli_insert_id($this->m_linkID);
 		}
 	}
 	
 	function close(){
-		return @mysql_close($this->m_linkID);
+		return @mysqli_close($this->m_linkID);
 	}	
 }
 ?>

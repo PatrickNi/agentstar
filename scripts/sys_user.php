@@ -3,6 +3,9 @@ require_once('../etc/const.php');
 require_once(__LIB_PATH.'Template.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
 
+$position_arr['PE'] = 'Edu Partner';
+$position_arr['PC'] = 'Coach Partner';
+
 $_userid = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
 if (!($_userid > 0)) {
 	echo "<script language='javascript'>parent.location.href='login.php';</script>";

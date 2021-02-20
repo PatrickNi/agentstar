@@ -7,7 +7,7 @@ require_once(__LIB_PATH.'ClientAPI.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
 require_once(__LIB_PATH.'VisaAPI.class.php');
 
-$PAYMENT_ITEMS = array('agreement'=>'sub-agent', 'extra-agreement'=>'', 'app'=>'app', 'marriage'=>'marriage', 'printing'=>'printing', 'postage'=>'postage', 'translation'=>'translation', "OSHC"=>"OSHC", 'other'=>'',);
+$PAYMENT_ITEMS = array('agreement'=>'sub-agent', 'extra-agreement'=>'', 'app'=>'app', 'marriage'=>'marriage', 'printing'=>'printing', 'postage'=>'postage', 'translation'=>'translation', "OSHC"=>"OSHC", 'other'=>'', 'coaching'=>'coaching', 'material'=>'material');
 
 
 # check valid user

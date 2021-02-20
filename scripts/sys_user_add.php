@@ -2,6 +2,10 @@
 require_once('../etc/const.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
 
+$position_arr['PE'] = 'Edu Partner';
+$position_arr['PC'] = 'Coach Partner';
+
+
 $_userid = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
 
 if (!($_userid > 0)) {
@@ -142,7 +146,11 @@ if($user_id > 0){
     </tr>	
     <tr>
         <td align="left"><strong>Official Leave Date: </strong>&nbsp;&nbsp;</td>
-        <td align="left" width="86%"><input type="text" size="30" name="u_leavedate" value="<?php echo $user_leavedate;?>" onDblClick="calendar()" onChange="audit_date(this)" ></td>
+        <td align="left" width="86%"><input type="text" size="30" name="u_leavedate" value="<?php echo $user_leavedate;?>" onDblClick="calendar()" onChange="audit_date(this)" >
+        	&nbsp;&nbsp;
+        	<a href="/scripts/sys_user_merge.php?uid=<?php echo $user_id;?>" target="_self">Course Consultant Merge</a>
+        </td>
+
     </tr>							
 	<tr>
 		<td class="title" colspan="2" align="center">			

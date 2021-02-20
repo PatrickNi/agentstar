@@ -1,0 +1,32 @@
+
+[ENDPOINT] 110.143.32.230:8080
+
+#1 Add Client
+    REQUEST URL: http://[ENDPOINT]/dataapi/reg.php?token=a74613df87c11d04519fb0ee4225c800&reg=2
+    REQUEST METHOD: POST
+    REQUEST PARAMETER:
+                        &t_email=YOUR_EMAIL
+                        &t_lname=YOUR_LAST_NAME
+                        &t_fname=YOUR_FIREST_NAME
+                        &t_phone=YOUR_MOBILE
+                        &t_wechatid=YOUR_WECHANTID
+                        &t_ctype=YOUR_SERVICE
+                       
+    RESPONSE:
+        SUCC:  PHP serialize STRING , source data is an ARRAY ['id'=>, 'code'=>''];
+        FAIL:  PHP serialize STRING , source data is INT int number of "0"; 
+
+
+YOUR_SERVICE:
+/*
+                <option value="study">* 留学 Study</option>
+                <option value="immi">* 移民 Immigration</option>
+                <option value="homeloan">* 贷款 Home Loan</option>
+                <option value="legal">* 法律 Legal</option>
+ */
+
+NOTE:
+TOKEN: a74613df87c11d04519fb0ee4225c800 (长期有效)
+t_email: 为必填字段
+
+

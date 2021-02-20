@@ -38,6 +38,25 @@
 				</tr>
 				{/foreach}
 			</table>
+			{if count($coupons) > 0}
+			 <table border="0" cellpadding="1" cellspacing="1" width="100%">
+				<tr><td colspan="2"><hr></td></tr>
+				<tr><td colspan="2" align="center" class="totalrowodd">Active Coupons</td></tr>
+				<tr align="left">
+					<td colspan="2" class="roweven">
+						<select name="t_coupon">
+						<option value="0" selected>Choose a coupon</option>	
+						{foreach key=couponid item=title from=$coupons}
+							<option value="{$couponid}">{$title}</option>
+						{/foreach}
+							
+						</select>
+						&nbsp;&nbsp;&nbsp;
+						<input type="submit" value="Redeem" style="font-weight:bold" onClick="this.form.bt_name.value='redeem';this.disable=false;" >
+					</td>
+				</tr>				
+			</table>
+			{/if}
 			<table border="0" cellpadding="1" cellspacing="1" width="100%">
 				<tr><td colspan="2"><hr></td></tr>
 				<tr><td colspan="2" align="center" class="totalrowodd"><input type="checkbox" name="t_new" id="t_new" value="1" onClick="newPayment(this)">&nbsp;Add new</td></tr>

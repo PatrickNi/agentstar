@@ -26,10 +26,9 @@
                         &email=YOUR_EMAIL
                         &contact=YOUR_CONTACT_PERSON
                         &add=YOUR_ADDRESS
-                        &fax=YOUR_FAX_NUMBER
+                        &wechatid=YOUR_WECHANTID
     RESPONSE:
         PHP serialize STRING , source data is an ARRAY ['err'=>1, 'msg'=>''];
-
 
 
 FOLLOWING IS COUNTRY CODE：

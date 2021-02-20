@@ -87,7 +87,7 @@ class ClientAPI extends MysqlDB {
 		}
         
         if($only_course == 1) {
-			$sql .= " AND ClientType in ('study') ";
+			$sql .= " AND ClientType like '%study%' ";
 		}
 		
 		if ($cid > 0){
@@ -96,7 +96,7 @@ class ClientAPI extends MysqlDB {
 			if ($col_f == 'TOKEN')
 				$sql .= " AND {$col_f} = '".md5($col_v)."' ";
 			else
-				$sql .= " AND {$col_f} like '{$col_v}%' ";
+				$sql .= " AND {$col_f} like '%{$col_v}%' ";
 		}
 		
 		if ($from != "" && $to != ""){
@@ -107,6 +107,7 @@ class ClientAPI extends MysqlDB {
 			$sql .= " AND STATUS = '{$status}' ";
 		
 		$sql .= " Order by STATUS ASC, CreateTime desc, LName asc Limit " . ($page - 1)* $page_size . ", " . $page_size;
+		//echo $sql."\n";
 		$this->query($sql);
 
 		$_arr = array();
@@ -1423,7 +1424,7 @@ class ClientAPI extends MysqlDB {
 		if ($vid > 0){
 			$sql .= " Where CVID = {$vid}";
 		}
-		$sql .= " AND BeginDate <> '0000-00-00' AND BeginDate <> '' order by BeginDate asc ";
+		$sql .= " AND BeginDate <> '0000-00-00' AND BeginDate is NOT NULL order by BeginDate asc ";
 		$this->query($sql);
 		$_arr = array();
 		while ($this->fetch()){
@@ -1440,7 +1441,7 @@ class ClientAPI extends MysqlDB {
 		if ($vid > 0){
 			$sql .= " Where CVID = {$vid}";
 		}
-		$sql .= " AND (BeginDate = '0000-00-00' or BeginDate = '') ";
+		$sql .= " AND (BeginDate = '0000-00-00' or BeginDate is NULL) ";
 		$this->query($sql);
 		while ($this->fetch()){
 			$_arr[$this->ID]['date']    = $this->BeginDate == '0000-00-00'? '': $this->BeginDate;
@@ -1499,18 +1500,19 @@ class ClientAPI extends MysqlDB {
     
     
     function getAccount($visa_id = 0, $account_id = 0, $account_typ='visa'){
-        $sql = "select a.ID, VisaID, DueAmount, Note, Step, UserID, DueDate, GST, PARTY_3RD, AMOUNT_3RD, GST_3RD, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a left join client_payment b on(a.ID = b.AccountID) Where 1 ";
+        $sql = "select a.ID, VisaID, DueAmount, Note, Step, UserID, DueDate, GST, PARTY_3RD, AMOUNT_3RD, GST_3RD, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid, ACC_TYPE from client_account a left join client_payment b on(a.ID = b.AccountID) Where 1 ";
         if ($account_id > 0){
         	$sql .= " AND a.ID = '{$account_id}' ";
         }else{
 	        if ($visa_id > 0){
 	        	$sql .= " And VisaID = '{$visa_id}' ";
 	        }
+
+	        if ($account_typ != "") {
+	        	$sql .= " AND ACC_TYPE = '{$account_typ}' ";
+	        }
         }
 
-        if ($account_typ != "") {
-        	$sql .= " AND ACC_TYPE = '{$account_typ}' ";
-        }
 
         $sql .= " Group by a.ID Order by Step";
 	    $this->query($sql);
@@ -1528,6 +1530,8 @@ class ClientAPI extends MysqlDB {
             $_arr[$this->ID]['spand']    = 0;
             $_arr[$this->ID]['gst_chk']     = $this->GST;
             $_arr[$this->ID]['gst_3rd_chk'] = $this->GST_3RD;
+            $_arr[$this->ID]['type'] = $this->ACC_TYPE;
+            $_arr[$this->ID]['objid'] = $this->VisaID;
         }
 
 		$sql = "select a.ID, sum(if(c.PaidAmount is null, 0, c.PaidAmount)) as spand from client_account a left join client_spand c on (a.ID = c.AccountID) Where 1 ";
@@ -1610,7 +1614,7 @@ class ClientAPI extends MysqlDB {
 		}
 	}
 
-function getSpand($aid){
+	function getSpand($aid){
 		if ($aid > 0){
 			$sql = "select ID, PaidAmount, PaidDate from client_spand where AccountID = '{$aid}' ";
 			$this->query($sql);
@@ -2270,7 +2274,7 @@ function getSpand($aid){
     }
 
     function getClientFrom() {
-        $sql = "SELECT item from client_from order by rank";
+        $sql = "SELECT item from client_from order by `rank`";
         $this->query($sql);
         $arr = array();
         while ($this->fetch()){
@@ -2431,6 +2435,63 @@ function getSpand($aid){
 			$sets['isAuto']  = 1;
 			$this->addCourseProcess($courseid, $sets);
     	}
+    }
+
+    function countCourseByConsultant($staff_id=0) {
+    	if (!$staff_id)
+    		return 0;
+    	$sql = "select count(*) as c from client_course where ConsultantID = {$staff_id}";
+    	$this->query($sql);
+    	$this->fetch();
+    	return $this->c;
+    }
+
+    function mergeCourseConsultant($from_staff_id, $to_staff_id) {
+    	if (!$from_staff_id || !$to_staff_id)
+    		return false;
+
+    	$sql = "update client_course SET ConsultantID = {$to_staff_id} where ConsultantID = {$from_staff_id}";
+    	$this->query($sql);
+    	return $this->getAffectNum();
+    } 
+
+    function countVisaAgreementByStaff($staff_id=0) {
+    	if (!$staff_id)
+    		return 0;
+    	//$sql = "select count(*) as c from client_visa where VUSERID = {$staff_id}";
+		$sql = "select count(*) as c from client_visa v where vuserid = {$staff_id} and not exists (select 'x' from client_visa_process vp, visa_rs_item vi where vp.itemid = vi.itemid and v.id = vp.cvid and vi.Item like 'grant%' and vp.done = 1)";
+    	$this->query($sql);
+    	$this->fetch();
+    	return $this->c;
+	}
+
+	function mergeVisaAgreementStaff($from_staff_id, $to_staff_id) {
+    	if (!$from_staff_id || !$to_staff_id)
+    		return false;
+
+    	$sql = "update client_visa v SET v.VUSERID = {$to_staff_id} where v.VUSERID = {$from_staff_id} and not exists (select 'x' from client_visa_process vp, visa_rs_item vi where vp.itemid = vi.itemid and v.id = vp.cvid and vi.Item like 'grant%' and vp.done = 1)";
+    	$this->query($sql);
+    	return $this->getAffectNum();
+    } 
+
+    function getClientIDbyAccount($account) {
+    	if (!$account || !isset($account['type']) || $account['type'] == '')
+    		return false;
+    	if ($account['type'] == 'visa') {
+    		$sql = "select CID FROM client_visa where ID = '{$account['objid']}'";
+    	}
+    	elseif ($account['type'] == 'coach') {
+    		$sql = "select CID FROM client_coach where ID = '{$account['objid']}'";
+    	}
+    	elseif ($account['type'] == 'legal') {
+    		$sql = "select CID FROM client_legal where ID = '{$account['objid']}'";
+    	}
+    	else {
+    		return false;
+    	}
+    	$this->query($sql);
+    	$this->fetch();
+    	return $this->CID;
     }
 
 }

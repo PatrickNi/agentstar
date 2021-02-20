@@ -3,6 +3,8 @@ require_once('../etc/const.php');
 require_once(__LIB_PATH.'Template.class.php');
 require_once(__LIB_PATH.'CalendarAPI.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
+require_once(__LIB_PATH.'ClientAPI.class.php');
+require_once(__LIB_PATH.'CoachAPI.class.php');
 
 # check valid user
 $user_id = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
@@ -21,7 +23,8 @@ $min_hour = 9;
 $max_hour = 19;
 
 $o_c = new CalendarAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
-
+$o_ch = new CoachAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
+$o_cl = new ClientAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
 # get user calendar
 $calendar_arr = $o_c->getUserCalendar($date, $uid);
@@ -41,6 +44,7 @@ for($i=0; $i<=($max_hour - $min_hour) * 2; $i++){
 	$show_arr[$ht]['due']   = "";
 	$show_arr[$ht]['done']  = "";
 	$show_arr[$ht]['over']  = 0;
+	$show_arr[$ht]['coach'] = 0;
 	$minute += 30;   
 }
 
@@ -65,6 +69,32 @@ foreach($calendar_arr as $id => $v){
 	}		
 }
 
+
+//get Coach
+$coaches = $o_ch->getCoach(0,0,$date, $uid);
+$coach_items = $o_ch->getItems();
+//var_dump($coaches);exit;
+foreach ($coaches as $id => $v) {
+	if(array_key_exists($v['starttime'], $show_arr)){
+		$client = $o_cl->getOneClientInfo($v['cid']);
+
+		$show_arr[$v['starttime']]['id']    = $id;
+		$show_arr[$v['starttime']]['title'] = $client['fname']. ' '. $client['lname'] .'('. $coach_items[$v['itemid']]['tit'].')';
+		$show_arr[$v['starttime']]['due']   = $v['duehour'];
+		$show_arr[$v['starttime']]['coach']  = '/scripts/client_coach_detail.php?cid='.$v['cid'].'&coachid='.$id;
+		if ($v['duehour'] >= 60){
+			$tmp_arr = explode(":", $v['starttime']);
+			$mode = round($v['duehour'] / 30) - 1;
+			for ($i=1;$i <= $mode; $i++){
+				$ht = date("H:i", mktime($tmp_arr[0], $tmp_arr[1]+ ($i*30), 0,0,0,0));
+				if (array_key_exists($ht, $show_arr)){
+					$show_arr[$ht]['over']  = 1;
+					$show_arr[$ht]['coach']  = '/scripts/client_coach_detail.php?cid='.$v['cid'].'&coachid='.$id;
+				}
+			}
+		}		
+	}		
+}
 
 
 # get user array

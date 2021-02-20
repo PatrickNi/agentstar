@@ -4,9 +4,9 @@
 <title>Agent Star -Client Management</title>
 </head>
 <link rel="stylesheet" href="../css/sam.css">
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
-<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
-<script src="https://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
+
+{include file="style.tpl"}
+
 <script language="javascript" src="../js/audit.js"></script>
 <body>
 <form name="form1" target="_self" method="post">
@@ -43,17 +43,17 @@
         </select>
         &nbsp;&nbsp;&nbsp;
         <input type="submit" name="bt_name" value="create report" style="font-weight:bold ">
-
-        {if $from_archive}
-          <strong>Reporting data from Archive</strong>
-        {else}
-          <input type="submit" name="bt_archive" value="archive report" style="font-weight:bold ">
-        {/if}
         &nbsp;&nbsp;&nbsp;&nbsp;
         <!--<input type="button" style="font-weight:bold" onclick="printPage();"value="Print">-->
         <input type="button" style="font-weight:bold" value="Print" onClick="document.all.WebBrowser.ExecWB(6,1)">
         <input type="button"style="font-weight:bold" value="Print Setting" onClick="document.all.WebBrowser.ExecWB(8,1)">
-        <input type="button" style="font-weight:bold" value="Print Review" onClick="document.all.WebBrowser.ExecWB(7,1)"></td>
+        <input type="button" style="font-weight:bold" value="Print Review" onClick="document.all.WebBrowser.ExecWB(7,1)">
+        {if $from_archive}
+          <strong style="color:red;">Reporting data from Archive</strong>
+        {else}
+          <input type="submit" name="bt_archive" value="archive report" style="font-weight:bold ">
+        {/if}
+      </td>
     </tr>
   </table>
 </form>
@@ -424,6 +424,36 @@
     </td>
 
   </tr>
+    <tr class="greybg">
+    <td colspan="6"class="highyellow">Coach Services</td>
+  </tr>   
+  <tr align="center" class="totalrowodd">
+    <td>Course Item</td>
+    <td ># of hours delivered</td>
+    <td># of students(active / current)</td>
+    <td>Profit / Sales</td>
+    <td>Received Coaching Fee(Payment)</td>
+    <td>&nbsp;</td>
+  </tr>
+  {foreach key=titleid item=coach from=$coaches[$week]}
+  <tr align="right" class="roweven" >
+    <td align="center">{$coach.title}</td>
+    <td>{$coach.hour}</td>
+    <td>
+     <span onClick="openinSatff('d14_{$week}_{$titleid}');" style="text-decoration:underline; cursor:pointer;">{$coach.client}</span>
+      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:300px" id="d14_{$week}_{$titleid}">
+        <ul>
+          {foreach key=coach_id item=coach_st from=$coach.list}
+          <li><span style="text-decoration:underline; cursor:pointer;" onclick="window.open('/scripts/client_coach_detail.php?cid={$coach_st.cid}&coachid={$coach_id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$coach_st.name}</span>
+            {/foreach}
+        </ul>
+        <span style="font-size:16px; font-weight:bolder; cursor:pointer;" onclick="$('#d14_{$week}_{$titleid}').css('display', 'none')">&times;</span> </div>
+    </td>
+    <td>{$coach.sale|string_format:"%.2f"}</td>
+    <td>{$coach.paid|string_format:"%.2f"}</td>
+    <td>&nbsp;</td>
+  </tr> 
+  {/foreach}
   
   <tr class="greybg">
     <td colspan="6"class="highyellow">Legal Service</td>

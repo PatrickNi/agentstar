@@ -3,6 +3,8 @@ require_once('../etc/const.php');
 require_once(__LIB_PATH.'Template.class.php');
 require_once(__LIB_PATH.'ClientAPI.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
+require_once(__LIB_PATH.'CouponAPI.class.php');
+
 
 # check valid user
 $user_id = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
@@ -13,6 +15,7 @@ $pid = isset($_POST['pid'])? trim($_POST['pid']) : 0;
 $isNew = isset($_POST['t_new'])? trim($_POST['t_new']) : 0;
 $o_c = new ClientAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 $o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
+$o_p = new CouponAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
 //user grants
 $ugs = array();
@@ -56,7 +59,30 @@ if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
 			echo "<script language='javascript'>alert('permission denied');</script>";
 		}    		
 	}
-}elseif(isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "DELETE"){
+}elseif(isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "REDEEM") {
+	if (isset($_POST['t_coupon']) && $_POST['t_coupon'] > 0) {
+		$accounts = $o_c->getAccount(0, $account_id);
+
+		$sets['date'] = date('Y-m-d');
+		$coupon = $o_p->checkAvalid($_POST['t_coupon'], $accounts[$account_id]['type'].'.'.$accounts[$account_id]['step'], $sets['date']);
+		if ($coupon) {
+			$sets['paid'] = $coupon[$_POST['t_coupon']];
+			$sets['remark'] = 'Redeem a coupon';
+			//var_dump($sets);exit;
+			$o_c->addPayment($account_id, $sets);
+			$o_p->redeemCoupon($_POST['t_coupon'], $accounts[$account_id]['type'], $accounts[$account_id]['objid']);
+			echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
+			exit;    
+		}
+		echo "<script language='javascript'>alert('Redeem failed');</script>";
+		
+	}
+	else {
+		echo "<script language='javascript'>alert('Redeem failed');</script>";
+	}
+
+}
+elseif(isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "DELETE"){
 	if($ugs['p_h']['d'] == 1){
 		$o_c->delPayment($pid);
 		echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
@@ -75,6 +101,7 @@ if($account_id > 0){
 $o_tpl = new Template;
 if($account_id > 0){
 	$o_tpl->assign('account', $accounts[$account_id]);
+	$o_tpl->assign('coupons', $o_p->getCouponsByClient($o_c->getClientIDbyAccount($accounts[$account_id]), $accounts[$account_id]['type'].'.'.$accounts[$account_id]['step'], 'NEW'));
 }
 
 $o_tpl->assign('aid', $account_id);

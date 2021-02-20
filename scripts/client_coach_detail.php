@@ -25,7 +25,8 @@ $sets['freqw']   = implode(',', $sets['freqw_l']);
 
 $sets['fee']  = isset($_REQUEST['fee'])? trim($_REQUEST['fee']) : 0;
 $sets['staff']  = isset($_REQUEST['staff'])? trim($_REQUEST['staff']) : 0;
-$sets['note']    = isset($_REQUEST['t_note'])? (string)trim($_REQUEST['t_note']) : "";
+$sets['sales']  = isset($_REQUEST['sales'])? trim($_REQUEST['sales']) : 0;
+$sets['note']    = isset($_REQUEST['t_note'])? iconv('utf-8', 'GBK', (string)trim($_REQUEST['t_note'])) : "";
 
 
 $o_c = new ClientAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
@@ -121,6 +122,17 @@ if($coach_id > 0){
 }
 
 
+$min_hour = 9;
+$max_hour = 19;
+$init_hours = array();
+$minute = 0;
+for($i=0; $i<=($max_hour - $min_hour) * 2; $i++){
+    array_push($init_hours, date("H:i", mktime($min_hour, $minute, 0,0,0,0)));
+    $minute += 30;   
+}
+
+$o_tpl->assign('init_hour', $init_hours);
+
 
 $o_tpl->assign("init_courses", "var items=".json_encode($o_h->getAssocItems()));
 $o_tpl->assign("items_arr", $o_h->getItems());
@@ -142,6 +154,7 @@ $o_tpl->assign('coachid', $coach_id);
 $o_tpl->assign('client', $o_c->getOneClientInfo($client_id));
 $o_tpl->assign('msg', $msg);
 $o_tpl->assign('ugs', $ugs);
+$o_tpl->assign('due_arr', array('30' => "0.5hr", '60' => "1hr", '90' => "1.5hrs", '120' => "2hrs", '150' => "2.5hrs", '180' => "3hrs", '210' => "3.5hrs", '240' => "4hrs", '480' => "1day"));
 
 
 $o_tpl->display('client_coach_detail.tpl'); 

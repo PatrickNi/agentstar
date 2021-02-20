@@ -58,6 +58,8 @@ $oTpl->assign('grouArr', $arr_func);
 $oTpl->assign('task_num', $o_func->getNumberOfUndoTask($user_id));
 $oTpl->assign('user_name', $o_func->getUserName($user_id));
 $oTpl->assign('ugs', $ugs);
+
+//var_dump($arr_func);exit;
 $oTpl->display('frame_test.tpl');
 
 echo '<script language="javascript">

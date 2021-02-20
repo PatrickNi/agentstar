@@ -5,9 +5,9 @@
 </head>
 
 <link rel="stylesheet" href="../css/sam.css">
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
-<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
-<script src="https://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
+
+{include file="style.tpl"}
+
 <script language="javascript" src="../js/audit.js?v1"></script>
 {$msg}
 <body>
@@ -61,10 +61,21 @@
           </tr>   
 
           <tr> 
-            <td width="36%" align="left" class="rowodd"><strong>Time & Hours:</strong></td> 
+            <td width="36%" align="left" class="rowodd"><strong>Class start & Class hours:</strong></td> 
             <td align="left" width="64%" class="roweven"> 
-              <input type="text" name="starttime" size="10" value="{$dt_arr.starttime}">&nbsp;&nbsp;
-              <input type="text" name="duehour" size="10" value="{$dt_arr.duehour}">(h)
+
+              <select name="starttime">
+                {foreach key=id item=name from=$init_hour}
+                  <option value="{$name}" {if $name eq $dt_arr.starttime} selected {/if}>{$name}</option>
+                {/foreach}
+              </select>&nbsp;&nbsp;
+
+
+              <select name="duehour">
+                {foreach key=id item=name from=$due_arr}
+                  <option value="{$id}" {if $id eq $dt_arr.duehour} selected {/if}>{$name}</option>
+                {/foreach}
+            </select>
             </td> 
           </tr> 
           <tr> 
@@ -78,9 +89,22 @@
                <input type="checkbox" name="freqw[]" value="Sat" {if in_array('Sat', $dt_arr.freqw_l)}checked{/if}/>Sat&nbsp;
                <input type="checkbox" name="freqw[]" value="Sun" {if in_array('Sun', $dt_arr.freqw_l)}checked{/if}/>Sun&nbsp;
             </td> 
-          </tr>                         
+          </tr>   
           <tr> 
-            <td width="36%" align="left" class="rowodd"><strong>Staff:</strong>&nbsp;&nbsp;</td> 
+            <td width="36%" align="left" class="rowodd"><strong>Sales:</strong>&nbsp;&nbsp;</td> 
+            <td align="left" width="64%" class="roweven"> 
+                <select name="sales" >
+                {foreach key=id item=name from=$user_arr}
+                  <option  value="{$id}" {if $dt_arr.sales eq $id} selected {/if}>{$name}</option>
+                {/foreach}
+                {if $dt_arr.sales lt 1}
+                  <option  value="0" selected >Choose a sales</option>
+                {/if}
+              </select>       
+            </td> 
+          </tr>                       
+          <tr> 
+            <td width="36%" align="left" class="rowodd"><strong>Teacher:</strong>&nbsp;&nbsp;</td> 
             <td align="left" width="64%" class="roweven"> 
                 <select name="staff" >
                 {foreach key=id item=name from=$user_arr}
@@ -93,12 +117,17 @@
             </td> 
           </tr> 
           <tr> 
-            <td width="36%" align="left" class="rowodd"><strong>Fee(/times):</strong>&nbsp;&nbsp;</td> 
+            <td width="36%" align="left" class="rowodd"><strong>Fee(per class):</strong>&nbsp;&nbsp;</td> 
             <td align="left" width="64%" class="roweven"> 
                 <input type="text" size="10" name="fee" value="{$dt_arr.fee}">
             </td> 
           </tr>
-          
+          <tr> 
+            <td width="36%" align="left" class="rowodd"><strong>Total Deliver Hours:</strong>&nbsp;&nbsp;</td> 
+            <td align="left" width="64%" class="roweven"> 
+                <strong><em>{$dt_arr.deliverhour/60|string_format:"%.1f"}</em></strong>
+            </td> 
+          </tr>          
           <tr><td colspan="2"><hr/></td></tr>
 
           <tr>
@@ -123,23 +152,11 @@
                     <tr align="center" class="roweven">
                         <td style="text-decoration:underline; cursor:pointer" onClick="window.open('client_account_detail.php?vid={$coachid}&aid={$id}&cid={$cid}&typ=coach','_blank', 'alwaysRaised=yes,height=500, width=800,location=no,scrollbars=yes')" >{$arr.step|ucwords}</td>
                         <td align="right">{$arr.dueamt|string_format:"%.2f"}</td>
-                        <td align="right">
-                            {if $arr.gst eq 1}
-                                {$arr.dueamt/11|string_format:"%.2f"}
-                            {else}
-                                -
-                            {/if}
-                        </td>
+                        <td align="right">{$arr.gst|string_format:"%.2f"}</td>
                         <td align="right"><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_payment.php?aid={$id}','_blank', 'alwaysRaised=yes,height=500,width=800,location=no,scrollbars=yes')">{$arr.paid|string_format:"%.2f"}</span></td>
                         <td>{$arr.party|ucwords}</td>
                         <td align="right">{$arr.dueamt_3rd|string_format:"%.2f"}</td>
-                        <td>
-                            {if $arr.gst_3rd eq 1}
-                                {$arr.dueamt_3rd/11|string_format:"%.2f"}
-                            {else}
-                                -
-                            {/if}
-                        </td>
+                        <td>{$arr.gst_3rd|string_format:"%.2f"}</td>
                         <td align="right"><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_spand.php?aid={$id}','_blank', 'alwaysRaised=yes,height=500,width=800,location=no,scrollbars=yes')">{$arr.spand|string_format:"%.2f"}</span></td>
                         <td align="right">
                             {$arr.paid-$arr.dueamt_3rd|string_format:"%.2f"}

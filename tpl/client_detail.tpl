@@ -4,9 +4,9 @@
 <title>Agent Star -Client Management</title>
 </head>
 <link rel="stylesheet" href="../css/sam.css">
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
-<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
-<script src="https://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
+
+{include file="style.tpl"}
+
 <script language="javascript" src="../js/audit.js"></script>
 <body {$forbid_sl} {$forbid_cp} {$forbid_rc}>
 <form name="form1" action="" target="_self" method="get">
@@ -33,6 +33,10 @@
         <input name="button" type="button" style="font-weight:bold;" onClick="javascript:this.form.action='client_visa.php';this.form.submit();" value="Visa service">
         &nbsp;&nbsp; 
         {/if} 
+        {if in_array('coach', $client_type)}
+        <input name="button" type="button" style="font-weight:bold;" onClick="javascript:this.form.action='client_coach.php';this.form.submit();" value="Coach Service">
+        &nbsp;
+        {/if}
         {if in_array('homeloan', $client_type)}
         <input name="button" type="button" style="font-weight:bold;" onClick="javascript:this.form.action='client_homeloan.php';this.form.submit();" value="Home Loan">
         &nbsp;&nbsp; 
@@ -41,7 +45,6 @@
         <input name="button" type="button" style="font-weight:bold;" onClick="javascript:this.form.action='client_legal.php';this.form.submit();" value="Legal Service">
         &nbsp;&nbsp; 
         {/if}  
-        <input name="button" type="button" style="font-weight:bold;" onClick="javascript:this.form.action='client_coach.php';this.form.submit();" value="Coach Service">
       </td>
     </tr>
     <tr>
@@ -210,11 +213,11 @@
                 <td width="28%"  align="left" class="rowodd"><strong>Matrial Status:</strong>&nbsp;&nbsp;</td>
                 <td align="left" width="72%" class="roweven">
                         <select name="t_m" class="text">
-                          <option value="married" {if $arr.married == 'married'} selected {/if}>½á»é(Married)</option>
-                          <option value="divorce" {if $arr.married == 'divorce'} selected {/if}>Àë»é(Divorce)</option>
-                          <option value="never_married" {if $arr.married == 'never_married'} selected {/if}>Î´»é(Never Married)</option>
-                          <option value="separated" {if $arr.married == 'separated'} selected {/if}>·Ö¾Ó(Separated)</option>
-                          <option value="defacto" {if $arr.married == 'defacto'} selected {/if}>Í¬¾Ó(Defacto Relationship)</option>
+                          <option value="married" {if $arr.married == 'married'} selected {/if}>ï¿½ï¿½ï¿½(Married)</option>
+                          <option value="divorce" {if $arr.married == 'divorce'} selected {/if}>ï¿½ï¿½ï¿½(Divorce)</option>
+                          <option value="never_married" {if $arr.married == 'never_married'} selected {/if}>Î´ï¿½ï¿½(Never Married)</option>
+                          <option value="separated" {if $arr.married == 'separated'} selected {/if}>ï¿½Ö¾ï¿½(Separated)</option>
+                          <option value="defacto" {if $arr.married == 'defacto'} selected {/if}>Í¬ï¿½ï¿½(Defacto Relationship)</option>
                         </select> 
                 </td>
               <tr>    
@@ -281,7 +284,7 @@
                       <input type="hidden" name="t_agent_p" value="{$arr.agent}">
                   {/if}
                   <select id="t_agent_p" name="t_agent_p" onChange="changeClientFrom(this,this.form.t_about,'t_agent_a');changeAboutInput(this.form.t_about.value,this.form.t_aboutTxt);" {if $ugs.b_suba.v eq 1 && $ugs.b_suba.m eq 0 && ($cid gt 0 || $ugs.b_suba.i eq 0)} disabled {/if}>
-                    <option value="0">choose a global partner</option>
+                    <option value="0">choose a Global Partner</option>
                     {foreach key=ag_id item=v from=$agent_partner}
                         <option value="{$ag_id}" {if $ag_id eq $arr.agent} selected {/if}>{$v.name}</option>
                     {/foreach}
@@ -290,13 +293,13 @@
                 </td>
               </tr>    
               <tr>
-                <td width="28%" align="left" class="rowodd"><strong>Global Assistant:</strong>&nbsp;&nbsp;</td>
+                <td width="28%" align="left" class="rowodd"><strong>Ambassador:</strong>&nbsp;&nbsp;</td>
                 <td align="left" width="72%" class="roweven"> 
                   {if $ugs.b_suba.v eq 1 && $ugs.b_suba.m eq 0 && ($cid gt 0 || $ugs.b_suba.i eq 0)}
                       <input type="hidden" name="t_agent_a" value="{$arr.agent}">
                   {/if}
                   <select id="t_agent_a" name="t_agent_a" onChange="changeClientFrom(this,this.form.t_about,'t_agent_p');changeAboutInput(this.form.t_about.value,this.form.t_aboutTxt)" {if $ugs.b_suba.v eq 1 && $ugs.b_suba.m eq 0 && ($cid gt 0 || $ugs.b_suba.i eq 0)} disabled {/if}>
-                  <option value="0">chose a global assistant</option>
+                  <option value="0">choose an Ambassador</option>
                   {foreach key=ag_id item=v from=$agent_ambassador}
                       <option value="{$ag_id}" {if $ag_id eq $arr.agent} selected {/if}>{$v.name}</option>
                   {/foreach}
@@ -307,7 +310,7 @@
               </tr> 
               <tr>
                 <td width="28%"  align="left" class="rowodd"><strong>Where do you know about us:</strong>&nbsp;&nbsp;</td>
-                <td align="left" width="72%" class="roweven"><!--internet, Australian Newspaper,Education Seminar£¬Passby, Friends, other-->
+                <td align="left" width="72%" class="roweven"><!--internet, Australian Newspaper,Education Seminarï¿½ï¿½Passby, Friends, other-->
                 <select name="t_about" onChange="changeAboutInput(this.value,this.form.t_aboutTxt);">
                   <option value="" selected >Others</option>
                   {foreach item=name from=$clientfroms}
@@ -321,7 +324,7 @@
               </tr>
               <tr>
                 <td width="28%"  align="left" class="rowodd"><strong>Activated Membership:</strong>&nbsp;&nbsp;</td>
-                <td align="left" width="72%" class="roweven"><!--internet, Australian Newspaper,Education Seminar£¬Passby, Friends, other-->
+                <td align="left" width="72%" class="roweven"><!--internet, Australian Newspaper,Education Seminarï¿½ï¿½Passby, Friends, other-->
                     <select name="t_actm" >
                       <option value="" {if $arr.actm == ""} selected {/if}>--</option>
                       <option value="ct" {if $arr.actm == "ct"} selected {/if}> Client testimonail</option>
@@ -332,7 +335,7 @@
               </tr>     
               <tr>
                 <td width="28%"  align="left" class="rowodd"><strong>Do You have an Australian bank account:</strong>&nbsp;&nbsp;</td>
-                <td align="left" width="72%" class="roweven"><!--internet, Australian Newspaper,Education Seminar£¬Passby, Friends, other-->
+                <td align="left" width="72%" class="roweven"><!--internet, Australian Newspaper,Education Seminarï¿½ï¿½Passby, Friends, other-->
                     <select name="t_bank" >
                       <option value="" {if $arr.bank == ""} selected {/if}> --</option>
                       <option value="nab" {if $arr.bank == "nab"} selected {/if}> NAB</option>

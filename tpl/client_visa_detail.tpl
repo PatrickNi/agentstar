@@ -332,8 +332,8 @@
 	            {foreach key=id item=arr from=$process_arr}
 	            <tr align="left" class="roweven"> 
 	              <td class="border_1"><span style="font-size:16px;font-weight:bolder; color:#990000">{if $arr.done eq 1}&radic;{else}?{/if}</span>{$arr.date}</td> 
-	              <td class="border_1"><span style="cursor:pointer; text-decoration:underline;" onClick="window.open('client_visa_process.php?vid={$vid}&pid={$id}&cid={$cid}','_blank','alwaysRaised=yes,height=500,width=800, location=no')">{$arr.subject}</span></td>
-	              <td class="border_1"><img src="../images/arr_down.gif" style="cursor:pointer" onClick="window.open('client_visa_process.php?vid={$vid}&pid={$id}&cid={$cid}&isNew=1&isOther=1','_blank','alwaysRaised=yes,height=500,width=800, location=no')"></td> 
+	              <td class="border_1"><span style="cursor:pointer; text-decoration:underline;" onClick="window.open('client_visa_process.php?vid={$vid}&pid={$id}&cid={$cid}','_blank','alwaysRaised=yes,height=500,width=1000, location=no')">{$arr.subject}</span></td>
+	              <td class="border_1"><img src="../images/arr_down.gif" style="cursor:pointer" onClick="window.open('client_visa_process.php?vid={$vid}&pid={$id}&cid={$cid}&isNew=1&isOther=1','_blank','alwaysRaised=yes,height=500,width=1000, location=no')"></td> 
 	            </tr> 
 	            {/foreach}
 	          </table> 

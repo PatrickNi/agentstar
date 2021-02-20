@@ -5,7 +5,7 @@ class GeicAPI extends MysqlDB {
 
     private $user_orders = array(29,3,86,37,79,80,58,67,57,81,84,82,50);
 
-    function GeicAPI($host, $user, $pswd, $database, $debug) {
+    function GeicAPI ($host, $user, $pswd, $database, $debug) {
     	 $this->MysqlDB($host, $user, $pswd, $database, $debug);
     }
     
@@ -116,16 +116,20 @@ class GeicAPI extends MysqlDB {
 	}
 	
 	
-    function getUserNameArr($userid=0){
-    	$sql = "select ID, UserName from sys_user";
+    function getUserNameArr($userid=0,$leave=false){
+    	$sql = "select ID, UserName, LeaveDate from sys_user WHERE 1 ";
+		if (!$leave) {
+			$sql .= " AND LeaveDate = '0000-00-00' ";
+		}
+
 		if($userid > 0){
-			$sql .= " Where ID = {$userid} ";
+			$sql .= " AND ID = {$userid} ";
 		}    	
 		$this->query($sql);
 
 		$_arr = array();
 		while($this->fetch()){
-			$_arr[$this->ID] = ucwords($this->UserName);
+			$_arr[$this->ID] = ucwords($this->UserName) . ($this->LeaveDate != '0000-00-00'? "(Departed)" : "");
             if (!in_array($this->ID,$this->user_orders)) {
                 array_push($this->user_orders, $this->ID);
             }
@@ -324,7 +328,7 @@ class GeicAPI extends MysqlDB {
 			}
 			$_str = substr($_str, 0, strlen($_str) - 1);
 			$sql = "delete from sys_func where GroupID in($_str) ";
-			return $this-query($sql);	 
+			return $this->query($sql);	 
 		}
 		return false;
 	}
@@ -870,6 +874,17 @@ class GeicAPI extends MysqlDB {
             }
         }
         return $agents;
-    }	
+	}	
+	
+	function getMemberByStaffId($user_id) {
+		$sql = "select UserName, u.ID from sys_user u, sys_user_management um where u.ID = um.StaffID and um.ManagerID = {$user_id}";
+		//var_dump($sql);
+		$this->query($sql);
+		$rtn = array();
+		while($this->fetch()){
+			$rtn[$this->ID] = $this->UserName;
+		}
+		return $rtn;
+	}
 }
 ?>

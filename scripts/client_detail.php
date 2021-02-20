@@ -6,14 +6,6 @@ require_once(__LIB_PATH.'VisaAPI.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
 require_once(__LIB_PATH.'AgentAPI.class.php');
 
-unset($client_type_arr['all']);
-foreach ($client_type_arr as $id => $v){
-	$client_type_arr[$id] = strtolower($v);
-}
-//new client type
-$client_type_arr['Home Loan'] = 'homeloan';
-$client_type_arr['Legal'] = 'legal';
-
 
 # check valid user
 $user_id = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
@@ -38,6 +30,15 @@ foreach ($g_user_grants as $item){
 		}		
 	}
 }
+
+unset($client_type_arr['all']);
+foreach ($client_type_arr as $id => $v){
+	$client_type_arr[$id] = strtolower($v);
+}
+//new client type
+$client_type_arr['Home Loan'] = 'homeloan';
+$client_type_arr['Legal'] = 'legal';
+$client_type_arr['Coach'] = 'coach';
 
 
 # get client id 
@@ -133,13 +134,16 @@ if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" |
 	elseif (isset($_REQUEST) && $_REQUEST['t_dob'] == '') {
 		echo "<script language='javascript'>alert('\"DOB: \" can not be empty!')</script>";
 	}
+	elseif (isset($_REQUEST) && !preg_match('/^[\d]{4}-[\d]{2}-[\d]{2}/', $_REQUEST['t_dob'])) {
+		echo "<script language='javascript'>alert('\"DOB: \" should be YYYY-MM-DD!')</script>";
+	}
 	elseif ($sets['email'] == '' || !preg_match('/^[^@]+@[^@]+$/', $sets['email'])) {
 		echo "<script language='javascript'>alert('\Email: \" can not be empty! or incorrect!')</script>";
 	}
 	elseif ($sets['mobile'] == '') {
 		echo "<script language='javascript'>alert('\"Mobile: \" can not be empty!')</script>";
 	}
-	elseif($sets['about'] == ""){
+	elseif($sets['about'] == "" && $sets['agent'] == 0){
         echo "<script language='javascript'>alert('\"Where do you know about us: \" can not be empty!')</script>";
 	}
 	else {
@@ -209,23 +213,11 @@ $country_arr = array();
 $country_arr = $o_c->getCountry();
 
 # get agent name
-//$agent_arr = array();
-//$agent_arr = $o_a->getAgent('sub');
 //get global partner
 $agent_partner = $o_a->getAgentList(0,'sub','education');
-foreach ($agent_partner as $aid => $v) {
-	if ($aid != $client_arr['agent'] && $aid != $sets['agent'] && $v['uid'] != $user_id)
-		unset($agent_partner[$aid]);
-}
 
 //get global ambassador
 $agent_ambassador = $o_a->getAgentList(0,'sub','student');
-/*
-foreach ($agent_ambassador as $aid => $v) {
-	if ($aid != $client_arr['agent'] && $aid != $sets['agent'] && $v['uid'] != $user_id)
-		unset($agent_ambassador[$aid]);
-}
-*/
 
 
 //# get user

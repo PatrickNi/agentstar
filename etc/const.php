@@ -1,5 +1,5 @@
 <?php
-define("__ROOT_PATH", "/Library/WebServer/Documents/immi");//e:/inetpub/wwwroot/
+define("__ROOT_PATH", "/Users/pani/Github/agentstar/");//e:/inetpub/wwwroot/
 
 define("__LIB_PATH", __ROOT_PATH."lib/");
 define("__DOWNLOAD_PATH", __ROOT_PATH."download/");
@@ -10,9 +10,9 @@ define("__SMARTY_CFG_PATH", __SMARTY_TPL_PATH."config/");
 define("__SMARTY_CAH_PATH", __SMARTY_TPL_PATH."cache/");
 
 # database configuration
-define("__DB_HOST", "localhost");
+define("__DB_HOST", "127.0.0.1");
 define("__DB_USER", "root");
-define("__DB_PASSWORD", "dowhatyoudo"); //
+define("__DB_PASSWORD", "agentstar.local"); //agentstar.local
 define("__DB_DATABASE", "geic");
 
 define("__REDIR_PHP", "redir.php");
@@ -64,7 +64,10 @@ define('ADV_STP', 'STP');
 $contact_type_arr = array("D" => "DIMIA", "O" => "Office Suplier");
 
 # client type
-$client_type_arr = array('Study'=>"Study", 'visa'=>"Immi", 'all'=>"all");
+$client_type_arr = array('Study'=>"study", 'Visa'=>"immi", 'Home Loan'=>'homeloan', 'Legal'=>'legal', 'Coach'=>'coach');
+
+
+
 
 # define file type
 define("__FILE_VISA", "visa");

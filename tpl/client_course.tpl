@@ -64,6 +64,10 @@ function ShowComm() {
         <input name="button" type="button" style="font-weight:bold;" onClick="javascript:this.form.action='client_visa.php';this.form.submit();" value="Visa service">
         &nbsp;&nbsp; 
         {/if} 
+        {if in_array('coach', $client_type)}
+        <input name="button" type="button" style="font-weight:bold;" onClick="javascript:this.form.action='client_coach.php';this.form.submit();" value="Coach Service">
+        &nbsp;
+        {/if}
         {if in_array('homeloan', $client_type)}
         <input name="button" type="button" style="font-weight:bold;" onClick="javascript:this.form.action='client_homeloan.php';this.form.submit();" value="Home Loan">
         &nbsp;&nbsp; 

@@ -12,7 +12,7 @@
 <table align="center" width="100%"  class="graybordertable">
 	<tr align="left"  class="bordered_2">
 		<td colspan="2">
-			<input style="font-weight:bold;" type="button" value="{if $dt_arr.cate eq 'student'}Assistant{else}Agent{/if} Detail" onClick="javascript:this.form.action='agent_add.php';this.form.submit();">&nbsp;&nbsp;
+			<input style="font-weight:bold;" type="button" value="{if $dt_arr.cate eq 'student'}Ambassador{else}Agent{/if} Detail" onClick="javascript:this.form.action='agent_add.php';this.form.submit();">&nbsp;&nbsp;
 			{if $aid > 0 && (($exType eq 'top' && $ugs.a_proc.v eq 1) || ($exType eq 'sub' && $dt_arr.cate eq 'education' && $ugs.ap_pa.v eq 1) || ($exType eq 'sub' && $dt_arr.cate eq "student" && $ugs.aa_pa.v eq 1))}
 			<input style="font-weight:bold;" type="button" value="Process" onClick="javascript:this.form.action='agent_process.php';this.form.submit();">&nbsp;&nbsp;
 			{/if}
@@ -26,7 +26,7 @@
 		</td>
 	</tr>
 	<tr align="center"  class="greybg" >
-		<td class="whitetext" colspan="2">{if $dt_arr.cate eq 'student'}Assistant{else}Agent{/if} Detail</td>
+		<td class="whitetext" colspan="2">{if $dt_arr.cate eq 'student'}Ambassador{else}Agent{/if} Detail</td>
 	</tr>
 	<tr>
 		<td width="58%" align="center"  valign="top">
@@ -39,9 +39,13 @@
                         		<option value="education" {if $dt_arr.cate eq "education"} selected {/if}>Education agent</option>
                         		<option value="inactive" {if $dt_arr.cate eq "inactive"} selected {/if}>Inactive agent</option>    
                         	{elseif $exType eq 'sub'}
-							    <option value="education" {if $dt_arr.cate eq "education"} selected {/if}>Global Partner</option>
-                        		<option value="student" {if $dt_arr.cate eq "student"} selected {/if}>Global Assistant</option>  
-                        		<option value="inactive" {if $dt_arr.cate eq "inactive"} selected {/if}>Inactive agent</option>    
+                        		{if $dt_arr.cate eq "education"}
+							    	<option value="education" selected>Global Partner</option>
+							    {elseif $dt_arr.cate eq "student"}
+                        			<option value="student" selected >Ambassador</option>  
+                        		{else}
+                        			<option value="inactive" selected >Inactive agent</option> 
+                        		{/if}   
 							{else}
                         		<option value="education" {if $dt_arr.cate eq "education"} selected {/if}>Education agent</option>
                         		<option value="company" {if $dt_arr.cate eq "company"} selected {/if}>Company agent</option>

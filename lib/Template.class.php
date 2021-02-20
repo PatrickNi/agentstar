@@ -8,7 +8,7 @@ class Template extends Smarty{
 		$this->compile_dir		= __SMARTY_CPL_PATH;
 		$this->config_dir		= __SMARTY_CFG_PATH;
 		$this->cache_dir		= __SMARTY_CAH_PATH;
-//		$this->caching			= true;
+		$this->caching			= false;
     }
 }
 ?>

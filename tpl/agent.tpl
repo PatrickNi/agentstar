@@ -95,7 +95,7 @@
       
     </tr>    
     {foreach item=id from=$v.aid}
-    <tr id="tr_{$id}" onMouseOut="roff({$id});" onMouseOver="ron({$id});">
+    <tr id="tr_{$id}" class="{if $agent_arr[$id].sn == 'New'}yellowbg{else}{cycle values='rowodd,roweven'}{/if}">
       <td onClick="rowToggle({$id});" align="center" class="border_1"><input type="checkbox" id="box_{$id}" onClick="toggleRow(this);" name="agentId[]" value="{$id}">
       </td>
       <!--<td align="center" class="border_1" nowrap="nowrap">{if $agent_arr[$id].verify eq 1}<span style="font-size:18px;font-weight: bolder; color: #FF0000">&radic;</span>{else}&nbsp;&nbsp;{/if}</td>-->

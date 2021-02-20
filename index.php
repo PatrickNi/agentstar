@@ -1,4 +1,5 @@
 <?php
+var_dump($_REQUEST);exit;
 $user_id = isset($_COOKIE['userid'])? trim($_COOKIE['userid']) : 0;
 if ($user_id > 0){
 	header("Location: scripts/index.php");

@@ -1,29 +1,31 @@
 <?php
 require_once('MysqlDB.class.php');
-class AgentAPI extends MysqlDB{
-    function AgentAPI($host, $user, $pswd, $database, $debug) {
+
+class AgentAPI extends MysqlDB {
+
+	function AgentAPI($host, $user, $pswd, $database, $debug) {
     	 $this->MysqlDB($host, $user, $pswd, $database, $debug);
     }
     
     function _register() {
-        $sets['name']    = isset($_REQUEST['t_name'])? trim($_REQUEST['t_name']) : '';
-        $sets['web']     = isset($_REQUEST['t_web'])? trim($_REQUEST['t_web']) : '';
-        $sets['tel']     = isset($_POST['t_tel'])? trim($_POST['t_tel']) : "";
+        $sets['name']    = isset($_REQUEST['name'])? trim($_REQUEST['name']) : '';
+        $sets['web']     = isset($_REQUEST['web'])? trim($_REQUEST['web']) : '';
+        $sets['tel']     = isset($_POST['tel'])? trim($_POST['tel']) : "";
         //$sets['fax']     = isset($_POST['t_fax'])? trim($_POST['t_fax']) : "";
-        $sets['email']   = isset($_POST['t_email'])? trim($_POST['t_email']) : "";
-        $sets['add']     = isset($_POST['t_add'])? trim($_POST['t_add']) : "";
-        $sets['country'] = isset($_POST['t_country'])? trim($_POST['t_country']) : 0;
-        $sets['contact'] = isset($_POST['t_contact'])? trim($_POST['t_contact']) : "";
-        $sets['type']    = isset($_POST['t_type'])? trim($_POST['t_type']) : "sub";
-        $sets['note']    = isset($_POST['t_note'])? trim($_POST['t_note']) : "";
-        $sets['status']  = isset($_POST['t_status'])? trim($_POST['t_status']) : 0;
-        $sets['city']    = isset($_POST['t_city'])? trim($_POST['t_city']) : "";
-        $sets['verify']  = isset($_POST['t_verify'])? trim($_POST['t_verify']) : 0;
-        $sets['cate']    = isset($_POST['t_cate'])? trim($_POST['t_cate']) : '';    
-        $sets['uid']  = isset($_POST['t_uid'])? trim($_POST['t_uid']) : 0;
-        $sets['wechatid']  = isset($_POST['t_wechatid'])? trim($_POST['t_wechatid']) : '';
-        $sets['pos']  = isset($_POST['t_pos'])? trim($_POST['t_pos']) : '';
-        $sets['state']  = isset($_POST['t_state'])? trim($_POST['t_state']) : '';
+        $sets['email']   = isset($_POST['email'])? trim($_POST['email']) : "";
+        $sets['add']     = isset($_POST['add'])? trim($_POST['add']) : "";
+        $sets['country'] = isset($_POST['country'])? trim($_POST['country']) : 0;
+        $sets['contact'] = isset($_POST['contact'])? trim($_POST['contact']) : "";
+        $sets['type']    = isset($_POST['type'])? trim($_POST['type']) : "sub";
+        $sets['note']    = isset($_POST['note'])? trim($_POST['note']) : "";
+        $sets['status']  = isset($_POST['status'])? trim($_POST['status']) : 0;
+        $sets['city']    = isset($_POST['city'])? trim($_POST['city']) : "";
+        $sets['verify']  = isset($_POST['verify'])? trim($_POST['verify']) : 0;
+        $sets['cate']    = isset($_POST['cate'])? trim($_POST['cate']) : '';    
+        $sets['uid']  = isset($_POST['uid'])? trim($_POST['uid']) : 0;
+        $sets['wechatid']  = isset($_POST['wechatid'])? trim($_POST['wechatid']) : '';
+        $sets['pos']  = isset($_POST['pos'])? trim($_POST['pos']) : '';
+        $sets['state']  = isset($_POST['state'])? trim($_POST['state']) : '';
 
         if ($sets['name'] == '' || $sets['email'] == '')
             return array('err'=>1, 'msg'=>'no company name or no email');
@@ -84,7 +86,7 @@ class AgentAPI extends MysqlDB{
             $sql .= " AND USER_ID = {$staff_id} ";
         }
 */       	
-        $sql .= " Order by lower(Name) asc";
+        $sql .= " Order by isVerify asc, lower(Name) asc";
         $this->query($sql);
         //echo $sql;
 
