@@ -51,7 +51,9 @@
         {if $from_archive}
           <strong style="color:red;">Reporting data from Archive</strong>
         {else}
+          {if $uid eq 3}
           <input type="submit" name="bt_archive" value="archive report" style="font-weight:bold ">
+          {/if}
         {/if}
       </td>
     </tr>
@@ -262,11 +264,11 @@
       {if $visaprocs[$week].lc_free > 0}
         <span onClick="openinSatff('d8_free_{$week}');" style="text-decoration:underline; cursor:pointer;">({$visaprocs[$week].lc_free})</span>&nbsp;
       {/if}
-      Free:&nbsp;${$visaprocs[$week].lfee_free|string_format:"%.2f"}<br/>
+      Student:&nbsp;${$visaprocs[$week].lfee_free|string_format:"%.2f"}<br/>
       {if $visaprocs[$week].lc_paid > 0}
         <span onClick="openinSatff('d8_paid_{$week}');" style="text-decoration:underline; cursor:pointer;">({$visaprocs[$week].lc_paid})</span>&nbsp;
       {/if}
-      Paid:&nbsp;${$visaprocs[$week].lfee_paid|string_format:"%.2f"}<br/>
+      Other:&nbsp;${$visaprocs[$week].lfee_paid|string_format:"%.2f"}<br/>
       <hr/>
       <!--
       <span onClick="openinSatff('d8_{$week}');" style="text-decoration:underline; cursor:pointer;">[{$visaprocs[$week].lcnt0}/{$visaprocs[$week].lcnt1}]
@@ -431,10 +433,12 @@
     <td>Course Item</td>
     <td ># of hours delivered</td>
     <td># of students(active / current)</td>
-    <td>Profit / Sales</td>
-    <td>Received Coaching Fee(Payment)</td>
+    <td>Received Coaching Fee</td>
+    <td>Profit</td>
     <td>&nbsp;</td>
   </tr>
+  {assign var="total_paid" value="0"}
+  {assign var="total_sale" value="0"}
   {foreach key=titleid item=coach from=$coaches[$week]}
   <tr align="right" class="roweven" >
     <td align="center">{$coach.title}</td>
@@ -449,12 +453,25 @@
         </ul>
         <span style="font-size:16px; font-weight:bolder; cursor:pointer;" onclick="$('#d14_{$week}_{$titleid}').css('display', 'none')">&times;</span> </div>
     </td>
-    <td>{$coach.sale|string_format:"%.2f"}</td>
-    <td>{$coach.paid|string_format:"%.2f"}</td>
+    <td>
+      {$coach.paid|string_format:"%.2f"}
+      {assign var="total_paid" value=$total_paid+$coach.paid}
+    </td>
+    <td>
+      {$coach.sale|string_format:"%.2f"}
+      {assign var="total_sale" value=$total_sale+$coach.sale}
+    </td>
     <td>&nbsp;</td>
   </tr> 
   {/foreach}
-  
+  {if $isAll eq 's'}
+    <tr align="right" class="roweven" >
+      <td colspan="3"><strong>Total:</strong></td>
+      <td><strong>{$total_paid|string_format:"%.2f"}</strong></td>
+      <td><strong>{$total_sale|string_format:"%.2f"}</strong></td>
+      <td>&nbsp;</td>
+    </tr>
+  {/if}
   <tr class="greybg">
     <td colspan="6"class="highyellow">Legal Service</td>
   </tr> 

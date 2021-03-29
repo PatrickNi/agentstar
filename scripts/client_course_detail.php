@@ -72,6 +72,9 @@ $set_course['unit']  = isset($_REQUEST['t_unit'])? (string)trim($_REQUEST['t_uni
 $set_course['vma']  = isset($_REQUEST['t_vma'])? (string)trim($_REQUEST['t_vma']) : 0;
 $set_course['vms']  = isset($_REQUEST['t_vms'])? (string)trim($_REQUEST['t_vms']) : "none";
 
+$set_course['completed']  = isset($_REQUEST['t_completed'])? (string)trim($_REQUEST['t_completed']) : "NO";
+
+
 $apodue = isset($_REQUEST['t_apodue'])? (string)trim($_REQUEST['t_apodue']) : "0000-00-00";
 $apodue = $apodue != ''? $apodue : "0000-00-00";
 

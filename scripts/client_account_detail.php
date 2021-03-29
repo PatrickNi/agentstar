@@ -53,23 +53,46 @@ if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
     else {
 
         if($account_id > 0){
-            $o_c->setAccount($account_id, $sets);
+            if ($account_typ == 'visa' && $ugs['v_agf']['m'] == 1 || $account_typ != 'visa') {
+                $o_c->setAccount($account_id, $sets);
+                echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
+                exit;  
+            }
+            else {
+                echo "<script language='javascript'>alert('Permission denied!');</script>"; 
+            }
         }
         else{
-            $o_c->addAccount($user_id, $visa_id, $sets, $account_typ);
-        }
-    	echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
-    	exit;    
+            if ($account_typ == 'visa' && $ugs['v_agf']['i'] == 1 || $account_typ != 'visa') {
+                $o_c->addAccount($user_id, $visa_id, $sets, $account_typ);
+                echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
+                exit;  
+            }
+            else {
+                echo "<script language='javascript'>alert('Permission denied!');</script>"; 
+            }
+            
+        }  
     }
 }
 elseif (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "DELETE"){
     if($account_id > 0){
-        $o_c->delAccountByID($account_id);
-    }	
-	echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
-	exit;    
+        if ($account_typ == 'visa' && $ugs['v_agf']['m'] == 1 || $account_typ != 'visa') {
+            $o_c->delAccountByID($account_id);
+            echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
+            exit;  
+        }
+        else {
+            echo "<script language='javascript'>alert('Permission denied!');</script>"; 
+        }
+        
+    }
 }
 
+if ($account_typ == 'visa' && $ugs['v_agf']['v'] == 0) {
+    echo "<script language='javascript'>alert('Permission denied!');</script>";
+    exit;
+}
 
 # set smarty tpl
 $o_tpl = new Template;

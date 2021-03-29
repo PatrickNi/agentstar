@@ -47,7 +47,7 @@
               <input type='checkbox' name="is_geic" value="new" {if $is_geic eq "new"} checked {/if}>From GEIC
               
               &nbsp;&nbsp;
-              <input type="submit" value="QUERY" name="bt_name" style="font-weight:bold;" ></td>
+              <input type="submit" value="Search" name="bt_name" style="font-weight:bold;" ></td>
           </tr>
         </table></td>
     </tr>

@@ -19,14 +19,21 @@
 <input type="hidden" name="vid" value="{$vid}">
 <input type="hidden" name="typ" value="{$typ}">
 <input type="hidden" name="hCancel" value="0">
+<input type="hidden" name="t_duedate" value="{$dt_arr.duedate}">
 			<table width="100%" cellpadding="1" cellspacing="1" border="0" class="graybordertable">
 				<tr><td colspan="2"><table cellpadding="0" cellspacing="0" width="100%">
 					<tr align="center"  class="greybg">
 						<input type="hidden" name="bt_name" value="">
 						<td align="left" width="10%">
-						   {if $ugs.v_pay.d eq 1}<input type="submit" value="Delete" style="font-weight:bold" onClick="this.form.bt_name.value='delete';this.disable=false;">{/if}						</td>		
+							{if $typ != 'visa' || ($typ == 'visa' && (($aid eq 0 && $ugs.v_agf.i eq 1) || ($aid > 0 && $ugs.v_agf.m eq 1)))}
+						  		<input type="submit" value="Delete" style="font-weight:bold" onClick="this.form.bt_name.value='delete';this.disable=false;">{/if}	  
+							</td>		
 						<td align="center" class="whitetext">Payment Detail </td>
-						<td align="right" width="10%"><input name="submit" type="submit" style="font-weight:bold" onClick="this.form.bt_name.value='save';this.disable=false;" value="Save" {if $ugs.v_pay.v eq 1 && $ugs.v_pay.m eq 0 && ($dt_arr.step neq '' || $ugs.v_pay.i eq 0)} disabled="disabled" {/if}></td>
+						<td align="right" width="10%">
+							{if $typ != 'visa' || ($typ == 'visa' && (($aid eq 0 && $ugs.v_agf.i eq 1) || ($aid > 0 && $ugs.v_agf.m eq 1)))}
+								<input name="submit" type="submit" style="font-weight:bold" onClick="this.form.bt_name.value='save';this.disable=false;" value="Save">
+							{/if}
+						</td>
 					</tr>					
 				</table></td></tr>
 				<tr>
@@ -50,22 +57,17 @@
 				<tr>
 					<td width="25%" align="left" class="rowodd"><strong>Due Amount:</strong>&nbsp;&nbsp;</td>
 					<td align="left" width="75%" class="roweven">
-				  	{if $ugs.v_pay.v eq 1 && $ugs.v_pay.m eq 0 && ($dt_arr.dueamt gt 0 || $ugs.v_pay.i eq 0)}
-						<input type="hidden" name="t_dueamt" value="{$dt_arr.dueamt}">
-				  	{/if}					
-						<input type="text" name="t_dueamt" value="{$dt_arr.dueamt}" size="30" onChange="audit_money(this)" {if $ugs.v_pay.v eq 0} style="visibility:hidden"{/if}  {if $ugs.v_pay.v eq 1 && $ugs.v_pay.m eq 0 && ($dt_arr.dueamt gt 0 || $ugs.v_pay.i eq 0)} disabled="disabled" {/if}>
+						<input type="text" name="t_dueamt" value="{$dt_arr.dueamt}" size="30" onChange="audit_money(this)">
 					</td>
 				</tr>
+				<!--
 				<tr>
 					<td width="25%" align="left" class="rowodd"><strong>Due Date:</strong>&nbsp;&nbsp;</td>
 					<td align="left" width="75%" class="roweven">
-					{if $ugs.p_duedate.v eq 1 && $ugs.p_duedate.m eq 0 && ($dt_arr.duedate neq '' || $dt_arr.duedate neq '0000-00-00' || $ugs.p_duedate.i eq 0)}
-						<input type="hidden" name="t_duedate" value="{$dt_arr.duedate}">
-					{/if}						
-					  <input type="text" name="t_duedate" id="t_duedate" value="{$dt_arr.duedate}" size="30" onchange="audit_date(this)" {if $ugs.p_duedate.v eq 0} style="visibility:hidden"{/if} {if $ugs.p_duedate.v eq 1 && $ugs.p_duedate.m eq 0 && ($dt_arr.duedate neq '' || $dt_arr.duedate neq '0000-00-00' || $ugs.p_duedate.i eq 0)} disabled="disabled"{/if}>
-
+						<input type="text" name="t_duedate" value="{$dt_arr.duedate}" size="30">
 					</td>
 				</tr>
+				-->
 				<tr>
 					<td width="25%" align="left" class="rowodd"><strong>Deduction:</strong>&nbsp;&nbsp;</td>
 				  	<td align="left" width="75%" class="roweven">
@@ -88,11 +90,8 @@
 				</tr>
 <tr>
 					<td width="25%" align="left" class="rowodd"><strong>Deduction Amount:</strong>&nbsp;&nbsp;</td>
-					<td align="left" width="75%" class="roweven">
-				  	{if $ugs.v_pay.v eq 1 && $ugs.v_pay.m eq 0 && ($dt_arr.dueamt_3rd gt 0 || $ugs.v_pay.i eq 0)}
-						<input type="hidden" name="t_dueamt_3rd" value="{$dt_arr.dueamt_3rd}">
-				  	{/if}					
-						<input type="text" name="t_dueamt_3rd" value="{$dt_arr.dueamt_3rd}" size="30" onChange="audit_money(this)" {if $ugs.v_pay.v eq 0} style="visibility:hidden"{/if}  {if $ugs.v_pay.v eq 1 && $ugs.v_pay.m eq 0 && ($dt_arr.dueamt_3rd gt 0 || $ugs.v_pay.i eq 0)} disabled="disabled" {/if}>
+					<td align="left" width="75%" class="roweven">	
+						<input type="text" name="t_dueamt_3rd" value="{$dt_arr.dueamt_3rd}" size="30" onChange="audit_money(this)">
 					</td>
 				</tr>																
 				<tr>

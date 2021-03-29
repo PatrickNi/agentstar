@@ -27,6 +27,8 @@ $sets['fee']  = isset($_REQUEST['fee'])? trim($_REQUEST['fee']) : 0;
 $sets['staff']  = isset($_REQUEST['staff'])? trim($_REQUEST['staff']) : 0;
 $sets['sales']  = isset($_REQUEST['sales'])? trim($_REQUEST['sales']) : 0;
 $sets['note']    = isset($_REQUEST['t_note'])? iconv('utf-8', 'GBK', (string)trim($_REQUEST['t_note'])) : "";
+$sets['school']    = isset($_REQUEST['t_school'])? (string)trim($_REQUEST['t_school']) : "";
+$sets['grade']    = isset($_REQUEST['t_grade'])? (string)trim($_REQUEST['t_grade']) : "";
 
 
 $o_c = new ClientAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
@@ -83,10 +85,14 @@ if (isset($_POST['bt_name']) && stripos($_POST['bt_name'], "SAVE") !== false){
     if($coach_id > 0){   
         if($msg == ''){
             $o_h->setCoach($user_id,$coach_id, $sets);
+            if (isset($_REQUEST['save_w_lesson']) && $_REQUEST['save_w_lesson'] == 1) {
+                $o_h->updateLessons($coach_id);
+            }
         }       
-
-    }else{
+    }
+    else{
         $coach_id =  $o_h->addCoach($user_id, $client_id, $sets);
+        $o_h->updateLessons($coach_id);
     }
     
 
@@ -102,6 +108,16 @@ elseif (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "DELE
     $o_h->delCoach($coach_id);
     echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
     exit;   
+}
+elseif (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "COMPLETED") {
+    $lesson_id   = isset($_REQUEST['lessonid'])? trim($_REQUEST['lessonid']) : 0;
+    if($o_h->completeLesson($coach_id, $lesson_id)) {
+        echo json_encode(array('msg'=>"Lesson completed OK"));
+    }
+    else {
+        echo json_encode(array('msg'=>"Lesson completed Failed"));
+    }
+    exit;
 }
 
 # get user position
@@ -155,7 +171,7 @@ $o_tpl->assign('client', $o_c->getOneClientInfo($client_id));
 $o_tpl->assign('msg', $msg);
 $o_tpl->assign('ugs', $ugs);
 $o_tpl->assign('due_arr', array('30' => "0.5hr", '60' => "1hr", '90' => "1.5hrs", '120' => "2hrs", '150' => "2.5hrs", '180' => "3hrs", '210' => "3.5hrs", '240' => "4hrs", '480' => "1day"));
-
+$o_tpl->assign('grade_arr', $o_h->GRADE_LIST);
 
 $o_tpl->display('client_coach_detail.tpl'); 
 

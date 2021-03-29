@@ -34,7 +34,7 @@ foreach ($g_user_grants as $item){
 
 
 # get user
-$user_arr = $o_g->getUserNameArr();
+$user_arr = $o_g->getUserNameArr(0,true);
 
 # client information
 $client_arr = $o_c->getOneClientInfo($client_id);

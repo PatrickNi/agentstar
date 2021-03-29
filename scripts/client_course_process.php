@@ -31,7 +31,9 @@ foreach ($g_user_grants as $item){
 $course_id  = isset($_REQUEST['courseid'])? trim($_REQUEST['courseid']) : 0;
 $client_id  = isset($_REQUEST['cid'])? trim($_REQUEST['cid']) : 0;
 $process_id = isset($_REQUEST['pid'])? trim($_REQUEST['pid']) : 0;
-$isOther      = isset($_REQUEST['isOther'])? trim($_REQUEST['isOther']) : 0;
+$isOther    = isset($_REQUEST['isOther'])? trim($_REQUEST['isOther']) : 0;
+$item_id    = isset($_REQUEST['itemid'])? trim($_REQUEST['itemid']) : 0;
+
 $o_c = new ClientAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
 # get process
@@ -74,7 +76,7 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 				$o_t->doneBySourceId('course', $process_id);
 				
 				$sets['order'] = $o_c->getCourseProcessOrder($process_id, $course_id);
-				$sets['subject'] = $o_c->getNextCourseProcessID($sets['subject']);
+				$sets['subject'] = $item_id > 0? $item_id : $o_c->getNextCourseProcessID($sets['subject']);
 				$sets['order'] = $sets['order'] + 1;
 				$sets['date']    = "0000-00-00";
 				$sets['due']     = "0000-00-00";
@@ -109,6 +111,7 @@ $o_tpl->assign('process_arr', $process_arr);
 
 if($isOther == 0 && $process_id > 0 && array_key_exists($process_id, $show_arr)){
 	$o_tpl->assign('dt_arr', $show_arr[$process_id]);
+	$o_tpl->assign('forward_btn', $o_c->getForwardProcess($show_arr[$process_id]['subject']));
 }
 $o_tpl->assign('cid', $client_id);
 $o_tpl->assign('course_id', $course_id);

@@ -27,6 +27,7 @@ foreach ($g_user_grants as $item){
 		}		
 	}
 }
+$accounts = $o_c->getAccount(0, $account_id);
 
 
 if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
@@ -42,35 +43,36 @@ if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
 	elseif ($pid > 0 && $isNew == 0){
 		# check valid user
 		$user_id = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
-		if($ugs['p_h']['m'] == 1){
+		if(($accounts[$account_id]['type'] == 'visa' && $ugs['v_pay']['m'] == 1) || $accounts[$account_id]['type'] != 'visa'){
 			$o_c->setPayment($pid, $sets);
 			echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
 			exit;
-		}else{
-			echo "<script language='javascript'>alert('permission denied');</script>";
+		}
+		else{
+			echo "<script language='javascript'>alert('Permission denied');</script>";
 		}    
 	}
 	elseif($isNew == 1){
-		if($ugs['p_h']['m'] == 1){
+		if(($accounts[$account_id]['type'] == 'visa' && $ugs['v_pay']['i'] == 1) || $accounts[$account_id]['type'] != 'visa'){
 			$o_c->addPayment($account_id, $sets);
 			echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
 			exit;    
-		}else{
-			echo "<script language='javascript'>alert('permission denied');</script>";
+		}
+		else{
+			echo "<script language='javascript'>alert('Permission denied');</script>";
 		}    		
 	}
-}elseif(isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "REDEEM") {
+}
+elseif(isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "REDEEM") {
 	if (isset($_POST['t_coupon']) && $_POST['t_coupon'] > 0) {
-		$accounts = $o_c->getAccount(0, $account_id);
-
 		$sets['date'] = date('Y-m-d');
-		$coupon = $o_p->checkAvalid($_POST['t_coupon'], $accounts[$account_id]['type'].'.'.$accounts[$account_id]['step'], $sets['date']);
+		$coupon = $o_p->redeem($_POST['t_coupon'], $accounts[$account_id]['type'].'.'.$accounts[$account_id]['step'], $sets['date']);
 		if ($coupon) {
 			$sets['paid'] = $coupon[$_POST['t_coupon']];
 			$sets['remark'] = 'Redeem a coupon';
 			//var_dump($sets);exit;
-			$o_c->addPayment($account_id, $sets);
-			$o_p->redeemCoupon($_POST['t_coupon'], $accounts[$account_id]['type'], $accounts[$account_id]['objid']);
+			$paymentid = $o_c->addPayment($account_id, $sets);
+			$o_p->postRedeem($_POST['t_coupon'], $account_id, $accounts[$account_id]['type'], $paymentid);
 			echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
 			exit;    
 		}
@@ -83,13 +85,18 @@ if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
 
 }
 elseif(isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "DELETE"){
-	if($ugs['p_h']['d'] == 1){
+	if(($accounts[$account_id]['type'] == 'visa' && $ugs['v_pay']['d'] == 1) || $accounts[$account_id]['type'] != 'visa'){
 		$o_c->delPayment($pid);
 		echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
 		exit;   	
 	}else{
-			echo "<script language='javascript'>alert('permission denied');</script>";
+			echo "<script language='javascript'>alert('Permission denied');</script>";
 	}   		
+}
+
+if ($accounts[$account_id]['type'] == 'visa' && $ugs['v_pay']['v'] == 0) {
+	echo "<script language='javascript'>alert('Permission denied');</script>";
+	exit;
 }
 
 $payments = $o_c->getPayment($account_id);
@@ -99,6 +106,8 @@ if($account_id > 0){
 
 # set smarty tpl
 $o_tpl = new Template;
+$o_tpl->assign('ugs', $ugs);
+
 if($account_id > 0){
 	$o_tpl->assign('account', $accounts[$account_id]);
 	$o_tpl->assign('coupons', $o_p->getCouponsByClient($o_c->getClientIDbyAccount($accounts[$account_id]), $accounts[$account_id]['type'].'.'.$accounts[$account_id]['step'], 'NEW'));

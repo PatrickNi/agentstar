@@ -142,6 +142,16 @@
 	                                    
               </select>
             </td>
+           <tr>
+            <td width="28%" align="left"class="rowodd"><strong>Course Completed:</strong>&nbsp;&nbsp;</td>
+            <td align="left" width="72%" class="roweven">
+              <select name="t_completed" onChange="this.form.t_key.focus();">
+                  <option value="YES" {if $dt_arr.completed == 'YES'} selected {/if}>YES</option>
+                  <option value="NO" {if $dt_arr.completed == 'NO' ||$dt_arr.cpmpleted == "" } selected {/if}>NO</option>                                        
+              </select>
+            </td>
+          </tr>
+
           </tr>
           {if $courseid > 0}
           <tr>

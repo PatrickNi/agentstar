@@ -124,6 +124,7 @@ function ShowComm() {
 					<td class="border_1" width="5%">Qualification</td>
 					<td class="border_1" width="5%">Major</td>
 					<td class="border_1" width="5%">Consultant</td>
+					<td class="border_1" width="3%">Completed</td>
 					<td class="border_1" width="5%">Verify<br>Migration</td>
 					<td class="border_1" width="5%">Consultant Date</td>							
 					<td class="border_1" width="5%">Course Start<br> Date</td>
@@ -147,6 +148,7 @@ function ShowComm() {
 					<td class="border_1">{$arr.qualname}</td>
 					<td class="border_1">{$arr.majorname}</td>
 					<td class="border_1">{$user_arr[$arr.consultant]}</td>
+					<td class="border_1">{$arr.completed}</td>
 					<td class="border_1">{$user_arr[$arr.vma]},{$arr.vms|ucwords}</td>
 					<td class="border_1">{$arr.consultant_date}</td>
 					<td class="border_1">{$arr.start}</td>
@@ -164,7 +166,7 @@ function ShowComm() {
                     <td class="border_1">&nbsp;</td>		
 				</tr>
 				{if $arr.active eq 1}
-							<tr name="{$id}" style="display:block;  font-weight:bolder;" align="right" class="yellowbg">
+							<tr name="{$id}" style="font-weight:bolder;" align="right" class="yellowbg">
 								<td class="border_1"align="center"><span style="text-decoration:underline; font-weight:lighter;cursor:pointer;" onClick="{if $show_detail eq 1}window.open('client_course_sem.php?cid={$cid}&courseid={$id}','_blank', 'alwaysRaised=yes,resizable=yes,scrollbars=yes,width='+ screen.width*4/5 +',height=' + screen.height*4/5){else}alert('Permission denied');{/if}">add semesters</span></td>
 								<td class="border_1">Start Date</td>
 								<td class="border_1">Complete Date</td>
@@ -182,7 +184,7 @@ function ShowComm() {
                                     <td class="border_1" style="color:#CC3300; visibility:hidden" id="ShowComm">Discount Pay Day</td>
 								{/if}							</tr>
 							{foreach key=semid item=semarr from=$course_sem[$id]}
-							<tr name="{$id}" class="yellowbg" style="display:block; {if $semarr.done eq 2}background-color: #ceccc5;font-style: italic;{/if}" >
+							<tr name="{$id}" class="yellowbg" style="{if $semarr.done eq 2}background-color: #ceccc5;font-style: italic;{/if}" >
 								<td class="border_1"align="center" ><span style="text-decoration:underline; cursor:pointer;" onClick="{if $show_detail eq 1}window.open('client_course_sem.php?cid={$cid}&courseid={$id}&semid={$semid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,width='+ screen.width*4/5 +',height=' + screen.height*4/5){else}alert('Permission denied');{/if}">semester{$semarr.sem}</span></td>
 								<td class="border_1" align="right">{$semarr.fdate}</td>
 								<td class="border_1" align="right">{$semarr.tdate}</td>

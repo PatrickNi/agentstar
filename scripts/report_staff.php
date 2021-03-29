@@ -188,8 +188,13 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
     }
 
     if (isset($_POST['bt_archive']) && $_POST['bt_archive'] == 'archive report' && !$from_archive) {
-        $filter = array('is_all'=>$is_all, 'from_day'=>$from_day, 'to_day'=>$to_day);
-        $o_r->doStaffArchive($staff_id, $is_all, $filter, $courses, $courseprocs, $coursesems, $coursepots, $visaagrees, $visaprocs, $visavisits, $homeloan, $homeloan_fee, $coaches);
+        if ($user_id == 3) {
+            $filter = array('is_all'=>$is_all, 'from_day'=>$from_day, 'to_day'=>$to_day);
+            $o_r->doStaffArchive($staff_id, $is_all, $filter, $courses, $courseprocs, $coursesems, $coursepots, $visaagrees, $visaprocs, $visavisits, $homeloan, $homeloan_fee, $coaches);
+        }
+        else {
+            echo "<script language='javascript'>alert('Permisson Denied');</script>"; 
+        }
     }
 }
 
@@ -213,6 +218,7 @@ $o_tpl->assign('toDay', $to_day);
 $o_tpl->assign('staffid', $staff_id);
 $o_tpl->assign('isAll', $is_all);
 $o_tpl->assign('from_archive', $from_archive);
+$o_tpl->assign('uid', $user_id);
 
 
 

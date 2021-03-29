@@ -620,7 +620,7 @@ class ClientAPI extends MysqlDB {
 		return 0;
 	}
 	function getCourseByUser($course_id=0, $client_id=0){
-		$sql = "select a.ID, b.Name, a.IID, b.CateID, d.Qual, e.Major, AppFee, ToUsDate, ToSchoolDate, UserID, AgentID, IsActive, StartDate, EndDate, TFee, Duration, a.QualID, MethodID, a.MajorID, Unit, KeyPoint, Refuse, ConsultantID, ConsultantDate, verify_migration_agent, verify_migration_status 
+		$sql = "select a.ID, b.Name, a.IID, b.CateID, d.Qual, e.Major, AppFee, ToUsDate, ToSchoolDate, UserID, AgentID, IsActive, StartDate, EndDate, TFee, Duration, a.QualID, MethodID, a.MajorID, Unit, KeyPoint, Refuse, ConsultantID, ConsultantDate, verify_migration_agent, verify_migration_status, isCompleted 
 						from client_course a left join institute b on(a.IID = b.ID) 
 							 left join institute_category c on(a.IID = c.ID)
 							 left join institute_qual d on(a.QualID = d.ID) 
@@ -661,12 +661,13 @@ class ClientAPI extends MysqlDB {
 			$_arr[$this->CateID][$this->ID]['consultant_date'] 	 = $this->ConsultantDate;
 			$_arr[$this->CateID][$this->ID]['vma'] 	 = $this->verify_migration_agent;
 			$_arr[$this->CateID][$this->ID]['vms'] 	 = $this->verify_migration_status;
+			$_arr[$this->CateID][$this->ID]['completed'] 	 = $this->isCompleted;
 		}
 		return $_arr;
 	}
 	
 	function getCourseByUserV2($course_id=0, $client_id=0){
-		$sql = "select a.ID, b.Name, a.IID, b.CateID, d.Qual, e.Major, AppFee, ToUsDate, ToSchoolDate, UserID, AgentID, IsActive, StartDate, EndDate, TFee, Duration, a.QualID, MethodID, a.MajorID, Unit, KeyPoint, Refuse, ConsultantID, ConsultantDate,verify_migration_agent, verify_migration_status 
+		$sql = "select a.ID, b.Name, a.IID, b.CateID, d.Qual, e.Major, AppFee, ToUsDate, ToSchoolDate, UserID, AgentID, IsActive, StartDate, EndDate, TFee, Duration, a.QualID, MethodID, a.MajorID, Unit, KeyPoint, Refuse, ConsultantID, ConsultantDate,verify_migration_agent, verify_migration_status, isCompleted 
 						from client_course a left join institute b on(a.IID = b.ID) 
 							 left join institute_category c on(a.IID = c.ID)
 							 left join institute_qual d on(a.QualID = d.ID) 
@@ -707,7 +708,8 @@ class ClientAPI extends MysqlDB {
 			$_arr[$this->ID]['consultant'] 	 = $this->ConsultantID;
 			$_arr[$this->ID]['consultant_date'] 	 = $this->ConsultantDate;	
 			$_arr[$this->ID]['vma'] 	 = $this->verify_migration_agent;
-			$_arr[$this->ID]['vms'] 	 = $this->verify_migration_status;		
+			$_arr[$this->ID]['vms'] 	 = $this->verify_migration_status;
+			$_arr[$this->ID]['completed'] 	 = $this->isCompleted;		
 		}
 		return $_arr;
 	}
@@ -751,8 +753,8 @@ class ClientAPI extends MysqlDB {
 			$v = addslashes($v);
 		}
 		
-		$sql = "insert into `client_course` (CID, IID, MajorID, QualID, AppFee, ToUsDate, ToSchoolDate, UserID, AgentID, MethodID, StartDate, EndDate, Duration, TFee, IsActive, Refuse, Unit, KeyPoint, ConsultantID, ConsultantDate, verify_migration_agent, verify_migration_status) values ";
-		$sql .= "('{$cid}', '{$sets['iid']}', '{$sets['major']}', '{$sets['qual']}', '{$sets['appfee']}', '{$sets['tusdate']}', '{$sets['tsdate']}', '{$user_id}', '{$sets['agent']}',  '{$sets['method']}',  '{$sets['start']}',  '{$sets['end']}',  '{$sets['due']}',  '{$sets['fee']}',  '{$sets['done']}',  '{$sets['refuse']}', '{$sets['unit']}', '{$sets['key']}', '{$sets['consultant']}', '{$sets['consultant_date']}', '{$sets['vma']}', '{$sets['vms']}')";
+		$sql = "insert into `client_course` (CID, IID, MajorID, QualID, AppFee, ToUsDate, ToSchoolDate, UserID, AgentID, MethodID, StartDate, EndDate, Duration, TFee, IsActive, Refuse, Unit, KeyPoint, ConsultantID, ConsultantDate, verify_migration_agent, verify_migration_status, isCompleted) values ";
+		$sql .= "('{$cid}', '{$sets['iid']}', '{$sets['major']}', '{$sets['qual']}', '{$sets['appfee']}', '{$sets['tusdate']}', '{$sets['tsdate']}', '{$user_id}', '{$sets['agent']}',  '{$sets['method']}',  '{$sets['start']}',  '{$sets['end']}',  '{$sets['due']}',  '{$sets['fee']}',  '{$sets['done']}',  '{$sets['refuse']}', '{$sets['unit']}', '{$sets['key']}', '{$sets['consultant']}', '{$sets['consultant_date']}', '{$sets['vma']}', '{$sets['vms']}', '{$sets['completed']}')";
 		$this->query($sql);
 		return $this->getLastInsertID();
 	}
@@ -761,7 +763,7 @@ class ClientAPI extends MysqlDB {
 		foreach($sets as &$v){
 			$v = addslashes($v);
 		}
-		$sql = "update client_course SET IID = '{$sets['iid']}', MajorID = '{$sets['major']}', QualID = '{$sets['qual']}', AppFee = '{$sets['appfee']}', ToUsDate = '{$sets['tusdate']}', ToSchoolDate = '{$sets['tsdate']}', AgentID = '{$sets['agent']}', MethodID = '{$sets['method']}', StartDate = '{$sets['start']}', EndDate = '{$sets['end']}', Duration = '{$sets['due']}', TFee = '{$sets['fee']}', IsActive = {$sets['done']}, Refuse = '{$sets['refuse']}', Unit = '{$sets['unit']}', KeyPoint = '{$sets['key']}', ConsultantID = '{$sets['consultant']}', ConsultantDate = '{$sets['consultant_date']}', verify_migration_agent = '{$sets['vma']}', verify_migration_status = '{$sets['vms']}' where ID = {$course_id}";
+		$sql = "update client_course SET IID = '{$sets['iid']}', MajorID = '{$sets['major']}', QualID = '{$sets['qual']}', AppFee = '{$sets['appfee']}', ToUsDate = '{$sets['tusdate']}', ToSchoolDate = '{$sets['tsdate']}', AgentID = '{$sets['agent']}', MethodID = '{$sets['method']}', StartDate = '{$sets['start']}', EndDate = '{$sets['end']}', Duration = '{$sets['due']}', TFee = '{$sets['fee']}', IsActive = {$sets['done']}, Refuse = '{$sets['refuse']}', Unit = '{$sets['unit']}', KeyPoint = '{$sets['key']}', ConsultantID = '{$sets['consultant']}', ConsultantDate = '{$sets['consultant_date']}', verify_migration_agent = '{$sets['vma']}', verify_migration_status = '{$sets['vms']}', isCompleted = '{$sets['completed']}' where ID = {$course_id}";
 		return $this->query($sql);
 	}
 	
@@ -896,6 +898,7 @@ class ClientAPI extends MysqlDB {
 		$sql = "select ID, Process, isNormal from course_process";
 		if ($isNormal > 0){
 			$sql .= " where isNormal = {$isNormal}";
+			$sql .= " order by rank ";
 			$this->query($sql);
 			$_arr = array();
 			while ($this->fetch()){
@@ -903,6 +906,7 @@ class ClientAPI extends MysqlDB {
 			}
 						
 		}else{
+			$sql .= " order by rank ";
 			$this->query($sql);
 			$_arr = array();
 			while ($this->fetch()){
@@ -911,6 +915,26 @@ class ClientAPI extends MysqlDB {
 			}
 		}
 		return $_arr;
+	}
+
+
+	function getForwardProcess($item_id) {
+		$sql = "SELECT FW_PROCESS FROM course_process where ID = {$item_id} ";
+		$this->query($sql);
+		$ids = array();
+		while ($this->fetch()){
+			$ids = explode(',', $this->FW_PROCESS);
+		}
+
+		$rtn = array();
+		if (count($ids) > 0) {
+			$sql = "SELECT ID, PROCESS From course_process WHERE ID IN (".implode(',', $ids).")";
+			$this->query($sql);
+			while($this->fetch()) {
+				$rtn[$this->ID] = $this->PROCESS;
+			}
+		}
+		return $rtn;		
 	}
 	
 	function addProcessOfCourse($process){
@@ -1603,8 +1627,10 @@ class ClientAPI extends MysqlDB {
 				$v = addslashes($v);
 			}
 			$sql = "insert into client_payment (AccountID, PaidDate, PaidAmount, Remark) values ('{$aid}', '{$sets['date']}', '{$sets['paid']}', '{$sets['remark']}')";
-			return $this->query($sql);
+			$this->query($sql);
+			return $this->getLastInsertID();
 		}
+		return false;
 	}
 	
 	function delPayment($pid){

@@ -3,6 +3,8 @@ require_once('MysqlDB.class.php');
 
 class CoachAPI extends MysqlDB{
 
+    public $GRADE_LIST = array(1=>'Year1',2=>'Year2',3=>'Year3',4=>'Year4',5=>'Year5',6=>'Year6',7=>'Year7',8=>'Year8',9=>'Year9',10=>'Year10',11=>'Year11',12=>'Year12');
+
     function __construct($host, $user, $pswd, $database, $debug) {
          $this->MysqlDB($host, $user, $pswd, $database, $debug);
     }
@@ -75,9 +77,12 @@ class CoachAPI extends MysqlDB{
 
     function addCoach($user_id, $cid, $sets) {
         $sets['note'] = addslashes($sets['note']);
+        $sets['school'] = addslashes($sets['school']);
+        $sets['grade'] = addslashes($sets['grade']);
         $deliver_hour = $this->calDeliverHour($sets['startdate'], $sets['enddate'], $sets['freqw'], $sets['duehour']);
+        $deliver_hour = $deliver_hour['totalhours'];
 
-        $sql = "insert into client_coach (CID, StaffID, AddUserId, ItemID, StartDate, EndDate, StartTime, DueHour, FreqWeek, Fee, AddTime, Note, SaleID, DeliverHours) values ('{$cid}','{$sets['staff']}', '{$user_id}', '{$sets['itemid']}', '{$sets['startdate']}','{$sets['enddate']}','{$sets['starttime']}','{$sets['duehour']}','{$sets['freqw']}','{$sets['fee']}', NOW(), '{$sets['note']}', '{$sets['sales']}', '{$deliver_hour}')";
+        $sql = "insert into client_coach (CID, StaffID, AddUserId, ItemID, StartDate, EndDate, StartTime, DueHour, FreqWeek, Fee, AddTime, Note, SaleID, DeliverHours, School, Grade) values ('{$cid}','{$sets['staff']}', '{$user_id}', '{$sets['itemid']}', '{$sets['startdate']}','{$sets['enddate']}','{$sets['starttime']}','{$sets['duehour']}','{$sets['freqw']}','{$sets['fee']}', NOW(), '{$sets['note']}', '{$sets['sales']}', '{$deliver_hour}', '{$sets['school']}', '{$sets['grade']}')";
         //var_dump($sql);exit;
         $this->query($sql);
         return $this->getLastInsertID();
@@ -88,9 +93,12 @@ class CoachAPI extends MysqlDB{
             return false;
 
         $sets['note'] = addslashes($sets['note']);
+        $sets['school'] = addslashes($sets['school']);
+        $sets['grade'] = addslashes($sets['grade']);
         $deliver_hour = $this->calDeliverHour($sets['startdate'], $sets['enddate'], $sets['freqw'], $sets['duehour']);
+        $deliver_hour = $deliver_hour['totalhours'];
 
-        $sql = "update client_coach SET AddUserID = '{$user_id}', ItemID = '{$sets['itemid']}', StartDate = '{$sets['startdate']}', EndDate = '{$sets['enddate']}', StaffId = '{$sets['staff']}', StartTime = '{$sets['starttime']}', DueHour = '{$sets['duehour']}', FreqWeek = '{$sets['freqw']}', Fee = '{$sets['fee']}', Note='{$sets['note']}', SaleID = '{$sets['sales']}', DeliverHours = '{$deliver_hour}' where id = {$coach_id}";
+        $sql = "update client_coach SET AddUserID = '{$user_id}', ItemID = '{$sets['itemid']}', StartDate = '{$sets['startdate']}', EndDate = '{$sets['enddate']}', StaffId = '{$sets['staff']}', StartTime = '{$sets['starttime']}', DueHour = '{$sets['duehour']}', FreqWeek = '{$sets['freqw']}', Fee = '{$sets['fee']}', Note='{$sets['note']}', SaleID = '{$sets['sales']}', DeliverHours = '{$deliver_hour}', School = '{$sets['school']}', Grade = '{$sets['grade']}' where id = {$coach_id}";
         //var_dump($sql);
         return $this->query($sql);
     }
@@ -99,12 +107,14 @@ class CoachAPI extends MysqlDB{
         if (!$coach_id)
             return false;
 
+        $this->delLesson($coach_id);
+        
         $sql = "DELETE FROM client_coach where id = {$coach_id}";
         return $this->query($sql);
     }
 
     function getCoach($cid, $coach_id=0, $date='', $staff=0) {
-        $sql = "SELECT ID, CID, StaffID, AddUserID, ItemID, StartDate, EndDate, StartTime, DueHour, FreqWeek, Fee, AddTime, Note, SaleID, DeliverHours FROM client_coach WHERE 1 ";
+        $sql = "SELECT ID, CID, StaffID, AddUserID, ItemID, StartDate, EndDate, StartTime, DueHour, FreqWeek, Fee, AddTime, Note, SaleID, DeliverHours, School, Grade FROM client_coach WHERE 1 ";
         if ($cid)
             $sql .= " AND CID = {$cid} ";
 
@@ -135,6 +145,8 @@ class CoachAPI extends MysqlDB{
             $arr[$this->ID]['note'] = $this->Note;
             $arr[$this->ID]['sales'] = $this->SaleID;
             $arr[$this->ID]['deliverhour'] = $this->DeliverHours;
+            $arr[$this->ID]['school'] = $this->School;
+            $arr[$this->ID]['grade'] = $this->Grade;
         }
         return $arr;
     }
@@ -145,14 +157,107 @@ class CoachAPI extends MysqlDB{
 
         $freq_weeks = explode(',', $freq_weeks);
         $count = 0;
+        $dates = array();
         do {
-            if(in_array(date('D', strtotime($startdate)), $freq_weeks))
-                $count++;
+            $week = date('D', strtotime($startdate));
+            if(in_array($week, $freq_weeks)) {
+                $dates[$startdate] = $week;
+            }
 
             $startdate = date("Y-m-d", strtotime('+1 day', strtotime($startdate)));
         }while($startdate <= $enddate);
         
-        return $duehour*$count;
+        return array('totalhours'=> $duehour * count($dates) ,'dates'=>$dates);
+    }
+
+
+    function updateLessons($coach_id) {
+        if (!$coach_id)
+            return false;
+
+        $coach = $this->getCoach(0, $coach_id);
+        if (!$coach)
+            return false;
+
+        $coach = $coach[$coach_id];
+        $lessons = $this->calDeliverHour($coach['startdate'], $coach['enddate'], $coach['freqw'], $coach['duehour']);
+        $lessons = $lessons['dates'];
+
+        $sql = "SELECT ID, StartDate FROM client_coach_lessons WHERE CoachID = {$coach_id} ";
+        $this->query($sql);
+        $del = array();
+        while($this->fetch()) {
+            if (isset($lessons[$this->StartDate])){
+                array_push($del, $this->ID);
+            }
+        }
+
+        if (count($del) > 0) {
+            $sql = "DELETE from client_coach_lessons where id in (".implode(',', $del).")";
+            $this->query($sql);
+        }
+
+        foreach ($lessons as $startdate => $week) {
+            $sql = "insert into client_coach_lessons (CID, CoachID, StartDate, EndDate, StartTime, DueHour, WeekName, Fee, AddTime, StaffID) values ('{$coach['cid']}', '{$coach_id}', '{$startdate}', '{$startdate}', '{$coach['starttime']}', '{$coach['duehour']}', '{$week}', '{$coach['fee']}', NOW(), '{$coach['staff']}')";
+            $this->query($sql);
+        }
+        return true;
+    }
+    
+    function getLessons($cid, $coach_id=0, $lesson_id=0) {
+        if (!$cid)
+            return false;
+
+        $sql = "SELECT * from client_coach_lessons WHERE CID = {$cid} ";
+        if ($coach_id > 0) {
+            $sql .= " AND CoachID = {$coach_id} ";
+        }
+
+        if ($lesson_id > 0) {
+            $sql .= " AND ID = {$lesson_id} ";
+        }
+
+        //echo $sql."\n";
+        $this->query($sql);
+        $rtn = array();
+        while($this->fetch()) {
+            $rtn[$this->CoachID][$this->ID]['startdate'] = $this->StartDate;
+            $rtn[$this->CoachID][$this->ID]['enddate'] = $this->EndDate;
+            $rtn[$this->CoachID][$this->ID]['starttime'] = $this->StartTime;
+            $rtn[$this->CoachID][$this->ID]['duehour'] = $this->DueHour;
+            $rtn[$this->CoachID][$this->ID]['week'] = $this->WeekName;
+            $rtn[$this->CoachID][$this->ID]['fee'] = $this->Fee;
+            $rtn[$this->CoachID][$this->ID]['coachid'] = $this->CoachID;
+            $rtn[$this->CoachID][$this->ID]['cid'] = $this->CID;
+            $rtn[$this->CoachID][$this->ID]['status'] = $this->Status;
+            $rtn[$this->CoachID][$this->ID]['staff'] = $this->StaffID;
+            $rtn[$this->CoachID][$this->ID]['adjust'] = $this->isAdjust;
+        }
+        //var_dump($rtn);
+        return $rtn;
+    }
+
+    function completeLesson($coach_id, $lesson_id) {
+        if (!$coach_id || !$lesson_id)
+            return false;
+
+        $sql = "Update client_coach_lessons SET isCompleted = 'YES' where coachid = {$coach_id} and id = {$lesson_id} ";
+        return $this->query($sql);
+    }
+
+    function delLesson($coach_id) {
+        if (!$coach_id)
+            return false;
+        $sql = "DELETE FROM client_coach_lessons where coachid = {$coach_id}";
+        return $this->query($sql);
+    }
+
+    function setLesson($lessonid, $sets) {
+        if (!$lessonid || !$sets)
+            return false;
+        
+        $sql = "Update client_coach_lessons SET Fee = '{$sets['fee']}', Status = '{$sets['status']}', StartDate = '{$sets['startdate']}', EndDate = '{$sets['startdate']}', isAdjust = '{$sets['adjust']}', StaffID = '{$sets['staff']}' where id = {$lessonid}";
+        return $this->query($sql);
     }
 }
 ?>

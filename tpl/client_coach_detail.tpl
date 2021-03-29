@@ -22,11 +22,9 @@
         <tr align="center"  class="greybg">
           <input type="hidden" name="bt_name" id="bt_name" value="">
           <td align="left" width="10%">
-            {if $ugs.v_visa.d eq 1}
             <input type="submit" value="Delete" style="font-weight:bold" onClick="this.form.bt_name.value='delete';this.disable=false;">&nbsp;&nbsp;&nbsp;
-            {/if}
           </td>         
-          <td align="center" class="whitetext"> Detail Information &nbsp;&nbsp; </td>       
+          <td align="center" class="whitetext"> Lesson Schedule Detail </td>       
           <td align="left" width="30%">
             <input type="button" value="Save" style="font-weight:bold" onClick="save_visa(this, false);" >
             <input type="button" value="Close &amp; Refresh " style="font-weight:bold" onClick="save_visa(this, true);">
@@ -59,7 +57,21 @@
             <td width="36%" align="left" class="rowodd"><strong>End Date:</strong></td> 
             <td align="left" width="64%" class="roweven"><input type="text" name="enddate" id="enddate" size="30" value='{$dt_arr.enddate}'></td> 
           </tr>   
-
+          <tr> 
+            <td width="36%" align="left" class="rowodd"><strong>Grade</strong></td> 
+            <td align="left" width="64%" class="roweven">
+              <select name="t_grade">
+                <option value="0">n/a</option>
+                {foreach key=id item=name from=$grade_arr}
+                  <option value="{$id}" {if $id == $dt_arr.grade} selected {/if}>{$name}</option>
+                {/foreach}
+              </select>
+            </td> 
+          </tr> 
+          <tr> 
+            <td width="36%" align="left" class="rowodd"><strong>School</strong></td> 
+            <td align="left" width="64%" class="roweven"><input type="text" name="t_school" id="enddate"  size="50" value='{$dt_arr.school}'></td> 
+          </tr> 
           <tr> 
             <td width="36%" align="left" class="rowodd"><strong>Class start & Class hours:</strong></td> 
             <td align="left" width="64%" class="roweven"> 
@@ -127,7 +139,13 @@
             <td align="left" width="64%" class="roweven"> 
                 <strong><em>{$dt_arr.deliverhour/60|string_format:"%.1f"}</em></strong>
             </td> 
-          </tr>          
+          </tr>        
+          <tr> 
+            <td width="36%" align="left" class="rowodd"><strong style="color:red">Save with lesson rebuild</strong>&nbsp;&nbsp;</td> 
+            <td align="left" width="64%" class="roweven"> 
+                <input type="checkbox" value="1" name="save_w_lesson"/>
+            </td> 
+          </tr>        
           <tr><td colspan="2"><hr/></td></tr>
 
           <tr>
@@ -217,7 +235,6 @@
                 $('#coachid').val(rtn.id);
             else {
                 alert(rtn.msg);
-                return false;
             }
             if (close_w) {
                 if(window.opener && !window.opener.closed){
@@ -255,5 +272,6 @@
         $("#course").append(new Option(items[$(this).val()][x], x));
     }
   });
-</script>
+
 {/literal}  
+</script>

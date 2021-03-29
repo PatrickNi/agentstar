@@ -4,6 +4,7 @@
 <title>Agent Star - Coach Service</title>
 </head>
 <link rel="stylesheet" href="../css/sam.css">
+{include file="style.tpl"}
 <body>
 <form name="form1" action="" target="_self" method="get">
 <input type="hidden" name="cid" value="{$cid}">
@@ -39,7 +40,7 @@
         <td class="whitetext" colspan="9" style="padding:3 ">Client Coach Service
             &nbsp;&nbsp;&nbsp;&nbsp;
          {if $ugs.v_service.i eq 1}
-            <span style="font-weight:bold; font-size:10px; color:#0066FF; cursor:pointer; text-decoration:underline" onClick="window.open('client_coach_detail.php?cid={$cid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">add new</span>       
+            <span style="font-weight:bold; font-size:10px; color:#0066FF; cursor:pointer; text-decoration:underline" onClick="window.open('client_coach_detail.php?cid={$cid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">Add new schedule</span>       
          {/if}
         </td>
     </tr>
@@ -47,12 +48,11 @@
         <td align="left" style="font-size:16px " colspan="9"> <span class="highyellow">Client: {$client.lname} {$client.fname}</span>&nbsp;&nbsp; <span class="highyellow">DoB: {$client.dob}</span>&nbsp;&nbsp;<span class="highyellow">Main Visa: {$client.visa_n}-{$client.class_n}, expr: {$client.epdate}</span></td>
     </tr>       
     <tr align="center" class="totalrowodd">
-        <td class="border_1">Category</td>
         <td class="border_1">Course</td>
-        <td class="border_1">Date (Start ~ End) </td>
-        <td class="border_1">Schedule</td>
-        <td class="border_1">Fee</td>
-        <td class="border_1">Staff</td>
+        <td class="border_1">Subject</td>
+        <td class="border_1">Grade</td>
+        <td class="border_1">Teacher</td>
+        <td class="border_1">&nbsp;</td>
     </tr>
     {foreach key=id item=arr from=$coach_arr}
     <tr align="center" class="roweven" >
@@ -60,11 +60,49 @@
         {assign var="partnerid" value=$items_arr[$arr.itemid].pid}
         {$items_arr[$partnerid].tit}&nbsp;&nbsp;</span></td>
         <td class="border_1">{$items_arr[$arr.itemid].tit}</td>
-        <td class="border_1">{$arr.startdate} ~ {$arr.enddate}</td>
-        <td class="border_1">Time: {$arr.starttime} ({$arr.duehour} hours)<br/>Week: {$arr.freqw}</td>
-        <td class="border_1">{$arr.fee}</td>
-        <td class="border_1">{$user_arr[$arr.staff]}</td>                       
+        <td class="border_1">{$grade_arr[$arr.grade]}</td>
+        <td class="border_1">{$user_arr[$arr.staff]}</td>
+        <td class="border_1">&nbsp;</td>                       
     </tr>
+    {if count($lesson_arr[$id]) > 0}
+        <tr style="font-weight:bolder;" align="center" class="yellowbg">
+            <td class="border_1" >Lesson</td>
+            <td class="border_1" >Date</td>
+            <td class="border_1" >Week</td>
+            <td class="border_1" >Fee</td>
+            <td class="border_1" >Status</td>
+        </tr>
+        {assign var="lesson_no" value="0"}
+        {foreach key=lessonid item=larr from=$lesson_arr[$id]}
+        {assign var="lesson_no" value=$lesson_no+1}
+        <tr class="yellowbg" align="center">
+            <td class="border_1" >Lesson {$lesson_no}</td>
+            <td class="border_1">{$larr.startdate}</td>
+            <td class="border_1">{$larr.week}&nbsp;&nbsp;{$larr.starttime}&nbsp;&nbsp;{$larr.duehour/60}(hours)</td>
+            <td class="border_1" align="right">${$larr.fee}</td>
+            <td class="border_1"> <a href="#" style="cursor:pointer;" onClick="window.open('client_lesson_detail.php?cid={$cid}&coachid={$id}&lessonid={$lessonid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth=300,width=500')">{$larr.status}</a></td>
+        </tr>        
+        {/foreach}
+    {/if}
     {/foreach}
 </table>
-</form> 
+</form>
+
+<script type="text/javascript">
+{literal}
+      
+function complete_lesson(obj,coachid,lessonid){
+    btn_n = $(obj).val();
+    $(obj).val('waiting...');
+    //ContentType UTF-8
+    $.post('/scripts/client_coach_detail.php', '&coachid='+coachid+'&lessonid='+lessonid+'&bt_name='+btn_n, function(data){
+        console.log(data);
+        rtn = $.parseJSON(data);           
+        $(obj).val(btn_n);
+        alert(rtn.msg);
+        window.location.reload();
+        
+    });
+}
+{/literal}
+</script>

@@ -327,8 +327,9 @@
                 <td align="left" width="72%" class="roweven"><!--internet, Australian Newspaper,Education Seminar��Passby, Friends, other-->
                     <select name="t_actm" >
                       <option value="" {if $arr.actm == ""} selected {/if}>--</option>
-                      <option value="ct" {if $arr.actm == "ct"} selected {/if}> Client testimonail</option>
-                      <option value="fb" {if $arr.actm == "fb"} selected {/if}> Facebook</option>       
+                      <option value="ct" {if $arr.actm == "ct"} selected {/if}> Client testimonoial</option>
+                      <option value="fb" {if $arr.actm == "fb"} selected {/if}> Facebook</option>
+                      <option value="gr" {if $arr.actm == "gr"} selected {/if}> Google review</option>      
                     </select>
                     <input type="text" id='t_d_actm' name="t_d_actm" value="{$arr.d_actm}" size="30">
                 </td>

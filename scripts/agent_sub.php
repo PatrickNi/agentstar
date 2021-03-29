@@ -26,6 +26,11 @@ $o_s = new SchoolAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 $o_c = new ClientAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 $o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
+
+if(isset($_POST['qflag']) && strtoupper($_POST['qflag']) == "REMOVE" && isset($_POST['agentId'])){
+    $o_a->delAgentByArr($_POST['agentId']);
+}
+
 $ugs = array();
 $user_grants = $o_g->get_user_grants($user_id);
 

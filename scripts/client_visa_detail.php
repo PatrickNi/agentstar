@@ -130,7 +130,7 @@ if ($ugs['seeall']['v'] == 0){
 }
 
 # get user
-$user_arr = $o_g->getUserNameArr();
+$user_arr = $o_g->getUserNameArr(0,true);
 
 
 //# get dependant arr

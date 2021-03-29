@@ -208,6 +208,7 @@
 			delete&nbsp;<input type="checkbox" name="g_v_pay[]" value="{$grant.v_pay.d}" {if $ugs.v_pay.d eq 1} checked="checked" {/if}>&nbsp;&nbsp;
 		</td>
    </tr>  
+   <!--
     <tr class="roweven">
 		<td align="left" ><ul>Payment Due Date</ul></td>
 		<td align="left">
@@ -225,6 +226,7 @@
 			delete&nbsp;<input type="checkbox" name="g_p_h[]" value="{$grant.p_h.d}" {if $ugs.p_h.d eq 1} checked="checked" {/if}>&nbsp;&nbsp;
 		</td>
    </tr>        
+   -->
     <tr class="roweven">
 		<td align="left" ><ul>ExpireDate Report</ul></td>
 		<td align="left">

@@ -247,15 +247,22 @@
 		          	    -->
                       </tr>
 		          	{assign var="total_profit" value="0"}
+					{assign var="total_dueamt" value="0"}
                     {assign var="agreement_profit" value="0"}
                     {assign var="paperwork_profit" value="0"}
 	                {foreach key=id item=arr from=$account_arr}
 					<tr align="center" class="roweven">
 						<td style="text-decoration:underline; cursor:pointer" onClick="window.open('client_account_detail.php?vid={$vid}&aid={$id}&cid={$cid}&typ=visa','_blank', 'alwaysRaised=yes,height=500, width=800,location=no,scrollbars=yes')" >{$arr.step|ucwords}</td>
-						<td align="right">{$arr.dueamt|string_format:"%.2f"}</td>
+						<td align="right">
+							{$arr.dueamt|string_format:"%.2f"}
+							{assign var="total_dueamt" value=$total_dueamt+$arr.dueamt}	
+						</td>
 						<td align="right">{$arr.gst|string_format:"%.2f"}</td>
-						<td align="right"><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_payment.php?aid={$id}','_blank', 'alwaysRaised=yes,height=500,width=800,location=no,scrollbars=yes')">{$arr.paid|string_format:"%.2f"}</span></td>
-						<td>{$arr.party|ucwords}</td>
+						<td align="right">
+								<span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_payment.php?aid={$id}','_blank', 'alwaysRaised=yes,height=500,width=800,location=no,scrollbars=yes')">{$arr.paid|string_format:"%.2f"}</span>
+						</td>
+						<td>{$arr.party|ucwords}
+						</td>
 						<td align="right">{$arr.dueamt_3rd|string_format:"%.2f"}</td>
 						<td align="right">{$arr.gst_3rd|string_format:"%.2f"}</td>
 						<td align="right"><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_spand.php?aid={$id}','_blank', 'alwaysRaised=yes,height=500,width=800,location=no,scrollbars=yes')">{$arr.spand|string_format:"%.2f"}</span></td>
@@ -288,7 +295,9 @@
 					</tr>
 					{/foreach}
 					<tr align="center" class="roweven">
-						<td align="right" colspan="8"><strong>Total:</strong></td>
+						<td align="right"><strong>Total:</strong></td>
+						<td align="right"><strong>{$total_dueamt|string_format:"%.2f"}</strong></td>
+						<td align="right" colspan="6"><strong>Total:</strong></td>
 						<td align="right"><strong>{$total_profit|string_format:"%.2f"}</strong></td>
                         <!--
                         <td align="right"><strong>{$agreement_profit|string_format:"%.2f"}</strong></td>

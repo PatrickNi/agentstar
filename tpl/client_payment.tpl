@@ -76,10 +76,14 @@
 				<tr align="center"  class="greybg">
 					<input type="hidden" name="bt_name" value="">
 					<td align="left">
-						<input type="submit" value="Delete" style="font-weight:bold" onClick="this.form.bt_name.value='delete';this.disable=false;">
+						{if ($account.type == 'visa' && $ugs.v_pay.d eq 1) || $account.type != 'visa'}
+							<input type="submit" value="Delete" style="font-weight:bold" onClick="this.form.bt_name.value='delete';this.disable=false;">
+						{/if}
 					</td>		
 					 <td align="right">
-						<input type="submit" value="Save" style="font-weight:bold" onClick="this.form.bt_name.value='save';this.disable=false;" >
+					 	{if ($account.type == 'visa' && ($ugs.v_pay.m eq 1 || $ugs.v_pay.i eq 1)) || $account.type != 'visa'}
+							<input type="submit" value="Save" style="font-weight:bold" onClick="this.form.bt_name.value='save';this.disable=false;" >
+						{/if}
 					</td>
 				</tr>
 			</table>

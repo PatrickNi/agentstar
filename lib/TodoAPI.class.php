@@ -169,7 +169,12 @@ class TodoAPI {
     
         $this->db->query($sql);
         $data = array();
+        $now_date = date('Y-m-d');
         while ($this->db->fetch()) {
+            if (stripos($this->db->ProcessName, 'Meet Condition') && $this->db->DueDate > '{$now_date}') {
+                continue;
+            }
+            
             array_push($data, array('user_id'=>$userid, 
                                      'source'=>'course', 
                                      'source_id'=>$this->db->ProcessID, 

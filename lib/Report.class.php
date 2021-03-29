@@ -1311,7 +1311,7 @@ class ReportAPI extends MysqlDB {
 	
 	function getNumOfVisaProcByUser($fromDay, $toDay, $userid){
 		
-		$sql  = "select date_format(BeginDate, '%Y%u') as Week, if(b.Item is null, ExItem, b.Item) as Item, c.AFee, concat(LName, ' ', FName) as Name, d.CID, c.ID, c.r_Status 
+		$sql  = "select date_format(BeginDate, '%Y%u') as Week, if(b.Item is null, ExItem, b.Item) as Item, c.AFee, concat(LName, ' ', FName) as Name, d.CID, c.ID, c.r_Status, c.CateID, c.SubClassID   
 		          from client_visa_process a left join visa_rs_item b on (a.ItemID = b.ItemID), client_visa c, client_info d  
 		          where a.CVID  = c.ID and c.CID = d.CID and (b.Item not like '%assessment'  or b.Item is null) and a.Done = 1 ";
 		if ($userid > 0) {
@@ -1351,6 +1351,8 @@ class ReportAPI extends MysqlDB {
                 $visa[$this->ID]['apply'][$this->Week][] = $_arr[$this->Week]['lcnt'];
                 $visa[$this->ID]['profit'] = 0; 
                 $visa[$this->ID]['has_agreement_fee'] = 0; 
+                $visa[$this->ID]['cate'] = $this->CateID;
+                $visa[$this->ID]['subclass'] = $this->SubClassID;
             }
             
             if (preg_match('/^grant/i', $this->Item)){
@@ -1526,21 +1528,21 @@ class ReportAPI extends MysqlDB {
                             if ($v['profit'] <= 0)
                                 $_arr[$w]['lcnt0']++;
                             
-                            if ($v['has_agreement_fee'] > 0) {
-                                $_arr[$w]['lfee_paid'] += $v['profit'];
-                                $_arr[$w]['lc_paid']++;
-                                if ($v['profit'] <= 0)
-                                    $_arr[$w]['lc_paid_0']++;
-
-                                $_arr[$w]['lname_paid'][$i] = $_arr[$w]['lname'][$i] .' $'.$v['profit'];
-                            }
-                            else {
+                            if ($v['cate'] == 5 && $v['subclass'] != 168 && $v['subclass'] != 53 && $v['subclass'] != 84  && $v['subclass'] != 167  && $v['subclass'] != 31  && $v['subclass'] != 30  && $v['subclass'] != 33  && $v['subclass'] != 210 && $v['subclass'] != 174) {
                                 $_arr[$w]['lfee_free'] += $v['profit'];
                                 $_arr[$w]['lc_free']++;    
                                 if ($v['profit'] <= 0)
                                     $_arr[$w]['lc_free_0']++;
 
                                 $_arr[$w]['lname_free'][$i] = $_arr[$w]['lname'][$i] .' $'.$v['profit'];                                
+                            }
+                            else { // $v['has_agreement_fee'] > 0
+                                $_arr[$w]['lfee_paid'] += $v['profit'];
+                                $_arr[$w]['lc_paid']++;
+                                if ($v['profit'] <= 0)
+                                    $_arr[$w]['lc_paid_0']++;
+
+                                $_arr[$w]['lname_paid'][$i] = $_arr[$w]['lname'][$i] .' $'.$v['profit'];
                             }
 
                             //$_arr[$w]['lname'][$i] .= ' $'.$v['profit'];
@@ -1742,7 +1744,7 @@ class ReportAPI extends MysqlDB {
 	function getAllOfVisaProcByUser($fromDay, $toDay, $userid){
 		
         //and (b.Item not like '%assessment' or b.Item is null) 
-		$sql  = "select if(b.Item is null, a.ExItem, b.Item) AS Item, c.AFee, concat(LName, ' ', FName) as Name, d.CID, c.ID, c.r_Status from client_visa_process a left join visa_rs_item b on (a.ItemID = b.ITEMID), client_visa c, client_info d
+		$sql  = "select if(b.Item is null, a.ExItem, b.Item) AS Item, c.AFee, concat(LName, ' ', FName) as Name, d.CID, c.ID, c.r_Status, c.CateID, c.SubClassID from client_visa_process a left join visa_rs_item b on (a.ItemID = b.ITEMID), client_visa c, client_info d
 		         where a.CVID  = c.ID and c.CID = d.CID and b.Item is not null and a.Done = 1 ";
 		if ($userid > 0) {
 			$sql .= " AND c.VUserID = {$userid} ";
@@ -1764,7 +1766,9 @@ class ReportAPI extends MysqlDB {
 				$_arr['all']['lv'    ][$lodge] = $this->ID; 
                 $visa[$this->ID]['apply'][] = $lodge;
                 $visa[$this->ID]['profit'] = 0;
-                $visa[$this->ID]['has_agreement_fee'] = 0;                
+                $visa[$this->ID]['has_agreement_fee'] = 0;           
+                $visa[$this->ID]['cate'] = $this->CateID;
+                $visa[$this->ID]['subclass'] = $this->SubClassID;     
                 $lodge++;
 			}
             
@@ -1853,19 +1857,19 @@ class ReportAPI extends MysqlDB {
                         if ($v['profit'] <= 0)
                             $lodge_0++;
 
-                        if ($v['has_agreement_fee'] > 0) {
-                            $lrev_paid += $v['profit'];
-                            $_arr['all']['lname_paid'][$i] = $_arr['all']['lname'][$i] .' $'.$v['profit'];
-                            $lc_paid++;
-                            if ($v['profit'] <= 0)
-                                $lc_paid_0++; 
-                        }
-                        else {
+                        if ($v['cate'] == 5 && $v['subclass'] != 168 && $v['subclass'] != 53 && $v['subclass'] != 84  && $v['subclass'] != 167  && $v['subclass'] != 31  && $v['subclass'] != 30  && $v['subclass'] != 33  && $v['subclass'] != 210 && $v['subclass'] != 174){
                             $lrev_free += $v['profit'];
                             $_arr['all']['lname_free'][$i] = $_arr['all']['lname'][$i] .' $'.$v['profit'];
                             $lc_free++;
                             if ($v['profit'] <= 0)
                                 $lc_free_0++;
+                        }
+                        else {
+                            $lrev_paid += $v['profit'];
+                            $_arr['all']['lname_paid'][$i] = $_arr['all']['lname'][$i] .' $'.$v['profit'];
+                            $lc_paid++;
+                            if ($v['profit'] <= 0)
+                                $lc_paid_0++; 
                         }
 
                         //$_arr['all']['lname'][$i] .= ' $'.$v['profit'];    

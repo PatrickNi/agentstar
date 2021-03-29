@@ -70,7 +70,7 @@ $status = isset($_REQUEST['is_geic'])?  $_REQUEST['is_geic'] : '';
 
 $page_link = '';
 $client_arr = array();
-if (isset($_REQUEST['bt_name']) && $_REQUEST['bt_name'] == 'QUERY' && array_key_exists($srch_type, $columns)){
+if (isset($_REQUEST['bt_name']) && stripos($_REQUEST['bt_name'], "Search") && array_key_exists($srch_type, $columns)){
 	$client_arr = $o_c->getClientInfo($page, $page_size, 0, $view_all, $columns[$srch_type], $srch_qtext, $from_date, $to_date, $only_course, $status);
 	$rows_num = $o_c->getClientTotalRows();
     $rows_arr   = $o_c->getClientNumRows(0, $view_all, $columns[$srch_type], $srch_qtext, $from_date, $to_date, $only_course, $status);

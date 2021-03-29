@@ -11,7 +11,7 @@
 <script language="javascript" src="../js/audit.js"></script>
 <script language="javascript">{$msg}</script>
 <body>
-<form method="get" name="form1" action="" target="_self" onSubmit="return isDelete()">
+<form method="get" name="form1" id="form1" action="" target="_self" onSubmit="return isDelete()">
 <input type="hidden" name="cid" value="{$cid}">
 <input type="hidden" name="courseid" value="{$course_id}">
 <input type="hidden" name="pid" value="{$pid}">
@@ -22,13 +22,18 @@
 			</tr>	
 			<tr><td colspan="2"><table cellpadding="0" cellspacing="0" width="100%">
 				<tr align="center"  class="greybg">
-					<input type="hidden" name="bt_name" value="">
+					<input type="hidden" id="bt_name" name="bt_name" value="">
+					<input type="hidden" id="itemid" name="itemid"  value=0>
 					<td align="left" width="10%">
 						<input type="submit" value="Delete" style="font-weight:bold" onClick="this.form.bt_name.value='delete';this.disable=false;" {if $isapprove eq 0} disabled {/if}>
 					</td>	
 					<td align="center" class="whitetext">Detail Information</td>
 					<td align="right" width="10%">
-						<input type="submit" value="Save" style="font-weight:bold" onClick="this.form.bt_name.value='save';this.disable=false;" {if $isapprove eq 0} disabled {/if}>
+						{if count($forward_btn) > 1}
+							<input type="button" value="Save" style="font-weight:bold" onClick="done_check()">
+						{else}
+							<input type="submit" value="Save" style="font-weight:bold" onClick="this.form.bt_name.value='save';this.disable=false;" {if $isapprove eq 0} disabled {/if}>
+						{/if}					
 					</td>
 				</tr>				
 			</table></td></tr>
@@ -70,8 +75,22 @@
 			</tr>
 			<tr>
 				<td width="24%" align="left" class="rowodd"><strong>Done:</strong>&nbsp;&nbsp;</td>
-				<td align="left" width="76%" class="roweven"><input type="checkbox" value="1"  name="t_done" {if $dt_arr.done eq 1} checked {/if}></td>
-			</tr>																				
+				<td align="left" width="76%" class="roweven">
+						<input type="checkbox" value="1" id="t_done" name="t_done" {if $dt_arr.done eq 1} checked {/if}>
+				</td>
+			</tr>		
+
+			{if count($forward_btn) > 1}
+			<tr>
+				<td width="24%" align="left" class="rowodd"><strong>Forword Processes:</strong>&nbsp;&nbsp;</td>
+				<td align="left" width="76%" class="roweven">
+					{foreach key=id item=name from=$forward_btn}
+						<input type="button" value="{$name}" style="font-weight:bold" onClick="save_process({$id})">
+						&nbsp;&nbsp;
+					{/foreach}
+				</td>
+			</tr>					
+			{/if}									
 			<tr class="greybg"><td colspan="2">&nbsp;</td></tr>								
 		</table>
 </form>	
@@ -79,5 +98,27 @@
 <script type="text/javascript">
 	$('#t_date').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });        
 	$('#t_due').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });
+	
+	function save_process($forward_process_id) {
+		if ($('#t_done').is(':checked')) {
+			$('#bt_name').val('save');
+			$('#itemid').val($forward_process_id);
+			$('#form1').submit();
+		}
+		else {
+			alert('Please checked "Done" first!')
+		}
+	}
+
+	function done_check() {
+		if ($('#t_done').is(':checked')) {
+			alert('Multi-process cannot "Save" with the "Done" checked!');
+		}
+		else {
+			$('#bt_name').val('save');
+			$('#form1').submit();
+		}
+	}
+
 </script>
 {/literal}	

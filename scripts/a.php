@@ -1,14 +1,22 @@
 <?php
+
 require_once('../etc/const.php');
 require_once(__LIB_PATH.'MysqlDB.class.php');
-require_once(__LIB_PATH.'GeicAPI.class.php');
-require_once(__LIB_PATH.'AgentAPI.class.php');
-require_once(__LIB_PATH.'GeicAPI.class.php');
-require_once(__LIB_PATH.'ClientAPI.class.php');
+require_once(__LIB_PATH.'Report.class.php');
+$o_a = new ReportAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
+$staff_id = 81;
+$path = __DOWNLOAD_PATH.'reportstaff/';
+if (file_exists($path.'s'.$staff_id.'.dat')) {
+    unlink($path.'s'.$staff_id.'.dat');
+}
 
-$o_a = new AgentAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
-$o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
-$db = new MysqlDB(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
+if (file_exists($path.'d'.$staff_id.'.dat')) {
+    unlink($path.'d'.$staff_id.'.dat');
+}
+exit;
+
+
+
 
 set_time_limit(0);
 /*
@@ -30,9 +38,9 @@ while($db->fetch()) {
     0 as nobonus 
 FROM client_course_sem a left join client_course_process t1 on (a.CCID = t1.CCID AND t1.Done = 1 and t1.ProcessID = 5) , client_course b,client_info c, sys_user d WHERE a.CCID = b.ID AND b.CID = c.CID AND b.ConsultantID = d.ID AND RedDate >= '2010-01-01' AND RedDate <= '2020-05-18' and b.ConsultantID = {$_REQUEST['uid']} Order by wk, Name, a.SEM
 
-*/
-select count(*) from client_course a where exists (select 'x' from client_course_process b where a.ID = b.CCID and b.Done = 1 and b.ProcessID = 5) and ConsultantID = 80
 
+select count(*) from client_course a where exists (select 'x' from client_course_process b where a.ID = b.CCID and b.Done = 1 and b.ProcessID = 5) and ConsultantID = 80
+*/
 
 $sql = <<<EOF
     SELECT if(d.id is not null, d.username, b.ConsultantID) as username, RedDate as wk, concat(LName, ' ', FName) as Name, c.CID, a.ID, a.CCID, c.DOB, ConsultantDate, c.AgentID, 

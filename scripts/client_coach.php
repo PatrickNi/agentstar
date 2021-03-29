@@ -36,6 +36,7 @@ foreach ($g_user_grants as $item){
 # set smarty tpl
 $o_tpl = new Template;
 $o_tpl->assign('coach_arr', $o_h->getCoach($client_id));
+$o_tpl->assign('lesson_arr', $o_h->getLessons($client_id));
 $o_tpl->assign('items_arr', $o_h->getItems());
 $o_tpl->assign('uid', $user_id);
 $o_tpl->assign('cid', $client_id);
@@ -43,7 +44,7 @@ $o_tpl->assign('client', $o_c->getOneClientInfo($client_id));
 $o_tpl->assign('client_type', $o_c->getClientType($client_id));
 $o_tpl->assign('user_arr', $o_g->getUserNameArr());
 $o_tpl->assign('ugs', $ugs);
-
+$o_tpl->assign('grade_arr', $o_h->GRADE_LIST);
 $o_tpl->assign('userid', $user_id);
 
 $o_tpl->display('client_coach.tpl'); 
