@@ -13,10 +13,10 @@
   <table align="center" width="100%"  class="graybordertable" cellpadding="1" cellspacing="1" border="0">
     <tr class="bordered_2">
       <td align="left"><strong>Start Date</strong>&nbsp;&nbsp;
-        <input type="text" id="t_fdate" name="t_fdate"  value="{$fromDay}" >
+        <input type="text" id="t_fdate" name="t_fdate"  value="{$fromDay}" autocomplete="off" >
 
         &nbsp;&nbsp;&nbsp;&nbsp; <strong>Finish Date</strong>&nbsp;&nbsp;
-        <input type="text" id="t_tdate" name="t_tdate"  value="{$toDay}" >
+        <input type="text" id="t_tdate" name="t_tdate"  value="{$toDay}" autocomplete="off" >
 
         &nbsp;&nbsp;&nbsp;&nbsp; <strong>Staff:</strong>&nbsp;&nbsp;
         <select name="t_staff" onChange="this.form.bt_name.focus();">
@@ -44,10 +44,11 @@
         &nbsp;&nbsp;&nbsp;
         <input type="submit" name="bt_name" value="create report" style="font-weight:bold ">
         &nbsp;&nbsp;&nbsp;&nbsp;
-        <!--<input type="button" style="font-weight:bold" onclick="printPage();"value="Print">-->
+        <!--<input type="button" style="font-weight:bold" onclick="printPage();"value="Print">
         <input type="button" style="font-weight:bold" value="Print" onClick="document.all.WebBrowser.ExecWB(6,1)">
         <input type="button"style="font-weight:bold" value="Print Setting" onClick="document.all.WebBrowser.ExecWB(8,1)">
         <input type="button" style="font-weight:bold" value="Print Review" onClick="document.all.WebBrowser.ExecWB(7,1)">
+        -->
         {if $from_archive}
           <strong style="color:red;">Reporting data from Archive</strong>
         {else}
@@ -431,47 +432,82 @@
   </tr>   
   <tr align="center" class="totalrowodd">
     <td>Course Item</td>
-    <td ># of hours delivered</td>
+    <td># of hours delivered</td>
     <td># of students(active / current)</td>
-    <td>Received Coaching Fee</td>
-    <td>Profit</td>
-    <td>&nbsp;</td>
+    <td># of lessons</td>
+    <td>{if $user_pos == 'PC' || $user_pos == 'C'}Received Coaching Fee{/if}</td>
+    <td>{if $user_pos == 'PC' || $user_pos == 'C'}Profit{/if}</td>
   </tr>
   {assign var="total_paid" value="0"}
   {assign var="total_sale" value="0"}
+  {assign var="total_hour" value="0"}
+  {assign var="total_student" value="0"}
+  {assign var="total_extrahour" value="0"}
+  {assign var="total_lesson" value="0"}
   {foreach key=titleid item=coach from=$coaches[$week]}
   <tr align="right" class="roweven" >
     <td align="center">{$coach.title}</td>
-    <td>{$coach.hour}</td>
     <td>
-     <span onClick="openinSatff('d14_{$week}_{$titleid}');" style="text-decoration:underline; cursor:pointer;">{$coach.client}</span>
+      {assign var="total_hour" value=$total_hour+$coach.hour}
+      {assign var="total_extrahour" value=$total_extrahour+$coach.extrahour}
+      <span onClick="openinSatff('d15_{$week}_{$titleid}');" style="text-decoration:underline; cursor:pointer;">{$coach.hour}</span>
+      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:300px" id="d15_{$week}_{$titleid}">
+        <ul>
+          {foreach key=coach_id item=coach_st from=$coach.list}
+          {if $coach_st.duehour > 0}
+              <li><span style="text-decoration:underline; cursor:pointer;" onclick="window.open('/scripts/client_coach_detail.php?cid={$coach_st.cid}&coachid={$coach_id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$coach_st.name} -- {$coach_st.duehour}(h)</span>
+              {foreach item=lesson_st from=$coach_st.duedetail}
+                <br>{$lesson_st}
+              {/foreach}
+              </li>
+          {/if}
+            {/foreach}
+        </ul>
+        <span style="font-size:16px; font-weight:bolder; cursor:pointer;" onclick="$('#d15_{$week}_{$titleid}').css('display', 'none')">&times;</span> </div>
+    
+    </td>
+    <td>
+     {assign var="tmp_student" value=$coach.list|@count}
+     {assign var="total_student" value=$total_student+$tmp_student}
+     <span onClick="openinSatff('d14_{$week}_{$titleid}');" style="text-decoration:underline; cursor:pointer;">{$coach.list|@count}</span>
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:300px" id="d14_{$week}_{$titleid}">
         <ul>
           {foreach key=coach_id item=coach_st from=$coach.list}
-          <li><span style="text-decoration:underline; cursor:pointer;" onclick="window.open('/scripts/client_coach_detail.php?cid={$coach_st.cid}&coachid={$coach_id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$coach_st.name}</span>
-            {/foreach}
+          <li><span style="text-decoration:underline; cursor:pointer;" onclick="window.open('/scripts/client_coach_detail.php?cid={$coach_st.cid}&coachid={$coach_id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$coach_st.name}</span></li>
+          {/foreach}
         </ul>
         <span style="font-size:16px; font-weight:bolder; cursor:pointer;" onclick="$('#d14_{$week}_{$titleid}').css('display', 'none')">&times;</span> </div>
     </td>
     <td>
-      {$coach.paid|string_format:"%.2f"}
-      {assign var="total_paid" value=$total_paid+$coach.paid}
+      {assign var="tmp_lesson" value=$coach.lessons|@count}
+      {assign var="total_lesson" value=$total_lesson+$tmp_lesson}
+      {$coach.lessons|@count}
     </td>
     <td>
-      {$coach.sale|string_format:"%.2f"}
-      {assign var="total_sale" value=$total_sale+$coach.sale}
+      {if $user_pos == 'PC' || $user_pos == 'C'}
+        {$coaches_fee[$week].$titleid.paid|string_format:"%.2f"}
+        {assign var="total_paid" value=$total_paid+$coaches_fee[$week].$titleid.paid}
+      {/if}
+    </td>
+    <td>
+      {if $user_pos == 'PC' || $user_pos == 'C'}
+        {$coaches_fee[$week].$titleid.sale|string_format:"%.2f"}
+        {assign var="total_sale" value=$total_sale+$coaches_fee[$week].$titleid.sale}
+      {/if}
     </td>
     <td>&nbsp;</td>
   </tr> 
   {/foreach}
-  {if $isAll eq 's'}
+
     <tr align="right" class="roweven" >
-      <td colspan="3"><strong>Total:</strong></td>
+      <td><strong>Total:</strong></td>
+      <td><strong>{$total_hour}</strong><br/><hr/>Extra hour: {$total_extrahour}</td>
+      <td><strong>{$total_student}</strong></td>
+      <td><strong>{$total_lesson}</strong></td>
       <td><strong>{$total_paid|string_format:"%.2f"}</strong></td>
       <td><strong>{$total_sale|string_format:"%.2f"}</strong></td>
-      <td>&nbsp;</td>
     </tr>
-  {/if}
+
   <tr class="greybg">
     <td colspan="6"class="highyellow">Legal Service</td>
   </tr> 

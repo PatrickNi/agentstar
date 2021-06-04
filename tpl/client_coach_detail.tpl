@@ -33,7 +33,7 @@
       </table>
     </td></tr>
     <tr align="center"  class="greybg" > 
-      <td align="left" style="font-size:16px " colspan="2" onClick="javascript:window.location.href='client_legal.php?cid={$cid}'" onMouseMove="javascript:this.style.cursor='pointer'; this.style.backgroundColor='#000'"; onMouseOut="javascript:this.style.backgroundColor='#a3a3a3'"> <span class="highyellow">Client: {$client.lname} {$client.fname}</span>&nbsp;&nbsp; <span class="highyellow">DoB: {$client.dob}</span>&nbsp;&nbsp;<span class="highyellow">Main Visa: {$client.visa_n}-{$client.class_n}, expr: {$client.epdate}</span>&nbsp;&nbsp; 
+      <td align="left" style="font-size:16px " colspan="2" onClick="javascript:window.location.href='client_coach.php?cid={$cid}'" onMouseMove="javascript:this.style.cursor='pointer'; this.style.backgroundColor='#000'"; onMouseOut="javascript:this.style.backgroundColor='#a3a3a3'"> <span class="highyellow">Client: {$client.lname} {$client.fname}</span>&nbsp;&nbsp; <span class="highyellow">DoB: {$client.dob}</span>&nbsp;&nbsp;<span class="highyellow">Main Visa: {$client.visa_n}-{$client.class_n}, expr: {$client.epdate}</span>&nbsp;&nbsp; 
       </td> 
     </tr> 
     <tr> 
@@ -103,14 +103,14 @@
             </td> 
           </tr>   
           <tr> 
-            <td width="36%" align="left" class="rowodd"><strong>Sales:</strong>&nbsp;&nbsp;</td> 
+            <td width="36%" align="left" class="rowodd"><strong>Agreement Staff:</strong>&nbsp;&nbsp;</td> 
             <td align="left" width="64%" class="roweven"> 
                 <select name="sales" >
                 {foreach key=id item=name from=$user_arr}
                   <option  value="{$id}" {if $dt_arr.sales eq $id} selected {/if}>{$name}</option>
                 {/foreach}
                 {if $dt_arr.sales lt 1}
-                  <option  value="0" selected >Choose a sales</option>
+                  <option  value="0" selected >Choose an agreement staff</option>
                 {/if}
               </select>       
             </td> 
@@ -123,7 +123,7 @@
                   <option  value="{$id}" {if $dt_arr.staff eq $id} selected {/if}>{$name}</option>
                 {/foreach}
                 {if $dt_arr.staff lt 1}
-                  <option  value="0" selected >Choose a staff</option>
+                  <option  value="0" selected >Choose a teacher</option>
                 {/if}
               </select>       
             </td> 

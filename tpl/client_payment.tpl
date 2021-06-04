@@ -62,7 +62,7 @@
 				<tr><td colspan="2" align="center" class="totalrowodd"><input type="checkbox" name="t_new" id="t_new" value="1" onClick="newPayment(this)">&nbsp;Add new</td></tr>
 				<tr align="center">
 					<td width="50%" class="rowodd"><strong>Paid Date</strong></td>
-					<td width="50%" align="left" class="roweven"><input name="t_date" id="t_date" id="t_date" value="" size="30">                      
+					<td width="50%" align="left" class="roweven"><input name="t_date" id="t_date" id="t_date" value="" size="30" autocomplete="off">                      
                     </td>
 				</tr>
 				<tr align="center">

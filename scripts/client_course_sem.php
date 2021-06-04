@@ -4,6 +4,7 @@ require_once(__LIB_PATH.'Template.class.php');
 require_once(__LIB_PATH.'ClientAPI.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
 require_once(__LIB_PATH.'SchoolAPI.class.php');
+require_once(__LIB_PATH.'FinanceAPI.class.php');
 ini_set("display_errors", 1);
 error_reporting(E_ALL);
 # check valid user
@@ -17,6 +18,7 @@ $sem_id = isset($_REQUEST['semid'])? trim($_REQUEST['semid']) : 0;
 
 $o_c = new ClientAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 $o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
+$o_f = new FinanceAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
 //user grants
 $ugs = array();
@@ -31,7 +33,6 @@ foreach ($g_user_grants as $item){
 
 # get cource
 $course_arr = array();
-$course_arr = array();
 $cateid = $o_c->getCateIDbyCourse($course_id);
 $course_arr = $o_c->getCourseByUser($course_id);
 
@@ -41,12 +42,15 @@ if ($course_id > 0 && $ugs['c_track']['v'] == 0 && $course_arr[$cateid][$course_
 }
 
 //get client info
+if ($client_id == 0) {
+	$client_id = $course_arr[$cateid][$course_id]['cid'];
+}
 $chk_arr = $o_c->getOneClientInfo($client_id);
 $client_name = $chk_arr['lname']. ' '. $chk_arr['fname'];
 
 # add new semenster
 if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "ADD NEW SEMESTER"){
-	$sem_id = $o_c->addCourseSem($course_id);
+	$sem_id = $o_c->addCourseSem($course_id, $client_id);
 }
 
 
@@ -207,6 +211,7 @@ $o_tpl = new Template;
 if($sem_id > 0 && array_key_exists($sem_id, $sem_arr)){
 	$o_tpl->assign('sem_arr', $sem_arr[$sem_id]);
 	$o_tpl->assign('chase', $o_c->checkCourseProcessByItem($course_id, "Chase tuition on SEM *{$sem_arr[$sem_id]['sem']}"));
+	$o_tpl->assign('account_arr', $o_c->getAccount($sem_id,0,'semester'));
 }
 
 # check has sub agents
@@ -222,6 +227,7 @@ if($course_id > 0 && array_key_exists($cateid, $course_arr)&& array_key_exists($
 
 if($sem_id > 0){
 	$o_tpl->assign('process_arr', $o_c->getSemProcess($sem_id));
+	$o_tpl->assign('transfer_arr', $o_f->getTransferBrief($sem_id));
 }
 
 $o_tpl->assign('qual_name', @$course_arr[$cateid][$course_id]['qualname']);

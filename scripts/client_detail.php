@@ -6,7 +6,8 @@ require_once(__LIB_PATH.'VisaAPI.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
 require_once(__LIB_PATH.'AgentAPI.class.php');
 
-
+//ini_set('error_reporting', E_ALL);
+//ini_set('display_errors', 1);
 # check valid user
 $user_id = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
 if (!($user_id > 0)) {
@@ -112,7 +113,7 @@ $sets['class']  = $sets['class'] == ""? 0 : $sets['class'];
 	$sets['wechatemail']  = isset($_REQUEST['t_wechat_email'])? (string)trim($_REQUEST['t_wechat_email']) : "";
 
 if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" || strtoupper($_REQUEST['bt_name']) == "APPROVED")) {
-
+/*
 	if ($sets['country'] == '0') {
 		echo "<script language='javascript'>alert('\"Country: \" can not be empty!')</script>";
 	}
@@ -121,12 +122,6 @@ if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" |
 	}
 	elseif ($sets['epdate'] == '') {
 		echo "<script language='javascript'>alert('\"Current Visa ExpireDate: \" can not be empty!')</script>";
-	}
-	elseif ($sets['lname'] == '') {
-		echo "<script language='javascript'>alert('\"Last Name: \" can not be empty!')</script>";
-	}
-	elseif ($sets['fname'] == '') {
-		echo "<script language='javascript'>alert('\"First Name: \" can not be empty!')</script>";
 	}
 	elseif ($sets['gender'] == '') {
 		echo "<script language='javascript'>alert('\"Gender: \" can not be empty!')</script>";
@@ -137,14 +132,21 @@ if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" |
 	elseif (isset($_REQUEST) && !preg_match('/^[\d]{4}-[\d]{2}-[\d]{2}/', $_REQUEST['t_dob'])) {
 		echo "<script language='javascript'>alert('\"DOB: \" should be YYYY-MM-DD!')</script>";
 	}
-	elseif ($sets['email'] == '' || !preg_match('/^[^@]+@[^@]+$/', $sets['email'])) {
-		echo "<script language='javascript'>alert('\Email: \" can not be empty! or incorrect!')</script>";
-	}
 	elseif ($sets['mobile'] == '') {
 		echo "<script language='javascript'>alert('\"Mobile: \" can not be empty!')</script>";
 	}
 	elseif($sets['about'] == "" && $sets['agent'] == 0){
         echo "<script language='javascript'>alert('\"Where do you know about us: \" can not be empty!')</script>";
+	}
+*/
+	if ($sets['lname'] == '') {
+		echo "<script language='javascript'>alert('\"Last Name: \" can not be empty!')</script>";
+	}
+	elseif ($sets['fname'] == '') {
+		echo "<script language='javascript'>alert('\"First Name: \" can not be empty!')</script>";
+	}
+	elseif ($sets['email'] == '' || !preg_match('/^[^@]+@[^@]+$/', $sets['email'])) {
+		echo "<script language='javascript'>alert('\Email: \" can not be empty! or incorrect!')</script>";
 	}
 	else {
 

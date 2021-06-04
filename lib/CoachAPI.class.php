@@ -256,8 +256,18 @@ class CoachAPI extends MysqlDB{
         if (!$lessonid || !$sets)
             return false;
         
-        $sql = "Update client_coach_lessons SET Fee = '{$sets['fee']}', Status = '{$sets['status']}', StartDate = '{$sets['startdate']}', EndDate = '{$sets['startdate']}', isAdjust = '{$sets['adjust']}', StaffID = '{$sets['staff']}' where id = {$lessonid}";
+        $sql = "Update client_coach_lessons SET Fee = '{$sets['fee']}', Status = '{$sets['status']}', StartDate = '{$sets['startdate']}', EndDate = '{$sets['startdate']}', isAdjust = '{$sets['adjust']}', StaffID = '{$sets['staff']}' , StartTime = '{$sets['starttime']}' where id = {$lessonid}";
         return $this->query($sql);
+    }
+
+    function countStudentInLesson($lesson) {
+        $sql = "select count(*) as cnt from client_coach_lessons where startdate = '{$lesson['startdate']}' and starttime = '{$lesson['starttime']}' and staffID = '{$lesson['staff']}'";
+        $this->query($sql);
+        if ($this->fetch()) {
+            return $this->cnt;
+        }
+        else 
+            return 0;
     }
 }
 ?>

@@ -7,7 +7,11 @@ require_once(__LIB_PATH.'ClientAPI.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
 require_once(__LIB_PATH.'VisaAPI.class.php');
 
-$PAYMENT_ITEMS = array('agreement'=>'sub-agent', 'extra-agreement'=>'', 'app'=>'app', 'marriage'=>'marriage', 'printing'=>'printing', 'postage'=>'postage', 'translation'=>'translation', "OSHC"=>"OSHC", 'other'=>'', 'coaching'=>'coaching', 'material'=>'material');
+$PAYMENT_ITEMS['visa'] = array('agreement'=>'sub-agent', 'extra-agreement'=>'', 'app'=>'app', 'marriage'=>'marriage', 'printing'=>'printing', 'postage'=>'postage', 'translation'=>'translation', "OSHC"=>"OSHC", 'other'=>'', 'coaching'=>'coaching', 'material'=>'material');
+$PAYMENT_ITEMS['coach'] = array('coaching'=>'coaching');
+$PAYMENT_ITEMS['semester'] = array('tuition'=>'tuition', 'enrollment'=>'enrollment','material'=>'material','coe'=>'coe','other'=>'other','discount'=>'discount');
+
+
 
 
 # check valid user
@@ -39,7 +43,7 @@ if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
     $sets['duedate'] = isset($_POST['t_duedate'])? trim($_POST['t_duedate']) : "0000-00-00";
     $sets['duedate'] = $sets['duedate'] == ""? "0000-00-00" : $sets['duedate'];
 
-	$sets['dueamt'] = isset($_POST['t_dueamt']) && $_POST['t_dueamt'] > 0? trim($_POST['t_dueamt']) : 0;
+	$sets['dueamt'] = isset($_POST['t_dueamt']) && abs($_POST['t_dueamt']) > 0? trim($_POST['t_dueamt']) : 0;
     $sets['step'] = isset($_POST['t_step'])? trim($_POST['t_step']) : "";
     $sets['note'] = isset($_POST['t_note'])? trim($_POST['t_note']) : "";
     $sets['gst'] = isset($_POST['t_gst'])? trim($_POST['t_gst']) : 0;
@@ -108,7 +112,7 @@ $o_tpl->assign('vid', $visa_id);
 $o_tpl->assign('cid', $client_id);
 $o_tpl->assign('aid', $account_id);
 $o_tpl->assign('typ', $account_typ);
-$o_tpl->assign('steps', $PAYMENT_ITEMS);
+$o_tpl->assign('steps', $PAYMENT_ITEMS[$account_typ]);
 $o_tpl->display('client_account_detail.tpl'); 
 
 ?>

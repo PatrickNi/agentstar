@@ -81,7 +81,7 @@ if (isset($_POST['bt_name']) && stripos($_POST['bt_name'], "SAVE") !== false){
 				$msg = "Unfinished Agreement!\\n\\nPlesas check payments";     		
 			}
 		}
-			
+		
 		if($msg == ''){
 			$o_c->setApplyVisa($visa_id, $sets);
 		}		

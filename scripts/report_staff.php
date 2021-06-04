@@ -51,6 +51,7 @@ $visapaids = array();
 $homeloan  = array();
 $homeloan_fee  = array();
 $coaches  = array();
+$coaches_fee = array();
 
 $from_archive = false;
 
@@ -125,8 +126,10 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
                 $homeloan_fee   = $o_r->getNumOfHomeLoanFee($from_day, $to_day, $staff_id);
             }
 
-            if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C')
+            if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C'){
                 $coaches = $o_r->getNumOfCoach($from_day, $to_day, $staff_id);
+                $coaches_fee = $o_r->getNumOfCoachFee($from_day, $to_day, $staff_id);
+            }
         }
     }
     elseif($is_all == "s"){
@@ -182,8 +185,11 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
                 $homeloan_fee   = $o_r->getAllOfHomeLoanFee($from_day, $to_day, $staff_id); 
             }
 
-            if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C')
+            if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C') {
                 $coaches = $o_r->getAllOfCoach($from_day, $to_day, $staff_id);
+                $coaches_fee = $o_r->getAllOfCoachFee($from_day, $to_day, $staff_id);
+            
+            }
         }
     }
 
@@ -213,12 +219,14 @@ $o_tpl->assign('coursepots', $coursepots);
 $o_tpl->assign('homeloan', $homeloan);
 $o_tpl->assign('homeloan_fee', $homeloan_fee);
 $o_tpl->assign('coaches', $coaches);
+$o_tpl->assign('coaches_fee', $coaches_fee);
 $o_tpl->assign('fromDay', $from_day);
 $o_tpl->assign('toDay', $to_day);
 $o_tpl->assign('staffid', $staff_id);
 $o_tpl->assign('isAll', $is_all);
 $o_tpl->assign('from_archive', $from_archive);
 $o_tpl->assign('uid', $user_id);
+$o_tpl->assign('user_pos', $user_pos);
 
 
 

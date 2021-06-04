@@ -2092,7 +2092,7 @@ class ReportAPI extends MysqlDB {
 	
 	
 	function getCommissionByUser($userid, $page=0, $page_size=0){
-		$sql = "select concat(LName, ' ', FName) as Name, a.CID, b.ID as CourseID, c.ID as SemID, d.Detail, d.KeyPoint from client_info a 
+		$sql = "select concat(LName, ' ', FName) as Name, a.CID, b.ID as CourseID, c.ID as SemID, d.Detail, d.KeyPoint, d.BeginDate from client_info a 
 				left join client_course b on(a.CID = b.CID) 
 				left join client_course_sem c on(b.ID = c.CCID) 
 				left join client_course_sem_process d on(c.ID = d.SemID and d.KeyPoint <> '' and Done = 0) 
@@ -2113,6 +2113,7 @@ class ReportAPI extends MysqlDB {
 			$_arr[$this->CID]['course'][$this->CourseID][$this->SemID]['desc'] = $this->Detail;
 			$_arr[$this->CID]['course'][$this->CourseID][$this->SemID]['key'] = $this->KeyPoint;
             $_arr[$this->CID]['course'][$this->CourseID][$this->SemID]['cid'] = $this->CID;
+            $_arr[$this->CID]['course'][$this->CourseID][$this->SemID]['date'] = $this->BeginDate;
 		}
 		return $_arr;
 	}
@@ -2137,7 +2138,7 @@ class ReportAPI extends MysqlDB {
 
 
     function getCommissionByTopAgent($userid, $page=0, $page_size=0){
-        $sql = "select concat(LName, ' ', FName) as Name, if(ag.Name is null, '*n/a', ag.Name) as NameAgent, b.AgentID, a.CID, b.ID as CourseID, c.ID as SemID, d.Detail, d.KeyPoint from client_info a 
+        $sql = "select concat(LName, ' ', FName) as Name, if(ag.Name is null, '*n/a', ag.Name) as NameAgent, b.AgentID, a.CID, b.ID as CourseID, c.ID as SemID, d.Detail, d.KeyPoint, d.BeginDate from client_info a 
                 left join client_course b on(a.CID = b.CID) 
                 left join client_course_sem c on(b.ID = c.CCID) 
                 left join client_course_sem_process d on(c.ID = d.SemID and d.KeyPoint <> '' and Done = 0) 
@@ -2160,6 +2161,7 @@ class ReportAPI extends MysqlDB {
             $_arr[$this->AgentID]['course'][$this->CourseID][$this->SemID]['key'] = $this->KeyPoint;
             $_arr[$this->AgentID]['course'][$this->CourseID][$this->SemID]['cid'] = $this->CID;
             $_arr[$this->AgentID]['course'][$this->CourseID][$this->SemID]['client'] = $this->Name;
+            $_arr[$this->AgentID]['course'][$this->CourseID][$this->SemID]['date'] = $this->BeginDate;
         }
         return $_arr;
     }
@@ -2185,7 +2187,7 @@ class ReportAPI extends MysqlDB {
 
 
     function getCommissionBySchool($userid, $page=0, $page_size=0){
-        $sql = "select concat(LName, ' ', FName) as Name, if(i.Name is null, '*n/a', i.Name) as NameSchool, b.IID, a.CID, b.ID as CourseID, c.ID as SemID, d.Detail, d.KeyPoint from client_info a 
+        $sql = "select concat(LName, ' ', FName) as Name, if(i.Name is null, '*n/a', i.Name) as NameSchool, b.IID, a.CID, b.ID as CourseID, c.ID as SemID, d.Detail, d.KeyPoint, d.BeginDate from client_info a 
                 left join client_course b on(a.CID = b.CID)
                 left join client_course_sem c on(b.ID = c.CCID) 
                 left join client_course_sem_process d on(c.ID = d.SemID and d.KeyPoint <> '' and Done = 0) 
@@ -2208,6 +2210,7 @@ class ReportAPI extends MysqlDB {
             $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['key'] = $this->KeyPoint;
             $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['cid'] = $this->CID;
             $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['client'] = $this->Name;
+            $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['date'] = $this->BeginDate; 
         }
         return $_arr;
     }
@@ -2232,7 +2235,7 @@ class ReportAPI extends MysqlDB {
 
 
     function getCommissionByAccount($userid, $page=0, $page_size=0){
-        $sql = "select concat(LName, ' ', FName) as Name, if(i.Name is null, '*n/a', i.Name) as NameSchool, b.IID, a.CID, b.ID as CourseID, c.ID as SemID, d.Subject, d.KeyPoint from client_info a 
+        $sql = "select concat(LName, ' ', FName) as Name, if(i.Name is null, '*n/a', i.Name) as NameSchool, b.IID, a.CID, b.ID as CourseID, c.ID as SemID, d.Subject, d.KeyPoint, d.BeginDate from client_info a 
                 left join client_course b on(a.CID = b.CID)
                 left join client_course_sem c on(b.ID = c.CCID) 
                 left join client_course_sem_process d on(c.ID = d.SemID and d.KeyPoint = '' and Done = 0) 
@@ -2255,6 +2258,7 @@ class ReportAPI extends MysqlDB {
             $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['key'] = $this->KeyPoint;
             $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['cid'] = $this->CID;
             $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['client'] = $this->Name;
+            $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['date'] = $this->BeginDate;
         }
         return $_arr;
     }
@@ -2509,91 +2513,165 @@ class ReportAPI extends MysqlDB {
 
 
     function getAllOfCoach($fromDay, $toDay, $userid){
-        $sql = "select concat(LName, ' ', FName) as Name, itemid, ci.title, DeliverHours, cc.id as COACHID, cc.CID from client_coach cc, coach_item ci, client_info c where cc.itemid = ci.id and c.CID = cc.CID and StartDate between '{$fromDay}' AND '{$toDay}' ";
+        $sql = "select concat(LName, ' ', FName) as Name, itemid, ci.title, ccl.DueHour, ccl.StartDate, cc.id as COACHID, cc.CID, ccl.Status, ccl.WeekName,ccl.StartTime from client_coach cc, coach_item ci, client_info c, client_coach_lessons as ccl where cc.itemid = ci.id and c.CID = cc.CID and cc.id = ccl.coachid and  ccl.StartDate between '{$fromDay}' AND '{$toDay}' ";
 
         if ($userid > 0) {
-            $sql .= " AND cc.staffid = {$userid} ";
+            $sql .= " AND (cc.staffid = {$userid} OR cc.saleid = {$userid}) ";
         }
 
-        $sql .= "Order by ci.title asc";  
+        $sql .= "Order by ci.title asc, cc.CID asc, ccl.StartDate asc ";  
+        $this->query($sql);
+        $_arr = array();
+        //$coaches = array();
+        while ($this->fetch()) {
+            if (!isset($_arr['all']) || !isset($_arr['all'][$this->itemid]))
+                $_arr['all'][$this->itemid] = array('title'=>'', 'hour'=>0, 'client'=>0, 'list'=>array(), 'extrahour'=>0, 'lessons'=>array());   
+
+            $_arr['all'][$this->itemid]['title'] = $this->title;
+            //$_arr['all'][$this->itemid]['client']++;
+            if (!isset($_arr['all'][$this->itemid]['list'][$this->COACHID])) {
+                $_arr['all'][$this->itemid]['list'][$this->COACHID] = array('name'=>$this->Name, 'cid'=>$this->CID, 'duehour' => 0, 'duedetail'=>array());
+            }
+
+            //$_arr['all'][$this->itemid]['sale'] = 0;
+            //$_arr['all'][$this->itemid]['paid'] = 0;
+            if ($this->Status == 'Completed') {
+                $_arr['all'][$this->itemid]['hour']  += round($this->DueHour/60, 2);
+                $_arr['all'][$this->itemid]['lessons'][md5($this->StartDate.'|'.$this->StartTime)] = 1;
+                if ($this->WeekName == 'Sat' || $this->WeekName == 'Sun' || $this->StartTime < '09:00' || $this->StartTime > '17:30') {
+                    $_arr['all'][$this->itemid]['extrahour']  += round($this->DueHour/60, 2);
+                }
+
+                array_push($_arr['all'][$this->itemid]['list'][$this->COACHID]['duedetail'], $this->StartDate."[".round($this->DueHour/60, 2)."h]");
+
+                if (!isset($_arr['all'][$this->itemid]['list'][$this->COACHID]['duehour'])) {
+                    $_arr['all'][$this->itemid]['list'][$this->COACHID]['duehour'] = round($this->DueHour/60, 2);
+                }
+                else {
+                    $_arr['all'][$this->itemid]['list'][$this->COACHID]['duehour'] += round($this->DueHour/60, 2);
+                }
+            }
+            //$coaches[$this->COACHID] = $this->itemid;
+        }
+
+        return $_arr;
+    }
+
+    function getAllOfCoachFee($fromDay, $toDay, $userid) {
+        $sql = "select itemid, cc.id as COACHID from client_coach cc, coach_item ci, client_info c, client_coach_lessons as ccl where cc.itemid = ci.id and c.CID = cc.CID and cc.id = ccl.coachid and  ccl.StartDate between '{$fromDay}' AND '{$toDay}' ";
+
+        if ($userid > 0) {
+            $sql .= " AND cc.saleid = {$userid} ";
+        }
+
+        $sql .= "Order by ci.title asc, cc.CID asc, ccl.StartDate asc ";  
         $this->query($sql);
         $_arr = array();
         $coaches = array();
-        while ($this->fetch()) {
-            if (!isset($_arr['all']) || !isset($_arr['all'][$this->itemid]))
-                $_arr['all'][$this->itemid] = array('title'=>'', 'hour'=>0, 'client'=>0, 'list'=>array());   
-
-            $_arr['all'][$this->itemid]['title'] = $this->title;
-            $_arr['all'][$this->itemid]['hour']  += round($this->DeliverHours/60, 2);
-            $_arr['all'][$this->itemid]['client']++;
-            $_arr['all'][$this->itemid]['list'][$this->COACHID] = array('name'=>$this->Name, 'cid'=>$this->CID);
+        while ($this->fetch()) {    
             $_arr['all'][$this->itemid]['sale'] = 0;
             $_arr['all'][$this->itemid]['paid'] = 0;
-        
             $coaches[$this->COACHID] = $this->itemid;
         }
 
         //calc payment
         if (count($coaches) > 0) {
-            $sql = "select VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD from client_account a Where VisaID IN (".implode(',', array_keys($coaches)).") AND ACC_TYPE = 'coach'";
-            $this->query($sql);   
-            while ($this->fetch()){
-                //paperwork profit
-                $_arr['all'][$coaches[$this->VisaID]]['sale'] += ($this->GST == 1? $this->DueAmount/1.1 : $this->DueAmount) - ($this->GST_3RD == 1? $this->AMOUNT_3RD/1.1 : $this->AMOUNT_3RD);
-            }
-
-            $sql = "select a.VisaID, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a,  client_payment b where a.ID = b.AccountID and VisaID IN (".implode(',', array_keys($coaches)).") AND ACC_TYPE = 'coach' group by a.VisaID";
-            $this->query($sql);
-            while ($this->fetch()) {
-                $_arr['all'][$coaches[$this->VisaID]]['paid'] += $this->paid;
+            foreach (array_chunk(array_keys($coaches),500,true) as $coach_ids) {
+                $sql = "select VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD from client_account a Where VisaID IN (".implode(',', $coach_ids).") AND ACC_TYPE = 'coach'";
+                $this->query($sql);   
+                while ($this->fetch()){
+                    //paperwork profit
+                    $_arr['all'][$coaches[$this->VisaID]]['sale'] += ($this->GST == 1? $this->DueAmount/1.1 : $this->DueAmount) - ($this->GST_3RD == 1? $this->AMOUNT_3RD/1.1 : $this->AMOUNT_3RD);
+                }
+    
+                $sql = "select a.VisaID, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a,  client_payment b where a.ID = b.AccountID and VisaID IN (".implode(',',$coach_ids).") AND ACC_TYPE = 'coach' group by a.VisaID";
+                $this->query($sql);
+                while ($this->fetch()) {
+                    $_arr['all'][$coaches[$this->VisaID]]['paid'] += $this->paid;
+                }
             }
         }
-
         return $_arr;        
     }
 
 
     function getNumOfCoach($fromDay, $toDay, $userid){
-        $sql = "select date_format(StartDate, '%Y%u') as Week, concat(LName, ' ', FName) as Name, itemid, ci.title, DeliverHours, cc.id as COACHID, cc.CID from client_coach cc, coach_item ci, client_info c where cc.itemid = ci.id and c.CID = cc.CID and StartDate between '{$fromDay}' AND '{$toDay}' ";
+        $sql = "select date_format(ccl.StartDate, '%Y%u') as Week, concat(LName, ' ', FName) as Name, itemid, ci.title, ccl.DueHour, ccl.Status, ccl.StartDate, cc.id as COACHID, cc.CID, ccl.StartTime, ccl.WeekName from client_coach cc, coach_item ci, client_info c , client_coach_lessons as ccl where cc.itemid = ci.id and c.CID = cc.CID and cc.id = ccl.coachid and ccl.StartDate between '{$fromDay}' AND '{$toDay}' ";
 
         if ($userid > 0) {
-            $sql .= " AND cc.staffid = {$userid} ";
+            $sql .= " AND ( cc.staffid = {$userid} or cc.saleid = {$userid}) ";
         }
 
-        $sql .= "Order by ci.title asc";  
+        $sql .= "Order by ci.title asc, cc.CID asc, ccl.StartDate asc ";  
+        $this->query($sql);
+        $_arr = array();
+        //$coaches = array();
+        while ($this->fetch()) {
+            if (!isset($_arr[$this->Week]) || !isset($_arr[$this->Week][$this->itemid]))
+                $_arr[$this->Week][$this->itemid] = array('title'=>'', 'hour'=>0, 'client'=>0, 'list'=>array(), 'extrahour' => 0, 'lessons'=>array());   
+
+            $_arr[$this->Week][$this->itemid]['title'] = $this->title;
+            //$_arr[$this->Week][$this->itemid]['client']++;
+            if (!isset($_arr[$this->Week][$this->itemid]['list'][$this->COACHID]))
+                $_arr[$this->Week][$this->itemid]['list'][$this->COACHID] = array('name'=>$this->Name, 'cid'=>$this->CID, 'duehour' => 0,  'duedetail'=>array());
+
+            //$_arr[$this->Week][$this->itemid]['sale'] = 0;
+            //$_arr[$this->Week][$this->itemid]['paid'] = 0;
+        
+            if ($this->Status == 'Completed') {
+                $_arr[$this->Week][$this->itemid]['hour']  += round($this->DueHour/60, 2);
+                $_arr[$this->Week][$this->itemid]['lessons'][md5($this->StartDate.'|'.$this->StartTime)] = 1;
+                
+                if ($this->WeekName == 'Sat' || $this->WeekName == 'Sun' || $this->StartTime < '09:00' || $this->StartTime > '17:30') {
+                    $_arr[$this->Week][$this->itemid]['extrahour']  += round($this->DueHour/60, 2);
+                }
+                array_push($_arr[$this->Week][$this->itemid]['list'][$this->COACHID]['duedetail'], $this->StartDate."[".round($this->DueHour/60, 2)."h]");
+
+                if (!isset($_arr[$this->Week][$this->itemid]['list'][$this->COACHID]['duehour'])) {
+                    $_arr[$this->Week][$this->itemid]['list'][$this->COACHID]['duehour'] = round($this->DueHour/60, 2);
+                }
+                else {
+                    $_arr[$this->Week][$this->itemid]['list'][$this->COACHID]['duehour'] += round($this->DueHour/60, 2);
+                }
+            }
+            //$coaches[$this->COACHID] = array('item_id'=>$this->itemid, 'week'=>$this->Week);
+        }
+        return $_arr;
+    }
+
+    function getNumOfCoachFee($fromDay, $toDay, $userid){
+        $sql = "select date_format(ccl.StartDate, '%Y%u') as Week, itemid, cc.id as COACHID from client_coach cc, coach_item ci, client_info c , client_coach_lessons as ccl where cc.itemid = ci.id and c.CID = cc.CID and cc.id = ccl.coachid and ccl.StartDate between '{$fromDay}' AND '{$toDay}' ";
+
+        if ($userid > 0) {
+            $sql .= " AND cc.saleid = {$userid} ";
+        }
+        $sql .= "Order by ci.title asc, cc.CID asc, ccl.StartDate asc ";  
         $this->query($sql);
         $_arr = array();
         $coaches = array();
         while ($this->fetch()) {
-            if (!isset($_arr[$this->Week]) || !isset($_arr[$this->Week][$this->itemid]))
-                $_arr[$this->Week][$this->itemid] = array('title'=>'', 'hour'=>0, 'client'=>0, 'list'=>array());   
-
-            $_arr[$this->Week][$this->itemid]['title'] = $this->title;
-            $_arr[$this->Week][$this->itemid]['hour']  += round($this->DeliverHours/60, 2);
-            $_arr[$this->Week][$this->itemid]['client']++;
-            $_arr[$this->Week][$this->itemid]['list'][$this->COACHID] = array('name'=>$this->Name, 'cid'=>$this->CID);
             $_arr[$this->Week][$this->itemid]['sale'] = 0;
             $_arr[$this->Week][$this->itemid]['paid'] = 0;
-        
             $coaches[$this->COACHID] = array('item_id'=>$this->itemid, 'week'=>$this->Week);
         }
 
         //calc payment
         if (count($coaches) > 0) {
-            $sql = "select VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD from client_account a Where VisaID IN (".implode(',', array_keys($coaches)).") AND ACC_TYPE = 'coach'";
-            $this->query($sql);   
-            while ($this->fetch()){
-                //paperwork profit
-                $_arr[$coaches[$this->VisaID]['week']][$coaches[$this->VisaID]['item_id']]['sale'] += ($this->GST == 1? $this->DueAmount/1.1 : $this->DueAmount) - ($this->GST_3RD == 1? $this->AMOUNT_3RD/1.1 : $this->AMOUNT_3RD);
-            }
+            foreach (array_chunk(array_keys($coaches), 500, true) as  $coach_ids) {
+                $sql = "select VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD from client_account a Where VisaID IN (".implode(',',$coach_ids).") AND ACC_TYPE = 'coach'";
+                $this->query($sql);   
+                while ($this->fetch()){
+                    //paperwork profit
+                    $_arr[$coaches[$this->VisaID]['week']][$coaches[$this->VisaID]['item_id']]['sale'] += ($this->GST == 1? $this->DueAmount/1.1 : $this->DueAmount) - ($this->GST_3RD == 1? $this->AMOUNT_3RD/1.1 : $this->AMOUNT_3RD);
+                }
 
-            $sql = "select a.VisaID, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a,  client_payment b where a.ID = b.AccountID and VisaID IN (".implode(',', array_keys($coaches)).") AND ACC_TYPE = 'coach' group by a.VisaID";
-            $this->query($sql);
-            while ($this->fetch()) {
-                $_arr[$coaches[$this->VisaID]['week']][$coaches[$this->VisaID]['item_id']]['paid'] += $this->paid;
+                $sql = "select a.VisaID, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a,  client_payment b where a.ID = b.AccountID and VisaID IN (".implode(',', $coach_ids).") AND ACC_TYPE = 'coach' group by a.VisaID";
+                $this->query($sql);
+                while ($this->fetch()) {
+                    $_arr[$coaches[$this->VisaID]['week']][$coaches[$this->VisaID]['item_id']]['paid'] += $this->paid;
+                }
             }
         }
-
         return $_arr;        
     }
 
@@ -2714,7 +2792,7 @@ class ReportAPI extends MysqlDB {
         $file = __DOWNLOAD_PATH.'reportstaff/'.$rpt_type.$staff_id.'.dat';
         if (!file_exists($file))
             return $rtn;
-
+        //unlink($file);exit;
         $fp = fopen($file, 'r');
         if (!$fp)
             return $rtn;

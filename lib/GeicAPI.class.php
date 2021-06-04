@@ -116,35 +116,43 @@ class GeicAPI extends MysqlDB {
 	}
 	
 	
-    function getUserNameArr($userid=0,$leave=false){
-    	$sql = "select ID, UserName, LeaveDate from sys_user WHERE 1 ";
-		if (!$leave) {
+    function getUserNameArr($userid=0,$allmember=false){
+    	$sql = "select ID, UserName, LeaveDate, Department from sys_user WHERE 1 ";
+		if (!$allmember) {
 			$sql .= " AND LeaveDate = '0000-00-00' ";
 		}
 
 		if($userid > 0){
 			$sql .= " AND ID = {$userid} ";
 		}    	
+		$sql .= " Order by Department, DepartmentRank ";
 		$this->query($sql);
-
+		//echo $sql."\n";
 		$_arr = array();
+		$departed = array();
+		$departed['###Departed###'] = '-----------Darparted----------';
+		$department = '';
 		while($this->fetch()){
-			$_arr[$this->ID] = ucwords($this->UserName) . ($this->LeaveDate != '0000-00-00'? "(Departed)" : "");
-            if (!in_array($this->ID,$this->user_orders)) {
-                array_push($this->user_orders, $this->ID);
-            }
+			if ($userid > 0) {
+				$_arr[$this->ID] =  ucwords($this->UserName);
+			}
+			elseif ($this->LeaveDate != '0000-00-00') {
+				$departed[$this->ID] =  ucwords($this->UserName);
+			}
+			else {
+				if ($department == '' || $department != $this->Department) {
+					$_arr['###'.$this->Department.'###'] =  '-----------'.$this->Department.'----------';
+				}
+				
+				$_arr[$this->ID] =  ucwords($this->UserName);
+				$department = $this->Department;
+			}	
 		}
-
-        $rtn = array();
-        foreach ($this->user_orders as $uid) {
-            if(!isset($_arr[$uid]))
-                continue;
-            
-            $rtn[$uid] = $_arr[$uid];
-            unset($_arr[$uid]);
-        }
-
-		return $rtn;    	
+		foreach ($departed as $k => $v) {
+			$_arr[$k] = $v;
+		}
+		
+		return $_arr;  	
     }
     	
 	function getUserMark($userId){
@@ -158,7 +166,7 @@ class GeicAPI extends MysqlDB {
 
 
 	function getUserList($rUserID=0){
-		$sql = "Select ID, UserName, UserPassword, Position, Email, Mobile, Telephone, Address, Mark, Advance, StartDate, LeaveDate from sys_user";
+		$sql = "Select ID, UserName, UserPassword, Position, Email, Mobile, Telephone, Address, Mark, Advance, StartDate, LeaveDate, Department, DepartmentRank from sys_user";
 		if($rUserID > 0){
 			$sql .= " Where ID = {$rUserID}";
 		}
@@ -176,6 +184,9 @@ class GeicAPI extends MysqlDB {
 			$_arr[$this->ID]['adv']    = $this->Advance;
 			$_arr[$this->ID]['startdate']    = $this->StartDate;
             $_arr[$this->ID]['leavedate']    = $this->LeaveDate;
+			$_arr[$this->ID]['department']    = $this->Department;
+			$_arr[$this->ID]['department_rank']    = $this->DepartmentRank;
+
 		}
 		return $_arr;
 	}
@@ -230,7 +241,7 @@ class GeicAPI extends MysqlDB {
     }
     
     	
-    function addUser($rName, $rPassword, $rEmail, $rMobile, $rPhone, $rAddress, $rPosition, $rMark, $rAdv, $rStartDate, $rLeaveDate){
+    function addUser($rName, $rPassword, $rEmail, $rMobile, $rPhone, $rAddress, $rPosition, $rMark, $rAdv, $rStartDate, $rLeaveDate, $rDepartment="", $rDepartmentRank=0){
     	if($this->checkUser($rName)){
     		return false;
     	}
@@ -244,12 +255,15 @@ class GeicAPI extends MysqlDB {
     	$rAddress 	= addslashes($rAddress);
     	$rStartDate = addslashes($rStartDate);
         $rLeaveDate = addslashes($rLeaveDate);
-		$sql = "insert into `sys_user`(UserName, UserPassword, Position, Email, Mobile, Telephone, Address, Mark, Advance, StartDate, LeaveDate)values ('{$rName}', '{$rPassword}', '{$rPosition}', '{$rEmail}', '{$rMobile}', '{$rPhone}', '{$rAddress}', '{$rMark}', '{$rAdv}', '{$rStartDate}', '{$rLeaveDate}')";
+		$rDepartment = addslashes($rDepartment);
+		$rDepartmentRank = addslashes($rDepartmentRank);
+
+		$sql = "insert into `sys_user`(UserName, UserPassword, Position, Email, Mobile, Telephone, Address, Mark, Advance, StartDate, LeaveDate, Department, DepartmentRank)values ('{$rName}', '{$rPassword}', '{$rPosition}', '{$rEmail}', '{$rMobile}', '{$rPhone}', '{$rAddress}', '{$rMark}', '{$rAdv}', '{$rStartDate}', '{$rLeaveDate}', '{$rDepartment}', '{$rDepartmentRank}')";
  		return $this->query($sql);
  	}
  	
 
-	function setUser($rUserID, $rName, $rPassword, $rEmail, $rMobile, $rPhone, $rAddress, $rPosition, $rMark, $rAdv, $rStartDate, $rLeaveDate){
+	function setUser($rUserID, $rName, $rPassword, $rEmail, $rMobile, $rPhone, $rAddress, $rPosition, $rMark, $rAdv, $rStartDate, $rLeaveDate, $rDepartment="", $rDepartmentRank=0){
     	$rName 		= addslashes($rName);
     	$rPassword 	= addslashes($rPassword);
     	$rEmail 	= addslashes($rEmail);
@@ -259,7 +273,10 @@ class GeicAPI extends MysqlDB {
     	$rAddress 	= addslashes($rAddress);
     	$rStartDate = addslashes($rStartDate);
         $rLeaveDate = addslashes($rLeaveDate);	
-		$sql = "Update sys_user SET UserName = '{$rName}', UserPassword = '{$rPassword}', Position = '{$rPosition}', Email = '{$rEmail}', Mobile = '{$rMobile}', Telephone = '{$rPhone}', Address = '{$rAddress}', Mark = '{$rMark}', Advance = {$rAdv}, StartDate = '{$rStartDate}', LeaveDate = '{$rLeaveDate}'  where ID = {$rUserID} ";
+		$rDepartment = addslashes($rDepartment);
+		$rDepartmentRank = addslashes($rDepartmentRank);
+
+		$sql = "Update sys_user SET UserName = '{$rName}', UserPassword = '{$rPassword}', Position = '{$rPosition}', Email = '{$rEmail}', Mobile = '{$rMobile}', Telephone = '{$rPhone}', Address = '{$rAddress}', Mark = '{$rMark}', Advance = {$rAdv}, StartDate = '{$rStartDate}', LeaveDate = '{$rLeaveDate}', Department = '{$rDepartment}', DepartmentRank = '{$rDepartmentRank}'  where ID = {$rUserID} ";
 		return $this->query($sql);
 	}
 	
@@ -885,6 +902,45 @@ class GeicAPI extends MysqlDB {
 			$rtn[$this->ID] = $this->UserName;
 		}
 		return $rtn;
+	}
+
+	function setMemberByStaffId($user_id, $members) {
+		if (!$user_id || !$members || count($members) == 0)
+			return false;
+
+		$sql = "SELECT id, staffid from sys_user_management WHERE ManagerID = {$user_id} ";
+		$this->query($sql);
+		$dels = $exists = array();
+		while($this->fetch()) {
+			if (!in_array($this->staffid, $members)){
+				array_push($dels, $this->id);
+			}
+			else {
+				$exists[$this->staffid] = 1;
+			}
+		}
+
+		$inserts = array();
+		foreach ($members as $member_id) {
+			if (isset($exists[$member_id]))
+				continue;
+
+			array_push($inserts, "({$member_id}, {$user_id})");
+		}
+
+		if (count($inserts) > 0) {
+			$sql = "INSERT INTO sys_user_management (StaffID, ManagerID) values ". implode(',', $inserts);
+			//echo $sql."\n";
+			$this->query($sql);
+		}
+
+		if (count($dels) > 0) {
+			$sql = "DELETE FROM sys_user_management where id in (".implode(',', $dels).")";
+			//echo $sql."\n";
+			$this->query($sql);
+		}
+
+		return true;
 	}
 }
 ?>

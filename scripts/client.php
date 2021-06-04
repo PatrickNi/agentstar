@@ -14,7 +14,8 @@ if (!($user_id > 0)) {
 }
 
 #define serach filed
-$columns = array('l'=>'LName', 'f'=>'FName', 'e'=>'EName', 't'=>'ClientType', 'm'=>'Email', 'c'=>'TOKEN', 'dob'=>'Dob');
+$columns = array('l'=>'LName', 'f'=>'FName', 'e'=>'FullName',  'en'=>'EName', 't'=>'ClientType', 'm'=>'Email', 'mobile'=>'Mobile', 'c'=>'TOKEN', 'dob'=>'Dob');
+
 $o_c = new ClientAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, true);
 $o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, true);
 
@@ -70,7 +71,8 @@ $status = isset($_REQUEST['is_geic'])?  $_REQUEST['is_geic'] : '';
 
 $page_link = '';
 $client_arr = array();
-if (isset($_REQUEST['bt_name']) && stripos($_REQUEST['bt_name'], "Search") && array_key_exists($srch_type, $columns)){
+//var_dump($srch_type, array_key_exists($srch_type, $columns), $_REQUEST['bt_name'] == 'Search' );
+if (isset($_REQUEST['bt_name']) && $_REQUEST['bt_name'] == 'Search' && array_key_exists($srch_type, $columns)){
 	$client_arr = $o_c->getClientInfo($page, $page_size, 0, $view_all, $columns[$srch_type], $srch_qtext, $from_date, $to_date, $only_course, $status);
 	$rows_num = $o_c->getClientTotalRows();
     $rows_arr   = $o_c->getClientNumRows(0, $view_all, $columns[$srch_type], $srch_qtext, $from_date, $to_date, $only_course, $status);

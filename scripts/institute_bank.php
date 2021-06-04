@@ -27,18 +27,18 @@ foreach ($g_user_grants as $item){
 
 # get course id
 $school_id  = isset($_REQUEST['sid'])? trim($_REQUEST['sid']) : 0;
-$comm_id    = isset($_REQUEST['cid'])? trim($_REQUEST['cid']) : 0;
+$bank_id    = isset($_REQUEST['bankid'])? trim($_REQUEST['bankid']) : 0;
 $isNew = isset($_REQUEST['isNew'])? trim($_REQUEST['isNew']) : "none";
 
 $o_f = new SchoolAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
 $error = "";
 # get action
-$action = isset($_POST["at_{$comm_id}"])? trim($_POST["at_{$comm_id}"]) : "";
+$action = isset($_POST["at_{$bank_id}"])? trim($_POST["at_{$bank_id}"]) : "";
 switch (strtoupper($action)){
 	case __ACT_DEL:
 		if($ugs['i_comm']['d'] == 1){
-			$o_f->delComm($comm_id);	
+			$o_f->delBank($bank_id);	
 		}else{
 			$error = "alert('Permission Denied!')";
 		}
@@ -52,28 +52,23 @@ switch (strtoupper($action)){
 
 
 if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
-	$course = isset($_POST['t_course'])? trim($_POST['t_course']) : "";
-	$rate   = isset($_POST['t_rate'])? trim($_POST['t_rate']) : 0;
-	$agent  = isset($_POST['t_agent'])? trim($_POST['t_agent']) : 0;
-	$boun   = isset($_POST['t_boun'])? trim($_POST['t_boun']) : 0;
-	$start_date = isset($_POST['t_fd'])? trim($_POST['t_fd']) : '0000-00-00';
-	$end_date = isset($_POST['t_ed'])? trim($_POST['t_ed']) : '0000-00-00';
-	$major_id =  isset($_POST['t_major'])? trim($_POST['t_major']) : 0;
-	$qual_id =  isset($_POST['t_qual'])? trim($_POST['t_qual']) : 0;
+	$account_name = isset($_POST['t_aname'])? trim($_POST['t_aname']) : "";
+	$bsb   = isset($_POST['t_bsb'])? trim($_POST['t_bsb']) : "";
+	$account_no  = isset($_POST['t_ano'])? trim($_POST['t_ano']) : 0;
 	
-	if($course == "" || $rate == "" || $boun == ""){
-		$error = "alert('Error empty data submitted!');";
-			
-	}else{
-		if($comm_id > 0){
+	if($account_name == "" || $bsb == "" || $account_no == ""){
+		$error = "alert('Error empty data submitted!');";		
+	}
+    else{
+		if($bank_id > 0){
 			if($ugs['i_comm']['m'] == 1){
-				$o_f->setComm($comm_id, $course, $rate, $agent, $boun, $start_date, $end_date, $major_id, $qual_id);
+				$o_f->setBank($bank_id, $account_name, $bsb, $account_no);
 			}else{
 				$error = "alert('Permission Denied!')";
 			}
 		}else{
 			if($ugs['i_comm']['i'] == 1){
-				$o_f->addComm($school_id, $course, $rate, $agent, $boun, $start_date, $end_date, $major_id, $qual_id);
+				$o_f->addBank($school_id, $account_name, $bsb, $account_no);
 			}else{
 				$error = "alert('Permission Denied!')";
 			}
@@ -88,32 +83,25 @@ if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
 $action_arr = array(__ACT_EDIT => "Edit", __ACT_DEL => "Delete");
 
 # format array
-$comm_arr = $o_f->getComm($school_id);
+$bank_arr = $o_f->getBank($school_id);
 
-$o_a = new AgentAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
-$agent_arr = $o_a->getAgent('top');
 
 # set smarty tpl
 $o_tpl = new Template;
 $o_tpl->assign('act_arr', $action_arr);
-$o_tpl->assign('comm_arr', $comm_arr);
-$o_tpl->assign('agent_arr', $agent_arr);
+$o_tpl->assign('bank_arr', $bank_arr);
 
-$qual_arr = $o_f->getCourseQual($school_id);
-$o_tpl->assign('qual_arr', $qual_arr[$school_id]);
-$major_arr = $o_f->getCourseMajorBySchool($school_id);
-$o_tpl->assign('major_arr', $major_arr[$school_id]);
 
-if($comm_id > 0 && array_key_exists($comm_id, $comm_arr)){
-	$o_tpl->assign('dt_arr', $comm_arr[$comm_id]);
+if($bank_id > 0 && array_key_exists($bank_id, $bank_arr)){
+	$o_tpl->assign('dt_arr', $bank_arr[$bank_id]);
 }
 
 $o_tpl->assign('iname', $o_f->getNameByIID($school_id));
 $o_tpl->assign('sid', $school_id);
-$o_tpl->assign('cid', $comm_id);
+$o_tpl->assign('bankid', $bank_id);
 $o_tpl->assign('isNew', $isNew);
 $o_tpl->assign('error_js', $error);
 $o_tpl->assign('ugs', $ugs);
-$o_tpl->display('institute_comm.tpl');
+$o_tpl->display('institute_bank.tpl');
 ?>
 

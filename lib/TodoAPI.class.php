@@ -16,10 +16,19 @@ class TodoAPI {
     }
 
 
-    function upload($data) {
-        foreach ($data as $v){
-            $sql = "INSERT IGNORE INTO ".self::TBL." (user_id, source, source_id, begin_date, due_date, raw_data, created) VALUES ('{$v['user_id']}','{$v['source']}','{$v['source_id']}','{$v['begin_date']}','{$v['due_date']}','".json_encode($v['raw_data'])."', NOW())";
-            $this->db->query($sql);
+    function upload($data, $has_remind=false) {
+        if ($has_remind) {
+            foreach ($data as $v){
+                $sql = "INSERT IGNORE INTO ".self::TBL." (user_id, source, source_id, begin_date, due_date, raw_data, remind_time, created) VALUES ('{$v['user_id']}','{$v['source']}','{$v['source_id']}','{$v['begin_date']}','{$v['due_date']}','".json_encode($v['raw_data'])."','{$v['remind_time']}', NOW()) ON DUPLICATE KEY UPDATE remind_time = if(values(remind_time) > remind_time, values(remind_time), remind_time), raw_data = if(values(raw_data) <> raw_data, values(raw_data), raw_data), due_date = if(values(due_date) <> due_date, values(due_date), due_date) ";
+                //echo $sql."\n";
+                $this->db->query($sql);
+            }
+        }
+        else {
+            foreach ($data as $v){
+                $sql = "INSERT IGNORE INTO ".self::TBL." (user_id, source, source_id, begin_date, due_date, raw_data, created) VALUES ('{$v['user_id']}','{$v['source']}','{$v['source_id']}','{$v['begin_date']}','{$v['due_date']}','".json_encode($v['raw_data'])."', NOW())";
+                $this->db->query($sql);
+            }
         }
         return true;
     } 
@@ -213,6 +222,9 @@ class TodoAPI {
             case 'dob':
                 return 'Date of Birthday';
                 break;
+            case 'appointment':
+                return 'Appointment';
+                break;
             default:
                 return $source;
         }
@@ -228,6 +240,9 @@ class TodoAPI {
                 break;
             case 'course':
                 return "{$data['client']} ({$data['school']})";
+                break;
+            case 'appointment':
+                return $data['title'];
                 break;
             default:
                 return $source;
@@ -248,6 +263,9 @@ class TodoAPI {
                 break;
             case 'dob':
                 return 'Birthday: '.$data['dob'];
+                break;
+            case 'appointment':
+                return $data['desc'];
                 break;
             default:
                 return $source;
@@ -271,6 +289,9 @@ class TodoAPI {
             case 'dob':
                 return '#';
                 break;
+            case 'appointment':
+                return "/scripts/calendar_add.php?id={$source_id}";
+                break;
         }
         return '#';
     }
@@ -280,7 +301,12 @@ class TodoAPI {
         $sql = "SELECT *, IF(REMIND_TIME IS NOT NULL, REMIND_TIME, '9999-99-99 99:99:99') as alert FROM ".self::TBL. " WHERE STATUS <> '".self::STATUS_DONE."' AND (REMIND_TIME IS NULL OR REMIND_TIME < NOW()) ";
         if ($src != '')
             $sql .= " AND SOURCE = '{$src}' ";
+        else 
+            $sql .= " AND SOURCE <> 'appointment' ";
 
+        if ($src == 'appointment')  {
+            $sql .= " AND REMIND_TIME >= NOW() - INTERVAL 15 minute ";
+        }   
         if ($userid > 0)
             $sql .= " AND USER_ID = '{$userid}' ";
 
@@ -351,5 +377,12 @@ class TodoAPI {
         return $this->db->query($sql);
     }
 
+    function delBySource($source, $source_id) {
+        if (!$source || !$source_id)
+            return false;
+        
+        $sql = "DELETE FROM ".self::TBL. " WHERE source = '{$source}' and source_id = '{$source_id}' ";
+        return $this->db->query($sql);
+    }
 
 }

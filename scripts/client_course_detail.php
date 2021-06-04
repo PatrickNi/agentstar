@@ -74,7 +74,6 @@ $set_course['vms']  = isset($_REQUEST['t_vms'])? (string)trim($_REQUEST['t_vms']
 
 $set_course['completed']  = isset($_REQUEST['t_completed'])? (string)trim($_REQUEST['t_completed']) : "NO";
 
-
 $apodue = isset($_REQUEST['t_apodue'])? (string)trim($_REQUEST['t_apodue']) : "0000-00-00";
 $apodue = $apodue != ''? $apodue : "0000-00-00";
 
@@ -82,6 +81,7 @@ $set_course['consultant_date']   = isset($_REQUEST['t_consultant_date'])? (strin
 $set_course['consultant_date']   = $set_course['consultant_date'] == ""? "0000-00-00" : $set_course['consultant_date'];
 $set_course['consultant'] = isset($_REQUEST['t_consultant'])? (string)trim($_REQUEST['t_consultant']) : 0;
 
+$set_course['studentid']  = isset($_REQUEST['t_studentid'])? (string)trim($_REQUEST['t_studentid']) : "";
 
 $msg = '';
 if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" || strtoupper($_REQUEST['bt_name']) == "COURSEPROCESS")){

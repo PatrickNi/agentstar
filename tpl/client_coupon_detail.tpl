@@ -39,13 +39,13 @@
 	</tr>
 	<tr>
 		<td width="20%" align="left" class="rowodd"><strong>Start Date:</strong>&nbsp;&nbsp;</td>
-		<td align="left" width="80%" class="roweven"><input type="text" name="t_sdate" id="t_sdate" value="{$dt_arr.sdate}" size="30">
+		<td align="left" width="80%" class="roweven"><input type="text" name="t_sdate" id="t_sdate" value="{$dt_arr.sdate}" size="30" autocomplete="off">
 
         </td>
 	</tr>
 	<tr>
 		<td width="20%" align="left" class="rowodd"><strong>End Date:</strong>&nbsp;&nbsp;</td>
-		<td align="left" width="80%" class="roweven"><input type="text" name="t_edate" id="t_edate" value="{$dt_arr.edate}" size="30"></td>
+		<td align="left" width="80%" class="roweven"><input type="text" name="t_edate" id="t_edate" value="{$dt_arr.edate}" size="30" autocomplete="off"></td>
 	</tr>					
 	<tr class="greybg"><td colspan="2">&nbsp;</td></tr>									
 </table>

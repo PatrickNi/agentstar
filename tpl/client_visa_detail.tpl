@@ -181,7 +181,7 @@
 				{foreach key=id item=name from=$user_arr}
 					<option  value="{$id}" {if $dt_arr.vuser eq $id} selected {/if}>{$name}</option> 
                 {/foreach}
-				{if $dt_arr.auser lt 1} 
+				{if $dt_arr.vuser lt 1} 
 	                <option  value="0" selected >select a user</option> 
     			{/if}
 				</select>			</td> 
@@ -190,9 +190,9 @@
             <td width="36%" align="left" class="rowodd"><strong>Consult Date:</strong></td> 
             <td align="left" width="64%" class="roweven">
                 {if $ugs.v_agd.v eq 1 && $ugs.v_agd.m eq 0 && (($dt_arr.vdate neq '' && $dt_arr.vdate neq '0000-00-00') || $ugs.v_agd.i eq 0)}
-                    <input type="hidden" name="t_first" value="{$dt_arr.vdate}"> 
+                    <input type="hidden" name="t_first" value="{$dt_arr.vdate}" autocomplete="off"> 
                 {/if}
-                <input type="text" id="t_first" name="t_first" value="{$dt_arr.vdate}" size="30" {if $ugs.v_agd.v eq 0} style="visibility:hidden"{/if} {if $ugs.v_agd.v eq 1 && $ugs.v_agd.m eq 0 && (($dt_arr.vdate neq '' && $dt_arr.vdate neq '0000-00-00') || $ugs.v_agd.i eq 0)} disabled {/if}>               
+                <input autocomplete="off" type="text" id="t_first" name="t_first" value="{$dt_arr.vdate}" size="30" {if $ugs.v_agd.v eq 0} style="visibility:hidden"{/if} {if $ugs.v_agd.v eq 1 && $ugs.v_agd.m eq 0 && (($dt_arr.vdate neq '' && $dt_arr.vdate neq '0000-00-00') || $ugs.v_agd.i eq 0)} disabled {/if}>               
             </td> 
           </tr>           
           <tr> 
@@ -217,7 +217,7 @@
 				{if $ugs.v_agd.v eq 1 && $ugs.v_agd.m eq 0 && (($dt_arr.adate neq '' && $dt_arr.adate neq '0000-00-00') || $ugs.v_agd.i eq 0)}
                 	<input type="hidden" name="t_adate" value="{$dt_arr.adate}"> 
                 {/if}
-				<input type="text" id="t_adate" name="t_adate" value="{$dt_arr.adate}" size="30" {if $ugs.v_agd.v eq 0} style="visibility:hidden"{/if} {if $ugs.v_agd.v eq 1 && $ugs.v_agd.m eq 0 && (($dt_arr.adate neq '' && $dt_arr.adate neq '0000-00-00') || $ugs.v_agd.i eq 0)} disabled {/if}> 
+				<input autocomplete="off" type="text" id="t_adate" name="t_adate" value="{$dt_arr.adate}" size="30" {if $ugs.v_agd.v eq 0} style="visibility:hidden"{/if} {if $ugs.v_agd.v eq 1 && $ugs.v_agd.m eq 0 && (($dt_arr.adate neq '' && $dt_arr.adate neq '0000-00-00') || $ugs.v_agd.i eq 0)} disabled {/if}> 
                
                 
 			</td> 
@@ -341,8 +341,8 @@
 	            {foreach key=id item=arr from=$process_arr}
 	            <tr align="left" class="roweven"> 
 	              <td class="border_1"><span style="font-size:16px;font-weight:bolder; color:#990000">{if $arr.done eq 1}&radic;{else}?{/if}</span>{$arr.date}</td> 
-	              <td class="border_1"><span style="cursor:pointer; text-decoration:underline;" onClick="window.open('client_visa_process.php?vid={$vid}&pid={$id}&cid={$cid}','_blank','alwaysRaised=yes,height=500,width=1000, location=no')">{$arr.subject}</span></td>
-	              <td class="border_1"><img src="../images/arr_down.gif" style="cursor:pointer" onClick="window.open('client_visa_process.php?vid={$vid}&pid={$id}&cid={$cid}&isNew=1&isOther=1','_blank','alwaysRaised=yes,height=500,width=1000, location=no')"></td> 
+	              <td class="border_1"><span style="cursor:pointer; text-decoration:underline;" onClick="window.open('client_visa_process.php?vid={$vid}&pid={$id}&cid={$cid}','_blank','alwaysRaised=yes,height='+screen.height*1/3+',width='+screen.width*1/2+', location=no')">{$arr.subject}</span></td>
+	              <td class="border_1"><img src="../images/arr_down.gif" style="cursor:pointer" onClick="window.open('client_visa_process.php?vid={$vid}&pid={$id}&cid={$cid}&isNew=1&isOther=1','_blank','alwaysRaised=yes,height='+screen.height*1/3+',width='+screen.width*1/2+', location=no')"></td> 
 	            </tr> 
 	            {/foreach}
 	          </table> 

@@ -159,6 +159,76 @@
                                     </td>
 								</tr>													
 							{/if}
+
+							 <tr><td colspan="2"><hr/></td></tr>                    
+								<tr>
+									<td colspan="2">      	
+										<table border="0" cellpadding="1" cellspacing="1" width="100%"> 
+											<tr class="greybg"> 
+											<td colspan="11" class="whitetext" align="center">Payment</td> 
+											</tr>
+											<tr align="center" class="totalrowodd">
+												<td>Item</td>
+												<td>Due<br/>Amount</td>
+												<td>GST</td>
+												<td>Total<br/>Received</td>
+												<td>Deduction</td>
+												<td>Deduction<br/>Amount</td>
+												<td>GST</td>
+												<td>Total Paid</td>
+												<td>Profit</td>
+												<!--
+												<td>Agreement<br/>Profit</td>
+												<td>Paperwork<br/>Profit</td>
+												-->
+											</tr>
+											{assign var="total_profit" value="0"}
+											{assign var="total_dueamt" value="0"}
+											{assign var="agreement_profit" value="0"}
+											{assign var="paperwork_profit" value="0"}
+											{foreach key=id item=arr from=$account_arr}
+											<tr align="center" class="roweven">
+												<td style="text-decoration:underline; cursor:pointer" onClick="window.open('client_account_detail.php?vid={$vid}&aid={$id}&cid={$cid}&typ=semester','_blank', 'alwaysRaised=yes,height=500, width=800,location=no,scrollbars=yes')" >{$arr.step|ucwords}</td>
+												<td align="right">
+													{$arr.dueamt|string_format:"%.2f"}
+													{assign var="total_dueamt" value=$total_dueamt+$arr.dueamt}	
+												</td>
+												<td align="right">{$arr.gst|string_format:"%.2f"}</td>
+												<td align="right">
+														<span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_payment.php?aid={$id}','_blank', 'alwaysRaised=yes,height=500,width=800,location=no,scrollbars=yes')">{$arr.paid|string_format:"%.2f"}</span>
+												</td>
+												<td>{$arr.party|ucwords}
+												</td>
+												<td align="right">{$arr.dueamt_3rd|string_format:"%.2f"}</td>
+												<td align="right">{$arr.gst_3rd|string_format:"%.2f"}</td>
+												<td align="right"><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_spand.php?aid={$id}','_blank', 'alwaysRaised=yes,height=500,width=800,location=no,scrollbars=yes')">{$arr.spand|string_format:"%.2f"}</span></td>
+												<td align="right">
+													{if $arr.step != 'app'}
+														{$arr.paid-$arr.dueamt_3rd|string_format:"%.2f"}
+														{assign var="total_profit" value=$total_profit+$arr.paid-$arr.dueamt_3rd}
+													{else}
+														0.00
+													{/if}
+												</td>                                              
+											</tr>
+											{/foreach}
+											<tr align="center" class="roweven">
+												<td align="right"><strong>Total:</strong></td>
+												<td align="right"><strong>{$total_dueamt|string_format:"%.2f"}</strong></td>
+												<td align="right" colspan="6"><strong>Total:</strong></td>
+												<td align="right"><strong>{$total_profit|string_format:"%.2f"}</strong></td>
+											</tr>	
+										
+											<tr align="center" class="roweven">
+												<td colspan="11" align="center">
+													{if $semid > 0}        
+													<input type="button" value="Add new" onclick="window.open('client_account_detail.php?cid={$cid}&vid={$semid}&typ=semester','_blank', 'alwaysRaised=yes,height=500,width=800,location=no,scrollbars=yes')" />
+													{/if}
+												</td>
+											</tr>				          	
+										</table>	    
+									</td>
+								</tr>  
 				  </table></td>
 					
 					<td width="20%" align="left" valign="top">
@@ -201,6 +271,25 @@
 										<td class="border_1">{$chase.due}</td>
 									</tr>
 								{/if}
+							</table>
+							<p/>
+							<table border="0" cellpadding="0" cellspacing="0" width="100%">
+								<tr class="greybg">
+									<td colspan="4" class="whitetext" align="center">Internal Transfer Notes</td>				
+								</tr>							
+								<tr align="center" class="totalrowodd">
+									<td class="border_1" width="32%">Transfer Date</td>
+									<td class="border_1" width="59%">Comm. to Company</td>
+								</tr>
+								{foreach key=id item=arr from=$transfer_arr}
+									<tr align="center" class="roweven">
+										<td class="border_1" align="left"><span style="cursor:pointer; text-decoration:underline;" onClick="window.open('/scripts/internal_transfer_note.php?courseid={$courseid}&semid={$semid}&cid={$cid}&tid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,width=500,height=380')">{$arr.date}</span></td>
+										<td class="border_1" align="left">{$arr.comm2biz}</td>
+									</tr>
+								{/foreach}
+								<tr align="center" class="roweven">
+									<td class="border_1" colspan="2" width="100%"><button type="button" onClick="window.open('/scripts/internal_transfer_note.php?courseid={$courseid}&semid={$semid}&cid={$cid}&tid={$id}&bt_name=addnew','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,width=500,height=380');">Generate new tranfer notes</button><br/></td>
+								</tr>								
 							</table>
 						</div>
 				    </td>	

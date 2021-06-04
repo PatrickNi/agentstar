@@ -54,7 +54,8 @@ class CalendarAPI extends MysqlDB{
 			$v = addslashes($v);
 		}
         $sql = "insert into calendar (Date, UserID, Time, Title, Duration, Description, FromUserID) values ('{$sets['date']}', {$sets['user']}, '{$sets['hour']}', '{$sets['title']}',  '{$sets['due']}', '{$sets['desc']}', {$user_id})";
-        return $this->query($sql);
+        $this->query($sql);
+        return $this->getLastInsertID();
     } 
 
     function getOneUserCalendar($id){

@@ -39,9 +39,7 @@
     <tr align="center"  class="greybg" >
         <td class="whitetext" colspan="9" style="padding:3 ">Client Coach Service
             &nbsp;&nbsp;&nbsp;&nbsp;
-         {if $ugs.v_service.i eq 1}
-            <span style="font-weight:bold; font-size:10px; color:#0066FF; cursor:pointer; text-decoration:underline" onClick="window.open('client_coach_detail.php?cid={$cid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">Add new schedule</span>       
-         {/if}
+            <span style="font-weight:bold; font-size:10px; color:#0066FF; cursor:pointer; text-decoration:underline" onClick="window.open('client_coach_detail.php?cid={$cid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">Add new schedule</span>
         </td>
     </tr>
     <tr align="center"  class="greybg" >

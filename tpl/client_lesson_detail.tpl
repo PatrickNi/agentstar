@@ -52,6 +52,16 @@
 					</td>
 				</tr>
 				<tr>
+					<td width="25%" align="left" class="rowodd"><strong>Time:</strong>&nbsp;&nbsp;</td>
+					<td align="left" width="75%" class="roweven">
+						<select name="starttime">
+						{foreach key=id item=name from=$init_hour}
+							<option value="{$name}" {if $name eq $dt_arr.starttime} selected {/if}>{$name}</option>
+						{/foreach}
+						</select>
+					</td>
+				</tr>
+				<tr>
 					<td width="25%" align="left" class="rowodd"><strong>Teacher:</strong>&nbsp;&nbsp;</td>
 				  	<td align="left" width="75%" class="roweven">
                         <select name="staff" >
@@ -59,10 +69,14 @@
                             <option  value="{$id}" {if $dt_arr.staff eq $id} selected {/if}>{$name}</option>
                             {/foreach}
                             {if $dt_arr.staff lt 1}
-                            <option  value="0" selected >Choose a staff</option>
+                            <option  value="0" selected >Choose a teacher</option>
                             {/if}
                         </select> 
 					</td>
+				</tr>
+				<tr>
+					<td width="25%" align="left" class="rowodd"><strong>Students in lesson:</strong><br/>(base on same teacher & date & time)</td>
+				  	<td align="left" width="75%" class="roweven">{$student_in_lesson}</td>
 				</tr>
 				<tr>
 					<td width="25%" align="left" class="rowodd"><strong>Fee(per class):</strong>&nbsp;&nbsp;</td>

@@ -3,6 +3,7 @@ require_once('../etc/const.php');
 require_once(__LIB_PATH.'CalendarAPI.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
 require_once(__LIB_PATH.'Template.class.php');
+require_once(__LIB_PATH.'TodoAPI.class.php');
 
 $_userid = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
 
@@ -23,10 +24,11 @@ $sets['due']  = isset($_POST['t_due'])? (string)trim($_POST['t_due']) : "";
 $sets['done'] = isset($_POST['t_done'])? (int)trim($_POST['t_done']) : 0;
 
 $o_c = new CalendarAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
+$todo = new TodoAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
 if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){  
 	#check empty title
-	if (!preg_match("/[a-zA-z0-9]/",$sets['title'])){
+	if ($sets['title'] == ""){
     	echo "<script language='javascript'>alert('Empty Title');</script>";
 	}else{
 		
@@ -35,15 +37,30 @@ if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
         $nextht =  date("H:i", mktime($hours[0], $hours[1] + $sets['due'], 0,0,0,0));
 		if($o_c->checkDueTime($sets['user'], $sets['date'], $nextht, $sets['hour'], $sets['due'], $cal_id)){
 	    	echo "<script language='javascript'>alert('Error Due Time');</script>";		
-		}else{
+		}
+		else{
 			  
 			$date  = isset($_POST['hdate']) && $_POST['hdate'] != ""? trim($_POST['hdate']) : $sets['date'];
 			$user  = isset($_POST['huser'])&& $_POST['huser'] != ""? trim($_POST['huser']) : $sets['user'];	
 		    if($cal_id > 0){
 		        $o_c->setCalendar($cal_id, $sets);
-		    }else{
-		        $o_c->addCalendar($sets, $_userid);
 		    }
+			else{
+		        $cal_id = $o_c->addCalendar($sets, $_userid);
+		    }
+
+			$data[0] = array('user_id'=>$_userid, 
+							'source'=>'appointment', 
+							'source_id'=>$cal_id, 
+							'begin_date'=>$sets['date'], 
+							'due_date'=>$sets['date'], 
+							'remind_time' => $sets['date'].' '.$sets['hour'].':00',
+							'raw_data'=>array('title'=>$sets['title'], 
+												'desc'=>$sets['desc'], 
+												'due'=>$sets['due']
+						 				 )
+		  				);
+		  	$todo->upload($data,true);
 	   		echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
 			exit;
 		}
@@ -51,6 +68,7 @@ if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
 
 }elseif (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "DELETE"){
     $o_c->cancelCalendar($cal_id);
+	$todo->delBySource('appointment', $cal_id);
     echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
 	exit;	
 }
@@ -66,7 +84,7 @@ $user_arr = $o_u->getUserNameArr();
 
 # build duration time
 $due_arr = array();
-$due_arr = array('30' => "0.5hr", '60' => "1hr", '90' => "1.5hrs", '120' => "2hrs", '150' => "2.5hrs", '180' => "3hrs", '210' => "3.5hrs", '240' => "4hrs", '480' => "1day");
+$due_arr = array('60' => "1hr", '30' => "0.5hr" , '90' => "1.5hrs", '120' => "2hrs", '150' => "2.5hrs", '180' => "3hrs", '210' => "3.5hrs", '240' => "4hrs", '480' => "1day");
 
 # get hour array
 $hour_arr = array();

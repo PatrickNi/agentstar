@@ -183,7 +183,7 @@ class SchoolAPI extends MysqlDB{
 	function countStudentNumRows($from, $to, $iid, $userid){
 		if($iid > 0){
 			$sql = "select count(DISTINCT a.CID) as TotalCnt, sum(if(CoeCnt is null, 0, OfferCnt)) as OfferCnt, sum(if(CoeCnt is null, 0, CoeCnt)) as CoeCnt from client_course a 
-								left join (select CCID, Sum(if(ProcessID = 2, 1, 0)) as OfferCnt, Sum(if(ProcessID = 5, 1, 0)) as CoeCnt from client_course_process where done = 1 group by CCID) as c on(c.CCID = a.ID)
+								left join (select CCID, Sum(if(ProcessID = 2, 1, 0)) as OfferCnt, Sum(if(ProcessID = 5, 1, 0)) as CoeCnt, Sum(if(ProcessID = 11, 1, 0)) as CnocCnt  from client_course_process where done = 1 group by CCID) as c on(c.CCID = a.ID)
 								left join (select CCID, StartDate from client_course_sem where SEM = 1 Group by CCID) as e on(e.CCID = a.ID)
  								left join client_info d on(a.CID = d.CID) 
 					where a.IID = '{$iid}' ";//and a.IsActive = 1
@@ -194,11 +194,12 @@ class SchoolAPI extends MysqlDB{
 				$sql .= " AND a.ConsultantID = {$userid} ";
 			}			
 			$this->query($sql);
-			$_arr = array('total'=>0, 'offer'=>0, 'coe'=>0);
+			$_arr = array('total'=>0, 'offer'=>0, 'coe'=>0, 'cnoc'=>0);
 			while ($this->fetch()){
 				$_arr['total'] = $this->TotalCnt;
 				$_arr['offer'] = $this->OfferCnt;
 				$_arr['coe']   = $this->CoeCnt;
+				$_arr['cnoc']  = $this->CnocCnt;
 			}			
 			return $_arr;
 		}
@@ -362,24 +363,32 @@ class SchoolAPI extends MysqlDB{
 		return false;
 	}
 	
-	function setComm($cid, $course, $rate, $agent, $boun){
+	function setComm($cid, $course, $rate, $agent, $boun, $start_date, $end_date, $major_id, $qual_id){
 		$course = addslashes($course);
 		$rate   = addslashes($rate);
 		$boun   = addslashes($boun);
-		$sql = "Update institute_comm SET Course = '{$course}', CommRate = '{$rate}', AgentID = '{$agent}', Bouns = '{$boun}' where ID = {$cid}";
+		$start_date   = addslashes($start_date);
+		$end_date   = addslashes($end_date);
+		$major_id   = addslashes($major_id);
+		$qual_id   = addslashes($qual_id);
+		$sql = "Update institute_comm SET Course = '{$course}', CommRate = '{$rate}', AgentID = '{$agent}', Bouns = '{$boun}' , StartDate = '{$start_date}' , EndDate = '{$end_date}' , MajorID = '{$major_id}' , QualID = '{$qual_id}' where ID = {$cid}";
 		return $this->query($sql); 
 	}
 	
-	function addComm($sid, $course, $rate, $agent, $boun){
+	function addComm($sid, $course, $rate, $agent, $boun, $start_date, $end_date, $major_id, $qual_id){
 		$course = addslashes($course);
 		$rate   = addslashes($rate);
 		$boun   = addslashes($boun);
-		$sql = "insert into institute_comm (InstID, Course, CommRate, AgentID, Bouns) values ({$sid}, '{$course}', '{$rate}', '{$agent}', '{$boun}')";
+		$start_date   = addslashes($start_date);
+		$end_date   = addslashes($end_date);
+		$major_id   = addslashes($major_id);
+		$qual_id   = addslashes($qual_id);
+		$sql = "insert into institute_comm (InstID, Course, CommRate, AgentID, Bouns, StartDate, EndDate, MajorID, QualID) values ({$sid}, '{$course}', '{$rate}', '{$agent}', '{$boun}', '{$start_date}', '{$end_date}', '{$major_id}', '{$qual_id}')";
 		return $this->query($sql); 
 	}
 	
 	function getComm($sid){
-		$sql = "select a.ID, Course, CommRate, a.AgentID, b.Name, Bouns from institute_comm a left join agent b on(a.AgentID = b.ID)";
+		$sql = "select a.ID, Course, CommRate, a.AgentID, b.Name, Bouns, StartDate, EndDate, MajorID, QualID from institute_comm a left join agent b on(a.AgentID = b.ID)";
 		if ($sid > 0){
 			$sql .= " where InstID = {$sid} ";
 		}
@@ -391,6 +400,10 @@ class SchoolAPI extends MysqlDB{
 			$_arr[$this->ID]['agentid'] = $this->AgentID;
 			$_arr[$this->ID]['agent']   = $this->Name;	
 			$_arr[$this->ID]['boun']    = $this->Bouns;
+			$_arr[$this->ID]['startdate']    = $this->StartDate;
+			$_arr[$this->ID]['enddate']    = $this->EndDate;
+			$_arr[$this->ID]['major']    = $this->MajorID;
+			$_arr[$this->ID]['qual']    = $this->QualID;
 		}
 		return $_arr;
 	}
@@ -545,6 +558,17 @@ class SchoolAPI extends MysqlDB{
 		return $_arr;
 	}
 	
+	function getCourseMajorBySchool($iid=0){
+		$sql = "select a.ID, b.Qual, Major, b.IID from institute_major a, institute_qual b Where a.QUalID = b.ID and b.IID = {$iid} ";
+		$sql .= " Order by Qual, Major asc ";
+		$this->query($sql);
+		$_arr = array();
+		while ($this->fetch()){
+			$_arr[$this->IID][$this->ID] = $this->Qual.'------'.$this->Major;
+		}
+		return $_arr;
+	}
+
 	function addCourseQual($iid, $qual){
 		if($qual != "" && $iid > 0){
 			$qual = addslashes($qual);
@@ -590,5 +614,49 @@ class SchoolAPI extends MysqlDB{
 			return $this->query($sql);
 		}
 	}		
+
+
+	function delBank($bankid){
+		if($bankid > 0){
+			$sql = "delete from institute_bank where ID = {$bankid}";
+			return $this->query($sql);
+		}
+		return false;
+	}
+	
+	function setBank($bankid, $account_name, $bsb, $account_no){
+		$account_name = addslashes($account_name);
+		$bsb   = addslashes($bsb);
+		$account_no   = addslashes($account_no);
+
+		$sql = "Update institute_bank SET AccountName = '{$account_name}', BSB = '{$bsb}', AccountNo = '{$account_no}' where ID = {$bankid}";
+		return $this->query($sql); 
+	}
+	
+	function addBank($sid, $account_name, $bsb, $account_no){
+		$account_name = addslashes($account_name);
+		$bsb   = addslashes($bsb);
+		$account_no   = addslashes($account_no);
+
+		$sql = "insert into institute_bank (InstID, AccountName, BSB, AccountNo) values ({$sid}, '{$account_name}', '{$bsb}', '{$account_no}')";
+		return $this->query($sql); 
+	}
+	
+	function getBank($sid){
+		$sql = "select ID, InstID, AccountName, BSB, AccountNo from institute_bank  ";
+		if ($sid > 0){
+			$sql .= " where InstID = {$sid} ";
+		}
+		$this->query($sql);
+		$_arr = array();
+		while ($this->fetch()){
+			$_arr[$this->ID]['aname']  = $this->AccountName;
+			$_arr[$this->ID]['ano']    = $this->AccountNo;
+			$_arr[$this->ID]['bsb'] = $this->BSB;
+			$_arr[$this->ID]['iid']   = $this->InstID;
+		}
+		return $_arr;
+	}
+
 }
 ?>

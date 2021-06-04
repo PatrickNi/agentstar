@@ -20,7 +20,7 @@ $set_arr['conf']  = isset($_POST['t_conf'])? (string)trim($_POST['t_conf']) : 0;
 $set_arr['sdate']  = isset($_POST['t_sdate'])? (string)trim($_POST['t_sdate']) : "0000-00-00";
 $set_arr['sdate']  = $set_arr['sdate'] == ""? "0000-00-00" : $set_arr['sdate'] ; 
 
-$set_arr['edate']  = isset($_POST['t_sdate'])? (string)trim($_POST['t_sdate']) : "0000-00-00";
+$set_arr['edate']  = isset($_POST['t_edate'])? (string)trim($_POST['t_edate']) : "0000-00-00";
 $set_arr['edate']  = $set_arr['edate'] == ""? "0000-00-00" : $set_arr['edate'];
 
 

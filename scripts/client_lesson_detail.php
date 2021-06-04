@@ -20,7 +20,7 @@ $sets['startdate']  = isset($_REQUEST['startdate'])? trim($_REQUEST['startdate']
 $sets['fee']  = isset($_REQUEST['fee'])? trim($_REQUEST['fee']) : 0;
 $sets['staff']  = isset($_REQUEST['staff'])? trim($_REQUEST['staff']) : 0;
 $sets['status']  = isset($_REQUEST['t_status'])? trim($_REQUEST['t_status']) : 'Active';
-
+$sets['starttime']  = isset($_REQUEST['starttime'])? trim($_REQUEST['starttime']) : '0:00';
 
 $o_c = new ClientAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 $o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1); 
@@ -105,10 +105,20 @@ $lesson_arr = $o_h->getLessons($client_id, $coach_id, $lesson_id);
 
 $o_tpl->assign("items_arr", $o_h->getItems());
 $o_tpl->assign('dt_arr', $lesson_arr[$coach_id][$lesson_id]);
+$o_tpl->assign('student_in_lesson', $o_h->countStudentInLesson($lesson_arr[$coach_id][$lesson_id]));
 $o_tpl->assign('coach', $coach_arr[$coach_id]);
 $o_tpl->assign('user_arr', $o_g->getUserNameArr());
 
+$min_hour = 9;
+$max_hour = 19;
+$init_hours = array();
+$minute = 0;
+for($i=0; $i<=($max_hour - $min_hour) * 2; $i++){
+    array_push($init_hours, date("H:i", mktime($min_hour, $minute, 0,0,0,0)));
+    $minute += 30;   
+}
 
+$o_tpl->assign('init_hour', $init_hours);
 
 $o_tpl->assign('cid', $client_id);
 $o_tpl->assign('lessonid', $lesson_id);

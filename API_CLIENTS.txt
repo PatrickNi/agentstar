@@ -11,7 +11,7 @@
                         &t_phone=YOUR_MOBILE
                         &t_wechatid=YOUR_WECHANTID
                         &t_ctype=YOUR_SERVICE
-                       
+                        &t_about=YOUR_ABOUT                       
     RESPONSE:
         SUCC:  PHP serialize STRING , source data is an ARRAY ['id'=>, 'code'=>''];
         FAIL:  PHP serialize STRING , source data is INT int number of "0"; 
@@ -25,8 +25,12 @@ YOUR_SERVICE:
                 <option value="legal">* 法律 Legal</option>
  */
 
+ YOUR_ABOUT:
+    格式如下：utm_medimu:XXX|utm_campaign:XXX|utm_adgroup:XXX|page:XXX_PAGE
+    XXX 如果有值，填值，无值为空
+    XXX_PAGE: 表示当前页面的路径
+
 NOTE:
 TOKEN: a74613df87c11d04519fb0ee4225c800 (长期有效)
 t_email: 为必填字段
-
 

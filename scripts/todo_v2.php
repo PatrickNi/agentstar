@@ -41,6 +41,15 @@ try {
             echo json_encode(array('succ'=>1));
             exit;
             break;
+        case 'getappointment':
+            $data = $todo->getUndoneList($user_id, 'appointment', 1);
+            if (count($data) == 0) {
+                echo "";
+                exit;
+            }
+            $o_tpl->assign('todos', $data);
+            $o_tpl->display('todo_sample.tpl');
+            break;
         case 'getone':
             $data = $todo->getUndoneList($user_id, '', 1);
             if (count($data) == 0) {
@@ -51,7 +60,6 @@ try {
             $o_tpl->display('todo_sample.tpl');
             break;
         default:
-
             if ((time() - $last_reload_time) > 4*3600) {
                 $todo->genVisaTask($user_id);
                 $todo->genMainVisaExpire($user_id);

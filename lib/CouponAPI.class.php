@@ -99,10 +99,11 @@ class CouponAPI extends MysqlDB{
         $rtn = array();
         $sql = "select a.id, a.amount from coupon_clients a, coupon_confs b where a.CouponID = b.ID and a.id = {$couponid} AND FIND_IN_SET('{$service}', b.SCOPE) AND a.StartDate <= '{$date}' AND a.EndDate >= '{$date}' and a.status = 'NEW' and b.Status = 'Active' limit 1";
         $this->query($sql);
+        
         while($this->fetch()) {
             $rtn[$this->id] = $this->amount;
         }
-
+        
         foreach ($rtn as $id => $v) {
             $sql = "update coupon_clients SET status = 'Redeemed' where id = {$id}";
             $this->query($sql);

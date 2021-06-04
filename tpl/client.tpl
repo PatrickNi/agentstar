@@ -11,7 +11,7 @@
 <script language="javascript" src="../js/audit.js"></script>
 
 <body>
-<form name="form1" target="_self" method="get" onkeydown="{literal}if(event.keyCode==13){return false;}{/literal}">
+<form name="form1" target="_self" method="get" onkeydown="{literal}if(event.keyCode==13){form1.submit();}{/literal}">
   <table align="center" width="100%"  class="graybordertable" cellpadding="0" cellspacing="0">
     <tr >
       <td colspan="9" align="center"  class="bordered_2"><table width="100%" cellpadding="1" cellspacing="1">
@@ -20,7 +20,7 @@
               &nbsp;
               <!--<input type="submit" value="Delete" name="qSubmit" style="font-weight:bold;">	-->
               {if $ugs.export.v eq 1}
-              <input type="submit" value="Export Client Emails" name="bt_export" style="font-weight:bold;">
+              <input type="button" value="Export Client Emails" name="bt_export" style="font-weight:bold;" onClick="javascrtipt:this.form.submit();">
               {/if} </td>
             <td width="69%" colspan="4" align="right">
               {if $ugs.b_fromto.v eq 1}
@@ -33,11 +33,13 @@
                {/if}              
               &nbsp;&nbsp;
               <select name="srchType">
+                <option value="e" {if $srchtype eq 'e'} selected {/if}>Full Name</option>
                 <option value="l" {if $srchtype eq 'l'} selected {/if}>Last Name</option>
                 <option value="f" {if $srchtype eq 'f'} selected {/if}>First Name</option>
-                <option value="e" {if $srchtype eq 'e'} selected {/if}>English Name</option>
+                <option value="en" {if $srchtype eq 'en'} selected {/if}>English Name</option>
                 <option value="t" {if $srchtype eq 't'} selected {/if}>Client Type</option>
                 <option value="m" {if $srchtype eq 'm'} selected {/if}>Email</option>
+                <option value="mobile" {if $srchtype eq 'mobile'} selected {/if}>Mobile</option>
                 <option value="c" {if $srchtype eq 'c'} selected {/if}>Client Code</option>
                 <option value="dob" {if $srchtype eq 'dob'} selected {/if}>Dob</option>
               </select>
@@ -47,7 +49,7 @@
               <input type='checkbox' name="is_geic" value="new" {if $is_geic eq "new"} checked {/if}>From GEIC
               
               &nbsp;&nbsp;
-              <input type="submit" value="Search" name="bt_name" style="font-weight:bold;" ></td>
+              <input type="submit" value="Search" name="bt_name" style="font-weight:bold;" tabindex="-1"></td>
           </tr>
         </table></td>
     </tr>

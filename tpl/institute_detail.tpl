@@ -12,24 +12,25 @@
 <table align="center" width="100%"  class="graybordertable" cellpadding="1" cellspacing="1">
 	<tr align="left"  class="bordered_2">
 		<td colspan="2">
-			<input style="font-weight:bold;" type="button" value="Institute Detail" onClick="javascript:this.form.action='institute_detail.php';this.form.submit();">&nbsp;&nbsp;
+			<input style="font-weight:bold;" type="button" value="Institute Detail" onClick="javascript:window.location.href='/scripts/institute_detail.php?sid={$sid}';">&nbsp;&nbsp;
 			{if $ugs.i_course.v eq 1}
-			<input style="font-weight:bold;" type="button" value="Course" onClick="javascript:this.form.action='institute_course.php';this.form.submit();">&nbsp;&nbsp;
+			<input style="font-weight:bold;" type="button" value="Course" onClick="javascript:window.location.href='/scripts/institute_course.php?sid={$sid}';">&nbsp;&nbsp;
 			{/if}
-			<input style="font-weight:bold;" type="button" value="Sales Point" onClick="javascript:this.form.action='sales.php';this.form.submit();">&nbsp;&nbsp;
-			<input style="font-weight:bold;" type="button" value="Staff" onClick="javascript:this.form.action='institute_staff.php';this.form.submit();">&nbsp;&nbsp;
+			<input style="font-weight:bold;" type="button" value="Sales Point" onClick="javascript:window.location.href='/scripts/sales.php?sid={$sid}';">&nbsp;&nbsp;
+			<input style="font-weight:bold;" type="button" value="Staff" onClick="javascript:window.location.href='/scripts/institute_staff.php?sid={$sid}';">&nbsp;&nbsp;
 			{if $ugs.i_proc.v eq 1}
-			<input style="font-weight:bold;" type="button" value="Progress" onClick="javascript:this.form.action='institute_process.php';this.form.submit();">&nbsp;&nbsp;
+			<input style="font-weight:bold;" type="button" value="Progress" onClick="javascript:window.location.href='/scripts/institute_process.php?sid={$sid}';">&nbsp;&nbsp;
 			{/if}
 			{if $ugs.i_comm.v eq 1}
-			<input style="font-weight:bold;" type="button" value="Commission" onClick="javascript:this.form.action='institute_comm.php';this.form.submit();">&nbsp;&nbsp;
+			<input style="font-weight:bold;" type="button" value="Commission" onClick="javascript:window.location.href='/scripts/institute_comm.php?sid={$sid}';">&nbsp;&nbsp;
 			{/if}
 			{if $ugs.i_st.v eq 1}
-			<input style="font-weight:bold;" type="button" value="Student" onClick="javascript:this.form.action='institute_student.php';this.form.submit();">&nbsp;&nbsp;
+			<input style="font-weight:bold;" type="button" value="Student" onClick="javascript:window.location.href='/scripts/institute_student.php?sid={$sid}';">&nbsp;&nbsp;
 			{/if}
 			{if $ugs.i_proc.v eq 1}
 			<input type="button" value="Attachment" style="font-weight:bold" onClick="window.open('attachment.php?item={$sid}&type={$itemtype}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*3/7 +',width='+screen.width*2/7);">
 			{/if}
+			<input style="font-weight:bold;" type="button" value="Bank" onClick="javascript:window.location.href='/scripts/institute_bank.php?sid={$sid}';">&nbsp;&nbsp;
 		</td>
 	</tr>
 	<tr><td colspan="2"><table cellpadding="0" cellspacing="0" width="100%">

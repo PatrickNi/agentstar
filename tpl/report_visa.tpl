@@ -75,10 +75,10 @@
 		<td>{$catname}</td>
 		<td>{$subname}</td>
 		<td>{if $review[$catid][$subid].open gt 0}
-				<span  style="cursor:pointer; text-decoration:underline" onClick="openModel('report_visa_opencase.php?fd={$fromDay}&td={$toDay}&catid={$catid}&subid={$subid}&sf={$sf}&op=1',screen.width*4/5,screen.height*4/5,'NO', 'form1')">{$review[$catid][$subid].open}</span>
+				<span  style="cursor:pointer; text-decoration:underline" onClick="window.open('/scripts/report_visa_opencase.php?fd={$fromDay}&td={$toDay}&catid={$catid}&subid={$subid}&sf={$sf}&op=1','_blank', 'alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$review[$catid][$subid].open}</span>
 			{else}&nbsp;{/if}</td>
 		<td>{if $review[$catid][$subid].close gt 0}
-				<span  style="cursor:pointer; text-decoration:underline" onClick="openModel('report_visa_opencase.php?fd={$fromDay}&td={$toDay}&catid={$catid}&subid={$subid}&sf={$sf}&op=0',screen.width*4/5,screen.height*4/5,'NO', 'form1')">{$review[$catid][$subid].close}</span>
+				<span  style="cursor:pointer; text-decoration:underline" onClick="window.open('/scripts/report_visa_opencase.php?fd={$fromDay}&td={$toDay}&catid={$catid}&subid={$subid}&sf={$sf}&op=0','_blank', 'alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$review[$catid][$subid].close}</span>
 		    {else}&nbsp;{/if}</td>
 		{if $ugs.i_rev.v eq 1}<td>{if $review[$catid][$subid].amount-$review[$catid][$subid].paid gt 0}{$review[$catid][$subid].amount-$review[$catid][$subid].paid|string_format:"%.2f"}{else}&nbsp;{/if}</td>{/if}
 	</tr>

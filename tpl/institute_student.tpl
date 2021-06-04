@@ -34,13 +34,14 @@
 		<td align="left" style="font-size:16px " colspan="11"> <span class="highyellow">Insititute: {$iname}</span></td>
 	</tr>			
 	<tr align="left" class="greybg">
-		<td colspan="12" class="title">{$page_url}&nbsp;&nbsp;&nbsp;&nbsp;Student: {$totals.total}&nbsp;&nbsp;&nbsp;&nbsp;Offer: {$totals.offer}&nbsp;&nbsp;&nbsp;&nbsp;Coe: {$totals.coe}</td>
+		<td colspan="13" class="title">{$page_url}&nbsp;&nbsp;&nbsp;&nbsp;Student: {$totals.total}&nbsp;&nbsp;&nbsp;&nbsp;Offer: {$totals.offer}&nbsp;&nbsp;&nbsp;&nbsp;Coe: {$totals.coe}</td>
 	</tr>
 	<tr align="center" class="title" style="font-weight:bold ">
 		<td width="10%" nowrap="nowrap">First semester start date</td>
 		<td colspan="2">Students</td>
 		<td width="8%">Offer</td>
 		<td width="8%">Coe</td>
+		<td width="8%">Confirmation<br/>no commission</td>
 		<td width="12%">Course</td>
 		<td width="12%">Major</td>
 		<td width="9%">Course Consultant</td>
@@ -53,6 +54,7 @@
 		<td colspan="2" style="cursor:pointer;text-decoration:underline"onClick="window.open('client_course_detail.php?cid={$arr.cid}&courseid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7);">{$arr.lname} {$arr.fname}</td>
 		<td>{if $arr.offer gt 0}yes{else}no{/if}</td>
 		<td>{if $arr.coe gt 0}yes{else}no{/if}</td>
+		<td>{if $arr.cnoc gt 0}yes{else}no{/if}</td>
 		<td>{$courses[$arr.course]}</td>
 		<td>{$majors[$arr.course][$arr.major]}</td>
 		<td>{$users[$arr.cuser]}</td>

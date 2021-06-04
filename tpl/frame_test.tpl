@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Agent Star -Immigration System</title>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
 <link href="../css/sam.css" rel="stylesheet" type="text/css" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -108,9 +108,9 @@
         });
     }
 
-    function remind_task(){
+    function remind_task(action='getone'){
         $.ajax({ 
-                url: '/scripts/todo_v2.php?act=getone',
+                url: '/scripts/todo_v2.php?act='+action,
                 method: 'GET',
                 success: function(rtn) {
                             if (rtn != "") {
@@ -146,8 +146,9 @@
                          }
         });
   }
-  setTimeout("remind_task()", 300000);
-  setTimeout("sync_task()", 150000);
+  setInterval("remind_task('getappointment')", 180000);
+  setInterval("remind_task()", 300000);
+  setInterval("sync_task()", 150000);
 </script>
 {/literal}
 {/if}

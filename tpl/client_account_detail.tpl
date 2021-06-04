@@ -57,7 +57,7 @@
 				<tr>
 					<td width="25%" align="left" class="rowodd"><strong>Due Amount:</strong>&nbsp;&nbsp;</td>
 					<td align="left" width="75%" class="roweven">
-						<input type="text" name="t_dueamt" value="{$dt_arr.dueamt}" size="30" onChange="audit_money(this)">
+						<input type="text" name="t_dueamt" value="{$dt_arr.dueamt}" size="30">
 					</td>
 				</tr>
 				<!--

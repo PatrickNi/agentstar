@@ -142,6 +142,7 @@
 	                                    
               </select>
             </td>
+            </tr>
            <tr>
             <td width="28%" align="left"class="rowodd"><strong>Course Completed:</strong>&nbsp;&nbsp;</td>
             <td align="left" width="72%" class="roweven">
@@ -230,6 +231,10 @@
           </tr>
           <tr>
             <td colspan="2"><hr></td>
+          </tr>
+          <tr>
+            <td width="28%" align="left" class="rowodd"><strong style="color:red">StudentID :</strong>&nbsp;&nbsp;</td>
+            <td align="left" width="72%" class="roweven"><input type="text" name="t_studentid" value="{$dt_arr.studentid}" size="30"></td>
           </tr>
           <tr>
             <td width="28%" align="left" class="rowodd"><strong>Apply Fee :</strong>&nbsp;&nbsp;</td>

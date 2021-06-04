@@ -1,10 +1,14 @@
 <?php
+/*
+	#Update on 2021/04/11
+	alter table sys_user add column Department varchar(128) NOT NULL DEFAULT '', add column DepartmentRank int(11) NOT NULL DEFAULT 0;
+ */
 require_once('../etc/const.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
 
 $position_arr['PE'] = 'Edu Partner';
 $position_arr['PC'] = 'Coach Partner';
-
+$department_arr = array('7-Other', '0-Law', '1-Immi', '2-Study', '3-Marketing', '4-Finance', '5-Coach', '6-Accounts');
 
 $_userid = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
 
@@ -28,16 +32,18 @@ $user_add    = isset($_POST['u_add'])? trim($_POST['u_add']) : "";
 $user_adv    = isset($_POST['u_adv'])? trim($_POST['u_adv']) : 0;
 $user_startdate  = isset($_POST['u_startdate'])? trim($_POST['u_startdate']) : "";
 $user_leavedate  = isset($_POST['u_leavedate'])? trim($_POST['u_leavedate']) : "0000-00-00";
+$user_department  = isset($_POST['u_department'])? trim($_POST['u_department']) : "";
+$user_department_rank = isset($_POST['u_department_rank'])? trim($_POST['u_department_rank']) : 0;
 
 if(isset($_POST['qflag']) && strtoupper($_POST['qflag']) == "NEW"){	
-	$o_f->addUser($user_name, $user_pswd, $user_email, $user_mobile, $user_phone, $user_add, $user_pos, $user_mark, $user_adv, $user_startdate,$user_leavedate);
+	$o_f->addUser($user_name, $user_pswd, $user_email, $user_mobile, $user_phone, $user_add, $user_pos, $user_mark, $user_adv, $user_startdate,$user_leavedate, $user_department, $user_department_rank);
 	echo "<script language='javascript'>self.location.href='sys_user.php';</script>";
 	exit;
 }
 
 
 if($user_id > 0 && isset($_POST['qflag']) && strtoupper($_POST['qflag']) == "EDIT"){
-	$o_f->setUser($user_id, $user_name, $user_pswd, $user_email, $user_mobile, $user_phone, $user_add, $user_pos, $user_mark, $user_adv, $user_startdate, $user_leavedate);
+	$o_f->setUser($user_id, $user_name, $user_pswd, $user_email, $user_mobile, $user_phone, $user_add, $user_pos, $user_mark, $user_adv, $user_startdate, $user_leavedate, $user_department, $user_department_rank);
 	echo "<script language='javascript'>self.location.href='sys_user.php';</script>";
 	exit;
 }
@@ -59,6 +65,8 @@ if($user_id > 0){
 		$u_adv       = $user_arr[$user_id]['adv'];
 		$user_startdate = $user_arr[$user_id]['startdate'];
 		$user_leavedate = $user_arr[$user_id]['leavedate'];
+		$user_department = $user_arr[$user_id]['department'];
+		$user_department_rank = $user_arr[$user_id]['department_rank'];
 	}
 	$_tag = "Edit";
 }else{
@@ -108,6 +116,14 @@ if($user_id > 0){
 				}
 			?>
 			</select>
+
+			&nbsp;&nbsp;
+			<?php 
+				if ($user_pos == 'PE' || $user_pos == 'PC') {
+					echo '<a href="/scripts/sys_user_manage.php?leader_id='.$user_id.'" target="_self">Team Leader Management</a>';
+				}
+        	
+			?>
 	</tr>
 	<tr>
 		<td align="left"><strong>Mark: </strong>&nbsp;&nbsp;</td>
@@ -150,8 +166,27 @@ if($user_id > 0){
         	&nbsp;&nbsp;
         	<a href="/scripts/sys_user_merge.php?uid=<?php echo $user_id;?>" target="_self">Course Consultant Merge</a>
         </td>
-
-    </tr>							
+    </tr>	
+	<tr>
+		<td align="left"><strong>Department: </strong>&nbsp;&nbsp;</td>
+		<td align="left" width="86%">
+			<select name="u_department">
+			<?php
+				foreach($department_arr as $v){
+					if ($v == $user_department){
+						echo "<option value={$v} selected>{$v}</option>";
+					}
+					else{
+						echo "<option value={$v}>{$v}</option>";
+					}
+				}
+			?>
+			</select>
+	</tr>	
+	<tr>
+		<td align="left"><strong>#Rank in Department: </strong>&nbsp;&nbsp;</td>
+		<td align="left" width="86%"><input type="text" size="30" name="u_department_rank" value="<?php echo $user_department_rank;?>"></td>
+	</tr>					
 	<tr>
 		<td class="title" colspan="2" align="center">			
 			<input type="submit" style="font-weight:bold;" value="<?php echo $_tag;?>">&nbsp;&nbsp;
