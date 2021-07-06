@@ -129,6 +129,14 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
             if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C'){
                 $coaches = $o_r->getNumOfCoach($from_day, $to_day, $staff_id);
                 $coaches_fee = $o_r->getNumOfCoachFee($from_day, $to_day, $staff_id);
+
+                foreach ($coaches_fee as $week => $v) {
+                    foreach ($v as $itemid=> $vv) {
+                        if (!isset($coaches[$week]) || !isset($coaches[$week][$itemid])) {
+                            $coaches[$week][$itemid] = array('title'=>$vv['title'], 'list'=>array(), 'extrahour'=>array(), 'lessons'=>array(), 'hour'=>0, 'client'=>0);
+                        }
+                    }
+                }
             }
         }
     }
@@ -188,7 +196,14 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
             if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C') {
                 $coaches = $o_r->getAllOfCoach($from_day, $to_day, $staff_id);
                 $coaches_fee = $o_r->getAllOfCoachFee($from_day, $to_day, $staff_id);
-            
+
+                foreach ($coaches_fee as $week => $v) {
+                    foreach ($v as $itemid=> $vv) {
+                        if (!isset($coaches[$week]) || !isset($coaches[$week][$itemid])) {
+                            $coaches[$week][$itemid] = array('title'=>$vv['title'], 'list'=>array(), 'extrahour'=>array(), 'lessons'=>array(), 'hour'=>0, 'client'=>0);
+                        }
+                    }
+                }
             }
         }
     }

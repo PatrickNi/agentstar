@@ -444,6 +444,7 @@
   {assign var="total_student" value="0"}
   {assign var="total_extrahour" value="0"}
   {assign var="total_lesson" value="0"}
+  {assign var="total_lesson_hour" value="0"}
   {foreach key=titleid item=coach from=$coaches[$week]}
   <tr align="right" class="roweven" >
     <td align="center">{$coach.title}</td>
@@ -481,7 +482,9 @@
     <td>
       {assign var="tmp_lesson" value=$coach.lessons|@count}
       {assign var="total_lesson" value=$total_lesson+$tmp_lesson}
-      {$coach.lessons|@count}
+      {assign var="tmp_lesson_hour" value=$coach.lessons|@array_sum}
+      {assign var="total_lesson_hour" value=$total_lesson_hour+$tmp_lesson_hour}
+      {$coach.lessons|@count}({$coach.lessons|@array_sum} h)
     </td>
     <td>
       {if $user_pos == 'PC' || $user_pos == 'C'}
@@ -503,7 +506,7 @@
       <td><strong>Total:</strong></td>
       <td><strong>{$total_hour}</strong><br/><hr/>Extra hour: {$total_extrahour}</td>
       <td><strong>{$total_student}</strong></td>
-      <td><strong>{$total_lesson}</strong></td>
+      <td><strong>{$total_lesson}({$total_lesson_hour} h)</strong></td>
       <td><strong>{$total_paid|string_format:"%.2f"}</strong></td>
       <td><strong>{$total_sale|string_format:"%.2f"}</strong></td>
     </tr>

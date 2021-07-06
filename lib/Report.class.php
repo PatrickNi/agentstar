@@ -2537,7 +2537,7 @@ class ReportAPI extends MysqlDB {
             //$_arr['all'][$this->itemid]['paid'] = 0;
             if ($this->Status == 'Completed') {
                 $_arr['all'][$this->itemid]['hour']  += round($this->DueHour/60, 2);
-                $_arr['all'][$this->itemid]['lessons'][md5($this->StartDate.'|'.$this->StartTime)] = 1;
+                $_arr['all'][$this->itemid]['lessons'][md5($this->StartDate.'|'.$this->StartTime)] = round($this->DueHour/60, 2);
                 if ($this->WeekName == 'Sat' || $this->WeekName == 'Sun' || $this->StartTime < '09:00' || $this->StartTime > '17:30') {
                     $_arr['all'][$this->itemid]['extrahour']  += round($this->DueHour/60, 2);
                 }
@@ -2558,40 +2558,31 @@ class ReportAPI extends MysqlDB {
     }
 
     function getAllOfCoachFee($fromDay, $toDay, $userid) {
-        $sql = "select itemid, cc.id as COACHID from client_coach cc, coach_item ci, client_info c, client_coach_lessons as ccl where cc.itemid = ci.id and c.CID = cc.CID and cc.id = ccl.coachid and  ccl.StartDate between '{$fromDay}' AND '{$toDay}' ";
-
-        if ($userid > 0) {
-            $sql .= " AND cc.saleid = {$userid} ";
-        }
-
-        $sql .= "Order by ci.title asc, cc.CID asc, ccl.StartDate asc ";  
-        $this->query($sql);
-        $_arr = array();
         $coaches = array();
-        while ($this->fetch()) {    
-            $_arr['all'][$this->itemid]['sale'] = 0;
-            $_arr['all'][$this->itemid]['paid'] = 0;
-            $coaches[$this->COACHID] = $this->itemid;
+        $sql = "select a.VisaID, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a,  client_payment b where a.ID = b.AccountID and PaidDate >= '{$fromDay}' and PaidDate <= '{$toDay}' AND ACC_TYPE = 'coach' and exists (select 'x' from client_coach c where a.VisaID = c.id ".($userid > 0 && $userid <> 'all'? "and c.saleid = {$userid}" : "" ).") group by a.VisaID";
+        $this->query($sql);
+        while ($this->fetch()) {
+            $coaches[$this->VisaID]['paid'] = $this->paid;
         }
 
-        //calc payment
+        $_arr = array();
         if (count($coaches) > 0) {
-            foreach (array_chunk(array_keys($coaches),500,true) as $coach_ids) {
-                $sql = "select VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD from client_account a Where VisaID IN (".implode(',', $coach_ids).") AND ACC_TYPE = 'coach'";
-                $this->query($sql);   
-                while ($this->fetch()){
-                    //paperwork profit
-                    $_arr['all'][$coaches[$this->VisaID]]['sale'] += ($this->GST == 1? $this->DueAmount/1.1 : $this->DueAmount) - ($this->GST_3RD == 1? $this->AMOUNT_3RD/1.1 : $this->AMOUNT_3RD);
-                }
-    
-                $sql = "select a.VisaID, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a,  client_payment b where a.ID = b.AccountID and VisaID IN (".implode(',',$coach_ids).") AND ACC_TYPE = 'coach' group by a.VisaID";
-                $this->query($sql);
-                while ($this->fetch()) {
-                    $_arr['all'][$coaches[$this->VisaID]]['paid'] += $this->paid;
-                }
+            $sql = "select VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD from client_account a Where VisaID IN (".implode(',', array_keys($coaches)).") AND ACC_TYPE = 'coach'";
+            $this->query($sql);   
+            while ($this->fetch()){
+                //paperwork profit
+                $coaches[$this->VisaID]['sale'] = ($this->GST == 1? $this->DueAmount/1.1 : $this->DueAmount) - ($this->GST_3RD == 1? $this->AMOUNT_3RD/1.1 : $this->AMOUNT_3RD);
+            }
+
+            $sql = "select itemid, cc.id as COACHID, ci.title from client_coach cc, coach_item ci where cc.itemid = ci.id and cc.id in (".implode(',', array_keys($coaches)).")";  
+            $this->query($sql);
+            while ($this->fetch()) {    
+                @$_arr['all'][$this->itemid]['sale'] += $coaches[$this->COACHID]['sale'];
+                @$_arr['all'][$this->itemid]['paid'] += $coaches[$this->COACHID]['paid'];
+                $_arr['all'][$this->itemid]['title'] = $this->title;
             }
         }
-        return $_arr;        
+        return $_arr;  
     }
 
 
@@ -2620,7 +2611,7 @@ class ReportAPI extends MysqlDB {
         
             if ($this->Status == 'Completed') {
                 $_arr[$this->Week][$this->itemid]['hour']  += round($this->DueHour/60, 2);
-                $_arr[$this->Week][$this->itemid]['lessons'][md5($this->StartDate.'|'.$this->StartTime)] = 1;
+                $_arr[$this->Week][$this->itemid]['lessons'][md5($this->StartDate.'|'.$this->StartTime)] = round($this->DueHour/60, 2);
                 
                 if ($this->WeekName == 'Sat' || $this->WeekName == 'Sun' || $this->StartTime < '09:00' || $this->StartTime > '17:30') {
                     $_arr[$this->Week][$this->itemid]['extrahour']  += round($this->DueHour/60, 2);
@@ -2640,6 +2631,35 @@ class ReportAPI extends MysqlDB {
     }
 
     function getNumOfCoachFee($fromDay, $toDay, $userid){
+
+        $coaches = array();
+        $sql = "select date_format(b.PaidDate, '%Y%u') as Week, a.VisaID, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a,  client_payment b where a.ID = b.AccountID and PaidDate >= '{$fromDay}' and PaidDate <= '{$toDay}' AND ACC_TYPE = 'coach' and exists (select 'x' from client_coach c where a.VisaID = c.id ".($userid > 0 && $userid <> 'all'? "and c.saleid = {$userid}" : "" ).") group by a.VisaID";
+        $this->query($sql);
+        while ($this->fetch()) {
+            $coaches[$this->VisaID]['paid'] = $this->paid;
+            $coaches[$this->VisaID]['week'] = $this->Week;
+        }
+
+        $_arr = array();
+        if (count($coaches) > 0) {
+            $sql = "select VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD from client_account a Where VisaID IN (".implode(',', array_keys($coaches)).") AND ACC_TYPE = 'coach'";
+            $this->query($sql);   
+            while ($this->fetch()){
+                //paperwork profit
+                $coaches[$this->VisaID]['sale'] = ($this->GST == 1? $this->DueAmount/1.1 : $this->DueAmount) - ($this->GST_3RD == 1? $this->AMOUNT_3RD/1.1 : $this->AMOUNT_3RD);
+            }
+
+            $sql = "select itemid, cc.id as COACHID, ci.title from client_coach cc, coach_item ci where cc.itemid = ci.id and cc.id in (".implode(',', array_keys($coaches)).")";  
+            $this->query($sql);
+            while ($this->fetch()) {    
+                @$_arr[$coaches[$this->COACHID]['week']][$this->itemid]['sale'] = $coaches[$this->COACHID]['sale'];
+                @$_arr[$coaches[$this->COACHID]['week']][$this->itemid]['paid'] = $coaches[$this->COACHID]['paid'];
+                @$_arr[$coaches[$this->COACHID]['week']][$this->itemid]['title'] = $this->title;
+            }
+        }
+        return $_arr;  
+
+        /*
         $sql = "select date_format(ccl.StartDate, '%Y%u') as Week, itemid, cc.id as COACHID from client_coach cc, coach_item ci, client_info c , client_coach_lessons as ccl where cc.itemid = ci.id and c.CID = cc.CID and cc.id = ccl.coachid and ccl.StartDate between '{$fromDay}' AND '{$toDay}' ";
 
         if ($userid > 0) {
@@ -2672,7 +2692,8 @@ class ReportAPI extends MysqlDB {
                 }
             }
         }
-        return $_arr;        
+        return $_arr;   
+        */     
     }
 
 	function getVisaReviewByUser($fromDay, $toDay, $userid){

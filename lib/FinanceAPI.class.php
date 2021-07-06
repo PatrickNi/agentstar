@@ -67,7 +67,8 @@ class FinanceAPI extends MysqlDB{
 
     public function addTransferNotes($sem_id, $course_id) {
         
-        $transfer_start_date = $transfer_end_date = date("Y-m-d");
+        $transfer_start_date = '2021-01-01'; 
+        $transfer_end_date = date("Y-m-d");
         $sql = "SELECT TransferDate FROM internal_transfer_note where SemesterID = {$sem_id} order by TransferDate desc limit 1";
         $this->query($sql);
         if ($this->fetch()) {
@@ -82,13 +83,7 @@ class FinanceAPI extends MysqlDB{
         }
 
         if (count($fees) == 0)
-            return false;
-
-        $cr = $this->getCommRate($course_id, $transfer_start_date);
-        $comm = @$fees['tuition'] * $cr;
-        $comm_w_gst =  $comm * 1.1;
-        $bonus = 0;
-        $comm2biz = $comm_w_gst + $bonus + @$fees['discount'];
+            return array('succ'=>false,'msg'=>'Do not have any Fees!');
 
         $bank = array('name'=>'','no'=>'', 'bsb'=>'');
         $sql = "select AccountName, AccountNo, BSB from institute_bank b where exists (select 'x' from client_course c where b.instid = c.iid and c.id = {$course_id})";
@@ -98,10 +93,20 @@ class FinanceAPI extends MysqlDB{
             $bank['no'] = $this->AccountNo;
             $bank['bsb'] = $this->BSB;
         }
+        else {
+            return array('succ'=>false,'msg'=>'Empty Instiute Back Info!');
+        }
+
+        $cr = $this->getCommRate($course_id, $transfer_start_date);
+        $comm = @$fees['tuition'] * $cr;
+        $comm_w_gst =  $comm * 1.1;
+        $bonus = 0;
+        $comm2biz = $comm_w_gst + $bonus + @$fees['discount'];
+
 
         $sql = "insert into internal_transfer_note (SemesterID, TransferDate, CommRate, CommAmount, CommAmountGst, Comm2Biz, BonusAmount, FeeDetail, BankDetail, AddTime) values ('{$sem_id}', '{$transfer_end_date}', '{$cr}', '{$comm}', '{$comm_w_gst}', '{$comm2biz}', '{$bonus}', '".addslashes(json_encode($fees))."', '".addslashes(json_encode($bank))."', NOW())";
         //echo $sql;exit;
-        return $this->query($sql);
+        return array('succ'=>$this->query($sql), 'msg'=>'');
     }
 
     public function updateTransferNotes($id, $cr=0, $comm_w_gst=0,$comm2biz=0, $reciption='',$bonus=0) {

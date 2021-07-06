@@ -130,7 +130,7 @@ class GeicAPI extends MysqlDB {
 		//echo $sql."\n";
 		$_arr = array();
 		$departed = array();
-		$departed['###Departed###'] = '-----------Darparted----------';
+		$departed['###Departed###'] = '---Darparted---';
 		$department = '';
 		while($this->fetch()){
 			if ($userid > 0) {
@@ -141,7 +141,7 @@ class GeicAPI extends MysqlDB {
 			}
 			else {
 				if ($department == '' || $department != $this->Department) {
-					$_arr['###'.$this->Department.'###'] =  '-----------'.$this->Department.'----------';
+					$_arr['###'.$this->Department.'###'] =  '---'.$this->Department.'---';
 				}
 				
 				$_arr[$this->ID] =  ucwords($this->UserName);

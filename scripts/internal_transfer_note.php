@@ -57,11 +57,12 @@ if (isset($_POST['bt_name']) && stripos($_POST['bt_name'], "SAVE") !== false){
     exit; 
 }
 elseif (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "ADDNEW"){
-    if ($o_f->addTransferNotes($sem_id, $course_id)) {
+    $rtn = $o_f->addTransferNotes($sem_id, $course_id);
+    if ($rtn['succ']) {
         echo "<script language='javascript'>alert('Generate success!');if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
     }
     else {
-        echo "<script language='javascript'>alert('Do not have any Fees!');if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
+        echo "<script language='javascript'>alert('".($rtn['msg']? $rtn['msg'] : 'Generate Failed!!!')."');if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
     }
     exit;   
 }

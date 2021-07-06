@@ -39,7 +39,7 @@ class CoachAPI extends MysqlDB{
     function getItems($parentid=0) {
         $sql = "select ID, Title, Fee, ParentID from coach_item";
         if ($parentid) {
-            $sql .= "where parentid = {$id} ";
+            $sql .= "where parentid = {$parentid} ";
         }
         $this->query($sql);
         $arr = array();
@@ -256,7 +256,8 @@ class CoachAPI extends MysqlDB{
         if (!$lessonid || !$sets)
             return false;
         
-        $sql = "Update client_coach_lessons SET Fee = '{$sets['fee']}', Status = '{$sets['status']}', StartDate = '{$sets['startdate']}', EndDate = '{$sets['startdate']}', isAdjust = '{$sets['adjust']}', StaffID = '{$sets['staff']}' , StartTime = '{$sets['starttime']}' where id = {$lessonid}";
+        $week = date('D', strtotime($sets['startdate']));
+        $sql = "Update client_coach_lessons SET Fee = '{$sets['fee']}', Status = '{$sets['status']}', StartDate = '{$sets['startdate']}', EndDate = '{$sets['startdate']}', isAdjust = '{$sets['adjust']}', StaffID = '{$sets['staff']}' , StartTime = '{$sets['starttime']}', WeekName = '{$week}' where id = {$lessonid}";
         return $this->query($sql);
     }
 
