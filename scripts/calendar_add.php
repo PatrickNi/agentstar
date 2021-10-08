@@ -84,7 +84,7 @@ $user_arr = $o_u->getUserNameArr();
 
 # build duration time
 $due_arr = array();
-$due_arr = array('60' => "1hr", '30' => "0.5hr" , '90' => "1.5hrs", '120' => "2hrs", '150' => "2.5hrs", '180' => "3hrs", '210' => "3.5hrs", '240' => "4hrs", '480' => "1day");
+$due_arr = array('30' => "0.5hr" , '60' => "1hr", '90' => "1.5hrs", '120' => "2hrs", '150' => "2.5hrs", '180' => "3hrs", '210' => "3.5hrs", '240' => "4hrs", '480' => "1day");
 
 # get hour array
 $hour_arr = array();

@@ -9,7 +9,7 @@
 
 <script language="javascript" src="../js/audit.js"></script>
 <body {$forbid_sl} {$forbid_cp} {$forbid_rc}>
-<form name="form1" action="" target="_self" method="get">
+<form name="form1" action="" target="_self" method="get" onSubmit="return isDelete()">
   <input type="hidden" name="cid" value="{$cid}">
   <input type="hidden" name="visaChange" value="0">
   <table align="center" width="100%"  class="graybordertable" cellspacing="1" cellpadding="1" border="0">

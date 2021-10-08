@@ -139,13 +139,16 @@
             <td align="left" width="64%" class="roweven"> 
                 <strong><em>{$dt_arr.deliverhour/60|string_format:"%.1f"}</em></strong>
             </td> 
-          </tr>        
+          </tr>     
           <tr> 
-            <td width="36%" align="left" class="rowodd"><strong style="color:red">Save with lesson rebuild</strong>&nbsp;&nbsp;</td> 
+            <td width="36%" align="left" class="rowodd"><strong style="color:red">Save addition</strong>&nbsp;&nbsp;</td> 
             <td align="left" width="64%" class="roweven"> 
-                <input type="checkbox" value="1" name="save_w_lesson"/>
+                <input type="radio" value="0" name="save_w_method"/> base info &nbsp;&nbsp;
+                <input type="radio" value="2" name="save_w_method"/> update fee in lesson&nbsp;&nbsp;
+                <input type="radio" value="1" name="save_w_method"/> rebuild lesson&nbsp;&nbsp;
             </td> 
-          </tr>        
+          </tr>    
+          </tr>         
           <tr><td colspan="2"><hr/></td></tr>
 
           <tr>

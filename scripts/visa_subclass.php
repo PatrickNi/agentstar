@@ -30,6 +30,12 @@ switch (strtoupper($action)){
 	case __ACT_EDIT:
 		$isNone = "block";
 		break;		
+	case 'INACTIVE':
+		$o_v->setVisaSubclassStatus($cat_id, $sub_id, 'Inactive');
+		break;
+	case 'ACTIVE':
+		$o_v->setVisaSubclassStatus($cat_id, $sub_id, 'Active');
+		break;
 	default:
 		break;					
 }
@@ -50,10 +56,10 @@ if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
 
 
 # get action
-$action_arr = array(__ACT_EDIT => "Edit",  __ACT_RElATION => "Steps", __ACT_DEL => "Delete" );//__ACT_DEL => "Delete",
+$action_arr = array(__ACT_EDIT => "Edit",  __ACT_RElATION => "Steps", 'Inactive'=>'Abolised', 'Active'=>'Renew');//__ACT_DEL => "Delete",
 
 # format array
-$sub_arr = $o_v->getVisaClassArr($cat_id);
+$sub_arr = $o_v->getVisaClassArr($cat_id,'',true);
 
 # get category name
 $cat_name = $o_v->getVisaName($cat_id);
@@ -66,7 +72,7 @@ $o_tpl->assign('subclass_arr', $sub_arr);
 
 
 if($sub_id > 0 && array_key_exists($sub_id, $sub_arr)){
-	$o_tpl->assign('dt_name', $sub_arr[$sub_id]);
+	$o_tpl->assign('dt_name', $sub_arr[$sub_id]['name']);
 }
 
 $o_tpl->assign('catid', $cat_id);

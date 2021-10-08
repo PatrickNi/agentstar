@@ -1,6 +1,10 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+<style>
+{literal}
+body {margin-left: 0px;margin-top: 0px;margin-right: 0px;margin-bottom: 0px;overflow: hidden;}
+{/literal}
+</style>
 <title>Agent Star -Immigration System</title>
 <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
 <link href="../css/sam.css" rel="stylesheet" type="text/css" />
@@ -35,7 +39,7 @@
   <td width="" class="navigation">&nbsp;&nbsp;<span class="white">Navigation:</span>&nbsp;&nbsp;<span class="orange">{if $gid gt 0}{$group_name} > {$func_name}{/if}</span></td>
  </tr>
 </table>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" height="100%" border="0" cellpadding="0" cellspacing="0">
  <tr>
   <td width="192" align="center" valign="top">
   	<table height="100%" border="0" cellpadding="0" cellspacing="0" summary="menu">
@@ -57,7 +61,7 @@
   </td>	
   <td width="4"></td>
   <td align="center" valign="top">  
-    <iframe  name="dataFrame"  frameborder="0" width="100%" height="600" scrolling="auto" src="{$url}"></iframe>
+    <iframe  name="dataFrame"  frameborder="0" width="100%" height="100%" src="{$url}"></iframe>
   </td>
  </tr>
  <tr><td colspan="3"><hr   class="navigation" /></td></tr>

@@ -15,6 +15,7 @@ $user_id = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
 $coach_id   = isset($_REQUEST['coachid'])? trim($_REQUEST['coachid']) : 0;
 $client_id = isset($_REQUEST['cid'])? trim($_REQUEST['cid']) : 0;
 $lesson_id = isset($_REQUEST['lessonid'])? trim($_REQUEST['lessonid']) : 0;
+$token = isset($_POST['token'])? trim($_POST['token']) : '';
 
 $sets['startdate']  = isset($_REQUEST['startdate'])? trim($_REQUEST['startdate']) : "0000-00-00";
 $sets['fee']  = isset($_REQUEST['fee'])? trim($_REQUEST['fee']) : 0;
@@ -39,7 +40,7 @@ foreach ($g_user_grants as $item){
 }
 
 $msg = "";
-if(isset($_REQUEST['bt_name']) && stripos($_REQUEST['bt_name'], "CLOSE") !== false){
+if(isset($_REQUEST['btn_name']) && stripos($_REQUEST['btn_name'], "CLOSE") !== false){
     echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
     exit;   
 }
@@ -48,7 +49,7 @@ if(isset($_REQUEST['bt_name']) && stripos($_REQUEST['bt_name'], "CLOSE") !== fal
 $coach_arr = $o_h->getCoach($client_id, $coach_id);
 $lesson_arr = $o_h->getLessons($client_id, $coach_id, $lesson_id);
 
-if (isset($_POST['bt_name']) && stripos($_POST['bt_name'], "SAVE") !== false){
+if (isset($_POST['btn_name']) && stripos($_POST['btn_name'], "SAVE") !== false){
     
     //check primary information
     try {
@@ -58,6 +59,10 @@ if (isset($_POST['bt_name']) && stripos($_POST['bt_name'], "SAVE") !== false){
 
         if ($sets['startdate'] == '0000-00-00' || $sets['startdate'] == '0000-00-00') {
             throw new Exception ("Start Date or End Date cannot be empty");
+        }
+
+        if ($token != "" && !$o_h->checkLockCode($token)) {
+            throw new Exception ("Token checked failed!!!");
         }
     }
     catch (Exception $e){
@@ -79,13 +84,13 @@ if (isset($_POST['bt_name']) && stripos($_POST['bt_name'], "SAVE") !== false){
             $sets['adjust'] = 1;
         }
 
-        $o_h->setLesson($lesson_id, $sets);
+        $o_h->setLesson($lesson_id, $sets, $token);
         echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
         exit; 
     }
 }
-elseif (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "DELETE"){
-    $o_h->delCoach($coach_id);
+elseif (isset($_REQUEST['btn_name']) && strtoupper($_REQUEST['btn_name']) == "DELETE"){
+    //$o_h->delCoach($coach_id);
     echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
     exit;   
 }

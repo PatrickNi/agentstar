@@ -2,6 +2,7 @@
 require_once('MysqlDB.class.php');
 
 class CoachAPI extends MysqlDB{
+    private $LOCK_CODE = 'cu$7*s';
 
     public $GRADE_LIST = array(1=>'Year1',2=>'Year2',3=>'Year3',4=>'Year4',5=>'Year5',6=>'Year6',7=>'Year7',8=>'Year8',9=>'Year9',10=>'Year10',11=>'Year11',12=>'Year12');
 
@@ -14,7 +15,7 @@ class CoachAPI extends MysqlDB{
             return false;
 
         $title = addslashes($title);
-        $sql = "insert into coach_item (title, parentid) values ('{$tilte}', '{$root_id}')";
+        $sql = "insert into coach_item (title, parentid) values ('{$title}', '{$root_id}')";
         $this->query($sql);
 
         return $this->getLastInsertID();
@@ -171,7 +172,7 @@ class CoachAPI extends MysqlDB{
     }
 
 
-    function updateLessons($coach_id) {
+    function buildLessons($coach_id) {
         if (!$coach_id)
             return false;
 
@@ -204,6 +205,32 @@ class CoachAPI extends MysqlDB{
         return true;
     }
     
+    function updateLessonFees($coach_id) {
+        if (!$coach_id)
+            return false;
+
+        $coach = $this->getCoach(0, $coach_id);
+        if (!$coach)
+            return false;
+
+        $coach = $coach[$coach_id];
+        
+        $sql = "SELECT count(*) as lock_lesson FROM client_coach_lessons WHERE CoachID = {$coach_id} and isLocked = 1 ";
+        $this->query($sql);
+        if ($this->fetch() && $this->lock_lesson > 0) {
+            return false;
+        }
+
+        if ($coach['fee'] == 0)
+            return false;
+            
+        $sql = "update client_coach_lessons SET Fee = '{$coach['fee']}' where CoachID = {$coach_id}";
+        $this->query($sql);
+
+        return true;
+    }
+
+
     function getLessons($cid, $coach_id=0, $lesson_id=0) {
         if (!$cid)
             return false;
@@ -232,10 +259,12 @@ class CoachAPI extends MysqlDB{
             $rtn[$this->CoachID][$this->ID]['status'] = $this->Status;
             $rtn[$this->CoachID][$this->ID]['staff'] = $this->StaffID;
             $rtn[$this->CoachID][$this->ID]['adjust'] = $this->isAdjust;
+            $rtn[$this->CoachID][$this->ID]['locked'] = $this->isLocked;
         }
         //var_dump($rtn);
         return $rtn;
     }
+
 
     function completeLesson($coach_id, $lesson_id) {
         if (!$coach_id || !$lesson_id)
@@ -252,12 +281,18 @@ class CoachAPI extends MysqlDB{
         return $this->query($sql);
     }
 
-    function setLesson($lessonid, $sets) {
-        if (!$lessonid || !$sets)
+    function setLesson($lesson_id, $sets, $lock_code="") {
+        if (!$lesson_id || !$sets)
             return false;
         
+        if ($this->isLockedLesson($lesson_id)) {
+            if (!$this->checkLockCode($lock_code))
+                return false;
+        }
+
         $week = date('D', strtotime($sets['startdate']));
-        $sql = "Update client_coach_lessons SET Fee = '{$sets['fee']}', Status = '{$sets['status']}', StartDate = '{$sets['startdate']}', EndDate = '{$sets['startdate']}', isAdjust = '{$sets['adjust']}', StaffID = '{$sets['staff']}' , StartTime = '{$sets['starttime']}', WeekName = '{$week}' where id = {$lessonid}";
+        $sql = "Update client_coach_lessons SET Fee = '{$sets['fee']}', Status = '{$sets['status']}', StartDate = '{$sets['startdate']}', EndDate = '{$sets['startdate']}', isAdjust = '{$sets['adjust']}', StaffID = '{$sets['staff']}' , StartTime = '{$sets['starttime']}', WeekName = '{$week}' where id = {$lesson_id}";
+
         return $this->query($sql);
     }
 
@@ -270,5 +305,35 @@ class CoachAPI extends MysqlDB{
         else 
             return 0;
     }
+
+    function isLockedLesson($lesson_id) {
+        if (!$lesson_id)
+            return false;
+        $sql = "select count(*) as CNT from client_coach_lessons where id = {$lesson_id} and isLocked = 1";
+        $this->query($sql);
+        if ($this->fetch()) {
+            if ($this->CNT > 0)
+                return true;
+        }
+        return false;
+    }
+
+    function checkLockCode($token) {
+        return $token == $this->LOCK_CODE; 
+    }
+
+    function lockCompletedLesson($fromDay, $toDay, $userid){
+        if (!$fromDay || !$toDay || !$userid)
+            return false;
+
+        $sql = "update client_coach cc, client_coach_lessons as ccl SET ccl.isLocked = 1 where cc.id = ccl.coachid and  ccl.StartDate between '{$fromDay}' AND '{$toDay}' AND (cc.staffid = {$userid} OR cc.saleid = {$userid}) AND ccl.Status = 'Completed' and ccl.isLocked = 0";
+        //die($sql);
+        return $this->query($sql);
+    }
+
+    function releaseCompletedLesson() {
+
+    }
+
 }
 ?>

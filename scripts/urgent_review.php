@@ -163,7 +163,7 @@ $o_tpl->assign('sdu', $sdu);
 $o_tpl->assign('atopdu', $atopdu);
 $o_tpl->assign('asubdu', $asubdu);
 if ((isset($ugs['todo_visa']) && $ugs['todo_visa']['v'] == 1 && $viewWhat == 'v') || (isset($ugs['todo_course']) && $ugs['todo_course']['v'] == 1 && ($viewWhat == 'c' || $viewWhat == 's'))){
-	$o_tpl->assign('slUsers', $o_g->getUserNameArr());
+	$o_tpl->assign('slUsers', $o_g->getUserNameArr(0,true));
 }else {
 	$o_tpl->assign('slUsers', $o_g->getUserNameArr($staff_id));
 }

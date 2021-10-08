@@ -268,7 +268,7 @@ if (count($arr) > 0 && array_key_exists($set_course['qual'], $arr[$set_course['i
 }
 $o_tpl->assign('dt_arr', $set_course);
 
-$o_tpl->assign('user_arr',$o_g->getUserNameArr());
+$o_tpl->assign('user_arr',$o_g->getUserNameArr(0, $course_id ==0?false:true));
 $o_tpl->assign('item_arr', $o_c->getProcessOfCourse());
 $o_tpl->assign('courseid', $course_id);
 $o_tpl->assign('cid', $client_id);

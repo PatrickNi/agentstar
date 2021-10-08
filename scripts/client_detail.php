@@ -151,12 +151,44 @@ if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" |
 	else {
 
 		#set or add client info
-   		if ($client_id > 0){
+   		if ($client_id > 0){	
 			if (strtoupper($_REQUEST['bt_name']) == "APPROVED") {
-				$sets['status'] = 'approved';
+				$save = false;
+				if ($sets['country'] == '0') {
+					echo "<script language='javascript'>alert('\"Country: \" can not be empty!')</script>";
+				}
+				elseif ($sets['visa']  == '0') {
+					echo "<script language='javascript'>alert('\"Current Visa Type: \" can not be empty!')</script>";
+				}
+				elseif ($sets['epdate'] == '') {
+					echo "<script language='javascript'>alert('\"Current Visa ExpireDate: \" can not be empty!')</script>";
+				}
+				elseif ($sets['gender'] == '') {
+					echo "<script language='javascript'>alert('\"Gender: \" can not be empty!')</script>";
+				}
+				elseif (isset($_REQUEST) && $_REQUEST['t_dob'] == '') {
+					echo "<script language='javascript'>alert('\"DOB: \" can not be empty!')</script>";
+				}
+				elseif (isset($_REQUEST) && !preg_match('/^[\d]{4}-[\d]{2}-[\d]{2}/', $_REQUEST['t_dob'])) {
+					echo "<script language='javascript'>alert('\"DOB: \" should be YYYY-MM-DD!')</script>";
+				}
+				elseif ($sets['mobile'] == '') {
+					echo "<script language='javascript'>alert('\"Mobile: \" can not be empty!')</script>";
+				}
+				elseif($sets['about'] == "" && $sets['agent'] == 0){
+					echo "<script language='javascript'>alert('\"Where do you know about us: \" can not be empty!')</script>";
+				}
+				else {
+					$sets['status'] = 'approved';
+					$save = true;
+				}
+			}
+			else {
+				$save = true;
 			}
 
-			$o_c->setClientInfo($client_id, $sets);
+			if ($save)
+				$o_c->setClientInfo($client_id, $sets);
 	    } 
 		else {
 			if ($o_c->checkSimilarClient($sets) > 0) {
@@ -230,7 +262,7 @@ $agent_ambassador = $o_a->getAgentList(0,'sub','student');
 $visa_arr = array();
 $visa_arr = $o_v->getVisaNameArr();
 $class_arr = array();
-$class_arr = $o_v->getVisaClassArr($sets['visa']);
+$class_arr = $o_v->getVisaClassArr($sets['visa'], $client_id == 0? 'Active' : '');
 
 # set smarty tpl
 $o_tpl = new Template;

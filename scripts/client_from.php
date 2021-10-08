@@ -13,7 +13,8 @@ $isNone = "none";
 $item_id = isset($_REQUEST['item_id'])? trim($_REQUEST['item_id']) : "";
 
 # get action
-$action = isset($_POST["at_{$item_id}"])? trim($_POST["at_{$item_id}"]) : "";
+$key_at = "at_".str_replace(' ', '_', $item_id);
+$action = isset($_POST[$key_at])? trim($_POST[$key_at]) : "";
 switch (strtoupper($action)){
 	case __ACT_DEL:
 		$o_c->delClientFrom($item_id);	

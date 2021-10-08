@@ -98,9 +98,11 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 		}
 	}
 	elseif (!$case_aat && isset($process_item_arr[$sets['subject']]) && stripos($process_item_arr[$sets['subject']], 'apply') !== false && $sets['done'] == 1){
+		/*
 		if(!$o_c->checkVisaAmont($visa_id)){
 			$error = "<script language='javascript'>alert('Unfinished Agreement! Plesas check payments');</script>";     		
-		}		 
+		}
+		*/		 
 	}
 	elseif (stripos($sets['add'], 'apply') !== false) {
 		$error = "<script language='javascript'>alert('Additional Step cannot include \"Apply\" !');</script>";

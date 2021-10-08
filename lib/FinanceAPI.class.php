@@ -154,11 +154,12 @@ class FinanceAPI extends MysqlDB{
         $school_id = $this->InstID;
 
 
-        $sql = "SELECT CommRate FROM institute_comm where InstID = {$school_id} AND MajorID = {$this->MajorID} AND QualID = {$this->QualID} and StartDate <= '{$sem_start_date}' and EndDate >= '{$sem_start_date}' order by StartDate desc limit 1";
+        $sql = "SELECT CommRate FROM institute_comm where InstID = {$school_id} AND MajorID = {$this->MajorID} AND QualID = {$this->QualID} and StartDate <= '{$sem_start_date}' and (EndDate >= '{$sem_start_date}' or EndDate = '0000-00-00') order by StartDate desc limit 1";
+  
         $this->query($sql);
         $cr = false;
         if (!$this->fetch()) {
-            $sql = "SELECT CommRate FROM institute_comm where InstID = {$school_id} AND MajorID = 0 AND QualID = 0 and StartDate <= '{$sem_start_date}' and EndDate >= '{$sem_start_date}' order by StartDate desc limit 1";
+            $sql = "SELECT CommRate FROM institute_comm where InstID = {$school_id} AND MajorID = 0 AND QualID = 0 and StartDate <= '{$sem_start_date}' and (EndDate >= '{$sem_start_date}' or EndDate = '0000-00-00')  order by StartDate desc limit 1";
             $this->query($sql);
             if ($this->fetch()) {
                 $cr = $this->CommRate;

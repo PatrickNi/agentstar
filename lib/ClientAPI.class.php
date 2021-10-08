@@ -23,12 +23,12 @@ class ClientAPI extends MysqlDB {
 	function _register ($email,$lname='',$fname='',$phone='',$wechat_id='',$client_type='',$version=1,$about='') {
 		$email = addslashes($email);
 		$pass  = md5('12345');
-		$lname = addslashes($lname);
-		$fname = addslashes($fname);
+		$lname = addslashes(iconv('utf-8', 'GBK', (string)trim($lname)));
+		$fname = addslashes(iconv('utf-8', 'GBK', (string)trim($fname)));
 		$phone = addslashes($phone);
 		$wechat_id = addslashes($wechat_id);
 		$client_type = addslashes($client_type);
-		$about = addslashes($about);
+		$about = addslashes($this->_figeroutPortal($about));
 
 		if ($email == '')
 			return 0;
@@ -62,6 +62,18 @@ class ClientAPI extends MysqlDB {
 		$this->query($sql);
  	    return $cid;		
 	}	
+
+	function _figeroutPortal($ref='') {
+		if (!preg_match('/^https:\/\/www.geci.com.au(.*)/', $ref, $m))
+			return $ref;
+			
+		if (stripos($m[1], '/about-us/contact-us') !== false)
+			return 'Web Booking';
+		elseif (in_array($m[1], array('/491-visa/', '/cheap-courses-to-hk/', '/online-master-course-cn/', '/online-master-course-tw/', '/online-master-course-hk/')))
+			return 'Web Landing';
+		else 
+			return 'Web Popup';
+	}
 
 	function addClientUserRs($cid, $uid, $type=__RECEPTION){
 		if($cid > 0 && $uid > 0){
@@ -295,7 +307,7 @@ class ClientAPI extends MysqlDB {
 	}
 	
 	function delAccountByVisa(){
-		$sql = "delete from client_account where VisaID not in(select ID from client_visa)";
+		$sql = "delete from client_account where VisaID not in(select ID from client_visa) and ACC_TYPE = 'visa'";
 		$this->query($sql);
 	}
 	
@@ -1141,6 +1153,7 @@ class ClientAPI extends MysqlDB {
 		}
 		//LodgeDate = '{$sets['fdate']}', GrantDate = '{$sets['tdate']}', 
 		$sql = "Update client_visa SET CateID = '{$sets['cateid']}', SubClassID = '{$sets['subid']}', ClientNo = '{$sets['clientno']}', FileNum = '{$sets['file']}', CaseDetail = '{$sets['offdt']}', Fax = '{$sets['fax']}', Name = '{$sets['name']}', Tel = '{$sets['tel']}', Note = '{$sets['note']}', AUserID = '{$sets['auser']}', VUserID = '{$sets['vuser']}', OnShore = '{$sets['shore']}' , Email = '{$sets['email']}' , ABody = '{$sets['body']}' , State = '{$sets['state']}' , KeyPoint = '{$sets['key']}' , ADate = '{$sets['adate']}' , AFee = '{$sets['fee']}' , Note2 = '{$sets['note2']}', ExpireDate = '{$sets['epdate']}', VisitDate = '{$sets['vdate']}', r_Status = '{$sets['status']}', AscoID = '{$sets['asco']}', CFee = '{$sets['cfee']}', OFee = '{$sets['ofee']}' , AgentFee = '{$sets['sfee']}'  where ID = {$vid}";
+		//var_dump($sql);
 		return $this->query($sql);		
 	}
 
@@ -1278,16 +1291,10 @@ class ClientAPI extends MysqlDB {
     }    
     
 	function getProcessDateByVisa($visa_arr){
-		$vstr = "";
-		foreach ($visa_arr as $vid => $v){
-			$vstr .= "{$vid},";
-		}
-		$vstr = substr($vstr, 0, strlen($vstr) - 1);
-		
-		if ($vstr == "") {
+		if (count($visa_arr))
 			return false;
-		}
-		$sql = "select BeginDate, CVID, ItemID, DueDate from client_visa_process where CVID in ({$vstr}) order by ItemID asc ";
+
+		$sql = "select BeginDate, CVID, ItemID, DueDate from client_visa_process where CVID in (".implode(',', array_keys($visa_arr)).") order by ItemID asc ";
 		$this->query($sql);
 		$_arr = array();
 		while ($this->fetch()){
@@ -1297,13 +1304,11 @@ class ClientAPI extends MysqlDB {
 	}
 	
     function getAccountByVisa($visa_arr){
-       	$vstr = "";
-		foreach ($visa_arr as $vid => $v){
-			$vstr .= "{$vid},";
-		}
-		$vstr = substr($vstr, 0, strlen($vstr) - 1);
+		if (count($visa_arr))
+			return false;
+
 //		$sql = "select VisaID, if(DueDate = '' or DueDate = '0000-00-00', 0, sum(if(DueAmount is null, 0, DueAmount)) / count(*) - Sum(if(b.PaidAmount is null, 0, b.PaidAmount))) as Balance from client_account a left join client_payment b on(a.ID = b.AccountID) where a.VisaID in({$vstr}) Group by a.ID";
-		$sql = "select VisaID, if((DueDate = '' or DueDate = '0000-00-00') && (if(DueAmount is null, 0, DueAmount) > 0), 0, if(DueAmount is null, 0, DueAmount) - if(b.PaidAmount is null, 0, b.PaidAmount)) as Balance from client_account a left join (select AccountID, sum(PaidAmount) as PaidAmount from client_payment Group by AccountID) b on(a.ID = b.AccountID) where a.VisaID in({$vstr}) Group by a.ID";
+		$sql = "select VisaID, if((DueDate = '' or DueDate = '0000-00-00') && (if(DueAmount is null, 0, DueAmount) > 0), 0, if(DueAmount is null, 0, DueAmount) - if(b.PaidAmount is null, 0, b.PaidAmount)) as Balance from client_account a left join (select AccountID, sum(PaidAmount) as PaidAmount from client_payment Group by AccountID) b on(a.ID = b.AccountID) where a.VisaID (".implode(',', array_keys($visa_arr)).") Group by a.ID";
 		$this->query($sql);
         $_arr = array();
         while ($this->fetch()){
@@ -1604,9 +1609,11 @@ class ClientAPI extends MysqlDB {
 				from client_account a left join  (select AccountID, SUM(PaidAmount) as paid from client_payment Group by AccountID) b on (a.ID = b.AccountID)
 				Where VisaID = {$visa_id} and ACC_TYPE = 'visa' ";    	
 	    $this->query($sql);
-       if($this->fetch() && ($this->totalpay - $this->paid) == 0){
+		
+       if($this->fetch() && ($this->totalpay - $this->paid) <= 0){
        		return true;
        }
+	   //var_dump($this->totalpay, $this->paid);exit;
        return false;
     }
     
@@ -2494,8 +2501,9 @@ class ClientAPI extends MysqlDB {
     function countCourseByConsultant($staff_id=0) {
     	if (!$staff_id)
     		return 0;
-    	$sql = "select count(*) as c from client_course where ConsultantID = {$staff_id}";
-    	$this->query($sql);
+    	//$sql = "select count(*) as c from client_course where ConsultantID = {$staff_id}";
+    	$sql = "select count(*) as c from client_course cc where ConsultantID = {$staff_id} and not exists (select 'x' from client_course_process ccp where cc.id = ccp.ccid and processid = 5 and done = 1) ";
+		$this->query($sql);
     	$this->fetch();
     	return $this->c;
     }
@@ -2504,16 +2512,23 @@ class ClientAPI extends MysqlDB {
     	if (!$from_staff_id || !$to_staff_id)
     		return false;
 
-    	$sql = "update client_course SET ConsultantID = {$to_staff_id} where ConsultantID = {$from_staff_id}";
+		$sql = "update client_course SET MergeFromConsultantID = {$from_staff_id} where ConsultantID = {$from_staff_id} and MergeFromConsultantID = 0";
+		$this->query($sql);
+
+    	$sql = "update client_course cc SET cc.ConsultantID = {$to_staff_id} where cc.ConsultantID = {$from_staff_id}  and not exists (select 'x' from client_course_process ccp where cc.id = ccp.ccid and processid = 5 and done = 1) ";
     	$this->query($sql);
-    	return $this->getAffectNum();
+
+    	$sql = "update client_course cc SET cc.ConsultantID = {$to_staff_id} where cc.ConsultantID = {$from_staff_id}  and exists (select 'x' from client_course_process ccp where cc.id = ccp.ccid and done = 0) ";
+    	$this->query($sql);
+
+    	return true;
     } 
 
     function countVisaAgreementByStaff($staff_id=0) {
     	if (!$staff_id)
     		return 0;
     	//$sql = "select count(*) as c from client_visa where VUSERID = {$staff_id}";
-		$sql = "select count(*) as c from client_visa v where vuserid = {$staff_id} and not exists (select 'x' from client_visa_process vp, visa_rs_item vi where vp.itemid = vi.itemid and v.id = vp.cvid and vi.Item like 'grant%' and vp.done = 1)";
+		$sql = "select count(*) as c from client_visa v where vuserid = {$staff_id} and (r_status = '' or r_status = 'active')";
     	$this->query($sql);
     	$this->fetch();
     	return $this->c;
@@ -2523,7 +2538,7 @@ class ClientAPI extends MysqlDB {
     	if (!$from_staff_id || !$to_staff_id)
     		return false;
 
-    	$sql = "update client_visa v SET v.VUSERID = {$to_staff_id} where v.VUSERID = {$from_staff_id} and not exists (select 'x' from client_visa_process vp, visa_rs_item vi where vp.itemid = vi.itemid and v.id = vp.cvid and vi.Item like 'grant%' and vp.done = 1)";
+    	$sql = "update client_visa v SET v.VUSERID = {$to_staff_id} where v.VUSERID = {$from_staff_id} and (r_status = '' or r_status = 'active')";
     	$this->query($sql);
     	return $this->getAffectNum();
     } 

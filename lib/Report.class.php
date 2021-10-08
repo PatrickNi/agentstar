@@ -46,6 +46,12 @@ class ReportAPI extends MysqlDB {
             else{
                 $_arr[$this->ID]['islodge'] = 0;
             }
+	        if (stripos($_arr[$this->ID]['item'], 'apply') === 0){
+                $_arr[$this->ID]['isApply'] = 1;
+            }
+            else{
+                $_arr[$this->ID]['isApply'] = 0;
+            }
 			$_arr[$this->ID]['cate']  = $this->VisaName;
 			$_arr[$this->ID]['class'] = $this->ClassName;
 			$_arr[$this->ID]['begin'] = $this->BeginDate;
@@ -108,10 +114,10 @@ class ReportAPI extends MysqlDB {
 		$_arr = array();
     	$sql = "select a.ID, concat(LName, ' ', FName) as ClientName, Qual, Major, e.Name, DueDate, BeginDate, if(p.ID is not null, p.Process, ExItem) as ProcessName, f.CID, CCID,
             if(((a.DueDate >= Date(NOW()) and a.DueDate < Date(NOW()) + INTERVAL 7 Day) or a.DueDate < Date(NOW()))and a.DueDate <> '0000-00-00',0,1) as isTodo,
-                if(a.DueDate = '0000-00-00', '9999-99-99', a.DueDate) as sortdue, if(p.ID > 0, p.ID, 0) AS ProcessID  
+                    a.DueDate as sortdue, if(p.ID > 0, p.ID, 0) AS ProcessID  
     				from client_course_process a left join course_process p on (a.ProcessID = p.ID), client_course  b,  institute_qual c,  institute_major d, institute e, client_info f
 					where b.CID = f.CID and a.Done = 0 and a.CCID = b.ID and b.QualID = c.ID and b.MajorID = d.ID and b.IID = e.ID ";
-    	//a.DueDate >= Date(NOW()) and 
+    	//a.DueDate >= Date(NOW()) and if(a.DueDate = '0000-00-00', '9999-99-99', a.DueDate) 
 		if ($userid > 0 && $only_course == 0){
 			$sql .= " AND b.ConsultantID = {$userid}";
 		}
@@ -571,11 +577,16 @@ class ReportAPI extends MysqlDB {
 		return $_arr;		
 	}
 
-	function getNumOfCourseClientByUser($fromDay, $toDay, $userid){
+	function getNumOfCourseClientByUser($fromDay, $toDay, $userid, $offduty=false){
 		//$sql = "select Date_Format(CourseVisitDate, '%Y%u') as Week,  concat(LName, ' ', FName) as Name, a.CID, School, Qual from client_info a left join (select CID, School, Qual, max(t1.ID) from client_qual t1, school t2, course_qual t3 where t1.SchoolID = t2.ID and t1.QualID = t3.ID Group by t1.CID) b on(b.CID = a.CID) where CourseVisitDate != '0000-00-00' ";
 		$sql = "select Date_Format(ConsultantDate, '%Y%u') as Week,  concat(LName, ' ', FName) as Name, t1.CID, t2.ID as CourseID, t2.ProcessID, t3.IsActive from client_info t1 left join (select a.ID as PID, b.CID, b.ID, a.ProcessID from client_course_process a, client_course b where a.ProcessID = ".__C_APPLY_OFFER." and a.CCID = b.ID AND a.Done = 1) t2 on (t1.CID = t2.CID) left join client_course t3 ON(t1.CID = t3.CID) WHERE 1 ";		
 		if ($userid > 0) {
-			$sql .= " AND ConsultantID = {$userid} ";
+            if ($offduty) {
+                $sql .= " AND MergeFromConsultantID = {$userid} ";
+            }
+            else {
+                $sql .= " AND ConsultantID = {$userid} AND MergeFromConsultantID = 0  ";
+            }
 		}
 		if ($fromDay != "" && $toDay  != "") {
 			$sql .= " AND ConsultantDate >= '{$fromDay}' and ConsultantDate <= '{$toDay}' ";
@@ -621,13 +632,18 @@ class ReportAPI extends MysqlDB {
 		return $_arr;		 
 	}
 	
-	function getAllOfCourseClientByUser($fromDay, $toDay, $userid){
+	function getAllOfCourseClientByUser($fromDay, $toDay, $userid, $offduty=false){
 		//$sql = "select count(*) as cnt from client_info where CourseVisitDate != '0000-00-00' ";
 		//$sql = "select concat(LName, ' ', FName) as Name, a.CID, School, Qual from client_info a left join (select CID, School, Qual, max(t1.ID) from client_qual t1, school t2, course_qual t3 where t1.SchoolID = t2.ID and t1.QualID = t3.ID Group by t1.CID) b on(b.CID = a.CID) where CourseVisitDate != '0000-00-00' ";
 		$sql = "select concat(LName, ' ', FName) as Name, t1.CID, t2.ID as CourseID, t2.ProcessID, t3.IsActive from client_info t1 left join (select a.ID as PID, b.CID, b.ID, a.ProcessID from client_course_process a, client_course b where a.ProcessID = ".__C_APPLY_OFFER." and a.CCID = b.ID AND a.Done = 1) t2 on (t1.CID = t2.CID) left join client_course t3 ON (t1.CID = t3.CID) WHERE 1 ";
 
 		if ($userid > 0) {
-			$sql .= " AND ConsultantID = {$userid} ";
+            if ($offduty) {
+                $sql .= " AND MergeFromConsultantID = {$userid} ";
+            }
+            else {
+                $sql .= " AND ConsultantID = {$userid}  AND MergeFromConsultantID = 0 ";
+            }
 		}
 		if ($fromDay != "" && $toDay  != "") {
 			$sql .= " AND ConsultantDate >= '{$fromDay}' and ConsultantDate <= '{$toDay}' ";
@@ -668,14 +684,18 @@ class ReportAPI extends MysqlDB {
 		return $_arr;		 
 	}
 		
-	function getNumOfCourseProcessByUser($fromDay, $toDay, $userid){	
+	function getNumOfCourseProcessByUser($fromDay, $toDay, $userid, $offduty=false){	
         $sql = "select Date_Format(BeginDate, '%Y%u') as Week, b.IsActive, b.ID, a.ProcessID, concat(LName, ' ', FName) as Name, d.Name as School, e.Qual, c.CID, c.CreateTime, c.AgentID from client_course_process a, client_info c, client_course b left join institute d on(b.IID = d.ID) left join institute_qual e on(b.QualID = e.ID) where (a.ProcessID = ".__C_RECEIVE_OFFER." or a.ProcessID = ".__C_PASS_OFFER." or a.ProcessID = ".__C_GET_COE." or a.ProcessID = ".__C_PAY_TUITION_FEE.") and a.CCID = b.ID and b.CID = c.CID and a.Done = 1 ";
    
 		if ($userid > 0) {
-			$sql .= " AND b.ConsultantID = {$userid} ";
-		}else{
-			
+            if ($offduty) {
+                $sql .= " AND b.MergeFromConsultantID = {$userid} ";
+            }
+            else {
+                $sql .= " AND b.ConsultantID = {$userid} AND b.MergeFromConsultantID = 0 ";
+            }
 		}
+
 		if ($fromDay != "" && $toDay  != "") {
 			$sql .= " AND BeginDate >= '{$fromDay}' and BeginDate <= '{$toDay}' ";
         }
@@ -782,10 +802,15 @@ class ReportAPI extends MysqlDB {
 	}
 	
 	
-	function getAllOfCourseProcessByUser($fromDay, $toDay, $userid){
+	function getAllOfCourseProcessByUser($fromDay, $toDay, $userid, $offduty=false){
 		$where = "";
 		if ($userid > 0) {
-			$where .= " AND b.ConsultantID = {$userid} ";
+            if ($offduty) {
+                $where .= " AND b.MergeFromConsultantID = {$userid} ";
+            }
+            else {
+                $where .= " AND b.ConsultantID = {$userid}  AND b.MergeFromConsultantID = 0 ";
+            }
 		}
 		
 		if ($fromDay != "" && $toDay  != "") {
@@ -896,7 +921,7 @@ class ReportAPI extends MysqlDB {
 	}
 
 	
-	function getAmountOfCourseCommByUser($fromDay, $toDay, $userid){
+	function getAmountOfCourseCommByUser($fromDay, $toDay, $userid, $offduty=false){
 
 		$_arr = array();
 		$sql = "SELECT  date_format(RedDate, '%Y%u') as wk,
@@ -915,7 +940,12 @@ class ReportAPI extends MysqlDB {
                   AND b.ConsultantID = d.ID
                   AND RedDate >= '{$fromDay}' AND RedDate <= '{$toDay}' "; 
 	    if ($userid > 0) {
-            $sql .= " AND b.ConsultantID = {$userid} ";
+            if ($offduty) {
+                $sql .= " AND b.MergeFromConsultantID = {$userid} ";
+            }
+            else {
+                $sql .= " AND b.ConsultantID = {$userid}  AND b.MergeFromConsultantID = 0 ";
+            }
         }
         $sql .= " Order by wk, Name, a.SEM ";
 		$this->query($sql);
@@ -938,7 +968,7 @@ class ReportAPI extends MysqlDB {
 	}
 	
 	
-	function getAllOfCourseCommByUser($fromDay, $toDay, $userid){
+	function getAllOfCourseCommByUser($fromDay, $toDay, $userid, $offduty=false){
 		      $sql = "SELECT  date_format(RedDate, '%Y-%u') as wk,
                         concat(LName, ' ', FName) as Name, 
                         c.CID, a.ID, a.CCID,c.DOB, ConsultantDate, c.AgentID,
@@ -953,7 +983,12 @@ class ReportAPI extends MysqlDB {
                           AND RedDate >= '{$fromDay}' AND RedDate <= '{$toDay}'";
                   
 		if ($userid > 0) {
-			$sql .= " AND b.ConsultantID = {$userid} ";
+            if ($offduty) {
+                $sql .= " AND b.MergeFromConsultantID = {$userid} ";
+            }
+            else {
+                $sql .= " AND b.ConsultantID = {$userid}  AND b.MergeFromConsultantID = 0 ";
+            }
         }
 
         $sql .= " Order by wk, Name, a.SEM ";
@@ -992,7 +1027,7 @@ class ReportAPI extends MysqlDB {
 	}
 
 
-	function getAmountOfCoursePotCommByUser($fromDay, $toDay, $userid){
+	function getAmountOfCoursePotCommByUser($fromDay, $toDay, $userid, $offduty=false){
 
 		$_arr = array();
 		$sql = "SELECT  date_format(BeginDate, '%Y%u') as wk,
@@ -1012,7 +1047,12 @@ class ReportAPI extends MysqlDB {
                   AND b.ConsultantID = d.ID
                   AND t1.BeginDate >= '{$fromDay}' AND t1.BeginDate <= '{$toDay}' "; 
 	    if ($userid > 0) {
-            $sql .= " AND b.ConsultantID = {$userid} ";
+            if ($offduty) {
+                $sql .= " AND b.MergeFromConsultantID = {$userid} ";
+            }
+            else {
+                $sql .= " AND b.ConsultantID = {$userid}  AND b.MergeFromConsultantID = 0 ";
+            }
         }
         $sql .= " Order by wk, Name, a.SEM ";
         $this->query($sql);
@@ -1037,7 +1077,7 @@ class ReportAPI extends MysqlDB {
 		return $_arr;			
     }
     
-    function getAllOfCoursePotCommByUser($fromDay, $toDay, $userid){
+    function getAllOfCoursePotCommByUser($fromDay, $toDay, $userid, $offduty=false){
     			//concat(LName, ' ', FName) like 'sub-%',
 		      $sql = "SELECT  date_format(BeginDate, '%Y-%u') as wk,
                         concat(LName, ' ', FName) as Name, ConsultantDate,
@@ -1053,7 +1093,12 @@ class ReportAPI extends MysqlDB {
                           AND t1.BeginDate >= '{$fromDay}' AND t1.BeginDate <= '{$toDay}'";
                   
 		if ($userid > 0) {
-			$sql .= " AND b.ConsultantID = {$userid} ";
+            if ($offduty) {
+                $sql .= " AND b.MergeFromConsultantID = {$userid} ";
+            }
+            else {
+                $sql .= " AND b.ConsultantID = {$userid}  AND b.MergeFromConsultantID = 0 ";
+            }
         }
 
         $sql .= " Order by wk, Name, a.SEM ";
@@ -2513,7 +2558,7 @@ class ReportAPI extends MysqlDB {
 
 
     function getAllOfCoach($fromDay, $toDay, $userid){
-        $sql = "select concat(LName, ' ', FName) as Name, itemid, ci.title, ccl.DueHour, ccl.StartDate, cc.id as COACHID, cc.CID, ccl.Status, ccl.WeekName,ccl.StartTime from client_coach cc, coach_item ci, client_info c, client_coach_lessons as ccl where cc.itemid = ci.id and c.CID = cc.CID and cc.id = ccl.coachid and  ccl.StartDate between '{$fromDay}' AND '{$toDay}' ";
+        $sql = "select concat(LName, ' ', FName) as Name, itemid, ci.title, ccl.DueHour, ccl.StartDate, cc.id as COACHID, cc.CID, ccl.Status, ccl.WeekName,ccl.StartTime,cc.Fee from client_coach cc, coach_item ci, client_info c, client_coach_lessons as ccl where cc.itemid = ci.id and c.CID = cc.CID and cc.id = ccl.coachid and  ccl.StartDate between '{$fromDay}' AND '{$toDay}' ";
 
         if ($userid > 0) {
             $sql .= " AND (cc.staffid = {$userid} OR cc.saleid = {$userid}) ";
@@ -2522,21 +2567,22 @@ class ReportAPI extends MysqlDB {
         $sql .= "Order by ci.title asc, cc.CID asc, ccl.StartDate asc ";  
         $this->query($sql);
         $_arr = array();
-        //$coaches = array();
+        $coaches = array();
         while ($this->fetch()) {
             if (!isset($_arr['all']) || !isset($_arr['all'][$this->itemid]))
-                $_arr['all'][$this->itemid] = array('title'=>'', 'hour'=>0, 'client'=>0, 'list'=>array(), 'extrahour'=>0, 'lessons'=>array());   
+                $_arr['all'][$this->itemid] = array('title'=>'', 'hour'=>0, 'should_pay'=>0, 'client'=>0, 'list'=>array(), 'extrahour'=>0, 'lessons'=>array(), 'actual_pay'=>0);   
 
             $_arr['all'][$this->itemid]['title'] = $this->title;
             //$_arr['all'][$this->itemid]['client']++;
             if (!isset($_arr['all'][$this->itemid]['list'][$this->COACHID])) {
-                $_arr['all'][$this->itemid]['list'][$this->COACHID] = array('name'=>$this->Name, 'cid'=>$this->CID, 'duehour' => 0, 'duedetail'=>array());
+                $_arr['all'][$this->itemid]['list'][$this->COACHID] = array('name'=>$this->Name, 'cid'=>$this->CID, 'duehour' => 0, 'should_pay'=>0, 'actual_pay'=>0, 'duedetail'=>array());
             }
 
             //$_arr['all'][$this->itemid]['sale'] = 0;
             //$_arr['all'][$this->itemid]['paid'] = 0;
             if ($this->Status == 'Completed') {
                 $_arr['all'][$this->itemid]['hour']  += round($this->DueHour/60, 2);
+                $_arr['all'][$this->itemid]['should_pay']  += $this->Fee;
                 $_arr['all'][$this->itemid]['lessons'][md5($this->StartDate.'|'.$this->StartTime)] = round($this->DueHour/60, 2);
                 if ($this->WeekName == 'Sat' || $this->WeekName == 'Sun' || $this->StartTime < '09:00' || $this->StartTime > '17:30') {
                     $_arr['all'][$this->itemid]['extrahour']  += round($this->DueHour/60, 2);
@@ -2546,14 +2592,45 @@ class ReportAPI extends MysqlDB {
 
                 if (!isset($_arr['all'][$this->itemid]['list'][$this->COACHID]['duehour'])) {
                     $_arr['all'][$this->itemid]['list'][$this->COACHID]['duehour'] = round($this->DueHour/60, 2);
+                    $_arr['all'][$this->itemid]['list'][$this->COACHID]['should_pay'] = $this->Fee;
                 }
                 else {
                     $_arr['all'][$this->itemid]['list'][$this->COACHID]['duehour'] += round($this->DueHour/60, 2);
+                    $_arr['all'][$this->itemid]['list'][$this->COACHID]['should_pay'] += $this->Fee;
                 }
             }
-            //$coaches[$this->COACHID] = $this->itemid;
+            $coaches[$this->COACHID] = array('itemid' => $this->itemid, 'totalpaid'=>0, 'pay_before_start'=>0);
+        }   
+        
+        //calculate coach acutal paid
+        foreach (array_chunk(array_keys($coaches), 500, true) as $ids) {
+            $sql = "select a.VisaID, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a,  client_payment b where a.ID = b.AccountID AND ACC_TYPE = 'coach' and a.visaid in (".implode(',', $ids).") group by a.VisaID";
+            $this->query($sql);
+            while ($this->fetch()) {
+                $coaches[$this->VisaID]['totalpaid'] = $this->paid;
+            }            
         }
 
+        //calculate coach complete lesson before start date
+        foreach (array_chunk(array_keys($coaches), 500, true) as $ids) {
+            $sql = "select cc.ID, sum(cc.Fee) as paid from client_coach cc, client_coach_lessons as ccl where cc.id = ccl.coachid and cc.id in (".implode(',', $ids).") and ccl.status = 'Completed' and ccl.StartDate < '{$fromDay}' group by cc.ID ";
+
+            $this->query($sql);
+            while ($this->fetch()) {
+                $coaches[$this->ID]['pay_before_start'] = $this->paid;
+            }            
+        }
+
+        foreach ($_arr as $ki => $items) {
+            foreach ($items as $item_id => $item) {
+                foreach ($item['list'] as $coach_id=>$v) {
+                    if (isset($coaches[$coach_id])) {
+                        $_arr[$ki][$item_id]['list'][$coach_id]['actual_pay'] = $coaches[$coach_id]['totalpaid'] - $coaches[$coach_id]['pay_before_start'];
+                        $_arr[$ki][$item_id]['actual_pay'] += $_arr[$ki][$item_id]['list'][$coach_id]['actual_pay'];
+                    }
+                }
+            }
+        }
         return $_arr;
     }
 
@@ -2564,7 +2641,7 @@ class ReportAPI extends MysqlDB {
         while ($this->fetch()) {
             $coaches[$this->VisaID]['paid'] = $this->paid;
         }
-
+        //var_dump($coaches, $sql);
         $_arr = array();
         if (count($coaches) > 0) {
             $sql = "select VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD from client_account a Where VisaID IN (".implode(',', array_keys($coaches)).") AND ACC_TYPE = 'coach'";

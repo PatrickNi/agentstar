@@ -85,14 +85,20 @@ if (isset($_POST['bt_name']) && stripos($_POST['bt_name'], "SAVE") !== false){
     if($coach_id > 0){   
         if($msg == ''){
             $o_h->setCoach($user_id,$coach_id, $sets);
-            if (isset($_REQUEST['save_w_lesson']) && $_REQUEST['save_w_lesson'] == 1) {
-                $o_h->updateLessons($coach_id);
+            if (isset($_REQUEST['save_w_method']) && $_REQUEST['save_w_method'] == 1) {
+                $o_h->buildLessons($coach_id);
+            }
+            elseif (isset($_REQUEST['save_w_method']) && $_REQUEST['save_w_method'] == 2) {
+                if (!$o_h->updateLessonFees($coach_id)) {
+                    echo json_encode(array('msg'=>"Failed to update fee in lessons!!!!", 'id'=>$coach_id));
+                    exit;
+                }
             }
         }       
     }
     else{
         $coach_id =  $o_h->addCoach($user_id, $client_id, $sets);
-        $o_h->updateLessons($coach_id);
+        $o_h->buildLessons($coach_id);
     }
     
 

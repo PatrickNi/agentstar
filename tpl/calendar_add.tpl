@@ -72,7 +72,7 @@
         <td align="left" width="82%" class="roweven">			
 		   <select name="t_due" onChange="this.form.t_desc.focus();">
 			{foreach key=id item=name from=$due_arr}
-				<option value="{$id}" {if $id eq $dt_arr.due} selected {/if}>{$name}</option>
+				<option value="{$id}" {if $id eq $dt_arr.due || (!$dt_arr.due && $id == 60)} selected {/if}>{$name}</option>
 			{/foreach}
             </select>
 		</td>

@@ -9,7 +9,7 @@
 
 <script language="javascript" src="../js/audit.js"></script>
 <body>
-<form name="form1" target="_self" method="post">
+<form name="form1" id="form1" target="_self" method="post">
   <table align="center" width="100%"  class="graybordertable" cellpadding="1" cellspacing="1" border="0">
     <tr class="bordered_2">
       <td align="left"><strong>Start Date</strong>&nbsp;&nbsp;
@@ -52,9 +52,16 @@
         {if $from_archive}
           <strong style="color:red;">Reporting data from Archive</strong>
         {else}
-          {if $uid eq 3}
+          {if $uid eq 3 }
           <input type="submit" name="bt_archive" value="archive report" style="font-weight:bold ">
           {/if}
+        {/if}
+
+        {if $uid eq 86 && $staffid eq 87}
+          &nbsp;&nbsp;
+          <input type="hidden" id="token" name="token" value="">
+          <input type="hidden" id="bt_locked" name="bt_locked" value="">
+          <button type="button" id="btn_save" style="font-weight:bolder;font-size:larger" onclick="do_save()">Locked Period</button>
         {/if}
       </td>
     </tr>
@@ -435,8 +442,8 @@
     <td># of hours delivered</td>
     <td># of students(active / current)</td>
     <td># of lessons</td>
-    <td>{if $user_pos == 'PC' || $user_pos == 'C'}Received Coaching Fee{/if}</td>
-    <td>{if $user_pos == 'PC' || $user_pos == 'C'}Profit{/if}</td>
+    <td>{if $user_pos == 'PC' || $user_pos == 'C' || $user_pos == 'M'}Received Coaching Fee{/if}</td>
+    <td>{if $user_pos == 'PC' || $user_pos == 'C' || $user_pos == 'M'}Profit{/if}</td>
   </tr>
   {assign var="total_paid" value="0"}
   {assign var="total_sale" value="0"}
@@ -451,12 +458,12 @@
     <td>
       {assign var="total_hour" value=$total_hour+$coach.hour}
       {assign var="total_extrahour" value=$total_extrahour+$coach.extrahour}
-      <span onClick="openinSatff('d15_{$week}_{$titleid}');" style="text-decoration:underline; cursor:pointer;">{$coach.hour}</span>
+      <span onClick="openinSatff('d15_{$week}_{$titleid}');" style="text-decoration:underline; cursor:pointer;">{$coach.hour}[h]|(${$coach.actual_pay}/${$coach.should_pay})</span>
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:300px" id="d15_{$week}_{$titleid}">
         <ul>
           {foreach key=coach_id item=coach_st from=$coach.list}
           {if $coach_st.duehour > 0}
-              <li><span style="text-decoration:underline; cursor:pointer;" onclick="window.open('/scripts/client_coach_detail.php?cid={$coach_st.cid}&coachid={$coach_id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$coach_st.name} -- {$coach_st.duehour}(h)</span>
+              <li><span style="text-decoration:underline; cursor:pointer;" onclick="window.open('/scripts/client_coach_detail.php?cid={$coach_st.cid}&coachid={$coach_id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$coach_st.name} -- {$coach_st.duehour}(h)|(${$coach_st.actual_pay}/${$coach_st.should_pay})</span>
               {foreach item=lesson_st from=$coach_st.duedetail}
                 <br>{$lesson_st}
               {/foreach}
@@ -487,13 +494,13 @@
       {$coach.lessons|@count}({$coach.lessons|@array_sum} h)
     </td>
     <td>
-      {if $user_pos == 'PC' || $user_pos == 'C'}
+      {if $user_pos == 'PC' || $user_pos == 'C' || $user_pos == 'M'}
         {$coaches_fee[$week].$titleid.paid|string_format:"%.2f"}
         {assign var="total_paid" value=$total_paid+$coaches_fee[$week].$titleid.paid}
       {/if}
     </td>
     <td>
-      {if $user_pos == 'PC' || $user_pos == 'C'}
+      {if $user_pos == 'PC' || $user_pos == 'C' || $user_pos == 'M'}
         {$coaches_fee[$week].$titleid.sale|string_format:"%.2f"}
         {assign var="total_sale" value=$total_sale+$coaches_fee[$week].$titleid.sale}
       {/if}
@@ -574,6 +581,18 @@
 <script type="text/javascript">
     $('#t_fdate').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });        
     $('#t_tdate').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });
+
+	function do_save() {
+
+      var token = prompt("Plese type in execute token");
+      if (token == null) {
+          return false;
+      }    
+      $("#token").val(token);
+      $("#bt_locked").val("Locked Period");
+      $("#form1").submit();
+      return true;
+    }
 </script>
 {/literal}  
 </body>

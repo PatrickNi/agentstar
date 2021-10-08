@@ -23,10 +23,11 @@
 				<input type="submit" value="Delete" style="font-weight:bold" onClick="this.form.bt_name.value='delete';this.disable=false;">&nbsp;&nbsp;&nbsp;
 				{/if}
                 {if $dt_arr.auser != $uid}
-				<input name="button" type="button" style="font-weight:bold" onClick="openModel('attachment.php?item={$vid}&type={$itemtype}',screen.width*6/7,screen.height*4/7,'NO', 'form1')" value="Attachment">
+				<input type="button" value="Attachment" style="font-weight:bold"
+			onClick="window.open('/scripts/attachment.php?item={$vid}&type={$itemtype}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*4/7);">
                 {/if}
 			</td>					
-			<td align="center" class="whitetext"> Detail Information &nbsp;&nbsp; </td> 			
+			<td align="center" class="whitetext"> Visa Service Detail &nbsp;&nbsp; </td> 			
 			<td align="left" width="30%">
 				<input type="button" value="Save" style="font-weight:bold" onClick="save_visa(this, false);" >
                 <input type="button" value="Close &amp; Refresh " style="font-weight:bold" onClick="save_visa(this, true);">
@@ -167,7 +168,7 @@
 				{foreach key=id item=name from=$user_arr}
 	              <option  value="{$id}" {if $dt_arr.auser eq $id} selected {/if}>{$name}</option>
     			{/foreach}
-				{if $dt_arr.auser lt 1}
+				{if $dt_arr.auser lt 1 || !isset($user_arr[$dt_arr.auser])}
 					<option  value="0" selected >select a user</option>
                 {/if}
 				</select>			
@@ -181,9 +182,9 @@
 				{foreach key=id item=name from=$user_arr}
 					<option  value="{$id}" {if $dt_arr.vuser eq $id} selected {/if}>{$name}</option> 
                 {/foreach}
-				{if $dt_arr.vuser lt 1} 
-	                <option  value="0" selected >select a user</option> 
-    			{/if}
+				{if $dt_arr.vuser lt 1 || !isset($user_arr[$dt_arr.vuser])}
+					<option  value="0" selected >select a user</option>
+                {/if}
 				</select>			</td> 
           </tr>
           <tr> 
@@ -375,6 +376,7 @@
         $(obj).val('waiting...');
         //ContentType UTF-8
         $.post($('#form1').attr('action'), $('#form1').serialize(), function(data){
+			console.log(data);
             rtn = $.parseJSON(data);
             
             $(obj).val(btn_n);

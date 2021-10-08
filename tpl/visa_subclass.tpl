@@ -28,14 +28,14 @@
 					<td>SubClass Name</td>
 					<td>Action</td>
 				</tr>
-				{foreach key=id item=name from=$subclass_arr}
+				{foreach key=id item=v from=$subclass_arr}
 				<tr align="center" class="roweven">
 					<!--<td class="border_1">{$id}</td>-->
-					<td>{$name}</td>
+					<td>{$v.name}</td>
 					<td>
 						<select name="at_{$id}" style="font-size:9px; font-weight:bolder;" {if $arr.done eq 1} disabled {/if}>
 							{foreach key=act_id item=act_name from=$act_arr}
-								<option value="{$act_id}">{$act_name}</option>
+								<option value="{$act_id}" {if $v.status == $act_id && $act_id == 'Inactive'}selected{/if}>{$act_name}</option>
 							{/foreach}							
 						</select>&nbsp;
 						<input style="font-weight:bolder;" type="button" {if $arr.done eq 1} disabled {/if} value="OK" onClick="this.form.subid.value={$id};this.form.submit();"> 					

@@ -1,18 +1,24 @@
 <?php
-
 require_once('../etc/const.php');
 require_once(__LIB_PATH.'MysqlDB.class.php');
 require_once(__LIB_PATH.'Report.class.php');
 $o_a = new ReportAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
-$staff_id = 81;
-$path = __DOWNLOAD_PATH.'reportstaff/';
-if (file_exists($path.'s'.$staff_id.'.dat')) {
-    unlink($path.'s'.$staff_id.'.dat');
-}
-
-if (file_exists($path.'d'.$staff_id.'.dat')) {
-    unlink($path.'d'.$staff_id.'.dat');
-}
+$staff_id = 90;
+$archive = $o_a->getStaffArchive($staff_id, 's');
+var_dump(count($archive['courses']['all']['name']));
+var_dump(count($archive['courseprocs']['all']['apocid'])+count($archive['courseprocs']['all']['reocid'])+count($archive['courseprocs']['all']['reccid'])+count($archive['courseprocs']['all']['reo_st'])+count(array_unique($archive['coursesems']['all']['course']))+count(array_unique($archive['coursesems']['all']['coursepots'])));
+var_dump(count(array_unique(array_merge($archive['courseprocs']['all']['apocid'],$archive['courseprocs']['all']['reocid'],$archive['courseprocs']['all']['reccid'],$archive['courseprocs']['all']['reo_st']))));
+echo implode(',', array_keys($archive['courseprocs']['all']['reocid']));
+echo "<p/>";
+echo implode(',', array_keys($archive['courseprocs']['all']['reccid']));
+echo "<p/>";
+echo implode(',', array_keys($archive['courseprocs']['all']['apocid']));
+echo "<p/>";
+echo implode(',', array_keys($archive['courseprocs']['all']['reo_st']));
+echo "<p/>";
+echo implode(',', $archive['coursesems']['all']['course']);
+echo "<p/>";
+echo implode(',', $archive['coursepots']['all']['course']);
 exit;
 
 

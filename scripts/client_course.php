@@ -82,7 +82,7 @@ $o_tpl->assign('course_process', $course_process);
 $o_tpl->assign('col_arr', $o_c->getProcessOfCourse(1));
 $o_tpl->assign('qual_arr', $o_c->getQualOfCourse());
 $o_tpl->assign('major_arr', $o_c->getMajorOfCourse());
-$o_tpl->assign('user_arr', $o_g->getUserNameArr());
+$o_tpl->assign('user_arr', $o_g->getUserNameArr(0,true));
 $o_tpl->assign('cate_arr', $o_s->getCategory());
 
 $o_tpl->assign('cid', $client_id);

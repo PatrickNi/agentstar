@@ -179,7 +179,7 @@ else{
 # get visa category
 $o_v = new VisaAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 $cate_arr  = $o_v->getVisaNameArr();
-$class_arr = $o_v->getVisaClassArr($sets['cateid']);
+$class_arr = $o_v->getVisaClassArr($sets['cateid'], $visa_id ==0? 'Active':'');
 
 #set net amount
 if (isset($class_arr[$sets['subid']]) && stripos($class_arr[$sets['subid']], 'onshore') !== false) {

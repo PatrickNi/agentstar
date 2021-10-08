@@ -62,18 +62,31 @@ class VisaAPI extends MysqlDB {
     	return $_arr;
     }
 
-    function getVisaClassArr($catid = 0){
-    	$sql = "select SubClassID, CateID, ClassName from visa_subclass";
+    function getVisaClassArr($catid = 0,$status='',$lable=false){
+    	$sql = "select SubClassID, CateID, ClassName, SubStatus from visa_subclass WHERE 1 ";
     	if ($catid > 0){
-    		$sql .= " where CateID = {$catid}";	
+    		$sql .= " AND CateID = {$catid}";	
+		}
+		
+		if ($status != '') {
+			$sql .= " AND SubStatus = '{$status}' ";
 		}
 		$sql .= " order by ClassName asc ";
 
     	$this->query($sql);
     	$_arr = array();
-    	while($this->fetch()){
-    		$_arr[$this->SubClassID] = $this->ClassName;
-    	}
+
+		if ($lable) {
+			while($this->fetch()){
+				$_arr[$this->SubClassID] = array('name'=>$this->ClassName, 'status'=>$this->SubStatus);
+			}
+		}
+		else {
+			while($this->fetch()){
+				$_arr[$this->SubClassID] = $this->ClassName;
+			}
+		}
+
     	return $_arr;
     }
     
@@ -152,10 +165,19 @@ class VisaAPI extends MysqlDB {
     function delVisaSubclass($catid, $subid){
     	if ($catid > 0){
     		$sql = "delete from visa_subclass where CateID = {$catid} and SubClassID = {$subid}";
-    		return $this->query($sql);
+    		//$sql = "UPDATE visa_subclass SET status = 'Inactive' where CateID = {$catid} and SubClassID = {$subid} ";
+			return $this->query($sql);
     	}
 		return false;
     }
+
+	function setVisaSubclassStatus($catid, $subid, $status) {
+    	if ($catid > 0){
+			$sql = "UPDATE visa_subclass SET substatus = '{$status}' where CateID = {$catid} and SubClassID = {$subid} ";
+			return $this->query($sql);
+    	}
+		return false;		
+	}
     
     function addVisaSubclass($catid, $classname){
     	if ($classname != "" && $catid > 0){

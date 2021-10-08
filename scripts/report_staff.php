@@ -1,10 +1,13 @@
 <?php
 require_once('../etc/const.php');
+ini_set("display_errors", 1);
+error_reporting(4096);
+
 require_once(__LIB_PATH.'Template.class.php');
 require_once(__LIB_PATH.'Report.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
-ini_set("display_errors", 1);
-error_reporting(2047);
+require_once(__LIB_PATH.'CoachAPI.class.php');
+
 set_time_limit(0);
 
 # check valid user
@@ -14,10 +17,6 @@ if (!($user_id > 0)) {
 }
 $o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 $o_r = new ReportAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
-
-
-
-
 
 //user grants
 $ugs = array();
@@ -104,17 +103,24 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
                 $homeloan_fee   = $archive['homeloan_fee']; 
             }
 
-            if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C')
+            if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C' || $user_pos == 'M')
                 $coaches =  $archive['coaches'];
 
         }
         else {
 
             if ($staff_id == $user_id || $user_pos == 'PE' || $user_pos == 'C') {
-                $courses    = $o_r->getNumOfCourseClientByUser($from_day, $to_day, $staff_id);
-                $courseprocs= $o_r->getNumOfCourseProcessByUser($from_day, $to_day, $staff_id);
-                $coursesems = $o_r->getAmountOfCourseCommByUser($from_day, $to_day, $staff_id);
-                $coursepots = $o_r->getAmountOfCoursePotCommByUser($from_day, $to_day, $staff_id);
+                $offduty = false;
+                if ($staff_id > 0) {
+                    $staff_info = $o_g->getUserList($staff_id);
+                    if (isset($staff_info[$staff_id]) && $staff_info[$staff_id]['leavedate'] > '0000-00-00') {
+                        $offduty = true;
+                    }
+                }
+                $courses    = $o_r->getNumOfCourseClientByUser($from_day, $to_day, $staff_id, $offduty);
+                $courseprocs= $o_r->getNumOfCourseProcessByUser($from_day, $to_day, $staff_id, $offduty);
+                $coursesems = $o_r->getAmountOfCourseCommByUser($from_day, $to_day, $staff_id, $offduty);
+                $coursepots = $o_r->getAmountOfCoursePotCommByUser($from_day, $to_day, $staff_id, $offduty);
             }
             
             if ($staff_id == $user_id || $user_pos == 'C') {
@@ -126,14 +132,14 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
                 $homeloan_fee   = $o_r->getNumOfHomeLoanFee($from_day, $to_day, $staff_id);
             }
 
-            if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C'){
+            if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C' || $user_pos == 'M'){
                 $coaches = $o_r->getNumOfCoach($from_day, $to_day, $staff_id);
                 $coaches_fee = $o_r->getNumOfCoachFee($from_day, $to_day, $staff_id);
 
                 foreach ($coaches_fee as $week => $v) {
                     foreach ($v as $itemid=> $vv) {
                         if (!isset($coaches[$week]) || !isset($coaches[$week][$itemid])) {
-                            $coaches[$week][$itemid] = array('title'=>$vv['title'], 'list'=>array(), 'extrahour'=>array(), 'lessons'=>array(), 'hour'=>0, 'client'=>0);
+                            $coaches[$week][$itemid] = array('title'=>$vv['title'], 'list'=>array(), 'extrahour'=>0, 'lessons'=>array(), 'hour'=>0, 'client'=>0);
                         }
                     }
                 }
@@ -173,15 +179,22 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
                 $homeloan_fee   = $archive['homeloan_fee']; 
             }
 
-            if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C')
+            if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C' || $user_pos == 'M')
                 $coaches =  $archive['coaches']; 
         }
         else {
             if ($staff_id == $user_id || $user_pos == 'PE' || $user_pos == 'C') {
-                $courses    = $o_r->getAllOfCourseClientByUser($from_day, $to_day, $staff_id);
-                $courseprocs= $o_r->getAllOfCourseProcessByUser($from_day, $to_day, $staff_id);
-                $coursesems = $o_r->getAllOfCourseCommByUser($from_day, $to_day, $staff_id);
-                $coursepots = $o_r->getAllOfCoursePotCommByUser($from_day, $to_day, $staff_id);
+                $offduty = false;
+                if ($staff_id > 0) {
+                    $staff_info = $o_g->getUserList($staff_id);
+                    if (isset($staff_info[$staff_id]) && $staff_info[$staff_id]['leavedate'] > '0000-00-00') {
+                        $offduty = true;
+                    }
+                }
+                $courses    = $o_r->getAllOfCourseClientByUser($from_day, $to_day, $staff_id, $offduty);
+                $courseprocs= $o_r->getAllOfCourseProcessByUser($from_day, $to_day, $staff_id, $offduty);
+                $coursesems = $o_r->getAllOfCourseCommByUser($from_day, $to_day, $staff_id, $offduty);
+                $coursepots = $o_r->getAllOfCoursePotCommByUser($from_day, $to_day, $staff_id, $offduty);
             }
             
             if ($staff_id == $user_id || $user_pos == 'C') {
@@ -193,14 +206,14 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
                 $homeloan_fee   = $o_r->getAllOfHomeLoanFee($from_day, $to_day, $staff_id); 
             }
 
-            if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C') {
+            if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C' || $user_pos == 'M') {
                 $coaches = $o_r->getAllOfCoach($from_day, $to_day, $staff_id);
                 $coaches_fee = $o_r->getAllOfCoachFee($from_day, $to_day, $staff_id);
 
                 foreach ($coaches_fee as $week => $v) {
                     foreach ($v as $itemid=> $vv) {
                         if (!isset($coaches[$week]) || !isset($coaches[$week][$itemid])) {
-                            $coaches[$week][$itemid] = array('title'=>$vv['title'], 'list'=>array(), 'extrahour'=>array(), 'lessons'=>array(), 'hour'=>0, 'client'=>0);
+                            $coaches[$week][$itemid] = array('title'=>$vv['title'], 'list'=>array(), 'extrahour'=>0, 'lessons'=>array(), 'hour'=>0, 'client'=>0);
                         }
                     }
                 }
@@ -212,6 +225,15 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
         if ($user_id == 3) {
             $filter = array('is_all'=>$is_all, 'from_day'=>$from_day, 'to_day'=>$to_day);
             $o_r->doStaffArchive($staff_id, $is_all, $filter, $courses, $courseprocs, $coursesems, $coursepots, $visaagrees, $visaprocs, $visavisits, $homeloan, $homeloan_fee, $coaches);
+        }
+        else {
+            echo "<script language='javascript'>alert('Permisson Denied');</script>"; 
+        }
+    }
+    elseif (isset($_POST['bt_locked']) && $_POST['bt_locked'] == 'Locked Period') {
+        $o_h = new CoachAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
+        if ($user_id == 86 && $o_h->checkLockCode(isset($_POST['token'])? trim($_POST['token']) : '') && $staff_id == 87) {
+            $o_h->lockCompletedLesson($from_day, $to_day, $staff_id);
         }
         else {
             echo "<script language='javascript'>alert('Permisson Denied');</script>"; 
@@ -245,7 +267,7 @@ $o_tpl->assign('user_pos', $user_pos);
 
 
 
-if ($user_pos == 'C'){
+if ($user_pos == 'C' || $user_pos == 'M'){
     $o_tpl->assign('slUsers', $o_g->getUserNameArr(0,true));
 }
 elseif($user_pos == 'PC' || $user_pos == 'PE'){

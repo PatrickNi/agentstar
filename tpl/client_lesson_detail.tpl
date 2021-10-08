@@ -13,18 +13,20 @@
 
 
 <body>
-<form method="post" name="form1" action="" target="_self" onSubmit="return isDelete()">
+<form method="post" name="form1" action="" id="form1" target="_self">
 <input type="hidden" name="cid" value="{$cid}">
 <input type="hidden" name="coachid" value="{$coachid}">
 <input type="hidden" name="lessonid" value="{$lessonid}">
+<input type="hidden" id="token" name="token" value="">
+<input type="hidden" id="btn_name" name="btn_name" value="">
+
 			<table width="100%" cellpadding="1" cellspacing="1" border="0" class="graybordertable">
 				<tr><td colspan="2"><table cellpadding="0" cellspacing="0" width="100%">
 					<tr align="center"  class="greybg">
-						<input type="hidden" name="bt_name" value="">
 						<td align="left" width="10%">&nbsp;</td>		
 						<td align="center" class="whitetext">Lesson Detail </td>
 						<td align="right" width="10%">
-							<input name="submit" type="submit" style="font-weight:bold" onClick="this.form.bt_name.value='save';this.disable=false;" value="Save">
+							<button type="button" id="btn_save" style="font-weight:bolder;font-size:larger" onclick="do_save({if $dt_arr.locked eq 1}1{else}0{/if})">Save</button>
 						</td>
 					</tr>					
 				</table></td></tr>
@@ -84,12 +86,32 @@
                         <input type="text" size="10" name="fee" value="{$dt_arr.fee}">
 					</td>
 				</tr>	
+				<tr>
+					<td width="25%" align="left" class="rowodd"><strong>Locked Period</strong>&nbsp;&nbsp;</td>
+					<td align="left" width="75%" class="roweven">
+                        {if $dt_arr.locked eq 1}<span style="color:red;">Yes</span>{else}No{/if}
+					</td>
+				</tr>	
 				<tr class="greybg"><td colspan="2">&nbsp;</td></tr>										
 			</table>
 </form>	
 {literal}
 <script type="text/javascript">
-	$('#startdate').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });      
+	$('#startdate').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });
+
+	function do_save(locked) {
+		if (locked == 1){
+        	var token = prompt("Plese type in execute token");
+        	if (token == null) {
+            	return false;
+        	}
+		}
+        $("#token").val(token);
+        $("#btn_name").val("SAVE");
+        $("#form1").submit();
+        return true;
+    }
+         
 </script>
 {/literal}	
 </body>

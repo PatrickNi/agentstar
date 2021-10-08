@@ -132,12 +132,14 @@ class GeicAPI extends MysqlDB {
 		$departed = array();
 		$departed['###Departed###'] = '---Darparted---';
 		$department = '';
+		$has_departed = false;
 		while($this->fetch()){
 			if ($userid > 0) {
 				$_arr[$this->ID] =  ucwords($this->UserName);
 			}
 			elseif ($this->LeaveDate != '0000-00-00') {
 				$departed[$this->ID] =  ucwords($this->UserName);
+				$has_departed = true;
 			}
 			else {
 				if ($department == '' || $department != $this->Department) {
@@ -148,10 +150,11 @@ class GeicAPI extends MysqlDB {
 				$department = $this->Department;
 			}	
 		}
-		foreach ($departed as $k => $v) {
-			$_arr[$k] = $v;
+		if ($has_departed) {
+			foreach ($departed as $k => $v) {
+				$_arr[$k] = $v;
+			}
 		}
-		
 		return $_arr;  	
     }
     	

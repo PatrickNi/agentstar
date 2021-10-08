@@ -51,12 +51,14 @@
 		</td>
 	</tr>
 	<tr align="center"  class="greybg" >
-		<td align="left" style="font-size:16px " colspan="9"> <span class="highyellow">Client: {$client.lname} {$client.fname}</span>&nbsp;&nbsp; <span class="highyellow">DoB: {$client.dob}</span>&nbsp;&nbsp; <span class="highyellow">Main Visa: {$client.visa_n}-{$client.class_n}, expr: {$client.epdate}</span>&nbsp;&nbsp; </td>
+		<td align="left" style="font-size:16px " colspan="8"> <span class="highyellow">Client: {$client.lname} {$client.fname}</span>&nbsp;&nbsp; <span class="highyellow">DoB: {$client.dob}</span>&nbsp;&nbsp; <span class="highyellow">Main Visa: {$client.visa_n}-{$client.class_n}, expr: {$client.epdate}</span>&nbsp;&nbsp; </td>
 	</tr>		
 	<tr align="center" class="totalrowodd">
 		<td class="border_1">Visa</td>
 		<td class="border_1">Visa Subclass</td>
+		<!--
 		<td class="border_1">On Shore<br>/Off Shore</td>
+		-->
 		<td class="border_1">Agreement Date</td>
 		<td class="border_1">Apply Date</td>
 		<td class="border_1">Grant Date</td>
@@ -67,7 +69,9 @@
 	<tr align="center" class="roweven" >
 		<td class="border_1"><span style="{if $arr.active neq 2}font-weight:bold; color:#0066FF; {/if}cursor:pointer;" onClick="{if $arr.vuser eq $uid || $arr.auser eq $uid || $ugs.v_track.v eq 1 }window.open('client_visa_detail.php?cid={$cid}&vid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7){else}alert('Permission denied');{/if}">{$arr.visa}&nbsp;&nbsp;</span></td>
 		<td class="border_1">{$arr.class}</td>
+		<!--
 		<td class="border_1">{if $arr.shore eq 1} onshore {else} offshore {/if}</td>
+		-->
 		<td class="border_1">{$arr.adate}</td>
 		<td class="border_1">{if array_key_exists($id, $procs)}{$procs[$id].lodge}{/if}</td>
 		<td class="border_1">{if array_key_exists($id, $procs) && $procs[$id].grant != ""}{$procs[$id].grant}{else}{$arr.status}{/if}</td>
