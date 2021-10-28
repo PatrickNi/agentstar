@@ -15,7 +15,12 @@ else
 
 $alert_msg = "";
 if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "ADDEXIST"){
-
+    if (isset($_POST['t_idx_existed']) && $_POST['t_idx_existed'] != '' && $o_c->addItem($tpl_id, $_POST['t_idx_existed'])) {
+        $alert_msg = "<script>alert('CreateNew success');</script>";
+    }
+    else {
+        $alert_msg = "<script>alert('CreateNew failed');</script>";
+    }
 }
 elseif (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "CREATENEW"){
     $new_code = $o_c->addMeta(isset($_POST['t_name'])? $_POST['t_name'] : '', isset($_POST['t_idx'])? $_POST['t_idx'] : '', isset($_POST['t_tip'])? $_POST['t_tip'] : '');
@@ -32,11 +37,13 @@ elseif (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "CREATENEW"
 
 $tpl_arr  = $o_c->getTpls($tpl_id);
 $item_arr = $o_c->getItems($tpl_id);
+$meta_arr = $o_c->getMetas($tpl_id);
 
 # set smarty tpl
 $o_tpl = new Template;
 $o_tpl->assign('tpl_arr', $tpl_arr);
 $o_tpl->assign('item_arr', $item_arr);
+$o_tpl->assign('meta_arr', $meta_arr);
 $o_tpl->assign('alert_msg', $alert_msg);
 $o_tpl->display('checklist_detail.tpl');
 

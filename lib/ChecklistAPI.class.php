@@ -19,9 +19,9 @@ class ChecklistAPI extends MysqlDB{
             return $idx;
         
             
-        $sql = "insert into checklist_meta (Item, ItemDesc, ItemCode) values ('{$name}','{$desc}','{$desc}')";
+        $sql = "insert into checklist_meta (Item, ItemDesc, ItemCode) values ('{$name}','{$desc}','{$idx}')";
         $this->query($sql);
-        return $this->getLastInsertID();        
+        return $idx;        
     }
 
     function setMeta($item_id, $name='', $desc='') {
@@ -51,6 +51,27 @@ class ChecklistAPI extends MysqlDB{
         return $this->query($sql);        
     }
 
+    function getMetas($tpl_id = 0) {
+        if ($tpl_id > 0) {
+            $sql = "select a.ID, Item, ItemDesc, a.ItemCode,IsDeleted from checklist_meta a where IsDeleted = 0 and not exists (select 'x' from checklist_item b where b.TplID = {$tpl_id} and a.ItemCode = b.ItemCode) order by Item asc";
+        }
+        else {
+            $sql = "select a.ID, Item, ItemDesc, ItemCode,IsDeleted from checklist_meta where IsDeleted = 0 order by Item asc";
+            $tpl_id = 0;
+        }
+        $this->query($sql);
+        $rtn = array();
+        while($this->fetch()) {
+            $rtn[$this->ID]['tit'] = $this->Item;
+            $rtn[$this->ID]['tip'] = $this->ItemDesc;
+            $rtn[$this->ID]['idx'] = $this->ItemCode;
+            $rtn[$this->ID]['tpl'] = $tpl_id;
+            $rtn[$this->ID]['del'] = $this->IsDeleted;
+        }
+        return $rtn;        
+    }
+
+
     function addItem($tpl_id, $code) {
         if (!$tpl_id || !$code)
             return false;
@@ -69,12 +90,16 @@ class ChecklistAPI extends MysqlDB{
         return $this->getLastInsertID();
     }
 
-    function getItems($tpl_id) {
+    function getItems($tpl_id, $is_active=false) {
         if (!$tpl_id)
             return false;
 
-        $sql = "SELECT a.ID, b.Item, b.ItemDesc, b.IsDeleted, a.ItemCode, a.TplID FROM checklist_item a, checklist_meta b where a.ItemCode = b.ItemCode ";
-        $sql .= " and a.TplID = {$tpl_id} ";
+        $sql = "SELECT a.ID, b.Item, b.ItemDesc, b.IsDeleted, a.ItemCode, a.TplID FROM checklist_item a, checklist_meta b where a.ItemCode = b.ItemCode and a.TplID = {$tpl_id} ";
+        if ($is_active) {
+            $sql .= " and IsDeleted = 0 ";
+        }
+        
+        $sql .= "order by IsDeleted asc, ItemRank asc ";
         $this->query($sql);
         $rtn = array();
         while($this->fetch()) {
@@ -125,12 +150,15 @@ class ChecklistAPI extends MysqlDB{
 
     }
 
-    function getTpls($tpl_id=0) {
+    function getTpls($tpl_id=0,$active=false) {
         $rtn = array();
 
-        $sql = "SELECT ID, Subject, Status from checklist_tpl ";
+        $sql = "SELECT ID, Subject, Status from checklist_tpl WHERE 1 ";
         if ($tpl_id > 0) {
-            $sql .= " WHERE ID = {$tpl_id} ";
+            $sql .= " AND ID = {$tpl_id} ";
+        }
+        if ($active) {
+            $sql .= " AND status = 'Active' ";
         }
         $sql .= " order by Subject";
         $this->query($sql);
@@ -145,15 +173,59 @@ class ChecklistAPI extends MysqlDB{
             return $rtn;
     }
 
-    function createList() {
+    function getApp($type, $appid) {
+        $rtn = array();
+        if (!$type || !$appid)
+            return $rtn;
 
+        $sql = "select a.ID, a.Received, if(a.ItemCode = '', ExItem, b.Item) as Titile, if(a.ItemCode = '', '', b.ItemDesc) as Remark  from checklist_app a left join checklist_meta b on (a.ItemCode = b.ItemCode) where a.type = '{$type}' and a.Appid = {$appid} order by a.ID";
+        
+        $this->query($sql);
+        while ($this->fetch()) {
+            $rtn[$this->ID]['tit'] = $this->Titile;
+            $rtn[$this->ID]['rmk'] = $this->Remark;
+            $rtn[$this->ID]['rcd'] = $this->Received;
+        }
+        return $rtn;
     }
 
-    function updateList() {
-
+    function createApp($tpl_id, $type, $appid) {
+        if (!$tpl_id || !$type || !$appid)
+            return false;
+        
+        $sql = "insert into checklist_app (Type, AppID, ItemCode) Select '{$type}', '{$appid}', ItemCode FROM checklist_item where TplID = {$tpl_id} order by ItemRank ";
+        //echo $sql;
+        return $this->query($sql);        
     }
 
-    function updateReceived() {
 
+
+    function updateReceived($dates) {
+        if (!$dates)
+            return false;
+
+        foreach ($dates as $id => $d) {
+            if (!$d)
+                continue;
+
+            $sql = "update checklist_app SET Received = '{$d}' where id = {$id}";
+            $this->query($sql);
+        }
+
+        return false;
+    }
+
+    function addAppItems($type, $appid, $item, $received=''){
+        if (!$type || !$appid)
+            return false;
+
+        if ($item != '') {
+            if (!$received)
+                $received = '0000-00-00';
+            $sql = "insert into checklist_app (Type, AppID, ExItem, Received) values ('{$type}','{$appid}','{$item}','{$received}')";        
+            return $this->query($sql);
+        }
+        return false;
     }
 }
+

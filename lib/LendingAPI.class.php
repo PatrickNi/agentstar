@@ -141,7 +141,7 @@ class LendingAPI extends MysqlDB{
 		return false;
 	}
 
-	function getHomeloan($hid, $client_id, $user_id, $lend_id=0) {
+	function getHomeloan($hid, $client_id, $user_id, $lend_id=0, $agent_id=0) {
 		$sql = "SELECT a.*, b.LNAME, b.FNAME  FROM client_homeloan a, client_info b WHERE a.CID = b.CID";
 
 		if ($hid > 0)
@@ -155,6 +155,9 @@ class LendingAPI extends MysqlDB{
 
 		if ($lend_id > 0)
 			$sql .= " AND a.LID = {$lend_id} ";
+
+		if ($agent_id > 0)
+			$sql .= " AND b.AgentID = {$agent_id} ";
 		
 		$sql .= " ORDER BY a.ID ASC ";
 		$rtn = array();
@@ -242,8 +245,13 @@ class LendingAPI extends MysqlDB{
 		return false;
 	}
 
-	function getProcessByClient($cid) {
-		$sql = "select HID, REPLACE(Step, ' ', '') AS Step, BeginDate, Detail, Done, DueDate from client_homeloan_process a WHERE exists (select 'x' from client_homeloan b WHERE a.HID = b.ID and b.CID = {$cid}) ORDER BY HID, ID ASC ";
+	function getProcessByClient($cid,$agent_id=0) {
+		if ($cid > 0 ) {
+			$sql = "select HID, REPLACE(Step, ' ', '') AS Step, BeginDate, Detail, Done, DueDate from client_homeloan_process a WHERE exists (select 'x' from client_homeloan b WHERE a.HID = b.ID and b.CID = {$cid}) ORDER BY HID, ID ASC ";
+		}
+		elseif ($agent_id > 0) {
+			$sql = "select HID, REPLACE(Step, ' ', '') AS Step, BeginDate, Detail, Done, DueDate from client_homeloan_process a WHERE exists (select 'x' from client_homeloan b , client_info c WHERE a.HID = b.ID and b.CID = c.CID and c.agentID = {$agent_id} ) ORDER BY HID, ID ASC ";
+		}
 
 		$this->query($sql);
 		$_arr = array();

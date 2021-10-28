@@ -59,7 +59,6 @@
         $("#bt_name").val(act);
         $("#form1").submit();
     }
-  
 {/literal}
 </script>  
 </html>

@@ -184,7 +184,7 @@ if($user_id > 0){
 			</select>
 	</tr>	
 	<tr>
-		<td align="left"><strong>#Rank in Department: </strong>&nbsp;&nbsp;</td>
+		<td align="left"><strong>Division in Department: </strong>&nbsp;&nbsp;</td>
 		<td align="left" width="86%"><input type="text" size="30" name="u_department_rank" value="<?php echo $user_department_rank;?>"></td>
 	</tr>					
 	<tr>

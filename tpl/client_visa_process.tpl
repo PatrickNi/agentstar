@@ -53,6 +53,7 @@
                                      	<option value="cancel agreement" {if $dt_arr.subject eq 'cancel agreement'} selected {/if}>|------Cancel Agreement</option>
                                      	<option value="agent stop" {if $dt_arr.subject eq 'agent stop'} selected {/if}>|------Stop Agent</option>
                                      	<option value="declined" {if $dt_arr.subject eq 'declined'} selected {/if}>|------Declined</option>
+										<option value="reactive" {if $dt_arr.subject eq 'reactive'} selected {/if}>|------Reactive</option>
                                      </optgroup>
                                 {else}
                                      <option value="{$pid}" {if $pid eq $dt_arr.itemid} selected {/if}>{$process}</option>

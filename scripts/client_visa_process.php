@@ -6,7 +6,7 @@ require_once(__LIB_PATH.'VisaAPI.class.php');
 require_once(__LIB_PATH.'TodoAPI.class.php');
 
 
-$PROCESS_VISA_STATUS = array('withdraw'=>'withdraw', 'refused'=>'refused', 'cancel agreement'=>'cancel agreement', 'agent stop'=>'agent stop', 'declined' => 'declined' );
+$PROCESS_VISA_STATUS = array('withdraw'=>'withdraw', 'refused'=>'refused', 'cancel agreement'=>'cancel agreement', 'agent stop'=>'agent stop', 'declined' => 'declined', 'reactive' => 'reactive' );
 
 
 # check valid user

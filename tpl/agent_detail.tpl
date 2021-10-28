@@ -18,6 +18,10 @@
 			{/if}
 			{if $aid > 0 && (($exType eq 'top' && $ugs.a_st.v eq 1) || ($exType eq 'sub' && $dt_arr.cate eq 'education' && $ugs.ap_st.v eq 1) || ($exType eq 'sub' && $dt_arr.cate eq "student" && $ugs.aa_st.v eq 1))}
 			<input style="font-weight:bold;" type="button" value="Student" onClick="javascript:this.form.action='agent_student.php';this.form.submit();">&nbsp;&nbsp;
+			<input style="font-weight:bold;" type="button" value="Visa" onClick="javascript:this.form.action='agent_visa.php';this.form.submit();">&nbsp;&nbsp;
+			<input style="font-weight:bold;" type="button" value="Coach" onClick="javascript:this.form.action='agent_coach.php';this.form.submit();">&nbsp;&nbsp;
+			<input style="font-weight:bold;" type="button" value="Legal" onClick="javascript:this.form.action='agent_legal.php';this.form.submit();">&nbsp;&nbsp;
+			<input style="font-weight:bold;" type="button" value="Home Loan" onClick="javascript:this.form.action='agent_homeloan.php';this.form.submit();">&nbsp;&nbsp;
 			{/if}
 			{if $aid > 0 && ($exType eq 'top' || ($exType eq 'sub' && $dt_arr.cate eq 'education' && $ugs.ap_pa.v eq 1) || ($exType eq 'sub' && $dt_arr.cate eq "student" && $ugs.aa_pa.v eq 1))}
 			<input type="button" value="Attachment" style="font-weight:bold"

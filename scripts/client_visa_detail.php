@@ -243,6 +243,9 @@ $o_tpl->assign('msg', $msg);
 $o_tpl->assign('ugs', $ugs);
 global $g_visa_stauts;
 $o_tpl->assign('status', $g_visa_status);
+
+$o_tpl->assign('show_checklist', $visa_id == 8723? 1 : 0);
+
 $o_tpl->display('client_visa_detail.tpl'); 
 
 ?>

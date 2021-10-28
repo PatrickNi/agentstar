@@ -385,5 +385,102 @@ class AgentAPI extends MysqlDB {
 		$this->fetch();
 		return $this->ID;
 	}
+
+	function countVisa($agent_id) {
+		if (!$agent_id)
+			return false;
+
+		$sql = "select CONCAT(d.Fname, ' ', d.Lname) as ClientName, ID, VisaName, a.CateID, ClassName, a.SubClassID, ClientNo, FileNum, CaseDetail, a.Fax, a.Name, a.Email, a.Tel, a.AUserID, a.VUserID, a.OnShore, a.Note, a.Note2, a.ABody, a.State, a.KeyPoint, a.AFee, a.ADate, a.ATag, a.ExpireDate, a.VisitDate, a.r_Status, a.AscoID, CFee, OFee, AgentFee, a.CID from client_visa a left join visa_category b on(a.CateID = b.CateID) left join visa_subclass c on(a.SubClassID = c.SubClassID) left join client_info d on (a.CID = d.CID) Where d.AgentID = {$agent_id} ";
+		
+		$sql .= " ORDER BY IF(ADATE = '0000-00-00', '9999-99-99', ADATE) ASC ";
+		$this->query($sql);
+		$_arr = array();
+		while ($this->fetch()){
+			$_arr[$this->ID]['visa']    = $this->VisaName;
+			$_arr[$this->ID]['cateid']  = $this->CateID;
+			$_arr[$this->ID]['class']   = $this->ClassName;
+			$_arr[$this->ID]['classid'] = $this->SubClassID;
+			$_arr[$this->ID]['clientno'] = $this->ClientNo;
+			$_arr[$this->ID]['file']    = $this->FileNum;
+			$_arr[$this->ID]['offdt']   = $this->CaseDetail;
+			$_arr[$this->ID]['fax']     = $this->Fax;
+			$_arr[$this->ID]['name']    = $this->Name;
+			$_arr[$this->ID]['tel']     = $this->Tel;
+			$_arr[$this->ID]['email']   = $this->Email;
+			$_arr[$this->ID]['note']    = $this->Note;
+			$_arr[$this->ID]['shore']   = $this->OnShore;
+			$_arr[$this->ID]['auser']   = $this->AUserID;
+			$_arr[$this->ID]['vuser']   = $this->VUserID;
+			$_arr[$this->ID]['key']     = $this->KeyPoint;
+			$_arr[$this->ID]['body']    = $this->ABody;
+			$_arr[$this->ID]['state']   = $this->State;
+			$_arr[$this->ID]['note2']   = $this->Note2;
+			$_arr[$this->ID]['adate']   = $this->ADate;
+			$_arr[$this->ID]['fee']     = $this->AFee;
+			$_arr[$this->ID]['epdate']  = $this->ExpireDate;
+			$_arr[$this->ID]['vdate']   = $this->VisitDate;
+			$_arr[$this->ID]['status']  = $this->r_Status;
+			$_arr[$this->ID]['asco']    = $this->AscoID;
+			$_arr[$this->ID]['atag']    = $this->ATag;
+			$_arr[$this->ID]['cfee']    = $this->CFee;			
+			$_arr[$this->ID]['ofee']    = $this->OFee;
+			$_arr[$this->ID]['sfee']    = $this->AgentFee;
+			$_arr[$this->ID]['cname']   = $this->ClientName;
+			$_arr[$this->ID]['cid']   = $this->CID;
+					
+		}
+		return $_arr;		
+	}
+
+	function countVisaLodgeGrandProc($agent_id){
+		if ($agent_id == 0) {
+			return false;
+		}
+
+		$sql = "select BeginDate, CVID, b.Item, DueDate from client_visa_process a, visa_rs_item b, client_visa c left join client_info d on (c.CID = d.CID) where a.CVID = c.ID and a.ItemID = b.ItemID and d.AgentID = '{$agent_id}' and (b.Item like 'apply%' or b.Item like 'grant%') ";
+		$this->query($sql);      
+		$_arr = array();
+		while ($this->fetch()) {
+			
+			if (stripos($this->Item, 'apply') !== false) {
+				$_arr[$this->CVID]['lodge'] = $this->BeginDate;
+			}
+			elseif (stripos($this->Item, 'grant') !== false) {
+				$_arr[$this->CVID]['grant'] = $this->BeginDate;			
+			}
+		}
+		return $_arr;
+	}
+
+
+	function countCoach($agent_id) {
+        $sql = "SELECT concat(Fname, ' ', Lname) as ClientName, a.ID, a.CID, a.StaffID, a.AddUserID, a.ItemID, a.StartDate, a.EndDate, a.StartTime, a.DueHour, a.FreqWeek, a.Fee, a.AddTime, a.Note, a.SaleID, a.DeliverHours, a.School, a.Grade FROM client_coach a left join  client_info b on (a.CID = b.CID) where agentid = {$agent_id}";
+        
+        //echo $sql."<br/>";
+        $this->query($sql);
+        $arr = array();
+        while($this->fetch()) {
+            $arr[$this->ID]['cid'] = $this->CID;
+            $arr[$this->ID]['staff'] = $this->StaffID;
+            $arr[$this->ID]['adduser'] = $this->AddUserID;
+            $arr[$this->ID]['itemid'] = $this->ItemID;
+            $arr[$this->ID]['startdate'] = $this->StartDate;
+            $arr[$this->ID]['enddate'] = $this->EndDate;
+            $arr[$this->ID]['starttime'] = $this->StartTime;
+            $arr[$this->ID]['duehour'] = $this->DueHour;
+            $arr[$this->ID]['freqw'] = $this->FreqWeek;
+            $arr[$this->ID]['freqw_l'] = explode(',', $this->FreqWeek);
+            $arr[$this->ID]['fee'] = $this->Fee;
+            $arr[$this->ID]['created'] = $this->AddTime;
+            $arr[$this->ID]['note'] = $this->Note;
+            $arr[$this->ID]['sales'] = $this->SaleID;
+            $arr[$this->ID]['deliverhour'] = $this->DeliverHours;
+            $arr[$this->ID]['school'] = $this->School;
+            $arr[$this->ID]['grade'] = $this->Grade;
+			$arr[$this->ID]['cname'] = $this->ClientName;
+        }
+        return $arr;
+    }
+
 }
 ?>

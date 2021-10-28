@@ -45,7 +45,7 @@ class LegalAPI extends MysqlDB{
     	return false;    	
     }
 
-    function delCategory($cateid){
+    function delCategory($catid){
     	if ($catid > 0){
     		$sql = "delete from legal_category where CateID = {$catid} ";
     		return $this->query($sql);
@@ -210,6 +210,33 @@ class LegalAPI extends MysqlDB{
 		return $_arr;
 	}			
 
+	function countLegal($agent_id){
+		if (!$agent_id )
+			return false;
+
+		$cates = $this->getCategory();
+		$class = $this->getSubClass();
+
+		$sql = "select a.*, CONCAT(b.Fname, ' ', b.Lname) as ClientName from client_legal a left join client_info b on (a.CID = b.CID) where b.AgentID = {$agent_id} ";
+		$sql .= " ORDER BY ADDTIME ASC ";
+		$this->query($sql);
+		$_arr = array();
+		while ($this->fetch()){
+			$_arr[$this->ID]['cate']    = $cates[$this->CateID];
+			$_arr[$this->ID]['cateid']  = $this->CateID;
+			$_arr[$this->ID]['class']   = $class[$this->CateID][$this->SubClassID];
+			$_arr[$this->ID]['subid']   = $this->SubClassID;
+			$_arr[$this->ID]['auser']   = $this->AUserID;
+			$_arr[$this->ID]['vuser']   = $this->VUserID;
+			$_arr[$this->ID]['status']  = $this->STATUS;
+			$_arr[$this->ID]['vdate']   = $this->ConsultDate;
+			$_arr[$this->ID]['adate']   = $this->ADate;
+			$_arr[$this->ID]['note']    = $this->Note;	
+			$_arr[$this->ID]['cid']    = $this->CID;	
+			$_arr[$this->ID]['cname']    = $this->ClientName;	
+		}
+		return $_arr;
+	}		
 
 	function autoProcess($visa_id, $cateid, $subclassid) {
 		if (!$visa_id || !$cateid || !$subclassid)
