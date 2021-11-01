@@ -33,7 +33,17 @@
                 {/if}
             
         </select>
-        &nbsp;&nbsp;&nbsp;&nbsp; </td>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        {if $uid eq 3} 
+            <select name="t_about">
+                <option value="" selected>Choose where about us</option>
+                <option value="Others" {if $query_about eq "Others"} selected {/if}>Others</option>
+                {foreach item=name from=$clientfroms}
+                    <option value="{$name}" {if $query_about eq $name} selected {/if}>{$name}</option>
+                {/foreach}
+              </select>  
+        {/if}
+      </td>
     </tr>
     <tr class="bordered_2" align="center">
       <td align="left" colspan="2"> Report Type:&nbsp;
@@ -70,10 +80,10 @@
 <table width="100%" cellpadding="3" cellspacing="1" border="0" align="left">
   {foreach key=week item=daterange from=$weeks}
   <tr>
-    <td  class="highlighttext" colspan="6">{$daterange}</td>
+    <td  class="highlighttext" colspan="7">{$daterange}</td>
   </tr>
   <tr class="greybg">
-    <td colspan="6" class="highyellow">Apply School</td>
+    <td colspan="7" class="highyellow">Apply School</td>
   </tr>
   <tr align="center" class="totalrowodd" >
     <td>Course clients</td>
@@ -82,6 +92,7 @@
     <td>Received COE</td>
     <td>Potential Comm</td>  
     <td>Received Comm</td>
+    <td></td>
   </tr>
 
   <tr align="right" class="roweven" >
@@ -223,16 +234,18 @@
         <span style="font-weight:bolder; cursor:pointer;" onClick="d11_{$week}.style.display='none'">&times;</span>  
         </div>
         {/if}
-      </td>           
+      </td>    
+      <td></td>       
   </tr>
 
   <tr class="greybg">
-    <td colspan="6" class="highyellow">Visa Service</td>
+    <td colspan="7" class="highyellow">Visa Service</td>
   </tr> 
   <tr align="center" class="totalrowodd">
     <td>Visa Consultant </td>
     <td>Consultant Fee</td>
     <td>Agreement Signed</td>
+    <td>Agreement Received</td>
     <td>Apply Visa </td>
     <td>Finalized Cases (Free) </td>
     <td>Finalized Cases (Paid) </td>
@@ -267,6 +280,10 @@
           <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaagrees.$week.client.$id}&vid={$visaagrees.$week.visa.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="d7_{$week}.style.display='none'">&times;</span> </div></td>
+
+    <td>
+      <span onClick="openinSatff('d7_{$week}');" style="text-decoration:underline; cursor:pointer;">{$visaagrees[$week].paid|string_format:"%.2f"}</span>
+      </td>
 
     <td>
       {if $visaprocs[$week].lc_free > 0}
@@ -435,7 +452,7 @@
 
   </tr>
     <tr class="greybg">
-    <td colspan="6"class="highyellow">Coach Services</td>
+    <td colspan="7"class="highyellow">Coach Services</td>
   </tr>   
   <tr align="center" class="totalrowodd">
     <td>Course Item</td>
@@ -444,6 +461,7 @@
     <td># of lessons</td>
     <td>{if $user_pos == 'PC' || $user_pos == 'C' || $user_pos == 'M'}Received Coaching Fee{/if}</td>
     <td>{if $user_pos == 'PC' || $user_pos == 'C' || $user_pos == 'M'}Profit{/if}</td>
+    <td></td>
   </tr>
   {assign var="total_paid" value="0"}
   {assign var="total_sale" value="0"}
@@ -506,6 +524,7 @@
       {/if}
     </td>
     <td>&nbsp;</td>
+    <td></td>
   </tr> 
   {/foreach}
 
@@ -519,7 +538,7 @@
     </tr>
 
   <tr class="greybg">
-    <td colspan="6"class="highyellow">Legal Service</td>
+    <td colspan="7"class="highyellow">Legal Service</td>
   </tr> 
   <tr align="center" class="totalrowodd">
     <td>Legal consulted</td>
@@ -528,6 +547,7 @@
     <td>Completed legal</td>
     <td>&nbsp;</td>
     <td>&nbsp;</td>
+    <td></td>
   </tr>
   <tr align="right" class="roweven" >
     <td>&nbsp;</td>
@@ -536,10 +556,11 @@
     <td>&nbsp;</td>
     <td>&nbsp;</td>
     <td>&nbsp;</td>
+    <td></td>
   </tr> 
   
   <tr class="greybg">
-    <td colspan="6"class="highyellow">Home Loan</td>
+    <td colspan="7"class="highyellow">Home Loan</td>
   </tr>   
   <tr align="center" class="totalrowodd">
     <td> Referred clients</td>
@@ -548,6 +569,7 @@
     <td>&nbsp;</td>
     <td>&nbsp;</td>
     <td>&nbsp;</td>    
+    <td></td>
   </tr>
   <tr align="right" class="roweven" >  
    <td >
@@ -574,6 +596,7 @@
     <td>&nbsp;</td>
     <td>&nbsp;</td>
     <td>&nbsp;</td>
+    <td></td>
   </tr> 
   {/foreach}
 </table>

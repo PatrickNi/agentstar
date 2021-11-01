@@ -7,6 +7,7 @@ require_once(__LIB_PATH.'Template.class.php');
 require_once(__LIB_PATH.'Report.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
 require_once(__LIB_PATH.'CoachAPI.class.php');
+require_once(__LIB_PATH.'ClientAPI.class.php');
 
 set_time_limit(0);
 
@@ -17,6 +18,7 @@ if (!($user_id > 0)) {
 }
 $o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 $o_r = new ReportAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
+$o_c = new ClientAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
 //user grants
 $ugs = array();
@@ -36,6 +38,7 @@ $from_day = isset($_POST['t_fdate'])? trim($_POST['t_fdate']) : "";
 $to_day   = isset($_POST['t_tdate'])? trim($_POST['t_tdate']) : "";
 $staff_id = isset($_POST['t_staff'])? trim($_POST['t_staff']) : $user_id;
 $is_all   = isset($_POST['rp_type'])? trim($_POST['rp_type']) : "d";
+$query_about  = isset($_POST['t_about'])? trim($_POST['t_about']) : "";
 
 $weeks = array();
 $tmp_weeks  = array();
@@ -117,24 +120,24 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
                         $offduty = true;
                     }
                 }
-                $courses    = $o_r->getNumOfCourseClientByUser($from_day, $to_day, $staff_id, $offduty);
-                $courseprocs= $o_r->getNumOfCourseProcessByUser($from_day, $to_day, $staff_id, $offduty);
-                $coursesems = $o_r->getAmountOfCourseCommByUser($from_day, $to_day, $staff_id, $offduty);
-                $coursepots = $o_r->getAmountOfCoursePotCommByUser($from_day, $to_day, $staff_id, $offduty);
+                $courses    = $o_r->getNumOfCourseClientByUser($from_day, $to_day, $staff_id, $offduty,$query_about);
+                $courseprocs= $o_r->getNumOfCourseProcessByUser($from_day, $to_day, $staff_id, $offduty, $query_about);
+                $coursesems = $o_r->getAmountOfCourseCommByUser($from_day, $to_day, $staff_id, $offduty,$query_about);
+                $coursepots = $o_r->getAmountOfCoursePotCommByUser($from_day, $to_day, $staff_id, $offduty,$query_about);
             }
             
             if ($staff_id == $user_id || $user_pos == 'C') {
-                $visaagrees = $o_r->getNumOfAgreementByUser($from_day, $to_day, $staff_id); 
-                $visaprocs  = $o_r->getNumOfVisaProcByUser($from_day, $to_day, $staff_id);
+                $visaagrees = $o_r->getNumOfAgreementByUser($from_day, $to_day, $staff_id, $query_about); 
+                $visaprocs  = $o_r->getNumOfVisaProcByUser($from_day, $to_day, $staff_id, $query_about);
                 //$visapaids  = $o_r->getAmountofVisaByUser($from_day, $to_day, $staff_id);
-                $visavisits = $o_r->getNumOfVisitByUser($from_day, $to_day, $staff_id);
-                $homeloan   = $o_r->getNumOfHomeLoan($from_day, $to_day, $staff_id);
-                $homeloan_fee   = $o_r->getNumOfHomeLoanFee($from_day, $to_day, $staff_id);
+                $visavisits = $o_r->getNumOfVisitByUser($from_day, $to_day, $staff_id, $query_about);
+                $homeloan   = $o_r->getNumOfHomeLoan($from_day, $to_day, $staff_id, $query_about);
+                $homeloan_fee   = $o_r->getNumOfHomeLoanFee($from_day, $to_day, $staff_id, $query_about);
             }
 
             if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C' || $user_pos == 'M'){
-                $coaches = $o_r->getNumOfCoach($from_day, $to_day, $staff_id);
-                $coaches_fee = $o_r->getNumOfCoachFee($from_day, $to_day, $staff_id);
+                $coaches = $o_r->getNumOfCoach($from_day, $to_day, $staff_id, $query_about);
+                $coaches_fee = $o_r->getNumOfCoachFee($from_day, $to_day, $staff_id, $query_about);
 
                 foreach ($coaches_fee as $week => $v) {
                     foreach ($v as $itemid=> $vv) {
@@ -191,24 +194,24 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
                         $offduty = true;
                     }
                 }
-                $courses    = $o_r->getAllOfCourseClientByUser($from_day, $to_day, $staff_id, $offduty);
-                $courseprocs= $o_r->getAllOfCourseProcessByUser($from_day, $to_day, $staff_id, $offduty);
-                $coursesems = $o_r->getAllOfCourseCommByUser($from_day, $to_day, $staff_id, $offduty);
-                $coursepots = $o_r->getAllOfCoursePotCommByUser($from_day, $to_day, $staff_id, $offduty);
+                $courses    = $o_r->getAllOfCourseClientByUser($from_day, $to_day, $staff_id, $offduty, $query_about);
+                $courseprocs= $o_r->getAllOfCourseProcessByUser($from_day, $to_day, $staff_id, $offduty, $query_about);
+                $coursesems = $o_r->getAllOfCourseCommByUser($from_day, $to_day, $staff_id, $offduty, $query_about);
+                $coursepots = $o_r->getAllOfCoursePotCommByUser($from_day, $to_day, $staff_id, $offduty, $query_about);
             }
             
             if ($staff_id == $user_id || $user_pos == 'C') {
-                $visaagrees = $o_r->getAllOfAgreementByUser($from_day, $to_day, $staff_id); 
-                $visaprocs  = $o_r->getAllOfVisaProcByUser($from_day, $to_day, $staff_id);
+                $visaagrees = $o_r->getAllOfAgreementByUser($from_day, $to_day, $staff_id, $query_about); 
+                $visaprocs  = $o_r->getAllOfVisaProcByUser($from_day, $to_day, $staff_id, $query_about);
                 //$visapaids  = $o_r->getTotalAmountofVisaByUser($from_day, $to_day, $staff_id);
-                $visavisits = $o_r->getAllOfVisitByUser($from_day, $to_day, $staff_id);
-                $homeloan   = $o_r->getAllOfHomeLoan($from_day, $to_day, $staff_id);        
-                $homeloan_fee   = $o_r->getAllOfHomeLoanFee($from_day, $to_day, $staff_id); 
+                $visavisits = $o_r->getAllOfVisitByUser($from_day, $to_day, $staff_id, $query_about);
+                $homeloan   = $o_r->getAllOfHomeLoan($from_day, $to_day, $staff_id, $query_about);        
+                $homeloan_fee   = $o_r->getAllOfHomeLoanFee($from_day, $to_day, $staff_id, $query_about); 
             }
 
             if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C' || $user_pos == 'M') {
-                $coaches = $o_r->getAllOfCoach($from_day, $to_day, $staff_id);
-                $coaches_fee = $o_r->getAllOfCoachFee($from_day, $to_day, $staff_id);
+                $coaches = $o_r->getAllOfCoach($from_day, $to_day, $staff_id,$query_about);
+                $coaches_fee = $o_r->getAllOfCoachFee($from_day, $to_day, $staff_id, $query_about);
 
                 foreach ($coaches_fee as $week => $v) {
                     foreach ($v as $itemid=> $vv) {
@@ -264,6 +267,8 @@ $o_tpl->assign('isAll', $is_all);
 $o_tpl->assign('from_archive', $from_archive);
 $o_tpl->assign('uid', $user_id);
 $o_tpl->assign('user_pos', $user_pos);
+$o_tpl->assign('clientfroms', $o_c->getClientFrom());
+$o_tpl->assign('query_about', $query_about);
 
 
 

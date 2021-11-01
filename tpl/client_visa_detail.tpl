@@ -250,15 +250,11 @@
 							<td align="right">{$arr.gst_3rd|string_format:"%.2f"}</td>
 							<td align="right"><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_spand.php?aid={$id}','_blank', 'alwaysRaised=yes,height=500,width=800,location=no,scrollbars=yes')">{$arr.spand|string_format:"%.2f"}</span></td>
 							<td align="right">
-								{if $arr.step != 'app'}
-									{$arr.paid-$arr.dueamt_3rd|string_format:"%.2f"}
-									{if $arr.step == 'agreement' || $arr.step == 'extra-agreement'}
-										{assign var="total_profit" value=$total_profit+$arr.paid-$arr.dueamt_3rd}
-									{else}
-										{assign var="total_profit_3rd" value=$total_profit_3rd+$arr.paid-$arr.dueamt_3rd}
-									{/if}
+								{$arr.paid-$arr.dueamt_3rd|string_format:"%.2f"}
+								{if $arr.step == 'agreement' || $arr.step == 'extra-agreement'}
+									{assign var="total_profit" value=$total_profit+$arr.paid-$arr.dueamt_3rd}
 								{else}
-									0.00
+									{assign var="total_profit_3rd" value=$total_profit_3rd+$arr.paid-$arr.dueamt_3rd}
 								{/if}
 							</td>
 							<!--
