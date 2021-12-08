@@ -11,7 +11,7 @@ class ReportAPI extends MysqlDB {
     function getUrgentVisa($userid, $sort_list, $null_du=1, $page=1, $page_size=50){
 		$_arr = array();
 
-		$sql = "select SQL_CALC_FOUND_ROWS a.ID, concat(LName, ' ', FName) as ClientName, VisaName, ClassName, IF(a.ItemID > 0, Item, ExItem) as Item, DueDate, BeginDate, f.CID, CVID,
+		$sql = "select SQL_CALC_FOUND_ROWS a.ID, concat(LName, ' ', FName) as ClientName, VisaName, ClassName, IF(a.ItemID > 0, Item, ExItem) as Item, DueDate, BeginDate, f.CID, CVID, b.VUserID, 
 		               if(((a.DueDate >= Date(NOW()) and a.DueDate < Date(NOW()) + INTERVAL 7 Day) or a.DueDate < Date(NOW()))and a.DueDate <> '0000-00-00',0,1) as isTodo,
 		               if(a.DueDate = '0000-00-00', '9999-99-99', a.DueDate) as sortdue 
     				from client_visa_process a left join visa_rs_item c on(a.ItemID = c.ItemID) ,  client_visa  b, visa_category d,  visa_subclass e, client_info f   
@@ -59,6 +59,7 @@ class ReportAPI extends MysqlDB {
 			$_arr[$this->ID]['clientid']= $this->CID;
 			$_arr[$this->ID]['visaid']  = $this->CVID;
 			$_arr[$this->ID]['isTodo']  = $this->isTodo;
+            $_arr[$this->ID]['vuid']  = $this->VUserID;
 		}
 		return $_arr;
 	}        
@@ -1258,6 +1259,7 @@ class ReportAPI extends MysqlDB {
                 $visa[$this->ID]['paid'] = 0;
                 $visa[$this->ID]['gst'] = 0;
                 $_arr[$this->Week]['fname' ][$_arr[$this->Week]['pcnt']] = $this->Name." ( {$this->VisaName} {$this->ClassName} )";
+                $_arr[$this->Week]['done' ][$_arr[$this->Week]['pcnt']] = 0;
             }
 		}
 
@@ -1268,7 +1270,7 @@ class ReportAPI extends MysqlDB {
        
             while ($this->fetch()){
                 //paperwork profit
-                $visa[$this->VisaID]['fee'] += ($this->GST == 1? $this->DueAmount/1.1 : $this->DueAmount) - ($this->GST_3RD == 1? $this->AMOUNT_3RD/1.1 : $this->AMOUNT_3RD);
+                $visa[$this->VisaID]['fee'] += ($this->GST == 1? round($this->DueAmount/1.1,2) : $this->DueAmount) - ($this->GST_3RD == 1? round($this->AMOUNT_3RD/1.1,2) : $this->AMOUNT_3RD);
                 $visa[$this->VisaID]['gst'] = $this->GST;
             }            
                   
@@ -1276,7 +1278,7 @@ class ReportAPI extends MysqlDB {
             $sql = "select a.VisaID, sum(if(c.PaidAmount is null, 0, c.PaidAmount)) as paid from client_account a, client_payment c where a.ID = c.AccountID AND ACC_TYPE = 'visa'  and Step in ('agreement', 'extra-agreement') AND VisaID IN (".implode(',', array_keys($visa)).") group by a.ID";
             $this->query($sql);
             while ($this->fetch()){
-                $visa[$this->VisaID]['paid'] += ($visa[$this->VisaID]['gst'] == 1? $this->paid/1.1 : $this->paid);
+                $visa[$this->VisaID]['paid'] += ($visa[$this->VisaID]['gst'] == 1? round($this->paid/1.1,2) : $this->paid);
             }     
 
             foreach ($visa as $vid => $v) {
@@ -1286,7 +1288,9 @@ class ReportAPI extends MysqlDB {
                             $_arr[$w]['fname'][$i] .= ' $'.$v['fee'].' /$'.$v['paid'];
                             $_arr[$w]['fee'] += $v['fee'];
                             $_arr[$w]['paid'] += $v['paid'];
-
+                            if ($v['fee'] > 0 && $v['fee'] == $v['paid']) {
+                                $_arr[$w]['done'][$i] = 1;
+                            }
                             $_arr[$w]['sign1']++;
                             if ($v['fee'] == 0)
                                 $_arr[$w]['sign0']++;
@@ -1356,6 +1360,169 @@ class ReportAPI extends MysqlDB {
         return $_arr;       
     }
     	
+    function getNumOfVisaPaidByUser ($fromDay, $toDay, $userid, $aboutus="") {
+        $sql = "select date_format(p.PaidDate, '%Y%u') as Week, concat(LName, ' ', FName) as Name, v.CID, v.ID, vc.VisaName, vs.ClassName, sum(if(a.GST = 1, p.PaidAmount/1.1, p.PaidAmount)) as paid, a.GST  from client_payment p, client_account a, client_visa v, client_info c, visa_category vc, visa_subclass vs where p.AccountID = a.ID and a.ACC_TYPE = 'visa' and a.VisaID = v.ID and v.CID = c.CID  and v.CateID = vc.CateID and v.SubClassID = vs.SubClassID and a.Step in ('agreement', 'extra-agreement')  ";
+        if ($userid > 0) {
+			$sql .= " AND v.AUserID = {$userid} ";
+		}
+        if ($fromDay != "" && $fromDay  != "0000-00-00") {
+            $sql .= " AND p.PaidDate >= '{$fromDay}'";
+        }
+        if ($toDay != "" && $toDay  != "0000-00-00") {
+            $sql .= " And p.PaidDate <= '{$toDay}' ";
+        } 
+        if ($aboutus != "") {
+            if ($aboutus == 'Others') {
+                $sql .= " AND c.about = '' ";
+            }
+            else {
+                $sql .= " AND c.about = '{$aboutus}' ";
+            }
+        }
+
+        $sql .= " Group by Week, v.ID";
+        $this->query($sql);
+        $_arr = $visa = array();
+        while ($this->fetch()) {
+
+            if (!isset($_arr[$this->Week]) || !isset($_arr[$this->Week]['pcnt'])) {
+                $_arr[$this->Week]['pcnt'] = 0;  
+                $_arr[$this->Week]['paid'] = 0; 
+                $_arr[$this->Week]['spand'] = 0;            
+            }
+
+            $_arr[$this->Week]['pcnt']++;
+
+            $_arr[$this->Week]['show'  ][$_arr[$this->Week]['pcnt']] = $this->Name." ( {$this->VisaName} {$this->ClassName} )".'$'.round($this->paid,2);
+            $_arr[$this->Week]['client'][$_arr[$this->Week]['pcnt']] = $this->CID;
+            $_arr[$this->Week]['vid'   ][$_arr[$this->Week]['pcnt']] = $this->ID;
+            $_arr[$this->Week]['paid'] += round($this->paid,2);
+            $visa[$this->ID] = $_arr[$this->Week]['pcnt'];
+        }
+
+        //Spand
+        $sql = "select date_format(p.PaidDate, '%Y%u') as Week, concat(LName, ' ', FName) as Name, v.CID, v.ID, vc.VisaName, vs.ClassName, sum(if(a.GST_3RD = 1, p.PaidAmount/1.1, p.PaidAmount)) as spand from client_spand p, client_account a, client_visa v, client_info c, visa_category vc, visa_subclass vs where p.AccountID = a.ID and a.ACC_TYPE = 'visa' and a.VisaID = v.ID and v.CID = c.CID  and v.CateID = vc.CateID and v.SubClassID = vs.SubClassID and a.Step in ('agreement', 'extra-agreement')";
+        if ($userid > 0) {
+			$sql .= " AND v.AUserID = {$userid} ";
+		}
+        if ($fromDay != "" && $fromDay  != "0000-00-00") {
+            $sql .= " AND p.PaidDate >= '{$fromDay}'";
+        }
+        if ($toDay != "" && $toDay  != "0000-00-00") {
+            $sql .= " And p.PaidDate <= '{$toDay}' ";
+        } 
+        if ($aboutus != "") {
+            if ($aboutus == 'Others') {
+                $sql .= " AND c.about = '' ";
+            }
+            else {
+                $sql .= " AND c.about = '{$aboutus}' ";
+            }
+        }
+        $sql .= " Group by v.ID";
+        //echo $sql."\n";
+        $this->query($sql);
+        while ($this->fetch()) {
+            if (!isset($_arr[$this->Week]) || !isset($_arr[$this->Week]['pcnt'])) {
+                $_arr[$this->Week]['pcnt'] = 0;  
+                $_arr[$this->Week]['paid'] = 0; 
+                $_arr[$this->Week]['spand'] = 0;            
+            }
+
+            if (isset($visa[$this->ID])) {
+                $_arr[$this->Week]['show'][$visa[$this->ID]] = str_replace(' / $0', ' / -$'. round($this->spand,2), $_arr[$this->Week]['show'][$visa[$this->ID]]);
+            }
+            else {
+                $_arr[$this->Week]['pcnt']++;
+                $_arr[$this->Week]['client'][$_arr[$this->Week]['pcnt']] = $this->CID;
+                $_arr[$this->Week]['vid'][$_arr[$this->Week]['pcnt']] = $this->ID;
+                $_arr[$this->Week]['show'][$_arr[$this->Week]['pcnt']] = $this->Name." ( {$this->VisaName} {$this->ClassName} ) ".'$0 / -$'. round($this->spand,2);
+            }
+        
+            $_arr[$this->Week]['spand'] += round($this->spand,2);
+        }     
+        
+        return $_arr;
+    }
+
+    function getAllOfVisaPaidByUser ($fromDay, $toDay, $userid, $aboutus="") {
+        $sql = "select concat(LName, ' ', FName) as Name, v.CID, v.ID, vc.VisaName, vs.ClassName, sum(if(a.GST = 1, p.PaidAmount/1.1, p.PaidAmount)) as paid, a.GST  from client_payment p, client_account a, client_visa v, client_info c, visa_category vc, visa_subclass vs where p.AccountID = a.ID and a.ACC_TYPE = 'visa' and a.VisaID = v.ID and v.CID = c.CID  and v.CateID = vc.CateID and v.SubClassID = vs.SubClassID and a.Step in ('agreement', 'extra-agreement') ";
+        if ($userid > 0) {
+			$sql .= " AND v.AUserID = {$userid} ";
+		}
+        if ($fromDay != "" && $fromDay  != "0000-00-00") {
+            $sql .= " AND p.PaidDate >= '{$fromDay}'";
+        }
+        if ($toDay != "" && $toDay  != "0000-00-00") {
+            $sql .= " And p.PaidDate <= '{$toDay}' ";
+        } 
+        if ($aboutus != "") {
+            if ($aboutus == 'Others') {
+                $sql .= " AND c.about = '' ";
+            }
+            else {
+                $sql .= " AND c.about = '{$aboutus}' ";
+            }
+        }
+
+        $sql .= " Group by v.ID";
+        $this->query($sql);
+        $_arr = $visa = array();
+        $i = $paid = 0;
+        while ($this->fetch()) {
+            $_arr['all']['client'][$i] = $this->CID;
+            $_arr['all']['vid'][$i] = $this->ID;
+            $visa[$this->ID] = $i;
+            $_arr['all']['show'][$i] = $this->Name." ( {$this->VisaName} {$this->ClassName} ) ".'$'.round($this->paid,2).' / $0';
+            $paid += $this->paid;
+            $i++;   
+        }
+
+        $_arr['all']['paid'] = round($paid,2);
+
+
+        //Spand
+        $sql = "select concat(LName, ' ', FName) as Name, v.CID, v.ID, vc.VisaName, vs.ClassName, sum(if(a.GST_3RD = 1, p.PaidAmount/1.1, p.PaidAmount)) as spand from client_spand p, client_account a, client_visa v, client_info c, visa_category vc, visa_subclass vs where p.AccountID = a.ID and a.ACC_TYPE = 'visa' and a.VisaID = v.ID and v.CID = c.CID  and v.CateID = vc.CateID and v.SubClassID = vs.SubClassID and a.Step in ('agreement', 'extra-agreement')";
+        if ($userid > 0) {
+			$sql .= " AND v.AUserID = {$userid} ";
+		}
+        if ($fromDay != "" && $fromDay  != "0000-00-00") {
+            $sql .= " AND p.PaidDate >= '{$fromDay}'";
+        }
+        if ($toDay != "" && $toDay  != "0000-00-00") {
+            $sql .= " And p.PaidDate <= '{$toDay}' ";
+        } 
+        if ($aboutus != "") {
+            if ($aboutus == 'Others') {
+                $sql .= " AND c.about = '' ";
+            }
+            else {
+                $sql .= " AND c.about = '{$aboutus}' ";
+            }
+        }
+        $sql .= " Group by v.ID";
+        //echo $sql."\n";
+        $spand = 0;
+        $this->query($sql);
+        while ($this->fetch()) {
+            
+            if (isset($visa[$this->ID])) {
+                $_arr['all']['show'][$visa[$this->ID]] = str_replace(' / $0', ' / -$'. round($this->spand,2), $_arr['all']['show'][$visa[$this->ID]]);
+            }
+            else {
+                $_arr['all']['client'][$i] = $this->CID;
+                $_arr['all']['vid'][$i] = $this->ID;
+                $_arr['all']['show'][$i] = $this->Name." ( {$this->VisaName} {$this->ClassName} ) ".'$0 / -$'. round($this->spand,2);
+            }
+        
+            $spand += $this->spand;
+            $i++;   
+        }     
+        
+        $_arr['all']['spand'] = round($spand,2);
+
+        return $_arr;
+    }
 	
 	function getAllOfAgreementByUser($fromDay, $toDay, $userid,$aboutus=""){
 		$sql = "select concat(LName, ' ', FName) as Name, a.ID, b.CID, c.VisaName, d.ClassName, IF(`State` = 'active' and ADate > '0000-00-00', 1, 0) as sign, AUserID, AFee 
@@ -1384,7 +1551,8 @@ class ReportAPI extends MysqlDB {
 		while ($this->fetch()) {
 			$_arr['all']['pname'][$i] = $this->Name." ( {$this->VisaName} {$this->ClassName} )";
 			$_arr['all']['client'][$i] = $this->CID;
-            $_arr['all']['visa'  ][$i] = $this->ID;
+            $_arr['all']['visa'][$i] = $this->ID;
+            $_arr['all']['done'][$i] = 0;
 
 			if ($this->sign == 1) {
                 $visa[$this->ID]['client'][] = $i;
@@ -1393,7 +1561,7 @@ class ReportAPI extends MysqlDB {
                 $visa[$this->ID]['gst'] = 0;
 
 				$_arr['all']['fname' ][$i] = $this->Name." ( {$this->VisaName} {$this->ClassName} )";
-                $_arr['all']['line' ][$i] = $this->Name."\t".$this->VisaName."\t".$this->ClassName."\t".$this->sign."\t".$this->AUserID."\t".$this->AFee;
+                $_arr['all']['line' ][$i] = $this->Name."\t".$this->VisaName."\t".$this->ClassName."\t".$this->sign."\t".$this->AUserID."\t".$this->AFee;     
 			}
 			$i++;			
 		}
@@ -1402,10 +1570,11 @@ class ReportAPI extends MysqlDB {
         if (count($visa) > 0) {
             //Due , Due_3rd
             $sql = "select VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD from client_account a Where VisaID IN (".implode(',', array_keys($visa)).") AND ACC_TYPE = 'visa' and Step in ('agreement', 'extra-agreement')";
+            //echo $sql;
             $this->query($sql);   
             while ($this->fetch()){
                 //paperwork profit
-                $visa[$this->VisaID]['fee'] += ($this->GST == 1? $this->DueAmount/1.1 : $this->DueAmount) - ($this->GST_3RD == 1? $this->AMOUNT_3RD/1.1 : $this->AMOUNT_3RD);
+                $visa[$this->VisaID]['fee'] += ($this->GST == 1? round($this->DueAmount/1.1,2) : $this->DueAmount) - ($this->GST_3RD == 1? round($this->AMOUNT_3RD/1.1,2) : $this->AMOUNT_3RD);
                 $visa[$this->VisaID]['gst'] = $this->GST;
             }
 
@@ -1413,7 +1582,7 @@ class ReportAPI extends MysqlDB {
             $sql = "select a.VisaID, sum(if(c.PaidAmount is null, 0, c.PaidAmount)) as paid from client_account a, client_payment c where a.ID = c.AccountID AND ACC_TYPE = 'visa'  and Step in ('agreement', 'extra-agreement') AND VisaID IN (".implode(',', array_keys($visa)).") group by a.ID";
             $this->query($sql);
             while ($this->fetch()){
-                $visa[$this->VisaID]['paid'] += ($visa[$this->VisaID]['gst'] == 1? $this->paid/1.1 : $this->paid);
+                $visa[$this->VisaID]['paid'] += ($visa[$this->VisaID]['gst'] == 1? round($this->paid/1.1,2) : $this->paid);
             }     
 
             //echo "<pre>";
@@ -1423,6 +1592,13 @@ class ReportAPI extends MysqlDB {
                     foreach ($v['client'] as $i) {
                         $_arr['all']['fname'][$i] .= ' $'.$v['fee'] .' / $'.$v['paid'];
                         //echo $_arr['all']['line'][$i] ."\t". $v['fee']."\n";
+                        //var_dump($v['fee'] > 0 && $v['fee'] == $v['paid']);
+                        if ($v['fee'] > 0 && $v['fee'] == $v['paid']) {
+                            $_arr['all']['done'][$i] = 1;
+                        }
+                        elseif ($v['fee'] > 0 && $v['paid'] == 0) {
+                            $_arr['all']['done'][$i] = 2;
+                        }
                         $fee += $v['fee'];
                         $paid += $v['paid'];
                         $signed++;
@@ -1699,12 +1875,13 @@ class ReportAPI extends MysqlDB {
         
         //calc payment
         if (count($visa) > 0) {
-            $sql = "select a.ID, VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD, SUM(IF(STEP = 'agreement' AND DueAmount > 0, 1, 0)) AS HAS_AGREEMENT_FEE, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a left join client_payment b on(a.ID = b.AccountID) Where VisaID IN (".implode(',', array_keys($visa)).") AND ACC_TYPE = 'visa' Group by a.ID";
+            $sql = "select a.ID, VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD, SUM(IF(STEP = 'agreement' AND DueAmount > 0, 1, 0)) AS HAS_AGREEMENT_FEE, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a left join client_payment b on(a.ID = b.AccountID) Where VisaID IN (".implode(',', array_keys($visa)).") AND ACC_TYPE = 'visa' and Step in ('agreement', 'extra-agreement') Group by a.ID";
             $this->query($sql);
             
             while ($this->fetch()){
                 //paperwork profit
-                $visa[$this->VisaID]['profit'] += $this->paid - ($this->GST == 1? $this->DueAmount/11 : 0) - $this->AMOUNT_3RD + ($this->GST_3RD == 1? $this->AMOUNT_3RD/11 : 0);
+                //$visa[$this->VisaID]['profit'] += $this->paid - ($this->GST == 1? $this->DueAmount/11 : 0) - $this->AMOUNT_3RD + ($this->GST_3RD == 1? $this->AMOUNT_3RD/11 : 0);
+                $visa[$this->VisaID]['profit'] += ($this->GST == 1? $this->paid/1.1 : $this->paid);
                 $visa[$this->VisaID]['has_agreement_fee'] += $this->HAS_AGREEMENT_FEE; 
             }            
             foreach ($visa as $vid => $v) {
@@ -1966,7 +2143,10 @@ class ReportAPI extends MysqlDB {
 				$_arr['all']['lv'    ][$lodge] = $this->ID; 
                 $visa[$this->ID]['apply'][] = $lodge;
                 $visa[$this->ID]['profit'] = 0;
-                $visa[$this->ID]['has_agreement_fee'] = 0;           
+                $visa[$this->ID]['has_agreement_fee'] = 0;    
+                $visa[$this->ID]['receive_fee'] = 0; 
+                $visa[$this->ID]['spand_fee'] = 0; 
+                $visa[$this->ID]['gst'] = 0; 
                 $visa[$this->ID]['cate'] = $this->CateID;
                 $visa[$this->ID]['subclass'] = $this->SubClassID;     
                 $lodge++;
@@ -1978,7 +2158,10 @@ class ReportAPI extends MysqlDB {
                 $_arr['all']['gv'    ][$grant] = $this->ID;		
 				$visa[$this->ID]['grant'][] = $grant;
                 $visa[$this->ID]['profit'] = 0;
-                $visa[$this->ID]['has_agreement_fee'] = 0;                  
+                $visa[$this->ID]['has_agreement_fee'] = 0;
+                $visa[$this->ID]['receive_fee'] = 0; 
+                $visa[$this->ID]['spand_fee'] = 0; 
+                $visa[$this->ID]['gst'] = 0;             
                 $grant++;			
 			}
             elseif (preg_match('/^withdraw/i', $this->Item) ){
@@ -2040,15 +2223,26 @@ class ReportAPI extends MysqlDB {
 
         $comm_l = $comm_g = array();
         if (count($visa) > 0) {
-            $sql = "select a.ID, VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD, SUM(IF(STEP = 'agreement' AND DueAmount > 0, 1, 0)) AS HAS_AGREEMENT_FEE, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a left join client_payment b on(a.ID = b.AccountID) Where VisaID IN (".implode(',', array_keys($visa)).") AND ACC_TYPE = 'visa' Group by a.ID";
+            $sql = "select a.ID, VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD, SUM(IF(STEP = 'agreement' AND DueAmount > 0, 1, 0)) AS HAS_AGREEMENT_FEE, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a left join client_payment b on(a.ID = b.AccountID) Where VisaID IN (".implode(',', array_keys($visa)).") AND ACC_TYPE = 'visa' and Step in ('agreement', 'extra-agreement') Group by a.ID";
             $this->query($sql);
        
             while ($this->fetch()){
                 //paperwork profit
-                $visa[$this->VisaID]['profit'] += $this->paid - ($this->GST == 1? $this->DueAmount/11 : 0) - $this->AMOUNT_3RD + ($this->GST_3RD == 1? $this->AMOUNT_3RD/11 : 0);
+                //$visa[$this->VisaID]['profit'] += $this->paid - ($this->GST == 1? $this->DueAmount/11 : 0) - $this->AMOUNT_3RD + ($this->GST_3RD == 1? $this->AMOUNT_3RD/11 : 0);
+                $visa[$this->VisaID]['profit'] += ($this->GST == 1? $this->paid/1.1 : $this->paid);
                 $visa[$this->VisaID]['has_agreement_fee'] += $this->HAS_AGREEMENT_FEE;
+                $visa[$this->VisaID]['receive_fee'] += $this->paid;
+                $visa[$this->VisaID]['gst'] = $this->GST;
             }            
         
+            //Spand
+            $sql = "select a.ID, VisaID, Sum(if(p.PaidAmount is null, 0, p.PaidAmount)) as spand from client_spand p, client_account a where p.AccountID = a.ID and a.ACC_TYPE = 'visa' and a.Step in ('agreement', 'extra-agreement') and a.VisaID IN (".implode(',', array_keys($visa)).") Group by a.ID";
+            $this->query($sql);
+            while ($this->fetch()){
+                $visa[$this->VisaID]['spand_fee'] += $this->spand;
+            }  
+
+
             foreach ($visa as $vid => $v) {
                 if (isset($v['apply'])) {
                     foreach ($v['apply'] as $i) {
@@ -2077,23 +2271,23 @@ class ReportAPI extends MysqlDB {
                 }
                 if (isset($v['grant'])) {
                     foreach ($v['grant'] as $i) {
-                        
-                        $grev += $v['profit'];   
-                        if ($v['profit'] <= 0)
+                        $profit_net = $v['gst'] >0? round(($v['receive_fee'] - $v['spand_fee'])/1.1,2) : ($v['receive_fee'] - $v['spand_fee']);
+                        $grev += $profit_net;   
+                        if ($profit_net <= 0)
                             $grant_0++;      
 
                         if ($v['has_agreement_fee'] > 0) {
-                            $grev_paid += $v['profit'];
-                            $_arr['all']['gname_paid'][$i] = $_arr['all']['gname'][$i].' $'.$v['profit'];
+                            $grev_paid += $profit_net;
+                            $_arr['all']['gname_paid'][$i] = $_arr['all']['gname'][$i].' $'.$profit_net;
                             $gc_paid++;
-                            if ($v['profit'] <= 0)
+                            if ($profit_net <= 0)
                                 $gc_paid_0++;
                         }
                         else {
-                            $grev_free += $v['profit'];
-                            $_arr['all']['gname_free'][$i] = $_arr['all']['gname'][$i].' $'.$v['profit'];                           
+                            $grev_free += $profit_net;
+                            $_arr['all']['gname_free'][$i] = $_arr['all']['gname'][$i].' $'.$profit_net;                           
                             $gc_free++;
-                            if ($v['profit'] <= 0)
+                            if ($profit_net <= 0)
                                 $gc_free_0++;
                         }
                         //$_arr['all']['gname'][$i] .= ' $'.$v['profit'];
@@ -2289,7 +2483,225 @@ class ReportAPI extends MysqlDB {
 		return $_arr;				
 	}
 
-	
+
+    function getNumOfVisaGranted($fromDay, $toDay, $userid,$aboutus=""){
+		
+		$sql  = "select date_format(BeginDate, '%Y%u') as Week, if(b.Item is null, ExItem, b.Item) as Item, c.AFee, concat(LName, ' ', FName) as Name, d.CID, c.ID, c.r_Status, c.CateID, c.SubClassID   
+		          from client_visa_process a left join visa_rs_item b on (a.ItemID = b.ItemID), client_visa c, client_info d  
+		          where a.CVID  = c.ID and c.CID = d.CID and (b.Item not like '%assessment'  or b.Item is null) and a.Done = 1 ";
+		if ($userid > 0) {
+			$sql .= " AND c.AUserID = {$userid} ";
+		}
+		if ($fromDay != "" && $toDay  != "") {
+			$sql .= " AND a.BeginDate >= '{$fromDay}' and a.BeginDate <= '{$toDay}' ";
+		}
+        if ($aboutus != "") {
+            if ($aboutus == 'Others') {
+                $sql .= " AND d.about = '' ";
+            }
+            else {
+                $sql .= " AND d.about = '{$aboutus}' ";
+            }
+        }
+
+		//$sql .= " GROUP BY b.ITEM, c.ID ";
+        //echo $sql;
+		$this->query($sql);
+		$_arr = array();
+        $visa = array();
+		while ($this->fetch()) {
+            if (preg_match('/^grant/i', $this->Item)){
+				if (!isset($_arr[$this->Week]) || !isset($_arr[$this->Week]['gcnt'])) {
+					$_arr[$this->Week]['gcnt' ] = 0;
+					$_arr[$this->Week]['gcnt1'] = 0;
+					$_arr[$this->Week]['gcnt0']	= 0;
+                    $_arr[$this->Week]['gfee' ] = 0;
+                    $_arr[$this->Week]['gfee_paid' ] = 0;	
+                    $_arr[$this->Week]['gfee_free' ] = 0;
+				
+                    $_arr[$this->Week]['gc_free'  ] = 0;
+                    $_arr[$this->Week]['gc_free_0'] = 0;
+                    $_arr[$this->Week]['gc_paid'  ] = 0;
+                    $_arr[$this->Week]['gc_paid_0'] = 0;  
+                }
+
+				$_arr[$this->Week]['gcnt']++;
+
+				$_arr[$this->Week]['gname'][$_arr[$this->Week]['gcnt']] = $this->Name;
+				$_arr[$this->Week]['gc'   ][$_arr[$this->Week]['gcnt']] = $this->CID;
+                $_arr[$this->Week]['gv'   ][$_arr[$this->Week]['gcnt']] = $this->ID;
+                $visa[$this->ID]['grant'][$this->Week][] = $_arr[$this->Week]['gcnt'];
+                $visa[$this->ID]['profit'] = 0;
+                $visa[$this->ID]['has_agreement_fee'] = 0; 		
+			}
+		}
+        
+        //calc payment
+        if (count($visa) > 0) {
+            $sql = "select a.ID, VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD, SUM(IF(STEP = 'agreement' AND DueAmount > 0, 1, 0)) AS HAS_AGREEMENT_FEE, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a left join client_payment b on(a.ID = b.AccountID) Where VisaID IN (".implode(',', array_keys($visa)).") AND ACC_TYPE = 'visa' and Step in ('agreement', 'extra-agreement') Group by a.ID";
+            $this->query($sql);
+            
+            while ($this->fetch()){
+                //paperwork profit
+                //$visa[$this->VisaID]['profit'] += $this->paid - ($this->GST == 1? $this->DueAmount/11 : 0) - $this->AMOUNT_3RD + ($this->GST_3RD == 1? $this->AMOUNT_3RD/11 : 0);
+                $visa[$this->VisaID]['profit'] += ($this->GST == 1? $this->paid/1.1 : $this->paid);
+                $visa[$this->VisaID]['has_agreement_fee'] += $this->HAS_AGREEMENT_FEE; 
+            }            
+            foreach ($visa as $vid => $v) {
+                if (isset($v['grant'])) {
+                    foreach ($v['grant'] as $w => $vv) {
+                        foreach ($vv as $i) {
+                            
+                            $_arr[$w]['gfee'] += $v['profit'];
+                            $_arr[$w]['gcnt1']++;
+                            
+                            if ($v['profit'] <= 0) 
+                                $_arr[$w]['gcnt0']++; 
+
+                            if ($v['has_agreement_fee'] > 0) {
+                                $_arr[$w]['gfee_paid'] += $v['profit'];
+                                $_arr[$w]['gc_paid']++;
+                                if ($v['profit'] <= 0)
+                                    $_arr[$w]['gc_paid_0']++;
+
+                                $_arr[$w]['gname_paid'][$i] = $_arr[$w]['gname'][$i] .' $'.$v['profit'];
+                            }
+                            else {
+                                $_arr[$w]['gfee_free'] += $v['profit'];
+                                $_arr[$w]['gc_free']++;
+
+                                if ($v['profit'] > 0)
+                                    $_arr[$w]['gc_free_0']++;
+
+                                $_arr[$w]['gname_free'][$i] = $_arr[$w]['gname'][$i] .' $'.$v['profit']; 
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+		return $_arr;				
+	}
+
+
+    function getAllOfVisaGranted($fromDay, $toDay, $userid, $aboutus=""){
+		
+        //and (b.Item not like '%assessment' or b.Item is null) 
+		$sql  = "select if(b.Item is null, a.ExItem, b.Item) AS Item, c.AFee, concat(LName, ' ', FName) as Name, d.CID, c.ID, c.r_Status, c.CateID, c.SubClassID from client_visa_process a left join visa_rs_item b on (a.ItemID = b.ITEMID), client_visa c, client_info d
+		         where a.CVID  = c.ID and c.CID = d.CID and b.Item is not null and a.Done = 1 ";
+		if ($userid > 0) {
+			$sql .= " AND c.AUserID = {$userid} ";
+		}
+		if ($fromDay != "" && $toDay  != "") {
+			$sql .= " AND a.BeginDate >= '{$fromDay}' and a.BeginDate <= '{$toDay}' ";
+		}		
+
+        if ($aboutus != "") {
+            if ($aboutus == 'Others') {
+                $sql .= " AND d.about = '' ";
+            }
+            else {
+                $sql .= " AND d.about = '{$aboutus}' ";
+            }
+        }
+
+		//$sql .= " GROUP BY b.ITEM,c.ID ";
+        //echo $sql."\n";
+		$this->query($sql);
+		$lodge  = $grant = $withdraw = $refuse = $cancel = $stop = $declined = 0;
+        $visa   = array();
+		while ($this->fetch()) {
+ 			//$comm = round($this->Fee_Recv - $this->Fee_Pay,2);	
+            
+            if (preg_match('/^grant/i', $this->Item)){
+				$_arr['all']['gname' ][$grant] = $this->Name;
+                $_arr['all']['gc'    ][$grant] = $this->CID;
+                $_arr['all']['gv'    ][$grant] = $this->ID;		
+				$visa[$this->ID]['grant'][] = $grant;
+                $visa[$this->ID]['profit'] = 0;
+                $visa[$this->ID]['has_agreement_fee'] = 0;
+                $visa[$this->ID]['receive_fee'] = 0; 
+                $visa[$this->ID]['spand_fee'] = 0; 
+                $visa[$this->ID]['gst'] = 0;             
+                $grant++;			
+			}
+
+		}
+    
+        //calc payment
+        $grant_0  = $gc_paid = $gc_paid_0 =  $gc_free = $gc_free_0 = $grev = $grev_paid = $grev_free = 0;
+
+        $comm_l = $comm_g = array();
+        if (count($visa) > 0) {
+            $sql = "select a.ID, VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD, SUM(IF(STEP = 'agreement' AND DueAmount > 0, 1, 0)) AS HAS_AGREEMENT_FEE, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a left join client_payment b on(a.ID = b.AccountID) Where VisaID IN (".implode(',', array_keys($visa)).") AND ACC_TYPE = 'visa' and Step in ('agreement', 'extra-agreement') Group by a.ID";
+            $this->query($sql);
+       
+            while ($this->fetch()){
+                $visa[$this->VisaID]['profit'] += ($this->GST == 1? $this->paid/1.1 : $this->paid);
+                $visa[$this->VisaID]['has_agreement_fee'] += $this->HAS_AGREEMENT_FEE;
+                $visa[$this->VisaID]['receive_fee'] += $this->paid;
+                $visa[$this->VisaID]['gst'] = $this->GST;
+            }            
+        
+            //Spand
+            $sql = "select a.ID, VisaID, Sum(if(p.PaidAmount is null, 0, p.PaidAmount)) as spand from client_spand p, client_account a where p.AccountID = a.ID and a.ACC_TYPE = 'visa' and a.Step in ('agreement', 'extra-agreement') and a.VisaID IN (".implode(',', array_keys($visa)).") Group by a.ID";
+            $this->query($sql);
+            while ($this->fetch()){
+                $visa[$this->VisaID]['spand_fee'] += $this->spand;
+            }  
+
+
+            foreach ($visa as $vid => $v) {
+                if (isset($v['grant'])) {
+                    foreach ($v['grant'] as $i) {
+                        $profit_net = $v['gst'] >0? round(($v['receive_fee'] - $v['spand_fee'])/1.1,2) : ($v['receive_fee'] - $v['spand_fee']);
+                        $grev += $profit_net;   
+                        if ($profit_net <= 0)
+                            $grant_0++;      
+
+                        if ($v['has_agreement_fee'] > 0) {
+                            $grev_paid += $profit_net;
+                            $_arr['all']['gname_paid'][$i] = $_arr['all']['gname'][$i].' $'.$profit_net;
+                            $gc_paid++;
+                            if ($profit_net <= 0)
+                                $gc_paid_0++;
+                        }
+                        else {
+                            $grev_free += $profit_net;
+                            $_arr['all']['gname_free'][$i] = $_arr['all']['gname'][$i].' $'.$profit_net;                           
+                            $gc_free++;
+                            if ($profit_net <= 0)
+                                $gc_free_0++;
+                        }
+                        //$_arr['all']['gname'][$i] .= ' $'.$v['profit'];
+                    }
+                }
+            }
+        } 
+        
+		$_arr['all']['lcnt1'] = $lodge;
+		$_arr['all']['gcnt1'] = $grant;
+        $_arr['all']['wcnt1'] = $withdraw;
+        $_arr['all']['rcnt1'] = $refuse;
+        $_arr['all']['ccnt1'] = $cancel;
+        $_arr['all']['scnt1'] = $stop;
+        $_arr['all']['dcnt1'] = $declined;
+
+		$_arr['all']['gcnt0'] = $grant_0;
+
+
+
+		$_arr['all']['gfee'] = $grev;
+        $_arr['all']['gfee_paid'] = $grev_paid;
+        $_arr['all']['gfee_free'] = $grev_free;
+
+        $_arr['all']['gc_paid'] = $gc_paid;
+        $_arr['all']['gc_paid_0'] = $gc_paid_0;
+        $_arr['all']['gc_free'] = $gc_free;
+        $_arr['all']['gc_free_0'] = $gc_free_0;
+		return $_arr;				
+	}
 	
 	function getCommissionByUser($userid, $page=0, $page_size=0){
 		$sql = "select concat(LName, ' ', FName) as Name, a.CID, b.ID as CourseID, c.ID as SemID, d.Detail, d.KeyPoint, d.BeginDate from client_info a 

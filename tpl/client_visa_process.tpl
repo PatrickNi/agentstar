@@ -34,9 +34,12 @@
 				</tr>
 				{if $isOther eq 1 || ($dt_arr.itemid eq '0' && $isNew neq 1)}
 					<tr>
-						<td width="19%" align="left" class="rowodd"><strong>Additional Step:</strong>&nbsp;&nbsp;</td>
+						<td width="19%" align="left" class="rowodd">
+							<strong>Additional Step:</strong>&nbsp;&nbsp;
+							<button type="button" onclick="add_dha()" style="font-size:smaller;">Start w/ DHA request</button>
+						</td>
 						<td align="left" width="81%" class="roweven">
-							<input type="text" name="t_add" value="{$dt_arr.add}" style="width:600px;">
+							<input type="text" name="t_add" id="t_add" value="{$dt_arr.add}" style="width:600px;">
 						</td>
 					</tr>
 				{else}
@@ -103,6 +106,10 @@
 		 	$("#epd_span").css("visibility","hidden");
 		 	$("#t_epdate").attr("disabled","disabled");
 		 }
+	}
+
+	function add_dha(){
+		$("#t_add").val("DHA request ");
 	}
 </script>
 {/literal}

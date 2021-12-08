@@ -105,6 +105,8 @@
 						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="setSortOrd(4,0);t_view.value='v';form1.submit();"/>&nbsp;&nbsp;
 						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="setSortOrd(4,1);t_view.value='v';form1.submit();"/>					
 					</td>
+					<td nowrap="nowrap">Paperwork&nbsp;&nbsp;
+					</td>
 					<td nowrap="nowrap">Due Date&nbsp;&nbsp;						
 						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="setSortOrd(5,0);t_view.value='v';form1.submit();"/>&nbsp;&nbsp;
 						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="setSortOrd(5,1);t_view.value='v';form1.submit();"/>			<br/><input type="checkbox" name="vdu" value="1" {if $vdu eq 1} checked {/if} onChange="t_view.value='v';form1.submit()"/> ex(0000-00-00)
@@ -118,7 +120,8 @@
 					<td align="left" nowrap="nowrap">{$arr.cate}</td>
 					<td align="left">{$arr.class}</td>
 					<!-- onClick="openModel('client_visa_process.php?pid={$id}&cid={$arr.clientid}&vid={$arr.visaid}',800,560,'NO', 'form1')"-->
-					<td align="left" style="{if $arr.islodge eq 1}color:#FF3300;{elseif $arr.isApply eq 1}color:blue;{/if}cursor:pointer; text-decoration:underline" onClick="window.open('client_visa_detail.php?cid={$arr.clientid}&vid={$arr.visaid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$arr.item}</td>
+					<td align="left" style="{if $arr.islodge eq 1}color:#FF3300;{elseif $arr.isApply eq 1}color:blue;{elseif stripos($arr.item, 'DHA request') === 0}color:red;{/if}cursor:pointer; text-decoration:underline" onClick="window.open('client_visa_detail.php?cid={$arr.clientid}&vid={$arr.visaid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$arr.item}</td>
+					<td nowrap="nowrap">{$slUsers[$arr.vuid]}</td>
 					<td nowrap="nowrap" {if $arr.isTodo neq 1}style="color:#660000; font-weight:bold"{/if}>{$arr.due}</td>
 				 </tr>
 				{/foreach}	
@@ -167,7 +170,7 @@
 					<td width="100px">Due Date&nbsp;&nbsp;
 						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="t_view.value='c';setSortOrd(6,0);form1.submit();"/>&nbsp;&nbsp;
 						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="t_view.value='c';setSortOrd(6,1);form1.submit();"/>			
-						<br/><input type="checkbox" name="cdu" value="1" {if $cdu eq 1} checked {/if} onChange="t_view.value='v';form1.submit()"/> ex(0000-00-00)							
+						<br/><input type="checkbox" name="cdu" value="1" {if $cdu eq 1} checked {/if} onChange="t_view.value='vm';form1.submit()"/> ex(0000-00-00)							
 					</td>
 				</tr>
 				 {foreach key=id item=arr from=$urgent_arr}
@@ -225,7 +228,7 @@
 					<td width="100px">Due Date&nbsp;&nbsp;
 						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="t_view.value='c';setSortOrd(6,0);form1.submit();"/>&nbsp;&nbsp;
 						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="t_view.value='c';setSortOrd(6,1);form1.submit();"/>			
-						<br/><input type="checkbox" name="cdu" value="1" {if $cdu eq 1} checked {/if} onChange="t_view.value='v';form1.submit()"/> ex(0000-00-00)							
+						<br/><input type="checkbox" name="cdu" value="1" {if $cdu eq 1} checked {/if} onChange="t_view.value='c';form1.submit()"/> ex(0000-00-00)							
 					</td>
 				</tr>
 				 {foreach key=id item=arr from=$urgent_arr}
@@ -259,7 +262,7 @@
 					<td nowrap="nowrap">Due Date&nbsp;&nbsp;
 						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="t_view.value='i';setSortOrd(3,0);form1.submit();"/>&nbsp;&nbsp;
 						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="t_view.value='i';setSortOrd(3,1);form1.submit();"/>			
-						<br/><input type="checkbox" name="idu" value="1" {if $idu eq 1} checked {/if} onChange="t_view.value='v';form1.submit()"/> ex(0000-00-00)					
+						<br/><input type="checkbox" name="idu" value="1" {if $idu eq 1} checked {/if} onChange="t_view.value='i';form1.submit()"/> ex(0000-00-00)					
 					</td>
 				</tr>
 				 {foreach key=id item=arr from=$urgent_arr}
@@ -291,7 +294,7 @@
 					<td nowrap="nowrap">Due Date&nbsp;&nbsp;
 						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="t_view.value='a';setSortOrd(3,0);form1.submit();"/>&nbsp;&nbsp;
 						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="t_view.value='a';setSortOrd(3,1);form1.submit();"/>			
-						<br/><input type="checkbox" name="asubdu" value="1" {if $asubdu eq 1} checked {/if} onChange="t_view.value='v';form1.submit()"/> ex(0000-00-00)																	
+						<br/><input type="checkbox" name="asubdu" value="1" {if $asubdu eq 1} checked {/if} onChange="t_view.value='asub';form1.submit()"/> ex(0000-00-00)																	
 					</td>
 				</tr>
 				 {foreach key=id item=arr from=$urgent_arr}
@@ -322,7 +325,7 @@
 					<td nowrap="nowrap">Due Date&nbsp;&nbsp;
 						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="t_view.value='a';setSortOrd(3,0);form1.submit();"/>&nbsp;&nbsp;
 						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="t_view.value='a';setSortOrd(3,1);form1.submit();"/>
-						<br/><input type="checkbox" name="atopdu" value="1" {if $atopdu eq 1} checked {/if} onChange="t_view.value='v';form1.submit()"/> ex(0000-00-00)																				
+						<br/><input type="checkbox" name="atopdu" value="1" {if $atopdu eq 1} checked {/if} onChange="t_view.value='atop';form1.submit()"/> ex(0000-00-00)																				
 					</td>
 				</tr>
 				 {foreach key=id item=arr from=$urgent_arr}

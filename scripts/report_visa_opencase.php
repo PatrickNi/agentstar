@@ -44,10 +44,10 @@ $review_arr = array();
 $proc_arr = array();
 if ($catid > 0 && $subid > 0){
 	$review_arr = $o_c->getVisaReview($from_day, $to_day, $catid, $subid, $staff_id, $isOpencase);
-
+	
 	# add process
 	$proc_arr = $o_c->getProcessDateByVisa($review_arr);	
-
+	//var_dump($proc_arr);exit;
 	//get amount
 	$amount_arr = $o_c->getAccountByVisa($review_arr);
 	

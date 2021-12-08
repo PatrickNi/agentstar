@@ -213,14 +213,15 @@
 						</tr>
 						<tr align="center" class="totalrowodd">
 							<td>Item</td>
-							<td>Due<br/>Amount</td>
+							<td>Gross<br/>Due</td>
 							<td>GST</td>
 							<td>Total<br/>Received</td>
 							<td>Deduction</td>
-							<td>Deduction<br/>Amount</td>
+							<td>Gross<br/>Deduction</td>
 							<td>GST</td>
 							<td>Total Paid</td>
-							<td>Profit</td>
+							<td>Gross Profit</td>
+							<td>Net Profit</td>
 							<!--
 							<td>Agreement<br/>Profit</td>
 							<td>Paperwork<br/>Profit</td>
@@ -232,6 +233,7 @@
 						{assign var="total_received" value="0"}
 						{assign var="agreement_profit" value="0"}
 						{assign var="paperwork_profit" value="0"}
+						{assign var="net_profit" value="0"}
 						{foreach key=id item=arr from=$account_arr}
 						<tr align="center" class="roweven">
 							<td style="text-decoration:underline; cursor:pointer" onClick="window.open('client_account_detail.php?vid={$vid}&aid={$id}&cid={$cid}&typ=visa','_blank', 'alwaysRaised=yes,height=500, width=800,location=no,scrollbars=yes')" >{$arr.step|ucwords}</td>
@@ -250,11 +252,20 @@
 							<td align="right">{$arr.gst_3rd|string_format:"%.2f"}</td>
 							<td align="right"><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_spand.php?aid={$id}','_blank', 'alwaysRaised=yes,height=500,width=800,location=no,scrollbars=yes')">{$arr.spand|string_format:"%.2f"}</span></td>
 							<td align="right">
-								{$arr.paid-$arr.dueamt_3rd|string_format:"%.2f"}
-								{if $arr.step == 'agreement' || $arr.step == 'extra-agreement'}
-									{assign var="total_profit" value=$total_profit+$arr.paid-$arr.dueamt_3rd}
+								{$arr.paid-$arr.spand|string_format:"%.2f"}	
+							</td>
+							<td align="right">
+								{if $arr.gst > 0}
+									{math equation="(x - y)/1.1" x=$arr.paid y=$arr.spand assign="net_profit"}
 								{else}
-									{assign var="total_profit_3rd" value=$total_profit_3rd+$arr.paid-$arr.dueamt_3rd}
+									{assign var="net_profit" value=$arr.paid-$arr.spand}
+								{/if}
+								
+								{$net_profit|string_format:"%.2f"}
+								{if $arr.step == 'agreement' || $arr.step == 'extra-agreement'}
+									{assign var="total_profit" value=$total_profit+$net_profit}
+								{else}
+									{assign var="total_profit_3rd" value=$total_profit_3rd+$net_profit}
 								{/if}
 							</td>
 							<!--
@@ -280,11 +291,11 @@
 						<tr align="center" class="roweven">
 							<td align="right"><strong>Total Due:</strong></td>
 							<td align="right"><strong>{$total_dueamt-$total_received|string_format:"%.2f"}</strong></td>
-							<td align="right" colspan="6"><strong>Total:</strong></td>
+							<td align="right" colspan="7"><strong>Total:</strong></td>
 							<td align="right"><strong>{$total_profit|string_format:"%.2f"}</strong></td>
 						</tr>	
 						<tr align="center" class="roweven">
-							<td align="right" colspan="8"><strong>Total 3rd:</strong></td>
+							<td align="right" colspan="9"><strong>Total 3rd:</strong></td>
 							<td align="right"><strong>{$total_profit_3rd|string_format:"%.2f"}</strong></td>
 						</tr>						
 						<tr align="center" class="roweven">

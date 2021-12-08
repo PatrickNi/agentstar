@@ -63,7 +63,7 @@
           <strong style="color:red;">Reporting data from Archive</strong>
         {else}
           {if $uid eq 3 }
-          <input type="submit" name="bt_archive" value="archive report" style="font-weight:bold ">
+          <input type="button" name="bt_archive" value="archive report" onClick="archive_confirm()" style="font-weight:bold;">
           {/if}
         {/if}
 
@@ -80,10 +80,10 @@
 <table width="100%" cellpadding="3" cellspacing="1" border="0" align="left">
   {foreach key=week item=daterange from=$weeks}
   <tr>
-    <td  class="highlighttext" colspan="7">{$daterange}</td>
+    <td  class="highlighttext" colspan="8" style="text-decoration: underline;background-color: palegreen;">{$daterange}</td>
   </tr>
   <tr class="greybg">
-    <td colspan="7" class="highyellow">Apply School</td>
+    <td colspan="8" class="highyellow">Apply School</td>
   </tr>
   <tr align="center" class="totalrowodd" >
     <td>Course clients</td>
@@ -92,7 +92,7 @@
     <td>Received COE</td>
     <td>Potential Comm</td>  
     <td>Received Comm</td>
-    <td></td>
+    <td colspan="2"></td>
   </tr>
 
   <tr align="right" class="roweven" >
@@ -235,17 +235,18 @@
         </div>
         {/if}
       </td>    
-      <td></td>       
+      <td  colspan="2"></td>       
   </tr>
 
   <tr class="greybg">
-    <td colspan="7" class="highyellow">Visa Service</td>
+    <td colspan="8" class="highyellow">Visa Service</td>
   </tr> 
   <tr align="center" class="totalrowodd">
     <td>Visa Consultant </td>
     <td>Consultant Fee</td>
     <td>Agreement Signed</td>
-    <td>Agreement Received</td>
+    <td>Agreement staff visa grant</td>
+    <td>(Net received/Net deduction)<br/>Net profit</td>
     <td>Apply Visa </td>
     <td>Finalized Cases (Free) </td>
     <td>Finalized Cases (Paid) </td>
@@ -273,16 +274,52 @@
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="d66_{$week}.style.display='none'">&times;</span> </div></td> 
 
-    <td><span onClick="openinSatff('d7_{$week}');" style="text-decoration:underline; cursor:pointer;">{$visaagrees[$week].fee|string_format:"%.2f"}&nbsp;($0/paid : {$visaagrees[$week].sign0}/{$visaagrees[$week].sign1})</span>
+    <td><span onClick="openinSatff('d7_{$week}');" style="text-decoration:underline; cursor:pointer;">{$visaagrees[$week].fee|string_format:"%.2f"}&nbsp;($0:{$visaagrees[$week].sign0}/paid:{$visaagrees[$week].sign1})</span>
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d7_{$week}">
         <ul>
           {foreach key=id item=name from=$visaagrees[$week].fname}
-          <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaagrees.$week.client.$id}&vid={$visaagrees.$week.visa.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
+          <li><span style="text-decoration:underline; cursor:pointer; {if $visaagrees.$week.done.$id eq 1}color:gray;{elseif $visaagrees.$week.done.$id eq 2}color:blue;{/if}" onClick="window.open('client_visa_detail.php?cid={$visaagrees.$week.client.$id}&vid={$visaagrees.$week.visa.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="d7_{$week}.style.display='none'">&times;</span> </div></td>
-
     <td>
-      <span onClick="openinSatff('d7_{$week}');" style="text-decoration:underline; cursor:pointer;">{$visaagrees[$week].paid|string_format:"%.2f"}</span>
+      {if $visagrants[$week].gc_free > 0}
+        <span onClick="openinSatff('d8g_free_{$week}');" style="text-decoration:underline; cursor:pointer;">({$visagrants[$week].gc_free})</span>&nbsp;
+      {/if}
+      Student:&nbsp;${$visagrants[$week].gfee_free|string_format:"%.2f"}<br/>
+      {if $visagrants[$week].gc_paid > 0}
+        <span onClick="openinSatff('d8g_paid_{$week}');" style="text-decoration:underline; cursor:pointer;">({$visagrants[$week].gc_paid})</span>&nbsp;
+      {/if}
+      Other:&nbsp;${$visagrants[$week].gfee_paid|string_format:"%.2f"}<br/>
+      <hr/>
+      {if $visagrants[$week].gcnt1 > 0}
+        ({$visagrants[$week].gcnt1})&nbsp;
+      {/if}
+      Total:&nbsp;${$visagrants[$week].gfee|string_format:"%.2f"}<br/>
+      
+      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d8g_free_{$week}">
+        <ul>
+          {foreach key=id item=name from=$visagrants[$week].gname_free}
+          <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visagrants.$week.gc.$id}&vid={$visagrants.$week.gv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
+        </ul>
+        <span style="font-weight:bolder; cursor:pointer;" onClick="d8g_free_{$week}.style.display='none'">&times;</span> </div>
+
+      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d8g_paid_{$week}">
+        <ul>
+          {foreach key=id item=name from=$visagrants[$week].gname_paid}
+          <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visagrants.$week.gc.$id}&vid={$visagrants.$week.gv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
+        </ul>
+        <span style="font-weight:bolder; cursor:pointer;" onClick="d8g_paid_{$week}.style.display='none'">&times;</span> </div>
+    </td> 
+    <td>
+          ${$visapaids[$week].paid|string_format:"%.2f"} {if $visapaids[$week].spand > 0}&nbsp;/ -${$visapaids[$week].spand|string_format:"%.2f"}{/if}<br/>
+          <hr/>
+          Total: <span onClick="openinSatff('d71_{$week}');" style="text-decoration:underline; cursor:pointer;">${$visapaids[$week].paid-$visapaids[$week].spand|string_format:"%.2f"}</span>
+      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d71_{$week}">
+        <ul>
+          {foreach key=id item=name from=$visapaids[$week].show}
+          <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visapaids.$week.client.$id}&vid={$visapaids.$week.vid.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
+        </ul>
+        <span style="font-weight:bolder; cursor:pointer;" onClick="d71_{$week}.style.display='none'">&times;</span> </div></td>
       </td>
 
     <td>
@@ -319,6 +356,7 @@
         <span style="font-weight:bolder; cursor:pointer;" onClick="d8_paid_{$week}.style.display='none'">&times;</span> </div>
     </td>  
   
+ 
     <!--Fee Section-->
     <td>
       {if $visaprocs[$week].gc_free > 0}
@@ -452,16 +490,16 @@
 
   </tr>
     <tr class="greybg">
-    <td colspan="7"class="highyellow">Coach Services</td>
+    <td colspan="8"class="highyellow">Coach Services</td>
   </tr>   
   <tr align="center" class="totalrowodd">
     <td>Course Item</td>
-    <td># of hours delivered</td>
-    <td># of students(active / current)</td>
-    <td># of lessons</td>
+    <td>hours delivered<br/>(Fee Remaining/Delivered)</td>
+    <td>Students(active / current)</td>
+    <td>Lessons (net hours)</td>
     <td>{if $user_pos == 'PC' || $user_pos == 'C' || $user_pos == 'M'}Received Coaching Fee{/if}</td>
     <td>{if $user_pos == 'PC' || $user_pos == 'C' || $user_pos == 'M'}Profit{/if}</td>
-    <td></td>
+    <td colspan="2"></td>
   </tr>
   {assign var="total_paid" value="0"}
   {assign var="total_sale" value="0"}
@@ -524,7 +562,7 @@
       {/if}
     </td>
     <td>&nbsp;</td>
-    <td></td>
+    <td colspan="2"></td>
   </tr> 
   {/foreach}
 
@@ -538,7 +576,7 @@
     </tr>
 
   <tr class="greybg">
-    <td colspan="7"class="highyellow">Legal Service</td>
+    <td colspan="8"class="highyellow">Legal Service</td>
   </tr> 
   <tr align="center" class="totalrowodd">
     <td>Legal consulted</td>
@@ -547,7 +585,7 @@
     <td>Completed legal</td>
     <td>&nbsp;</td>
     <td>&nbsp;</td>
-    <td></td>
+    <td colspan="2"></td>
   </tr>
   <tr align="right" class="roweven" >
     <td>&nbsp;</td>
@@ -556,11 +594,11 @@
     <td>&nbsp;</td>
     <td>&nbsp;</td>
     <td>&nbsp;</td>
-    <td></td>
+    <td colspan="2"></td>
   </tr> 
   
   <tr class="greybg">
-    <td colspan="7"class="highyellow">Home Loan</td>
+    <td colspan="8"class="highyellow">Home Loan</td>
   </tr>   
   <tr align="center" class="totalrowodd">
     <td> Referred clients</td>
@@ -569,7 +607,7 @@
     <td>&nbsp;</td>
     <td>&nbsp;</td>
     <td>&nbsp;</td>    
-    <td></td>
+    <td colspan="2"></td>
   </tr>
   <tr align="right" class="roweven" >  
    <td >
@@ -596,7 +634,7 @@
     <td>&nbsp;</td>
     <td>&nbsp;</td>
     <td>&nbsp;</td>
-    <td></td>
+    <td colspan="2"></td>
   </tr> 
   {/foreach}
 </table>
@@ -604,6 +642,13 @@
 <script type="text/javascript">
     $('#t_fdate').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });        
     $('#t_tdate').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });
+
+  function archive_confirm() { 
+      if(confirm("Please confirm to archive report")){
+        $("#form1").submit();
+      }
+      return true;  
+  }
 
 	function do_save() {
 

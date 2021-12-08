@@ -99,11 +99,13 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
 
             if ($staff_id == $user_id || $user_pos == 'C') {
                 $visaagrees = $archive['visaagrees'];
+                $visapaids = $archive['visapaids'];
                 $visaprocs  = $archive['visaprocs'];
                 //$visapaids  = $o_r->getAmountofVisaByUser($from_day, $to_day, $staff_id);
                 $visavisits = $archive['visavisits'];
                 $homeloan   = $archive['homeloan'];
                 $homeloan_fee   = $archive['homeloan_fee']; 
+                $visagrants = $archive['visagrants'];
             }
 
             if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C' || $user_pos == 'M')
@@ -128,9 +130,10 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
             
             if ($staff_id == $user_id || $user_pos == 'C') {
                 $visaagrees = $o_r->getNumOfAgreementByUser($from_day, $to_day, $staff_id, $query_about); 
+                $visapaids = $o_r->getNumOfVisaPaidByUser($from_day, $to_day, $staff_id, $query_about); 
                 $visaprocs  = $o_r->getNumOfVisaProcByUser($from_day, $to_day, $staff_id, $query_about);
-                //$visapaids  = $o_r->getAmountofVisaByUser($from_day, $to_day, $staff_id);
                 $visavisits = $o_r->getNumOfVisitByUser($from_day, $to_day, $staff_id, $query_about);
+                $visagrants = $o_r->getNumOfVisaGranted($from_day, $to_day, $staff_id, $query_about);
                 $homeloan   = $o_r->getNumOfHomeLoan($from_day, $to_day, $staff_id, $query_about);
                 $homeloan_fee   = $o_r->getNumOfHomeLoanFee($from_day, $to_day, $staff_id, $query_about);
             }
@@ -176,10 +179,11 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
             if ($staff_id == $user_id || $user_pos == 'C') {
                 $visaagrees = $archive['visaagrees'];
                 $visaprocs  = $archive['visaprocs'];
-                //$visapaids  = $o_r->getAmountofVisaByUser($from_day, $to_day, $staff_id);
+                $visapaids  = $archive['visapaids'];
                 $visavisits = $archive['visavisits'];
                 $homeloan   = $archive['homeloan'];
                 $homeloan_fee   = $archive['homeloan_fee']; 
+                $visagrants = $archive['visagrants'];
             }
 
             if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C' || $user_pos == 'M')
@@ -202,9 +206,10 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
             
             if ($staff_id == $user_id || $user_pos == 'C') {
                 $visaagrees = $o_r->getAllOfAgreementByUser($from_day, $to_day, $staff_id, $query_about); 
+                $visapaids  = $o_r->getAllOfVisaPaidByUser($from_day, $to_day, $staff_id, $query_about);
                 $visaprocs  = $o_r->getAllOfVisaProcByUser($from_day, $to_day, $staff_id, $query_about);
-                //$visapaids  = $o_r->getTotalAmountofVisaByUser($from_day, $to_day, $staff_id);
                 $visavisits = $o_r->getAllOfVisitByUser($from_day, $to_day, $staff_id, $query_about);
+                $visagrants = $o_r->getAllOfVisaGranted($from_day, $to_day, $staff_id, $query_about);
                 $homeloan   = $o_r->getAllOfHomeLoan($from_day, $to_day, $staff_id, $query_about);        
                 $homeloan_fee   = $o_r->getAllOfHomeLoanFee($from_day, $to_day, $staff_id, $query_about); 
             }
@@ -253,7 +258,8 @@ $o_tpl->assign('courseprocs', $courseprocs);
 $o_tpl->assign('coursesems', $coursesems);
 $o_tpl->assign('visaprocs', $visaprocs);
 $o_tpl->assign('visaagrees', $visaagrees);
-//$o_tpl->assign('visapaids', $visapaids);
+$o_tpl->assign('visapaids', $visapaids);
+$o_tpl->assign('visagrants', $visagrants);
 $o_tpl->assign('visavisits', $visavisits);
 $o_tpl->assign('coursepots', $coursepots);
 $o_tpl->assign('homeloan', $homeloan);

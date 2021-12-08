@@ -1291,7 +1291,7 @@ class ClientAPI extends MysqlDB {
     }    
     
 	function getProcessDateByVisa($visa_arr){
-		if (count($visa_arr))
+		if (count($visa_arr) == 0)
 			return false;
 
 		$sql = "select BeginDate, CVID, ItemID, DueDate from client_visa_process where CVID in (".implode(',', array_keys($visa_arr)).") order by ItemID asc ";
@@ -1304,11 +1304,11 @@ class ClientAPI extends MysqlDB {
 	}
 	
     function getAccountByVisa($visa_arr){
-		if (count($visa_arr))
+		if (count($visa_arr) == 0)
 			return false;
 
 //		$sql = "select VisaID, if(DueDate = '' or DueDate = '0000-00-00', 0, sum(if(DueAmount is null, 0, DueAmount)) / count(*) - Sum(if(b.PaidAmount is null, 0, b.PaidAmount))) as Balance from client_account a left join client_payment b on(a.ID = b.AccountID) where a.VisaID in({$vstr}) Group by a.ID";
-		$sql = "select VisaID, if((DueDate = '' or DueDate = '0000-00-00') && (if(DueAmount is null, 0, DueAmount) > 0), 0, if(DueAmount is null, 0, DueAmount) - if(b.PaidAmount is null, 0, b.PaidAmount)) as Balance from client_account a left join (select AccountID, sum(PaidAmount) as PaidAmount from client_payment Group by AccountID) b on(a.ID = b.AccountID) where a.VisaID (".implode(',', array_keys($visa_arr)).") Group by a.ID";
+		$sql = "select VisaID, if((DueDate = '' or DueDate = '0000-00-00') && (if(DueAmount is null, 0, DueAmount) > 0), 0, if(DueAmount is null, 0, DueAmount) - if(b.PaidAmount is null, 0, b.PaidAmount)) as Balance from client_account a left join (select AccountID, sum(PaidAmount) as PaidAmount from client_payment Group by AccountID) b on(a.ID = b.AccountID) where a.VisaID in (".implode(',', array_keys($visa_arr)).") Group by a.ID";
 		$this->query($sql);
         $_arr = array();
         while ($this->fetch()){
@@ -1556,7 +1556,7 @@ class ClientAPI extends MysqlDB {
         }
 
 
-        $sql .= " Group by a.ID Order by Step";
+        $sql .= " Group by a.ID Order by Step asc ";
 	    $this->query($sql);
         $_arr = array();
         while ($this->fetch()){
@@ -2035,7 +2035,7 @@ class ClientAPI extends MysqlDB {
 	function setDependant($vid, $deparr){
     	if($vid > 0 && is_array($deparr) && count($deparr) > 0){
    			foreach($deparr as $id){
-    			if($id != $cid){
+    			if($id != $vid){
     				$sql = "insert into client_visa_dep (CVID, DepID) values ({$vid}, {$id}) ON DUPLICATE KEY UPDATE ExpireDate = ExpireDate ";
     				$this->query($sql);
     			}		
@@ -2302,7 +2302,7 @@ class ClientAPI extends MysqlDB {
 	}
 	
 	function addPosition($pos){
-		$process = addslashes($process);
+		$pos = addslashes($pos);
 		$sql = "Insert into position (Position) value ('{$pos}') ";
 		return $this->query($sql);
 	}

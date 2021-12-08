@@ -10,6 +10,7 @@ require_once(__LIB_PATH.'VisaAPI.class.php');
 $PAYMENT_ITEMS['visa'] = array('agreement'=>'sub-agent', 'extra-agreement'=>'', 'app'=>'app', 'marriage'=>'marriage', 'printing'=>'printing', 'postage'=>'postage', 'translation'=>'translation', "OSHC"=>"OSHC", 'other'=>'', 'coaching'=>'coaching', 'material'=>'material');
 $PAYMENT_ITEMS['coach'] = array('coaching'=>'coaching');
 $PAYMENT_ITEMS['semester'] = array('tuition'=>'tuition', 'enrollment'=>'enrollment','material'=>'material','coe'=>'coe','other'=>'other','discount'=>'discount');
+$PAYMENT_ITEMS['legal'] = array('app'=>'app', 'translation'=>'translation', 'postage'=>'postage', 'printing'=>'printing', 'barrister'=>'barrister', 'other'=>'');
 
 
 
