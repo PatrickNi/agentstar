@@ -13,7 +13,7 @@ $o_c = new ClientAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 $o_a = new AgentAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
 
-if(!isset($_REQUEST['token']) || $_REQUEST['token'] != 'a74613df87c11d04519fb0ee4225c800')
+if(($_REQUEST['reg'] != 'partner') && (!isset($_REQUEST['token']) || $_REQUEST['token'] != 'a74613df87c11d04519fb0ee4225c800'))
 	die("token expired");
 
 

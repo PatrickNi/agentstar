@@ -20,18 +20,12 @@
 		<a href="#" onClick="window.open('sale_category.php?iid={$iid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,heigth=50,width=200, location=no')" target="_blank"><button>Add Category</button></a>
 	</tr>
 </table>
-<table border="0" width="100%" cellpadding="1" cellspacing="1">
 	{foreach key=cateid item=name from=$category_arr}
-	<tr class="totalrowodd">
-		<td><a href="#" onClick="window.open('sale_category.php?iid={$iid}&cateid={$cateid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,heigth=150,width=450, location=no')" style="cursor:pointer;" target="_blank">{$name}</a></td>
-		<td>
-			<a href="#" target="_blank" onClick="window.open('sale_point.php?cateid={$cateid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,heigth=300,width=500, location=no')"><button>Add Point</button></a></td>
-	</tr>
-	{foreach key=pid item=arr from=$points[$cateid]}
-	<tr class="roweven">
-		<td colspan="2"><a href="#" target="_blank" onClick="window.open('sale_point.php?cateid={$cateid}&pid={$pid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,heigth=300,width=500, location=no')" style="padding-left:50; cursor:pointer; text-decoration:underline" >{$arr.name}</a></li></td>
-	</tr>
+	<h4 onClick="window.open('sale_category.php?iid={$iid}&cateid={$cateid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,heigth=150,width=450, location=no')" style="cursor:pointer; text-decoration:underline" >{$name} <button type="button" onClick="window.open('sale_point.php?cateid={$cateid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,heigth=300,width=500, location=no')">Add Point</button></h4>
+	<ul>
+		{foreach key=pid item=arr from=$points[$cateid]}
+			<li style="cursor:pointer;padding-bottom:5px;" onClick="window.open('sale_point.php?cateid={$cateid}&pid={$pid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,heigth=300,width=500, location=no')" >{$arr.name}</li>
+		{/foreach}
+	</ul>
 	{/foreach}
-	{/foreach}
-</table>
 </form>	

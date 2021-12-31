@@ -13,6 +13,7 @@ if (isset($g_user_grants) && is_array($g_user_grants)) {
     array_push($g_user_grants, 'aa_st');
     array_push($g_user_grants, 'aa_ppc');
     array_push($g_user_grants, 'todo_alert');
+    array_push($g_user_grants, 'visa_expire');
 
 }
 

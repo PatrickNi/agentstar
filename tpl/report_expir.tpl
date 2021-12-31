@@ -9,7 +9,19 @@
 <body>
 <form name="form1" target="_self" method="post">
 <table align="center" width="100%"  class="graybordertable" cellpadding="1" cellspacing="1" border="0">
-<tr><td align="center" class="title" style="font-size:14px; padding:3">Visa Expire Date</td></tr>
+<tr>
+	<td width="5%">
+		<select name="staff_id" onChange="form1.submit();">
+			{foreach key=user_id item=user_name from=$slUsers}
+				<option value="{$user_id}" {if $staffid eq $user_id} selected {/if}>{$user_name}</option>  
+			{/foreach}                    			  
+			{if $ugs.visa_expire.v eq 1}        			
+				<option value="0" {if $staffid eq '0' } selected {/if}>All Staff</option>          
+			{/if}    		
+		</select>
+	</td>
+	<td align="center" class="title" style="font-size:14px; padding:3">Visa Expire Date</td>
+</tr>
 </table>
 		<table border="0" cellpadding="1" cellspacing="1" width="100%">								  
 			<tr align="center" class="totalrowodd">
@@ -20,7 +32,7 @@
 				<td>Visa Category</td>
 				<td>Visa SubClass</td>
 			</tr>
-			{foreach key=id item=arr from=$visa_expire}
+			{foreach key=id item=arr from=$main_expire}
 			<tr align="center" class="roweven">
 				<td>Main Visa</td>
 				<td>{$arr.date}</td>

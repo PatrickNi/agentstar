@@ -20,7 +20,7 @@
               &nbsp;
               <!--<input type="submit" value="Delete" name="qSubmit" style="font-weight:bold;">	-->
               {if $ugs.export.v eq 1}
-              <input type="button" value="Export Client Emails" name="bt_export" style="font-weight:bold;" onClick="javascrtipt:this.form.submit();">
+              <input type="submit" value="Export Client Emails" name="bt_export" style="font-weight:bold;" onClick="javascrtipt:this.form.submit();">
               {/if} </td>
             <td width="69%" colspan="4" align="right">
               {if $ugs.b_fromto.v eq 1}

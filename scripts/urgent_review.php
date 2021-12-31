@@ -20,7 +20,10 @@ function getSortList($sort_list, &$sort_col, &$sort_ord){
                  else {
                     $sort_col[$cell[0]] = "if(p.ID > 0, p.ID, CONCAT(0, ExItem))";    
                  }             
-             }                     
+             }
+             elseif ($sort_col[$cell[0]] == 'Item') {
+				$sort_col[$cell[0]] = " (CASE WHEN IF(a.ItemID > 0, Item, ExItem) like 'apply%' THEN 'apply' WHEN IF(a.ItemID > 0, Item, ExItem) like 'grant%' THEN 'grant' WHEN IF(a.ItemID > 0, Item, ExItem) like 'sign%' THEN 'sign' WHEN IF(a.ItemID > 0, Item, ExItem) like 'issue%' THEN 'issue' ELSE IF(a.ItemID > 0, Item, ExItem) END ) ";          
+			}               
            array_push($_sort, $sort_col[$cell[0]]." ".$sort_ord[$cell[1]]);
 		}
 	}
@@ -88,8 +91,8 @@ switch ($viewWhat){
 			}
 		}
 		$sort_col_arr = array(1=>'ClientName',2=>'VisaName',3=>'ClassName',4=>'Item',5=>'SortDue');
-		$reports = $o_r->getUrgentVisa($staff_id,getSortList($sort_list, $sort_col_arr, $sort_ord_arr), $vdu);
-//        $reports = array_merge($o_r->getUrgentVisa($view_all, $sort_col, $sort_ord),$o_r->getTodoVisa($view_all, $sort_col, $sort_ord));		
+		//var_dump(getSortList($sort_list, $sort_col_arr, $sort_ord_arr));
+		$reports = $o_r->getUrgentVisa($staff_id,getSortList($sort_list, $sort_col_arr, $sort_ord_arr), $vdu);	
 		break;
 	case "c":
 		

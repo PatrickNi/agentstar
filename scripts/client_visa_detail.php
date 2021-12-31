@@ -47,8 +47,8 @@ if(isset($_REQUEST['bt_name']) && stripos($_REQUEST['bt_name'], "CLOSE") !== fal
 }
 
 if (isset($_POST['bt_name']) && stripos($_POST['bt_name'], "SAVE") !== false){
-    $sets['epdate']   = isset($_REQUEST['t_epdate'])? (string)trim($_REQUEST['t_epdate']) : "0000-00-00";
-    $sets['epdate']   = $sets['epdate'] == ""? "0000-00-00" : $sets['epdate'];
+    //$sets['epdate']   = isset($_REQUEST['t_epdate'])? (string)trim($_REQUEST['t_epdate']) : "0000-00-00";
+    //$sets['epdate']   = $sets['epdate'] == ""? "0000-00-00" : $sets['epdate'];
     
     $sets['clientno'] = isset($_REQUEST['t_clientno'])? (string)trim($_REQUEST['t_clientno']) : "";
     

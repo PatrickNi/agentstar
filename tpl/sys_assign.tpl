@@ -484,7 +484,16 @@
             open&nbsp;
             <input type="checkbox" name="g_todo_alert[]" value="{$grant.todo_alert.v}" {if $ugs.todo_alert.v eq 1} checked="checked" {/if}>&nbsp;&nbsp;
         </td>
-   </tr>                
+   </tr>     
+               <tr class="roweven">
+                <td align="left">
+                    <ul>Visa Expire Date</ul>
+                </td>
+                <td align="left">
+                    view all cases&nbsp;
+                    <input type="checkbox" name="g_visa_expire[]" value="{$grant.visa_expire.v}" {if $ugs.visa_expire.v eq 1} checked="checked" {/if}>&nbsp;&nbsp;
+                </td>
+            </tr>           
    {/if}       
 </table>            
 </form> 

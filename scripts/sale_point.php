@@ -48,13 +48,10 @@ $points = $o_g->getSalesPoint($pointid);
 		</tr>	
 		<tr>
 			<td width="25%" align="left" class="rowodd"><strong>Point Name:</strong>&nbsp;&nbsp;</td>
-			<td align="left" width="75%" class="roweven"><input type="text" name="t_name" size="30" value="<?php echo ($pointid > 0 && $cateid > 0)? $points[$cateid][$pointid]['name'] : "";?>"></td>
-		</tr>
-		<tr>
-			<td width="25%" align="left" class="rowodd"><strong>Note:</strong>&nbsp;&nbsp;</td>
 			<td align="left" width="75%" class="roweven">
-  				<textarea name="t_note" style="width:300px; height:100px;"><?php echo ($pointid > 0 && $cateid > 0)? $points[$cateid][$pointid]['note'] : "";?></textarea>
- 			</td>
+				<textarea name="t_name" style="width: -webkit-fill-available; height:500px;"><?php echo ($pointid > 0 && $cateid > 0)? $points[$cateid][$pointid]['name'] : "";?></textarea>
+		
+		</td>
 		</tr>																				
 		<tr align="center"  class="greybg" >
 		  <td colspan="2">

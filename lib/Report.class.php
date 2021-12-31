@@ -10,10 +10,10 @@ class ReportAPI extends MysqlDB {
     
     function getUrgentVisa($userid, $sort_list, $null_du=1, $page=1, $page_size=50){
 		$_arr = array();
-
+        //if(a.DueDate = '0000-00-00', '9999-99-99', a.DueDate) as sortdue 
 		$sql = "select SQL_CALC_FOUND_ROWS a.ID, concat(LName, ' ', FName) as ClientName, VisaName, ClassName, IF(a.ItemID > 0, Item, ExItem) as Item, DueDate, BeginDate, f.CID, CVID, b.VUserID, 
 		               if(((a.DueDate >= Date(NOW()) and a.DueDate < Date(NOW()) + INTERVAL 7 Day) or a.DueDate < Date(NOW()))and a.DueDate <> '0000-00-00',0,1) as isTodo,
-		               if(a.DueDate = '0000-00-00', '9999-99-99', a.DueDate) as sortdue 
+                       IF(IF(a.ItemID > 0, Item, ExItem) like '%issue biz%', '9999-99-99', if(a.DueDate = '0000-00-00', '9999-99-99', a.DueDate)) as sortdue
     				from client_visa_process a left join visa_rs_item c on(a.ItemID = c.ItemID) ,  client_visa  b, visa_category d,  visa_subclass e, client_info f   
 					where a.Done = 0 and a.CVID = b.ID and b.CID = f.CID and b.CateID = d.CateID and b.SubClassID = e.SubClassID ";
 		//((a.DueDate >= Date(NOW()) and a.DueDate < Date(NOW()) + INTERVAL 7 Day) or a.DueDate < Date(NOW()))and a.DueDate <> '0000-00-00' and	
@@ -515,7 +515,12 @@ class ReportAPI extends MysqlDB {
 	
     function getMainVisa($userid=0) {
         $_arr = array();
-        $sql = "select CID, FName, LName, c.VisaName, d.ClassName, ExpirDate as Epd from client_info a left join visa_category c on(a.VisaID = c.CateID) left join visa_subclass d on(a.VisaClassID = d.SubClassID) where ExpirDate >= '2018-05-04' AND CourseUser = {$userid} order by Epd asc";
+        $sql = "select CID, FName, LName, c.VisaName, d.ClassName, ExpirDate as Epd from client_info a left join visa_category c on(a.VisaID = c.CateID) left join visa_subclass d on(a.VisaClassID = d.SubClassID) where ExpirDate >= NOW() - INTERVAL 28 DAY  AND ExpirDate <= NOW() + INTERVAL 1 MONTH ";
+        if ($userid > 0) {
+            $sql .= " AND exists (select 'x' from client_course cc where a.CID = cc.CID and ConsultantID = {$userid}) ";
+        }
+        $sql .= "order by Epd asc";
+        //echo $sql."\n";
         $this->query($sql);
         $i=0;
         while ($this->fetch()) {
@@ -534,15 +539,16 @@ class ReportAPI extends MysqlDB {
 
 	function getVisaService($userid=0){
 		$_arr = array();
-		$sql = "select a.ID as VID, a.CID, a.ExpireDate as Epd, b.FName, b.LName, c.VisaName, d.ClassName, 0 as main from client_visa a left join visa_category c on(a.CateID = c.CateID) left join visa_subclass d on(a.SubClassID = d.SubClassID), client_info b where a.CID = b.CID and a.r_Status = 'active' and a.OnShore = 1 and (a.ADate <> '' and a.ADate <> '0000-00-00') AND a.ExpireDate >= '2018-05-04' ";
+		$sql = "select a.ID as VID, a.CID, a.ExpireDate as Epd, b.FName, b.LName, c.VisaName, d.ClassName, 0 as main from client_visa a left join visa_category c on(a.CateID = c.CateID) left join visa_subclass d on(a.SubClassID = d.SubClassID), client_info b where a.CID = b.CID AND a.ExpireDate >= NOW() - INTERVAL 28 DAY AND a.ExpireDate <= NOW() + INTERVAL 12 MONTH ";
 		if($userid > 0){
-			$sql .= " AND (a.AUserID = {$userid} or a.VUserID = {$userid}) ";
+			$sql .= " AND (a.AUserID = {$userid}) ";
 		}
-		$sql .= "Union all select e.CVID as VID, e.DepID, e.ExpireDate as Epd, b.FName, b.LName, c.VisaName, d.ClassName, a.CID as main from client_visa a left join visa_category c on(a.CateID = c.CateID) left join visa_subclass d on(a.SubClassID = d.SubClassID) , client_visa_dep e, client_info b where e.DepID = b.CID and e.CVID = a.ID and a.r_Status = 'active' and (a.ADate <> '' and a.ADate <> '0000-00-00')  AND a.ExpireDate >= '2018-05-04' ";
+		$sql .= "Union all select e.CVID as VID, e.DepID, e.ExpireDate as Epd, b.FName, b.LName, c.VisaName, d.ClassName, a.CID as main from client_visa a left join visa_category c on(a.CateID = c.CateID) left join visa_subclass d on(a.SubClassID = d.SubClassID) , client_visa_dep e, client_info b where e.DepID = b.CID and e.CVID = a.ID AND a.ExpireDate >= NOW() - INTERVAL 28 DAY AND a.ExpireDate <= NOW() + INTERVAL 12 MONTH ";
 		if($userid > 0){
-			$sql .= " AND (a.AUserID = {$userid} or a.VUserID = {$userid}) ";
+			$sql .= " AND (a.AUserID = {$userid}) ";
 		}		
 		$sql .= " order by Epd asc ";
+        //echo $sql."\n";
 		$this->query($sql);
 		$i=0;
 		while ($this->fetch()) {

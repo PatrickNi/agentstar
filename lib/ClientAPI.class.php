@@ -1142,7 +1142,7 @@ class ClientAPI extends MysqlDB {
 		foreach ($sets as &$v){
 			$v = addslashes($v);
 		}
-		$sql = "insert into client_visa (CateID, SubClassID, CID, ClientNo, FileNum, CaseDetail, Fax, Name, Tel, Email, AUserID, VUserID, Note, ABody, State, KeyPoint, ADate, AFee, Note2, ExpireDate, VisitDate, r_Status, OnShore, AscoID, CFee, OFee, AgentFee) values ('{$sets['cateid']}', '{$sets['subid']}', '{$cid}', '{$sets['clientno']}', '{$sets['file']}', '{$sets['offdt']}', '{$sets['fax']}', '{$sets['name']}', '{$sets['tel']}', '{$sets['email']}', '{$sets['auser']}', '{$sets['vuser']}', '{$sets['note']}', '{$sets['body']}', '{$sets['state']}', '{$sets['key']}', '{$sets['adate']}', '{$sets['fee']}', '{$sets['note2']}', '{$sets['epdate']}', '{$sets['vdate']}', '{$sets['status']}', '{$sets['shore']}', '{$sets['asco']}', '{$sets['cfee']}', '{$sets['ofee']}', '{$sets['sfee']}')";
+		$sql = "insert into client_visa (CateID, SubClassID, CID, ClientNo, FileNum, CaseDetail, Fax, Name, Tel, Email, AUserID, VUserID, Note, ABody, State, KeyPoint, ADate, AFee, Note2, VisitDate, r_Status, OnShore, AscoID, CFee, OFee, AgentFee) values ('{$sets['cateid']}', '{$sets['subid']}', '{$cid}', '{$sets['clientno']}', '{$sets['file']}', '{$sets['offdt']}', '{$sets['fax']}', '{$sets['name']}', '{$sets['tel']}', '{$sets['email']}', '{$sets['auser']}', '{$sets['vuser']}', '{$sets['note']}', '{$sets['body']}', '{$sets['state']}', '{$sets['key']}', '{$sets['adate']}', '{$sets['fee']}', '{$sets['note2']}', '{$sets['vdate']}', '{$sets['status']}', '{$sets['shore']}', '{$sets['asco']}', '{$sets['cfee']}', '{$sets['ofee']}', '{$sets['sfee']}')";
 		$this->query($sql);
 		return $this->getLastInsertID();
 	}
@@ -1152,7 +1152,7 @@ class ClientAPI extends MysqlDB {
 			$v = addslashes($v);
 		}
 		//LodgeDate = '{$sets['fdate']}', GrantDate = '{$sets['tdate']}', 
-		$sql = "Update client_visa SET CateID = '{$sets['cateid']}', SubClassID = '{$sets['subid']}', ClientNo = '{$sets['clientno']}', FileNum = '{$sets['file']}', CaseDetail = '{$sets['offdt']}', Fax = '{$sets['fax']}', Name = '{$sets['name']}', Tel = '{$sets['tel']}', Note = '{$sets['note']}', AUserID = '{$sets['auser']}', VUserID = '{$sets['vuser']}', OnShore = '{$sets['shore']}' , Email = '{$sets['email']}' , ABody = '{$sets['body']}' , State = '{$sets['state']}' , KeyPoint = '{$sets['key']}' , ADate = '{$sets['adate']}' , AFee = '{$sets['fee']}' , Note2 = '{$sets['note2']}', ExpireDate = '{$sets['epdate']}', VisitDate = '{$sets['vdate']}', r_Status = '{$sets['status']}', AscoID = '{$sets['asco']}', CFee = '{$sets['cfee']}', OFee = '{$sets['ofee']}' , AgentFee = '{$sets['sfee']}'  where ID = {$vid}";
+		$sql = "Update client_visa SET CateID = '{$sets['cateid']}', SubClassID = '{$sets['subid']}', ClientNo = '{$sets['clientno']}', FileNum = '{$sets['file']}', CaseDetail = '{$sets['offdt']}', Fax = '{$sets['fax']}', Name = '{$sets['name']}', Tel = '{$sets['tel']}', Note = '{$sets['note']}', AUserID = '{$sets['auser']}', VUserID = '{$sets['vuser']}', OnShore = '{$sets['shore']}' , Email = '{$sets['email']}' , ABody = '{$sets['body']}' , State = '{$sets['state']}' , KeyPoint = '{$sets['key']}' , ADate = '{$sets['adate']}' , AFee = '{$sets['fee']}' , Note2 = '{$sets['note2']}', VisitDate = '{$sets['vdate']}', r_Status = '{$sets['status']}', AscoID = '{$sets['asco']}', CFee = '{$sets['cfee']}', OFee = '{$sets['ofee']}' , AgentFee = '{$sets['sfee']}'  where ID = {$vid}";
 		//var_dump($sql);
 		return $this->query($sql);		
 	}
