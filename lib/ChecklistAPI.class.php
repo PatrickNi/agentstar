@@ -7,11 +7,11 @@ class ChecklistAPI extends MysqlDB{
          $this->MysqlDB($host, $user, $pswd, $database, $debug);
     }
 
-    function addMeta($name, $idx, $desc='') {
-        if ($name == '' || $idx== '')
+    function addMeta($name, $desc='') {
+        if ($name == '')
             return false;
 
-        $idx = addslashes($idx);
+        $idx = md5($name);
         $sql = "select count(*) as CNT from checklist_meta where ItemCode = '{$idx}' ";
         //die($sql);
         $this->query($sql);
@@ -47,7 +47,7 @@ class ChecklistAPI extends MysqlDB{
         if ($code == '')
             return false;       
 
-        $sql = "update checklist_meta SET IsDeleted = 1 where ItemCode = {$code}";
+        $sql = "update checklist_meta SET IsDeleted = 1 where ItemCode = '{$code}' ";
         return $this->query($sql);        
     }
 
@@ -76,6 +76,11 @@ class ChecklistAPI extends MysqlDB{
         if (!$tpl_id || !$code)
             return false;
 
+        $sql = "select count(*) as CNT from checklist_item where TplID =  {$tpl_id}  and ItemCode = '{$code}' ";
+        $this->query($sql);
+        if ($this->fetch() && $this->CNT > 0)
+            return false;       
+
         $sql = "select max(ItemRank) as Rank from checklist_item where TplID =  {$tpl_id} ";
         $this->query($sql);
         if ($this->fetch()) {
@@ -90,13 +95,21 @@ class ChecklistAPI extends MysqlDB{
         return $this->getLastInsertID();
     }
 
+    function delItem($item_id) {
+        if (!$item_id)
+            return false;
+
+        $sql = "delete from checklist_item where id = {$item_id}";
+        return $this->query($sql);
+    }
+ 
     function getItems($tpl_id, $is_active=false) {
         if (!$tpl_id)
             return false;
 
-        $sql = "SELECT a.ID, b.Item, b.ItemDesc, b.IsDeleted, a.ItemCode, a.TplID FROM checklist_item a, checklist_meta b where a.ItemCode = b.ItemCode and a.TplID = {$tpl_id} ";
+        $sql = "SELECT a.ID, b.Item, b.ItemDesc, b.IsDeleted, a.ItemCode, a.TplID FROM checklist_item a, checklist_meta b, checklist_tpl c where a.ItemCode = b.ItemCode and a.TplID = {$tpl_id} and a.tplid = c.id ";
         if ($is_active) {
-            $sql .= " and IsDeleted = 0 ";
+            $sql .= " and IsDeleted = 0 and c.status = 'active' ";
         }
         
         $sql .= "order by IsDeleted asc, ItemRank asc ";
@@ -127,7 +140,7 @@ class ChecklistAPI extends MysqlDB{
         return $this->getLastInsertID();
     }
 
-    function setTpl($id, $subject, $status) {
+    function setTpl($id, $subject, $status, $visa_cate_id=0, $visa_class_id=0) {
         if (!$id)
             return false;
 
@@ -137,6 +150,13 @@ class ChecklistAPI extends MysqlDB{
         }
         if ($status != '') {
             array_push($upd, " Status = '".addslashes($status)."' ");
+        }
+
+        if ($visa_cate_id > 0) {
+            array_push($upd, " VisaCateID = '".addslashes($visa_cate_id)."' ");
+        }
+        if ($visa_class_id > 0) {
+            array_push($upd, " VisaClassID = '".addslashes($visa_class_id)."' ");
         }
 
         if (count($upd) > 0) {
@@ -153,7 +173,7 @@ class ChecklistAPI extends MysqlDB{
     function getTpls($tpl_id=0,$active=false) {
         $rtn = array();
 
-        $sql = "SELECT ID, Subject, Status from checklist_tpl WHERE 1 ";
+        $sql = "SELECT ID, Subject, Status, VisaClassID, VisaCateID from checklist_tpl WHERE 1 ";
         if ($tpl_id > 0) {
             $sql .= " AND ID = {$tpl_id} ";
         }
@@ -165,6 +185,8 @@ class ChecklistAPI extends MysqlDB{
         while($this->fetch()){
             $rtn[$this->ID]['name'] =  $this->Subject;
             $rtn[$this->ID]['status'] =  $this->Status;   
+            $rtn[$this->ID]['visacate'] =  $this->VisaCateID;
+            $rtn[$this->ID]['visaclass'] =  $this->VisaClassID;
         }
 
         if ($tpl_id > 0 && isset($rtn[$tpl_id])) 
@@ -178,7 +200,7 @@ class ChecklistAPI extends MysqlDB{
         if (!$type || !$appid)
             return $rtn;
 
-        $sql = "select a.ID, a.Received, if(a.ItemCode = '', ExItem, b.Item) as Titile, if(a.ItemCode = '', '', b.ItemDesc) as Remark  from checklist_app a left join checklist_meta b on (a.ItemCode = b.ItemCode) where a.type = '{$type}' and a.Appid = {$appid} order by a.ID";
+        $sql = "select a.ID, a.Received, if(a.ExItem <> '', ExItem, b.Item) as Titile, if(a.ItemCode = '', '', b.ItemDesc) as Remark  from checklist_app a left join checklist_meta b on (a.ItemCode = b.ItemCode) where a.type = '{$type}' and a.Appid = {$appid} order by a.Rank, a.ID";
         
         $this->query($sql);
         while ($this->fetch()) {
@@ -198,8 +220,6 @@ class ChecklistAPI extends MysqlDB{
         return $this->query($sql);        
     }
 
-
-
     function updateReceived($dates) {
         if (!$dates)
             return false;
@@ -212,7 +232,7 @@ class ChecklistAPI extends MysqlDB{
             $this->query($sql);
         }
 
-        return false;
+        return true;
     }
 
     function addAppItems($type, $appid, $item, $received=''){
@@ -226,6 +246,57 @@ class ChecklistAPI extends MysqlDB{
             return $this->query($sql);
         }
         return false;
+    }
+
+    function delAppItems($app_item_id){
+        if (!$app_item_id)
+            return false;
+
+        $sql = "delete from checklist_app where id = {$app_item_id}";
+        return $this->query($sql);
+    }
+
+    function editAppItemTit($app_item_id, $app_item_tit) {
+        if (!$app_item_id || !$app_item_tit)
+            return false;
+        
+        $sql = 'update checklist_app set ExItem = "'.addslashes($app_item_tit).'" where id = '.$app_item_id;
+        return $this->query($sql);
+    }
+
+    function rankAppItems($type, $appid, $ranks) {
+        if (!$type || !$appid || count($ranks) == 0)
+            return false;        
+        
+        $rk = 1;
+        foreach ($ranks as $app_item_id) {
+            if (!$app_item_id)
+                continue;
+
+            $sql = "update checklist_app SET Rank = {$rk} where id = {$app_item_id} and type = '{$type}' and Appid = {$appid} ";
+            $this->query($sql);
+            $rk++;
+        }
+        return true;
+    }
+    
+    function findAppTpls($type, $appid) {
+        $rtn = array();
+        if ($type == 'visa') {
+            $sql = "select CateID, SubClassID from client_visa where id = {$appid}";
+            $this->query($sql);
+            if ($this->fetch()){
+                $visa_cate = $this->CateID;
+                $visa_class = $this->SubClassID;
+
+                $sql = "select ID from checklist_tpl where status = 'Active' and VisaCateID = {$visa_cate} and VisaClassID = {$visa_class}";
+                $this->query($sql);
+                if ($this->fetch()) {
+                    array_push($rtn, $this->ID);
+                }
+            }
+        }
+        return $rtn;
     }
 }
 

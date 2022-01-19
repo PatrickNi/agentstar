@@ -3,12 +3,13 @@ require_once('../etc/const.php');
 
 require_once(__LIB_PATH.'Template.class.php');
 require_once(__LIB_PATH.'ChecklistAPI.class.php');
+require_once(__LIB_PATH.'VisaAPI.class.php');
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 $o_c = new ChecklistAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
-
+$o_v = new VisaAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
 $alert_msg = "";
 if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
@@ -34,6 +35,8 @@ $about_arr = $o_c->getTpls();
 $o_tpl = new Template;
 $o_tpl->assign('about_arr', $about_arr);
 $o_tpl->assign('alert_msg', $alert_msg);
+$o_tpl->assign('visa_arr', $o_v->getVisaNameArr());
+$o_tpl->assign('visaclass_arr', $o_v->getVisaClassArr(0, 'Active'));
 $o_tpl->display('checklist.tpl');
 
 ?>

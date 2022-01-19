@@ -19,20 +19,69 @@ $o_c = new ChecklistAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 $o_tpl = new Template;
 
 
+if ($cl_act == 'app_add') {
+    $cl_new_item = isset($_REQUEST['cl_new_item'])? $_REQUEST['cl_new_item'] : '';
+    if ($cl_new_item != '') {
+        $cl_new_item = iconv('utf-8', 'GBK', (string)trim($cl_new_item));
+        $o_c->addAppItems($cl_typ, $cl_appid, $cl_new_item);
+    }
+}
+elseif ($cl_act == 'del_app') {
+    $res = $o_c->delAppItems(isset($_REQUEST['cl_app_item'])? $_REQUEST['cl_app_item'] : 0);
+    echo json_encode(array('succ'=>$res? 1 : 0));
+    exit;
+}
+elseif ($cl_act == 'rcd_app') {
+    $app_item_id = isset($_REQUEST['cl_app_item'])? $_REQUEST['cl_app_item'] : 0;
+    $app_item_rcd = isset($_REQUEST['cl_app_rcd']) && $_REQUEST['cl_app_rcd'] == 1? date('Y-m-d') : '0000-00-00';
+    $res = $o_c->updateReceived(array($app_item_id=>$app_item_rcd));
+    echo json_encode(array('succ'=>$res? $app_item_rcd : 0));
+    exit;    
+}
+elseif ($cl_act == 'rank_app') {
+    $app_item_rank = isset($_REQUEST['cl_ord'])? $_REQUEST['cl_ord'] : '';
+    $res = $o_c->rankAppItems($cl_typ, $cl_appid, explode('|', $app_item_rank));
+    echo json_encode(array('succ'=>$res? 1 : 0));
+    exit; 
+}
+elseif ($cl_act == 'edit_app') {
+    $app_item_id = isset($_REQUEST['cl_app_item'])? $_REQUEST['cl_app_item'] : 0;
+    $app_item_tit = isset($_REQUEST['cl_app_tit'])? $_REQUEST['cl_app_tit'] : '';
+    $app_item_tit = iconv('utf-8', 'GBK', (string)trim($app_item_tit));
+    $res = $o_c->editAppItemTit($app_item_id, $app_item_tit);
+    echo json_encode(array('succ'=>$res? 1 : 0));
+    exit;    
+}
+       
+
 $app_arr = $o_c->getApp($cl_typ, $cl_appid);
+$alltpl_arr = $o_c->getTpls(0,true);
 if (count($app_arr) == 0 && $cl_act == '') {
-    $o_tpl->assign('section', 'show_select');
+    $tpl_ids = $o_c->findAppTpls($cl_typ, $cl_appid);
+    $tpl_arr = array();
+    $cl_tplid  = 0;
+    foreach ($tpl_ids as $_id) {
+        if (isset($alltpl_arr[$_id])){
+            $tpl_arr[$_id] = $alltpl_arr[$_id];
+            $cl_tplid = $_id;
+        }
+    }
+
+    $o_tpl->assign('section', 'confirm_select');
+    $o_tpl->assign('tpl_arr', $tpl_arr);
     $o_tpl->assign('cl_typ', $cl_typ);
     $o_tpl->assign('cl_appid', $cl_appid);
-    $o_tpl->assign('tpl_arr', $o_c->getTpls());
+    $o_tpl->assign('cl_tplid', $cl_tplid);
+    $o_tpl->assign('item_arr', $cl_tplid > 0? $o_c->getItems($cl_tplid, true) : array());
     $output = $o_tpl->fetch('checklist_ajax.tpl');
 }
-elseif ($cl_act == 'change_tpl') {
+elseif ($cl_act == 'change_tpl' && count($app_arr) == 0) {
     if(!$cl_tplid) {
         $output = 'Incorrect parameters';
     }
     else {
         $o_tpl->assign('section', 'confirm_select');
+        $o_tpl->assign('tpl_arr', $alltpl_arr);
         $o_tpl->assign('cl_typ', $cl_typ);
         $o_tpl->assign('cl_appid', $cl_appid);
         $o_tpl->assign('cl_tplid', $cl_tplid);
@@ -40,11 +89,14 @@ elseif ($cl_act == 'change_tpl') {
         $output = $o_tpl->fetch('checklist_ajax.tpl');
     }
 }
-elseif ($cl_act == 'apply_tpl') {
-    if(!$cl_tplid) {
+elseif ($cl_act == 'apply_tpl' || $cl_act == 'apply_new') {
+    if(!$cl_tplid && $cl_act == 'apply_tpl') {
         $output = 'Incorrect parameters';
     }
     else {
+        if ($cl_act == 'apply_new') {
+            $cl_tplid = 0;
+        }
         $o_c->createApp($cl_tplid, $cl_typ, $cl_appid);
         $o_tpl->assign('section', 'show_detail');
         $o_tpl->assign('cl_typ', $cl_typ);
@@ -87,6 +139,6 @@ elseif(count($app_arr) > 0) {
     $output = $o_tpl->fetch('checklist_ajax.tpl');
 }
 
-echo iconv('GB2312', 'UTF-8', $output);
+echo iconv('GBK', 'utf-8', $output);
 exit;
 ?>

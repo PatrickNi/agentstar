@@ -238,7 +238,7 @@ class VisaAPI extends MysqlDB {
             foreach ($items as $id => $s) {
                 $this->query("update visa_rs_item SET Priority = '{$s}' WHERE ITEMID = {$id}");
             }
-            return ture;
+            return true;
         }
     	return false;
     }
