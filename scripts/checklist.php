@@ -26,7 +26,21 @@ elseif (isset($_POST['bt_name']) && (strtoupper($_POST['bt_name']) == "ACTIVE" |
 		$alert_msg = "<script>alert('Set success');</script>";
 	}
 }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
-
+elseif (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "CLONE"){
+	$tpl_id = $o_c->addTpl(isset($_POST['clone_tpl_name'])? trim($_POST['clone_tpl_name']) : "");
+	$clone_tpl_id = isset($_POST['clone_tpl_id'])? trim($_POST['clone_tpl_id']) : 0;
+	if ($o_c->cloneTpl($tpl_id, $clone_tpl_id)) {
+		$alert_msg = "<script>alert('Clone success');</script>";
+	}
+	else {
+		$alert_msg = "<script>alert('Clone failed');</script>";
+	}
+}
+elseif (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "DELETE"){
+	if ($o_c->delTpl(isset($_POST['tpl_id'])? trim($_POST['tpl_id']) : 0)) {
+		$alert_msg = "<script>alert('Delete success');</script>";
+	}
+} 
 
 $about_arr = array();
 $about_arr = $o_c->getTpls();

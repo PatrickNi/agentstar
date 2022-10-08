@@ -1,5 +1,6 @@
 <?php
 require_once('../etc/const.php');
+
 require_once(__LIB_PATH.'Template.class.php');
 require_once(__LIB_PATH.'ClientAPI.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
@@ -82,6 +83,7 @@ $set_course['consultant_date']   = $set_course['consultant_date'] == ""? "0000-0
 $set_course['consultant'] = isset($_REQUEST['t_consultant'])? (string)trim($_REQUEST['t_consultant']) : 0;
 
 $set_course['studentid']  = isset($_REQUEST['t_studentid'])? (string)trim($_REQUEST['t_studentid']) : "";
+$set_course['paperwork'] = isset($_REQUEST['t_paperwork'])? (string)trim($_REQUEST['t_paperwork']) : 0;
 
 $msg = '';
 if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" || strtoupper($_REQUEST['bt_name']) == "COURSEPROCESS")){
@@ -108,8 +110,17 @@ if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" |
 		}
 	}
 
+	$school = false;
+	if ($set_course['iid']){
+		$school = $o_s->getSchoolList($set_course['iid'],"","");
+	}
+
+	$process_apply_offer = $o_c->checkCourseDoneProcess($course_id, 2);
 	//check necessary column
-	if($course_id > 0 && ($set_course['catid'] == 0 ||	$set_course['iid'] == 0 || $set_course['qual'] == 0 || $set_course['major'] == 0 || $set_course['agent'] == '' || $set_course['start'] == '0000-00-00' || $set_course['end'] == '0000-00-00' || $set_course['fee'] == 0 || $set_course['due'] == "" || $process || $apodue == "0000-00-00" || ($set_course['refuse'] == "" && $set_course['active'] == 2))) {
+	if ($school && $school[$set_course['iid']]['status'] != 'Agent' && $set_course['agent'] == 0 && $process_apply_offer) {
+		$msg = 'alert("Save failed! Top-agent cannot be empty")';
+	}
+	elseif($course_id > 0 && ($set_course['catid'] == 0 ||	$set_course['iid'] == 0 || $set_course['qual'] == 0 || $set_course['major'] == 0 || $set_course['agent'] == '' || $set_course['start'] == '0000-00-00' || $set_course['end'] == '0000-00-00' || $set_course['fee'] == 0 || $set_course['due'] == "" || $process || $apodue == "0000-00-00" || ($set_course['refuse'] == "" && $set_course['active'] == 2))) {
 		if($msg == '') {
 			if ($set_course['refuse'] == "" && $set_course['active'] == 2) {
 				$msg = 'alert("Refuse reason should not be empty")';
@@ -124,6 +135,9 @@ if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" |
 	}
 	elseif ($set_course['consultant'] == 0 || $set_course['consultant_date'] == '0000-00-00') {
 		$msg = 'alert("Consultant and Consultant Date should be necessary")';
+	}
+	elseif ($set_course['paperwork'] == 0) {
+		$msg = 'alert("Paperwork should be necessary")';
 	}
 	else {
 
@@ -280,5 +294,7 @@ $o_tpl->assign("ugs", $ugs);
 $o_tpl->assign('client', $o_c->getOneClientInfo($client_id));
 $o_tpl->assign('apodue', $apodue);
 $o_tpl->assign('agent_users', $o_g->get_migration_agents());
+$o_tpl->assign('paperwork_arr',$o_g->getUserNameArr(0, $course_id ==0?false:true, array(58,114)));
+$o_tpl->assign('show_checklist', 1);
 $o_tpl->display('client_course_detail.tpl');
 ?>

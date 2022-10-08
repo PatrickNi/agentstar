@@ -92,6 +92,36 @@ class CouponAPI extends MysqlDB{
         return $this->query($sql);
     }
 
+
+    function transfer($coupon_id, $client_id, $client_email) {
+        if (!$coupon_id || !$client_id || !$client_email)
+            return array('err'=>1, 'msg'=>'incorrect input');
+
+        $sql = "select ID from coupon_clients where CID = {$client_id} AND ID = {$coupon_id} and EndDate >= NOW() and Status = 'NEW' ";
+        $this->query($sql);
+        if (!$this->fetch())
+            return array('err'=>1, 'msg'=>'coupon expired or not exists');
+
+        if ($this->ID != $coupon_id)
+            return array('err'=>1, 'msg'=>'coupon expired or not exists');
+
+        $client_email = addslashes($client_email);
+        $sql = "select CID from client_info where email = '{$client_email}'";
+        $this->query($sql);
+        if (!$this->fetch()) {
+            return array('err'=>1, 'msg'=>'transfer email not exists');
+        }
+
+        $sql = "update client_clients SET CID = {$this->CID} where ID = {$coupon_id}";
+        if($this->query($sql)) {
+            return array('err'=>0, 'msg'=>'transfer succ');
+        }
+        else {
+            return array('err'=>1, 'msg'=>'transfer fail');
+        }
+    }
+
+
     function redeem($couponid,$service, $date) {
         if (!$couponid || !$service || !$date)
             return false;
@@ -124,7 +154,7 @@ class CouponAPI extends MysqlDB{
         if (!$client_id)
             return false;
 
-        $sql = "select a.id, title, a.Amount, a.StartDate, a.EndDate, a.Status from coupon_clients a, coupon_confs b where a.CouponID = b.id and CID = {$client_id} ";
+        $sql = "select a.id, title, a.Amount, a.StartDate, a.EndDate, a.Status, a.CouponID from coupon_clients a, coupon_confs b where a.CouponID = b.id and CID = {$client_id} ";
         if ($scope) {
             $sql .= " AND FIND_IN_SET('{$scope}', SCOPE) ";
         }
@@ -147,6 +177,7 @@ class CouponAPI extends MysqlDB{
                 $rtn[$this->id]['sdate'] = $this->StartDate;
                 $rtn[$this->id]['edate'] = $this->EndDate;
                 $rtn[$this->id]['status'] = $this->Status;
+                $rtn[$this->id]['confid'] = $this->CouponID;
             }
         }
 

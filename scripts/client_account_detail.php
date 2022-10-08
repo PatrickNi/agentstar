@@ -44,12 +44,21 @@ if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
     $sets['duedate'] = isset($_POST['t_duedate'])? trim($_POST['t_duedate']) : "0000-00-00";
     $sets['duedate'] = $sets['duedate'] == ""? "0000-00-00" : $sets['duedate'];
 
-	$sets['dueamt'] = isset($_POST['t_dueamt']) && abs($_POST['t_dueamt']) > 0? trim($_POST['t_dueamt']) : 0;
+	$sets['dueamt'] = isset($_POST['t_dueamt'])? trim($_POST['t_dueamt']) : 0;
+    $sets['dueamt'] = str_replace(array('$', ','), '', $sets['dueamt']);
+    $sets['dueamt'] = abs($sets['dueamt']) > 0? $sets['dueamt'] : 0;
+
+
     $sets['step'] = isset($_POST['t_step'])? trim($_POST['t_step']) : "";
     $sets['note'] = isset($_POST['t_note'])? trim($_POST['t_note']) : "";
     $sets['gst'] = isset($_POST['t_gst'])? trim($_POST['t_gst']) : 0;
     $sets['party'] = isset($_POST['t_party'])? trim($_POST['t_party']) : "";
-    $sets['dueamt_3rd'] = isset($_POST['t_dueamt_3rd']) && $_POST['t_dueamt_3rd'] > 0? trim($_POST['t_dueamt_3rd']) : 0;
+    
+	$sets['dueamt_3rd'] = isset($_POST['t_dueamt_3rd'])? trim($_POST['t_dueamt_3rd']) : 0;
+    $sets['dueamt_3rd'] = str_replace(array('$', ','), '', $sets['dueamt_3rd']);
+    $sets['dueamt_3rd'] = abs($sets['dueamt_3rd']) > 0? $sets['dueamt_3rd'] : 0;
+
+
     $sets['gst_3rd'] = isset($_POST['t_gst_3rd'])? trim($_POST['t_gst_3rd']) : 0;
 
     if ($sets['step'] == '') {

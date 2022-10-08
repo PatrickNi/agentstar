@@ -15,7 +15,7 @@
 		<tr align="center"  class="greybg">
 			<td align="left" width="10%">
 				{if $ugs.v_visa.d eq 1}
-				<input type="submit" value="Delete" style="font-weight:bold" onClick="this.form.bt_name.value='delete';this.disable=false;">&nbsp;&nbsp;&nbsp;
+				<input type="submit" value="Delete" style="font-weight:bold" onClick="del_visa(this)">&nbsp;&nbsp;&nbsp;
 				{/if}
                 {if $dt_arr.auser != $uid}
 				<input type="button" value="Attachment" style="font-weight:bold"
@@ -25,7 +25,7 @@
 			<td align="center" class="whitetext"> Visa Service Detail &nbsp;&nbsp; </td> 			
 			<td align="left" width="30%">
 				<input type="button" value="Save" style="font-weight:bold" onClick="save_visa(this, false);" >
-                <input type="button" value="Close &amp; Refresh " style="font-weight:bold" onClick="save_visa(this, true);">
+                <input type="button" value="Save &amp; Close" style="font-weight:bold" onClick="save_visa(this, true);">
 			</td>
 		</tr>		
 	</table></td></tr>
@@ -166,6 +166,19 @@
 					{/foreach}
 					{if $dt_arr.vuser lt 1 || !isset($user_arr[$dt_arr.vuser])}
 						<option  value="0" selected >select a user</option>
+					{/if}
+					</select>			
+				</td> 
+			</tr>
+			<tr> 
+				<td width="36%" align="left" class="rowodd"><strong>Reviewer:</strong>&nbsp;&nbsp;</td> 
+				<td align="left" width="64%" class="roweven"> 
+					<select name="t_reviewer">                 
+					{foreach key=id item=name from=$user_arr}
+						<option  value="{$id}" {if $dt_arr.reviewer eq $id} selected {/if}>{$name}</option> 
+					{/foreach}
+					{if $dt_arr.reviewer lt 1 || !isset($user_arr[$dt_arr.reviewer])}
+						<option  value="0" selected >select a reviwer</option>
 					{/if}
 					</select>			
 				</td> 
@@ -315,15 +328,9 @@
 			</tr>
 			<tr>
 				<td align="left" class="roweven" colspan="2" >
-					<strong>Key Point</strong>
-					<textarea style="width:100%; height:100% " name="t_key"  rows="30">{$dt_arr.key}</textarea>
+					<strong>Notes</strong>
+					<textarea style="width:100%; height:100% " name="t_key"  rows="50">{$dt_arr.key}</textarea>
 				</td> 
-			</tr>
-			<tr>
-				<td align="left" class="roweven" colspan="2" >
-					<strong>Note</strong>
-					<textarea style="width:100%; height:100% " name="t_note2" rows="30">{$dt_arr.note2}</textarea>
-				</td>        
 			</tr>
         </table>
 		</form>
@@ -338,14 +345,16 @@
 	                {/if}
                 </tr> 
 	            <tr align="center" class="totalrowodd"> 
-	              <td class="border_1" width="33%">Date</td> 
-	              <td class="border_1" width="60%">Subject</td> 
-	              <td class="border_1" width="7%">Insert</td> 
+	              <td class="border_1" width="15%">Date</td> 
+	              <td class="border_1" width="65%">Subject</td> 
+				  <td class="border_1" width="15%">Due</td>
+	              <td class="border_1" width="5%">Insert</td> 
 	            </tr> 
 	            {foreach key=id item=arr from=$process_arr}
 	            <tr align="left" class="roweven"> 
 	              <td class="border_1"><span style="font-size:16px;font-weight:bolder; color:#990000">{if $arr.done eq 1}&radic;{else}?{/if}</span>{$arr.date}</td> 
 	              <td class="border_1"><span style="cursor:pointer; text-decoration:underline;" onClick="window.open('client_visa_process.php?vid={$vid}&pid={$id}&cid={$cid}','_blank','alwaysRaised=yes,height='+screen.height*1/3+',width='+screen.width*1/2+', location=no')">{$arr.subject}</span></td>
+				  <td class="border_1">{$arr.due}</td>
 	              <td class="border_1"><img src="../images/arr_down.gif" style="cursor:pointer" onClick="window.open('client_visa_process.php?vid={$vid}&pid={$id}&cid={$cid}&isNew=1&isOther=1','_blank','alwaysRaised=yes,height='+screen.height*1/3+',width='+screen.width*1/2+', location=no')"></td> 
 	            </tr> 
 	            {/foreach}
@@ -359,6 +368,7 @@
 				 	<input type="hidden" name="cl_act" id="cl_act" value="">
 					<input type="hidden" name="cl_typ" id="cl_typ" value="visa">
     				<input type="hidden" name="cl_appid" id="cl_appid" value="{$vid}">
+					<input type="hidden" name="cl_tplid" id="cl_tplid" value="1">
 				</form>
 			</div>
 			{/if}
@@ -406,7 +416,14 @@
                   window.location.reload();    
             }
         });
-    }	
+    }
+
+	function del_visa(obj) {
+		if(confirm("Do your want to DELETE currency visa case?")) {
+			$('#bt_name').val('delete');
+			$('#form1').submit();
+		}
+	}	
 
 	function do_checklist(act){
 		$('#cl_act').val(act);
@@ -416,6 +433,6 @@
 			$('#cl_msg').html('');
 		});	
 	}
-	do_checklist('');
+    do_checklist('');
 </script>
 {/literal}	

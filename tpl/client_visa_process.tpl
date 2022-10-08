@@ -36,7 +36,7 @@
 					<tr>
 						<td width="19%" align="left" class="rowodd">
 							<strong>Additional Step:</strong>&nbsp;&nbsp;
-							<button type="button" onclick="add_dha()" style="font-size:smaller;">Start w/ DHA request</button>
+							<button type="button" onclick="add_dha()" style="font-size:smaller;">DHA request</button>
 						</td>
 						<td align="left" width="81%" class="roweven">
 							<input type="text" name="t_add" id="t_add" value="{$dt_arr.add}" style="width:600px;">

@@ -84,6 +84,7 @@ $sets['class']  = $sets['class'] == ""? 0 : $sets['class'];
 
 
 	$sets['note']   = isset($_REQUEST['t_note'])? (string)trim($_REQUEST['t_note']) : "";
+	$sets['cus_note']   = isset($_REQUEST['t_cus_note'])? (string)trim($_REQUEST['t_cus_note']) : "";
 //	$sets['cuser']    = isset($_REQUEST['t_cuser'])? (string)trim($_REQUEST['t_cuser']) : 0;
 	$sets['sign']  = isset($_REQUEST['t_sign'])  && $_REQUEST['t_sign'] != '' ? (string)trim($_REQUEST['t_sign']) : "0000-00-00";
 //	$sets['sign']  = $sets['sign'] == ""? date("Y-m-d"): $sets['sign'];
@@ -111,6 +112,7 @@ $sets['class']  = $sets['class'] == ""? 0 : $sets['class'];
 	$sets['wechatid']  = isset($_REQUEST['t_wechat_id'])? (string)trim($_REQUEST['t_wechat_id']) : "";
 	$sets['wechatphone']  = isset($_REQUEST['t_wechat_phone'])? (string)trim($_REQUEST['t_wechat_phone']) : "";
 	$sets['wechatemail']  = isset($_REQUEST['t_wechat_email'])? (string)trim($_REQUEST['t_wechat_email']) : "";
+	$sets['staff_name']= isset($_REQUEST['t_staffname'])? (string)trim($_REQUEST['t_staffname']) : "";
 
 if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" || strtoupper($_REQUEST['bt_name']) == "APPROVED")) {
 /*
@@ -154,6 +156,8 @@ if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" |
    		if ($client_id > 0){	
 			if (strtoupper($_REQUEST['bt_name']) == "APPROVED") {
 				$save = false;
+				$sets['status'] = 'new';
+				
 				if ($sets['country'] == '0') {
 					echo "<script language='javascript'>alert('\"Country: \" can not be empty!')</script>";
 				}
@@ -213,9 +217,16 @@ if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" |
 	$o_c->delClient($client_id);
 	header("Location: client.php");
 	exit;
-}elseif (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == 'APPROVED'){
-	$o_c->delClient($client_id);
-	header("Location: client.php");
+}
+elseif(isset($_REQUEST['crypt_link']) && $_REQUEST['crypt_link'] != "") {
+	if ($_REQUEST['crypt_link'] == 'gen') {
+		$link = $o_c->genCryptionLink($client_id);
+		echo json_encode(array('succ'=>$link? 1: 0, 'link'=>$link));
+	}
+	elseif ($_REQUEST['crypt_link'] == 'expire') {
+		$link = $o_c->expireCryptionLink($client_id);
+		echo json_encode(array('succ'=>$link? 1: 0, 'link'=>''));
+	}
 	exit;
 }
 
@@ -266,7 +277,18 @@ $class_arr = $o_v->getVisaClassArr($sets['visa'], $client_id == 0? 'Active' : ''
 
 # set smarty tpl
 $o_tpl = new Template;
-$o_tpl->assign('arr', $client_id > 0? $client_arr : $sets);
+if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" || strtoupper($_REQUEST['bt_name']) == "APPROVED")) {
+	if ($save) {
+		$o_tpl->assign('arr', $client_arr);
+	}
+	else {
+		$o_tpl->assign('arr', $sets);
+	}
+}
+else {
+	$o_tpl->assign('arr', $client_arr);
+}
+
 $o_tpl->assign('visa_arr', $visa_arr);
 $o_tpl->assign('visaclass_arr', $class_arr);
 
@@ -291,5 +313,6 @@ if($ugs['b_nocp']['v'] == 1) {
     $o_tpl->assign('forbid_cp', FORBID_COPY);
 }
 
+$o_tpl->assign('cryption_link', $o_c->getCryptionLink($client_id));
 $o_tpl->display('client_detail.tpl');
 ?>

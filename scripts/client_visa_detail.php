@@ -22,6 +22,7 @@ $sets['body']    = isset($_REQUEST['t_body'])? trim($_REQUEST['t_body']) : 0;
 $sets['shore']   = isset($_REQUEST['t_shore'])? trim($_REQUEST['t_shore']) : 0; 
 $sets['auser']   = isset($_REQUEST['t_auser'])? (string)trim($_REQUEST['t_auser']) : 0;
 $sets['vuser']   = isset($_REQUEST['t_vuser'])? (string)trim($_REQUEST['t_vuser']) : 0;
+$sets['reviewer']   = isset($_REQUEST['t_reviewer'])? (int)trim($_REQUEST['t_reviewer']) : 0;
 
 $o_c = new ClientAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 $o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1); 

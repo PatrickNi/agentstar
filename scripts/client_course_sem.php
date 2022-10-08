@@ -161,6 +161,7 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 
 
 			        //Check "chase tuition process"
+					/*
 			        if ($semOrder > 1){
 				        $chase_due = date('Y-m-d', strtotime('-21 day', strtotime($sems['fdate'])));
 	  					$course_process['subject'] = 0;
@@ -181,6 +182,7 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 							$o_c->setCourseProcessDue($chase['id'], $chase_due);
 						}
 					}
+					*/
 	        }
 	        //Cancel status
 	        if ($sems['done'] == 2 ) {

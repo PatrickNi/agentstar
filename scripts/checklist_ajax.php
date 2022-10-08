@@ -55,16 +55,14 @@ elseif ($cl_act == 'edit_app') {
        
 
 $app_arr = $o_c->getApp($cl_typ, $cl_appid);
-$alltpl_arr = $o_c->getTpls(0,true);
+
+
 if (count($app_arr) == 0 && $cl_act == '') {
     $tpl_ids = $o_c->findAppTpls($cl_typ, $cl_appid);
     $tpl_arr = array();
     $cl_tplid  = 0;
-    foreach ($tpl_ids as $_id) {
-        if (isset($alltpl_arr[$_id])){
-            $tpl_arr[$_id] = $alltpl_arr[$_id];
-            $cl_tplid = $_id;
-        }
+    if (count($tpl_ids) > 0 ) {
+        $tpl_arr = $o_c->getTpls(0,true,$tpl_ids);
     }
 
     $o_tpl->assign('section', 'confirm_select');
@@ -72,7 +70,7 @@ if (count($app_arr) == 0 && $cl_act == '') {
     $o_tpl->assign('cl_typ', $cl_typ);
     $o_tpl->assign('cl_appid', $cl_appid);
     $o_tpl->assign('cl_tplid', $cl_tplid);
-    $o_tpl->assign('item_arr', $cl_tplid > 0? $o_c->getItems($cl_tplid, true) : array());
+    $o_tpl->assign('item_arr', array());
     $output = $o_tpl->fetch('checklist_ajax.tpl');
 }
 elseif ($cl_act == 'change_tpl' && count($app_arr) == 0) {
@@ -80,8 +78,14 @@ elseif ($cl_act == 'change_tpl' && count($app_arr) == 0) {
         $output = 'Incorrect parameters';
     }
     else {
+        $tpl_ids = $o_c->findAppTpls($cl_typ, $cl_appid);
+        $tpl_arr = array();
+        if (count($tpl_ids) > 0 ) {
+            $tpl_arr = $o_c->getTpls(0,true,$tpl_ids);
+        }
+
         $o_tpl->assign('section', 'confirm_select');
-        $o_tpl->assign('tpl_arr', $alltpl_arr);
+        $o_tpl->assign('tpl_arr', $tpl_arr);
         $o_tpl->assign('cl_typ', $cl_typ);
         $o_tpl->assign('cl_appid', $cl_appid);
         $o_tpl->assign('cl_tplid', $cl_tplid);

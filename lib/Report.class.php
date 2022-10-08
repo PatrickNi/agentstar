@@ -10,33 +10,35 @@ class ReportAPI extends MysqlDB {
     
     function getUrgentVisa($userid, $sort_list, $null_du=1, $page=1, $page_size=50){
 		$_arr = array();
-        //if(a.DueDate = '0000-00-00', '9999-99-99', a.DueDate) as sortdue 
-		$sql = "select SQL_CALC_FOUND_ROWS a.ID, concat(LName, ' ', FName) as ClientName, VisaName, ClassName, IF(a.ItemID > 0, Item, ExItem) as Item, DueDate, BeginDate, f.CID, CVID, b.VUserID, 
-		               if(((a.DueDate >= Date(NOW()) and a.DueDate < Date(NOW()) + INTERVAL 7 Day) or a.DueDate < Date(NOW()))and a.DueDate <> '0000-00-00',0,1) as isTodo,
-                       IF(IF(a.ItemID > 0, Item, ExItem) like '%issue biz%', '9999-99-99', if(a.DueDate = '0000-00-00', '9999-99-99', a.DueDate)) as sortdue
+        if ($sort_list != '') {
+            $sql_catalog = "(CASE WHEN IF(a.ItemID > 0, Item, ExItem) like 'apply%' THEN 'A1' WHEN IF(a.ItemID > 0, Item, ExItem) like 'issue checklist%' THEN 'A2' WHEN IF(a.ItemID > 0, Item, ExItem) like 'grant%' THEN 'Z2' WHEN IF(a.ItemID > 0, Item, ExItem) like 'sign%' THEN 'sign' WHEN IF(a.ItemID > 0, Item, ExItem) like 'DHA request%' THEN 'dha' WHEN IF(a.ItemID > 0, Item, ExItem) like 'issue biz%' THEN 'Z3' ELSE IF(a.ItemID > 0, Item, ExItem) END ) as Catalog ";
+            $sql_sort = 'Catalog asc, sortdue asc'; 
+        }
+        else {
+            $sql_catalog = " 'A' as Catalog ";
+            $sql_sort = 'sortdue asc, Name asc, Item desc'; 
+
+        }
+		$sql = "select SQL_CALC_FOUND_ROWS a.ID, concat(LName, ' ', FName) as ClientName, VisaName, ClassName, IF(a.ItemID > 0, Item, ExItem) as Item, DueDate, BeginDate, f.CID, CVID, b.VUserID, b.AUserID, b.ReviewerID, if(((a.DueDate >= Date(NOW()) and a.DueDate < Date(NOW()) + INTERVAL 7 Day) or a.DueDate < Date(NOW()))and a.DueDate <> '0000-00-00',0,1) as isTodo,IF(IF(a.ItemID > 0, Item, ExItem) like '%issue biz%', '9999-99-99', if(a.DueDate = '0000-00-00', '9999-99-99', a.DueDate)) as sortdue, {$sql_catalog}
     				from client_visa_process a left join visa_rs_item c on(a.ItemID = c.ItemID) ,  client_visa  b, visa_category d,  visa_subclass e, client_info f   
 					where a.Done = 0 and a.CVID = b.ID and b.CID = f.CID and b.CateID = d.CateID and b.SubClassID = e.SubClassID ";
-		//((a.DueDate >= Date(NOW()) and a.DueDate < Date(NOW()) + INTERVAL 7 Day) or a.DueDate < Date(NOW()))and a.DueDate <> '0000-00-00' and	
 		if ($null_du)
 			$sql .= " AND a.DueDate <> '0000-00-00' ";	
 
 		if ($userid > 0){
-			$sql .= " AND b.VUserID = {$userid} "; //(b.AUserID = {$userid} or 
+			$sql .= " AND (b.VUserID = {$userid} or b.ReviewerID = {$userid}) "; //(b.AUserID = {$userid} or 
 		}
         elseif ($userid == -1) {
             $sql .= " AND b.VUSERID = 0 ";
         }
 
-		if ($sort_list != ''){
-	        $sql .= " Order by {$sort_list}";
-		}
-		else{
-            $sql .= " Order by sortdue asc, Name asc, Item desc";	
-		}
+		$sql .= "order by  {$sql_sort}";
 		//$sql .= " limit 200 ";
         //$sql .= " LIMIT ".($page - 1)*$page_size .", {$page_size} " 
         //echo $sql."<br/>";
 		$this->query($sql);
+        $rank = 1;
+        $catalog = '';
 		while ($this->fetch()){
 			$_arr[$this->ID]['name'] = $this->ClientName;
 			$_arr[$this->ID]['item']  = $this->Item;
@@ -60,6 +62,19 @@ class ReportAPI extends MysqlDB {
 			$_arr[$this->ID]['visaid']  = $this->CVID;
 			$_arr[$this->ID]['isTodo']  = $this->isTodo;
             $_arr[$this->ID]['vuid']  = $this->VUserID;
+            $_arr[$this->ID]['auid']  = $this->AUserID;
+            $_arr[$this->ID]['reviewer']  = $this->ReviewerID;
+
+            if ($catalog == '' || $catalog != $this->Catalog) {
+                $rank = 1;
+            }
+            else {
+                $rank++;
+            }
+
+            $_arr[$this->ID]['catalog'] = $this->CataLog;
+            $_arr[$this->ID]['rank'] = $rank;
+            $catalog = $this->Catalog;
 		}
 		return $_arr;
 	}        
@@ -115,12 +130,12 @@ class ReportAPI extends MysqlDB {
 		$_arr = array();
     	$sql = "select a.ID, concat(LName, ' ', FName) as ClientName, Qual, Major, e.Name, DueDate, BeginDate, if(p.ID is not null, p.Process, ExItem) as ProcessName, f.CID, CCID,
             if(((a.DueDate >= Date(NOW()) and a.DueDate < Date(NOW()) + INTERVAL 7 Day) or a.DueDate < Date(NOW()))and a.DueDate <> '0000-00-00',0,1) as isTodo,
-                    a.DueDate as sortdue, if(p.ID > 0, p.ID, 0) AS ProcessID  
+                    a.DueDate as sortdue, if(p.ID > 0, p.ID, 0) AS ProcessID, b.PaperworkID, b.ConsultantID  
     				from client_course_process a left join course_process p on (a.ProcessID = p.ID), client_course  b,  institute_qual c,  institute_major d, institute e, client_info f
 					where b.CID = f.CID and a.Done = 0 and a.CCID = b.ID and b.QualID = c.ID and b.MajorID = d.ID and b.IID = e.ID ";
     	//a.DueDate >= Date(NOW()) and if(a.DueDate = '0000-00-00', '9999-99-99', a.DueDate) 
 		if ($userid > 0 && $only_course == 0){
-			$sql .= " AND b.ConsultantID = {$userid}";
+			$sql .= " AND (b.ConsultantID = {$userid} or (b.PaperworkID = {$userid} and p.ID not in (1,7) and a.ExItem not like '%Apply new course%')) ";
 		}
 		
 		if ($only_course == 1){
@@ -153,6 +168,8 @@ class ReportAPI extends MysqlDB {
 			$_arr[$this->ID]['clientid'] = $this->CID;
 			$_arr[$this->ID]['courseid'] = $this->CCID;
             $_arr[$this->ID]['isTodo'] = $this->isTodo;
+            $_arr[$this->ID]['consultant'] = $this->ConsultantID;
+            $_arr[$this->ID]['paperwork'] = $this->PaperworkID;
             $_arr[$this->ID]['isColor'] = ($this->ProcessID == __C_RECEIVE_OFFER || $this->ProcessID == __C_PASS_OFFER || $this->ProcessID == __C_GET_COE || ($this->ProcessID == 0 && stripos($this->ProcessName, 'p:') === 0))? 1 : 0;
 		}
 		return $_arr;
@@ -586,7 +603,7 @@ class ReportAPI extends MysqlDB {
 
 	function getNumOfCourseClientByUser($fromDay, $toDay, $userid, $offduty=false,$aboutus=""){
 		//$sql = "select Date_Format(CourseVisitDate, '%Y%u') as Week,  concat(LName, ' ', FName) as Name, a.CID, School, Qual from client_info a left join (select CID, School, Qual, max(t1.ID) from client_qual t1, school t2, course_qual t3 where t1.SchoolID = t2.ID and t1.QualID = t3.ID Group by t1.CID) b on(b.CID = a.CID) where CourseVisitDate != '0000-00-00' ";
-		$sql = "select Date_Format(ConsultantDate, '%Y%u') as Week,  concat(LName, ' ', FName) as Name, t1.CID, t2.ID as CourseID, t2.ProcessID, t3.IsActive from client_info t1 left join (select a.ID as PID, b.CID, b.ID, a.ProcessID from client_course_process a, client_course b where a.ProcessID = ".__C_APPLY_OFFER." and a.CCID = b.ID AND a.Done = 1) t2 on (t1.CID = t2.CID) left join client_course t3 ON(t1.CID = t3.CID) WHERE 1 ";		
+		$sql = "select Date_Format(ConsultantDate, '%Y%u') as Week,  concat(LName, ' ', FName) as Name, t1.CID, t2.ID as CourseID, t2.ProcessID, t3.IsActive from client_info t1  left join client_course t3 ON(t1.CID = t3.CID) left join (select a.ID as PID, b.CID, b.ID, a.ProcessID from client_course_process a, client_course b where a.ProcessID = ".__C_APPLY_OFFER." and a.CCID = b.ID AND a.Done = 1) t2 on (t3.ID = t2.ID) WHERE 1 ";		
 		if ($userid > 0) {
             if ($offduty) {
                 $sql .= " AND MergeFromConsultantID = {$userid} ";
@@ -651,7 +668,7 @@ class ReportAPI extends MysqlDB {
 	function getAllOfCourseClientByUser($fromDay, $toDay, $userid, $offduty=false,$aboutus=""){
 		//$sql = "select count(*) as cnt from client_info where CourseVisitDate != '0000-00-00' ";
 		//$sql = "select concat(LName, ' ', FName) as Name, a.CID, School, Qual from client_info a left join (select CID, School, Qual, max(t1.ID) from client_qual t1, school t2, course_qual t3 where t1.SchoolID = t2.ID and t1.QualID = t3.ID Group by t1.CID) b on(b.CID = a.CID) where CourseVisitDate != '0000-00-00' ";
-		$sql = "select concat(LName, ' ', FName) as Name, t1.CID, t2.ID as CourseID, t2.ProcessID, t3.IsActive from client_info t1 left join (select a.ID as PID, b.CID, b.ID, a.ProcessID from client_course_process a, client_course b where a.ProcessID = ".__C_APPLY_OFFER." and a.CCID = b.ID AND a.Done = 1) t2 on (t1.CID = t2.CID) left join client_course t3 ON (t1.CID = t3.CID) WHERE 1 ";
+		$sql = "select concat(LName, ' ', FName) as Name, t1.CID, t2.ID as CourseID, t2.ProcessID, t3.IsActive from client_info t1 left join client_course t3 ON (t1.CID = t3.CID) left join (select a.ID as PID, b.CID, b.ID, a.ProcessID from client_course_process a, client_course b where a.ProcessID = ".__C_APPLY_OFFER." and a.CCID = b.ID AND a.Done = 1) t2 on (t3.ID = t2.ID)  WHERE 1 ";
 
 		if ($userid > 0) {
             if ($offduty) {
@@ -673,7 +690,7 @@ class ReportAPI extends MysqlDB {
                 $sql .= " AND t1.about = '{$aboutus}' ";
             }
         }
-        
+        //echo $sql."\n";
 		$this->query($sql);
 		$_arr = array();
 		while ($this->fetch()) {
@@ -1271,15 +1288,16 @@ class ReportAPI extends MysqlDB {
 
         //calc payment
         if (count($visa) > 0) {
-            $sql = "select a.ID, VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a left join client_payment b on(a.ID = b.AccountID) Where VisaID IN (".implode(',', array_keys($visa)).") AND ACC_TYPE = 'visa' Group by a.ID";
-            $this->query($sql);
-       
+            //Due , Due_3rd
+            $sql = "select VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD from client_account a Where VisaID IN (".implode(',', array_keys($visa)).") AND ACC_TYPE = 'visa' and Step in ('agreement', 'extra-agreement')";
+            //echo $sql;
+            $this->query($sql);   
             while ($this->fetch()){
                 //paperwork profit
                 $visa[$this->VisaID]['fee'] += ($this->GST == 1? round($this->DueAmount/1.1,2) : $this->DueAmount) - ($this->GST_3RD == 1? round($this->AMOUNT_3RD/1.1,2) : $this->AMOUNT_3RD);
                 $visa[$this->VisaID]['gst'] = $this->GST;
-            }            
-                  
+            }
+
             // Received
             $sql = "select a.VisaID, sum(if(c.PaidAmount is null, 0, c.PaidAmount)) as paid from client_account a, client_payment c where a.ID = c.AccountID AND ACC_TYPE = 'visa'  and Step in ('agreement', 'extra-agreement') AND VisaID IN (".implode(',', array_keys($visa)).") group by a.ID";
             $this->query($sql);
@@ -1673,10 +1691,10 @@ class ReportAPI extends MysqlDB {
     }	
 	
 	function getNumOfVisaProcByUser($fromDay, $toDay, $userid,$aboutus=""){
-		
+
 		$sql  = "select date_format(BeginDate, '%Y%u') as Week, if(b.Item is null, ExItem, b.Item) as Item, c.AFee, concat(LName, ' ', FName) as Name, d.CID, c.ID, c.r_Status, c.CateID, c.SubClassID   
 		          from client_visa_process a left join visa_rs_item b on (a.ItemID = b.ItemID), client_visa c, client_info d  
-		          where a.CVID  = c.ID and c.CID = d.CID and (b.Item not like '%assessment'  or b.Item is null) and a.Done = 1 ";
+		          where a.CVID  = c.ID and c.CID = d.CID and b.Item is not null and a.Done = 1 ";
 		if ($userid > 0) {
 			$sql .= " AND c.VUserID = {$userid} ";
 		}

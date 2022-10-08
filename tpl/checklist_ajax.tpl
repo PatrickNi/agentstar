@@ -36,7 +36,7 @@
                 &nbsp;
                 <button type="button" onclick=""><strong>Create with a template</strong></button>
                 &nbsp;
-                <button type="button" onclick=""><strong>Create new </strong></button>
+                <button type="button" onclick=""><strong>Create empty checklist</strong></button>
             </td>
         </tr> 
     </table> 
@@ -56,9 +56,19 @@
                 <select name="cl_tplid" onChange="do_checklist('change_tpl')">
                     <option value="0" selected>choose a template</option>
                     {foreach key=id item=v from=$tpl_arr}
-                        <option value="{$id}" {if $cl_tplid eq $id} selected {/if}>{$v.name}</option>
+                        <option value="{$id}" {if $cl_tplid eq $id} selected {/if}>
+                        {if $v.catename != "" && $v.classname != ""}
+                            {$v.catename} - {$v.classname}
+                        {else}
+                            {$v.name}
+                        {/if}
+                        </option>
                     {/foreach}
                 </select>
+                &nbsp;
+                <button type="button" onclick="do_checklist('apply_tpl')" {if count($tpl_arr) == 0} disabled{/if}><strong>Create with a template</strong></button>
+                &nbsp;&nbsp;
+                <button type="button" onclick="do_checklist('apply_new')"><strong>Create empty checklist </strong></button>
             </td>
         </tr> 
         <tr align="center" class="totalrowodd"> 
@@ -70,18 +80,11 @@
         {foreach key=id item=v from=$item_arr}
         {assign var="rank" value=$rank+1}
         <tr align="center" class="roweven"> 
-            <td width="5%">{$rank}</td> 
-            <td width="55%" align="left">{$v.tit}</td> 
+            <td width="5%" style="vertical-align: top;">{$rank}</td> 
+            <td style="vertical-align: top;" width="55%" align="left">{$v.tit}</td> 
             <td width="30%"></td> 
         </tr> 
         {/foreach}
-        <tr align="left" class="totalrowodd"> 
-            <td colspan="3">
-                <button type="button" onclick="do_checklist('apply_tpl')"><strong>Create with a template</strong></button>
-                &nbsp;
-                <button type="button" onclick="do_checklist('apply_new')"><strong>Create new </strong></button>
-            </td>
-        </tr>
     </table> 	
 {elseif $section == "show_detail"}
     <input type="hidden" name="cl_act" id="cl_act" value="">
@@ -89,30 +92,37 @@
     <input type="hidden" name="cl_appid" id="cl_appid" value="{$cl_appid}">
     <table border="0" cellpadding="1" cellspacing="1" width="100%" id="tbl_checklist"> 
         <tr class="greybg"> 
-            <td colspan="4" class="whitetext" align="center">Check List</td>
+            <td colspan="5" class="whitetext" align="center">Check List
+            {if count($app_arr) > 0}
+                <a href="/scripts/checklist_pdf.php?cl_typ={$cl_typ}&cl_appid={$cl_appid}", target="_blank">PDF Download</a>
+            {/if}
+            </td>
         </tr>
         <tr align="center" class="totalrowodd"> 
             <td width="5%">No</td> 
-            <td width="80%">Item</td> 
-            <td width="10%">Received</td>
+            <td width="73%">Item</td> 
+            <td width="15%">Received</td>
             <td width="5%"></td> 
+            <td width="2%"></td>
         </tr>
         {assign var="rank" value="0"}
         {foreach key=id item=v from=$app_arr}
         {assign var="rank" value=$rank+1}
         <tr align="center" class="roweven" id="app_item_{$id}"> 
-            <td width="5%">{$rank}</td>
-            <td width="80%" align="left">
+            <td width="5%" style="vertical-align: top;">{$rank}</td>
+            <td style="vertical-align: top;" width="80%" align="left">
                 <span onclick="widget_checklist(this, {$id}, 'edit')">{$v.tit}</span>
             </td> 
             <td width="10%" id="app_rcd_{$id}">{if $v.rcd != '0000-00-00'}{$v.rcd}{/if}</td>
             <td width="5%"><input type="checkbox" id="app_chk_{$id}" {if $v.rcd != '0000-00-00'} checked {/if} onChange="mark_checklist({$id},this)" ></td> 
+            <td>{if $v.rmk != ""}<span class="ui-icon ui-icon-help" title="{$v.rmk}"></span>{/if}</td>
         </tr> 
         {/foreach}
         <tr align="center" class="roweven">
             <td></td> 
-            <td align="left" colspan="3">
-                <input type="text" size="50" name="cl_new_item" value="">&nbsp;&nbsp;<button type="button" onclick="do_checklist('app_add')">Add</button>
+            <td align="left" colspan="4">
+                <textarea rows="3" style="width:100%;"  name="cl_new_item" ></textarea><br/>
+                <button type="button" onclick="do_checklist('app_add')">Add</button>
             </td> 
         </tr>     
     </table>
@@ -126,6 +136,9 @@
     </style>
     <script type="text/javascript">
         function rm_checklist(app_item_id) {
+            if(!confirm('Delete Item: "'+$('#app_tit_'+app_item_id).val()+'"')){  
+                return false;            
+            }
             $.post($('#form_checklists').attr('action'), 'cl_act=del_app&cl_app_item='+app_item_id+'&cl_typ='+$('#cl_typ').val()+'&cl_appid='+$('#cl_appid').val(), function(data){
                 rtn = $.parseJSON(data);
                 if (rtn.succ == 1) {
@@ -138,12 +151,14 @@
         }
 
        function md_checklist(obj,app_item_id) {
-            $.post($('#form_checklists').attr('action'), 'cl_act=edit_app&cl_app_item='+app_item_id+'&cl_typ='+$('#cl_typ').val()+'&cl_appid='+$('#cl_appid').val()+'&cl_app_tit='+$('#app_tit_'+app_item_id).val(), function(data){
+            $(obj).val('saving...').prop("disabled", true);
+            $.post($('#form_checklists').attr('action'), 'cl_act=edit_app&cl_app_item='+app_item_id+'&cl_typ='+$('#cl_typ').val()+'&cl_appid='+$('#cl_appid').val()+'&cl_app_tit='+encodeURI($('#app_tit_'+app_item_id).val()), function(data){
                 rtn = $.parseJSON(data);
                 if (rtn.succ == 1) {
-                    widget_checklist(obj,app_item_id,'cancel');
+                    widget_checklist(obj,app_item_id,'postsave');
                 }
                 else {
+                    $(obj).val('save').prop("disabled", false);
                     alert("edit checklist failed!");
                 }
             });
@@ -174,11 +189,15 @@
 
         function widget_checklist(obj, app_item_id, act) {
             if (act == 'edit') {
-                var edit_tpl = '<input size="50" type="text" id="app_tit_'+app_item_id+'" value="'+$(obj).text()+'">&nbsp;<button type="button" onClick="md_checklist(this,'+app_item_id+')">save</button>&nbsp;<button type="button" onClick="widget_checklist(this,'+app_item_id+',\'cancel\')">cancel</button>&nbsp;<button type="button" onClick="rm_checklist('+app_item_id+')">remove</button>';
+                var edit_tpl = '<textarea rows="3" style="width:100%;" id="app_tit_'+app_item_id+'">'+$(obj).html().replace(/<br>/g, '\n')+'</textarea><br/><button type="button" onClick="md_checklist(this,'+app_item_id+')">save</button>&nbsp;<button type="button" onClick="rm_checklist('+app_item_id+')">delete</button>&nbsp;&nbsp;&nbsp;<input type="hidden" id="hidden_tit_'+app_item_id+'" value="'+$(obj).html().replace(/<br>/g, '\n')+'">';
                 $(obj).parent().html(edit_tpl);
             }
+            else if (act == 'postsave') {
+                var show_tpl = '<span onclick="widget_checklist(this, '+app_item_id+', \'edit\')">'+$('#app_tit_'+app_item_id).val().replace(/\n/g,'<br>')+'</span>';
+                $(obj).parent().html(show_tpl);            
+            }
             else {
-                var show_tpl = '<span onclick="widget_checklist(this, '+app_item_id+', \'edit\')">'+$('#app_tit_'+app_item_id).val()+'</span>';
+                var show_tpl = '<span onclick="widget_checklist(this, '+app_item_id+', \'edit\')">'+$('#hidden_tit_'+app_item_id).val().replace(/\n/g,'<br>')+'</span>';
                 $(obj).parent().html(show_tpl);
             }
         }
@@ -207,6 +226,11 @@
                             alert("Set item rank failed!");
                         }                        
                     });
+                }
+            });
+            $( document ).tooltip({ 
+                content: function(callback) { 
+                    callback($(this).prop('title').replace(/\n/g, '<br/>')); 
                 }
             });
         });

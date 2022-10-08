@@ -89,44 +89,82 @@
                         {/if}		
                     </select>
                     </td>
-					<td align="left" nowrap="nowrap">Client Name&nbsp;&nbsp;
-						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="setSortOrd(1,0);t_view.value='v';form1.submit();"/>&nbsp;&nbsp;
-						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="setSortOrd(1,1);t_view.value='v';form1.submit();"/>
+					<td align="left" nowrap="nowrap">Client Name
 					</td>		
-					<td align="left" nowrap="nowrap">Category&nbsp;&nbsp;
-						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="setSortOrd(2,0);t_view.value='v';form1.submit();"/>&nbsp;&nbsp;
-						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="setSortOrd(2,1);t_view.value='v';form1.submit();"/>
+					<td align="left" nowrap="nowrap">Category
 					</td>
-					<td align="left">SubClass&nbsp;&nbsp;
-						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="setSortOrd(3,0);t_view.value='v';form1.submit();"/>&nbsp;&nbsp;
-						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="setSortOrd(3,1);t_view.value='v';form1.submit();"/>					
+					<td align="left">SubClass				
 					</td>
 					<td align="left" width="40%">Process&nbsp;&nbsp;
 						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="setSortOrd(4,0);t_view.value='v';form1.submit();"/>&nbsp;&nbsp;
 						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="setSortOrd(4,1);t_view.value='v';form1.submit();"/>					
 					</td>
-					<td nowrap="nowrap">Paperwork&nbsp;&nbsp;
+					<td nowrap="nowrap">Agreement Staff
 					</td>
-					<td nowrap="nowrap">Due Date&nbsp;&nbsp;						
-						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="setSortOrd(5,0);t_view.value='v';form1.submit();"/>&nbsp;&nbsp;
-						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="setSortOrd(5,1);t_view.value='v';form1.submit();"/>			<br/><input type="checkbox" name="vdu" value="1" {if $vdu eq 1} checked {/if} onChange="t_view.value='v';form1.submit()"/> ex(0000-00-00)
-		
+					<td nowrap="nowrap">Paperwork
+					</td>
+					<td nowrap="nowrap">Reviewer
+					</td>
+					<td nowrap="nowrap">Due Date<br/>
+						<input type="checkbox" name="vdu" value="1" {if $vdu eq 1} checked {/if} onChange="t_view.value='v';form1.submit()"/> ex(0000-00-00)
 					</td>
 				</tr>
 				{foreach key=id item=arr from=$urgent_arr}
 				 <tr align="center" class="{cycle values='rowodd,roweven'}">
-					<td width="2%"><input type="checkbox" onClick="if(this.checked);"></td>
+					<td width="2%">{$arr.rank}</td>
 				 	<td align="left" nowrap="nowrap">{$arr.name}</td>
 					<td align="left" nowrap="nowrap">{$arr.cate}</td>
 					<td align="left">{$arr.class}</td>
 					<!-- onClick="openModel('client_visa_process.php?pid={$id}&cid={$arr.clientid}&vid={$arr.visaid}',800,560,'NO', 'form1')"-->
-					<td align="left" style="{if $arr.islodge eq 1}color:#FF3300;{elseif $arr.isApply eq 1}color:blue;{elseif stripos($arr.item, 'DHA request') === 0}color:red;{/if}cursor:pointer; text-decoration:underline" onClick="window.open('client_visa_detail.php?cid={$arr.clientid}&vid={$arr.visaid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$arr.item}</td>
+					<td align="left" style="{if $arr.islodge eq 1}color:#FF3300;{elseif stripos($arr.item, 'DHA request') === 0 || stripos($arr.item, 'apply onshore') === 0}color:red;{elseif $arr.isApply eq 1}color:blue;{/if}cursor:pointer; text-decoration:underline" onClick="window.open('client_visa_detail.php?cid={$arr.clientid}&vid={$arr.visaid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$arr.item}</td>
+					<td nowrap="nowrap">{$slUsers[$arr.auid]}</td>
 					<td nowrap="nowrap">{$slUsers[$arr.vuid]}</td>
+					<td nowrap="nowrap">{$slUsers[$arr.reviewer]}</td>
 					<td nowrap="nowrap" {if $arr.isTodo neq 1}style="color:#660000; font-weight:bold"{/if}>{$arr.due}</td>
 				 </tr>
 				{/foreach}	
 			</table>
 	</td></tr>{/if}
+	<tr><td class="menu"  align="left" style="cursor:pointer" onClick="trigger_list('vexp',form1,'view_vexp');">
+    		Visa Expire List
+      </td>
+	</tr>
+	{if $viewWhat eq 'vexp'}
+	<tr id="view_vexp">
+		<td>
+			<table width="100%" cellpadding="1" cellspacing="1" border="0">
+			<tr align="center" class="totalrowodd">
+				<td width="5%">
+					<select name="vUid" onChange="sort_list.value='';t_view.value='vexp';form1.submit();">
+					{foreach key=user_id item=user_name from=$slUsers}		
+						<option value="{$user_id}" {if $staffid eq $user_id} selected {/if}>{$user_name}</option>  
+					{/foreach}
+					{if $ugs.todo_visa.v eq 1}				
+						<option value="0" {if $staffid eq '0'} selected {/if}>All Staff</option>  
+						<option value="-1" {if $staffid eq '-1'} selected {/if}>Unassigned</option>  
+					{/if}		
+				</select>
+				</td>
+				<td>Expire Date </td>
+				<td>Last Name</td>
+				<td>Firset Name</td>
+				<td>Visa Category</td>
+				<td>Visa SubClass</td>
+			</tr>
+			{foreach key=id item=arr from=$urgent_arr}
+			<tr align="center" class="roweven">
+				<td>{$arr.type}</td>
+				<td>{$arr.date}</td>
+				<td><span style="cursor:pointer; text-decoration:underline;" onClick="window.open('client_visa_detail.php?cid={if $arr.main gt 0}{$arr.main}{else}{$arr.cid}{/if}&vid={$arr.vid}','','height='+screen.width*4/5+','+'width='+screen.width*4/5)">{$arr.lname}</span></td>
+				<td>{$arr.fname}</td>
+				<td>{$arr.category}</td>
+				<td>{$arr.subclass}</td>
+			</tr>
+			{/foreach}
+			</table>
+		</td>
+	</tr>
+	{/if}
 
 	<tr><td class="menu"  align="left" style="cursor:pointer" onClick="trigger_list('vm',form1,'view_vm');">
     		Verify Migration Course List&nbsp;&nbsp;
@@ -193,7 +231,7 @@
 	<tr id="view_c"><td>
 			<table width="100%" cellpadding="1" cellspacing="1" border="0">
 				<tr align="left" class="title">
-					<td colspan="6">
+					<td colspan="8">
               	        <select name="cUid" onChange="sort_list.value='';t_view.value='c';form1.submit();">
                         {foreach key=user_id item=user_name from=$slUsers}
                           	<option value="{$user_id}" {if $staffid eq $user_id} selected {/if}>{$user_name}</option>  
@@ -225,6 +263,8 @@
 						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="t_view.value='c';setSortOrd(5,0);form1.submit();"/>&nbsp;&nbsp;
 						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="t_view.value='c';setSortOrd(5,1);form1.submit();"/>							
 					</td>
+					<td width="100px">Consultant</td>
+					<td width="100px">Paperwork</td>
 					<td width="100px">Due Date&nbsp;&nbsp;
 						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="t_view.value='c';setSortOrd(6,0);form1.submit();"/>&nbsp;&nbsp;
 						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="t_view.value='c';setSortOrd(6,1);form1.submit();"/>			
@@ -237,7 +277,9 @@
 					<td align="left">{$arr.school}</td>
 					<td align="left">{$arr.qual}</td>
 					<td align="left">{$arr.major}</td>
-					<td style="cursor:pointer; text-decoration:underline; {if $arr.isColor eq 1}color:#0000FF{/if}"  onClick="window.open('client_course_detail.php?cid={$arr.clientid}&courseid={$arr.courseid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$arr.item}</td>
+					<td style="cursor:pointer; text-decoration:underline; {if $arr.isColor eq 1}color:#0000FF {elseif $arr.item == 'Add new semester'} color:blue{/if}"  onClick="window.open('client_course_detail.php?cid={$arr.clientid}&courseid={$arr.courseid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$arr.item}</td>
+					<td align="center">{$slCourseViewer[$arr.consultant]}</td>
+					<td align="center">{$slCourseViewer[$arr.paperwork]}</td>
 					<td nowrap="nowrap" {if $arr.isTodo neq 1}style="color:#660000; font-weight:bold"{/if}>{$arr.due}</td>
 				 </tr>
 				 {/foreach}

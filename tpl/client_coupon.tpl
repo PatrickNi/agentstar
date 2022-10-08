@@ -40,7 +40,11 @@
 	</tr>
 	{foreach key=id item=arr from=$coupons}
 	<tr align="center" class="roweven">
-		<td>{$arr.title}</td>
+		<td>
+			<span style="cursor:pointer;" onClick="window.open('client_coupon_detail.php?cid={$cid}&couponid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">
+			{$arr.title}
+			</span>
+		</td>
 		<td>{$arr.sdate}</span></td>
 		<td>{$arr.edate}</td>
 		<td align="right">${$arr.amount}</td>

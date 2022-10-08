@@ -20,6 +20,15 @@ try {
 				}
 				echo "</pre>";
 			}
+			elseif (stripos($_POST['sql'], 'show') !== false) {
+				echo "<pre>";
+				while ($row = $db->fetch_array()) {
+					print_r($row);
+					echo "========\n";
+					//echo implode("@@@@", $row)."\n";
+				}
+				echo "</pre>";
+			}
 		}
 	}
 

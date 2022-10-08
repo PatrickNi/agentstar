@@ -10,7 +10,7 @@ $o_p = new CouponAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, true);
 
 # get client id 
 $client_id  = isset($_REQUEST['cid'])? trim($_REQUEST['cid']) : 0;
-$couponid = isset($_REQUEST['t_conf_id'])? trim($_REQUEST['t_conf_id']) : 0;
+$couponid = isset($_REQUEST['couponid'])? trim($_REQUEST['couponid']) : 0;
 $isNew = isset($_REQUEST['isNew'])? trim($_REQUEST['isNew']) : 0;
 
 # get service
@@ -35,10 +35,21 @@ if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SEND") {
 		echo "<script language='javascript'>window.returnValue=1;self.close();</script>";
 		exit;		
 	}
-}elseif(isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "DELETE"){
+}
+elseif(isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "DELETE"){
 	//$o_c->delService($service_id);
 	echo "<script language='javascript'>window.returnValue=1;self.close();</script>";
 	exit;		
+}
+elseif(isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "TRANSFER"){
+	$rtn = $o_p->transfer($couponid, $client_id, isset($_REQUEST['t_email'])? $_REQUEST['t_email'] : '');
+	if ($rtn['err'] == 1) {
+		echo "<script language='javascript'>alert('".$rtn['msg']."');</script>";
+	}
+	else {
+		echo "<script language='javascript'>alert('".$rtn."');window.returnValue=1;self.close();</script>";
+		
+	}	
 }
 
 
@@ -46,7 +57,7 @@ if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SEND") {
 # get work experience
 $coupons = array();
 $coupons = $o_p->getCouponsByClient($client_id,'','',false);
-
+//var_dump($coupons, $isNew, $couponid);
 # set smarty tpl
 $o_tpl = new Template;
 if($isNew == 0 && $couponid > 0 && array_key_exists($couponid, $coupons)){

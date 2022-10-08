@@ -29,7 +29,7 @@
 					</tr>
 				</table></td></tr>
 				<tr align="center"  class="greybg" >
-      				<td align="left" style="font-size:16px " colspan="2" >
+      				<td align="left" style="font-size:16px " colspan="2" onClick="window.open('/scripts/client_detail.php?cid={$cid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,width='+ screen.width*4/5 +',height=' + screen.height*4/5)" onMouseMove="javascript:this.style.cursor='pointer'; this.style.backgroundColor='#000'"; onMouseOut="javascript:this.style.backgroundColor='#a3a3a3'">
       					<span class="highyellow">Client: {$client.lname} {$client.fname}</span>&nbsp;&nbsp; 
       					<span class="highyellow">DoB: {$client.dob}</span>&nbsp;&nbsp;
       					<span class="highyellow">Main Visa: {$client.visa_n}-{$client.class_n}, expr: {$client.epdate}</span>

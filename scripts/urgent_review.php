@@ -13,18 +13,31 @@ function getSortList($sort_list, &$sort_col, &$sort_ord){
 	foreach ($groups as $v){
 		$cell = explode(':', $v);
 		if (isset($sort_col[$cell[0]]) && isset($sort_ord[$cell[1]])){
-             if ($sort_col[$cell[0]] == 'ProcessName') {
-                 if ($cell[1] == 0) {
+            if ($sort_col[$cell[0]] == 'ProcessName') {
+                if ($cell[1] == 0) {
                     $sort_col[$cell[0]] = "if(p.ID > 0, p.ID, CONCAT(999999, ExItem))" ;   
-                 }
-                 else {
+                }
+                else {
                     $sort_col[$cell[0]] = "if(p.ID > 0, p.ID, CONCAT(0, ExItem))";    
-                 }             
-             }
-             elseif ($sort_col[$cell[0]] == 'Item') {
-				$sort_col[$cell[0]] = " (CASE WHEN IF(a.ItemID > 0, Item, ExItem) like 'apply%' THEN 'apply' WHEN IF(a.ItemID > 0, Item, ExItem) like 'grant%' THEN 'grant' WHEN IF(a.ItemID > 0, Item, ExItem) like 'sign%' THEN 'sign' WHEN IF(a.ItemID > 0, Item, ExItem) like 'issue%' THEN 'issue' ELSE IF(a.ItemID > 0, Item, ExItem) END ) ";          
-			}               
-           array_push($_sort, $sort_col[$cell[0]]." ".$sort_ord[$cell[1]]);
+                }  
+				
+				array_push($_sort, $sort_col[$cell[0]]." ".$sort_ord[$cell[1]]);
+            }
+            elseif ($sort_col[$cell[0]] == 'Item') {
+				if ($cell[1] == 0) {
+					$sort_col[$cell[0]] = " (CASE WHEN IF(a.ItemID > 0, Item, ExItem) like 'apply%' THEN 'A1' WHEN IF(a.ItemID > 0, Item, ExItem) like 'issue checklist%' THEN 'A2' WHEN IF(a.ItemID > 0, Item, ExItem) like 'grant%' THEN 'Z2' WHEN IF(a.ItemID > 0, Item, ExItem) like 'sign%' THEN 'sign' WHEN IF(a.ItemID > 0, Item, ExItem) like 'DHA request%' THEN 'dha' WHEN IF(a.ItemID > 0, Item, ExItem) like 'issue biz%' THEN 'Z3' ELSE IF(a.ItemID > 0, Item, ExItem) END ) "; 
+				     
+					array_push($_sort, $sort_col[$cell[0]]." ".$sort_ord[$cell[1]]);
+					array_push($_sort, " SortDue Asc");
+				}
+				else {
+					return '';
+				}
+
+			}
+			else {
+				array_push($_sort, $sort_col[$cell[0]]." ".$sort_ord[$cell[1]]);
+			}
 		}
 	}
 	return implode(",", $_sort);
@@ -43,6 +56,7 @@ $o_r = new ReportAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 //user grants
 $ugs = array();
 $user_grants = $o_g->get_user_grants($user_id);
+include_once dirname(__FILE__).'/init_grants.php';
 foreach ($g_user_grants as $item){
 	if (array_key_exists($item, $user_grants)) {
 		foreach ($g_user_ops as $key=>$op){
@@ -120,6 +134,30 @@ switch ($viewWhat){
         $sort_col_arr = array(1=>'ClientName',2=>'Name',3=>'Qual',4=>'Major',5=>'ProcessName', 6=>'SortDue');
         $reports = $o_r->getUrgentVerifyMigration($staff_id,getSortList($sort_list, $sort_col_arr, $sort_ord_arr));
         break;
+	case "vexp":
+		if(isset($_REQUEST['vUid'])) {
+			$staff_id = $_REQUEST['vUid'];
+		}
+		else {
+			$staff_id = 0;
+		}
+
+		if ($staff_id == 0 && $ugs['visa_expire']['v'] == 0){
+			$staff_id = $user_id;
+		}
+
+	
+		$visa_expire = $o_r->getVisaService($staff_id);
+		foreach ($visa_expire as $k => $v) {
+			$v['type'] = 'Visa Service';
+			$reports[$v['type'].'-'.$k] = $v;
+		}
+		$main_expire = $o_r->getMainVisa($staff_id);
+		foreach ($main_expire as $k => $v) {
+			$v['type'] = 'Main Visa';
+			$reports[$v['type'].'-'.$k] = $v;
+		}
+		break;
 	case "i":
         $sort_col_arr = array(1=>'Name',2=>'Subject',3=>'SortDue');
         $reports = $o_r->getUrgentInstitute(getSortList($sort_list, $sort_col_arr, $sort_ord_arr), $idu);
@@ -165,13 +203,13 @@ $o_tpl->assign('cdu', $cdu);
 $o_tpl->assign('sdu', $sdu);
 $o_tpl->assign('atopdu', $atopdu);
 $o_tpl->assign('asubdu', $asubdu);
-if ((isset($ugs['todo_visa']) && $ugs['todo_visa']['v'] == 1 && $viewWhat == 'v') || (isset($ugs['todo_course']) && $ugs['todo_course']['v'] == 1 && ($viewWhat == 'c' || $viewWhat == 's'))){
+if ((isset($ugs['todo_visa']) && $ugs['todo_visa']['v'] == 1 && ($viewWhat == 'v' || $viewWhat == 'vexp')) || (isset($ugs['todo_course']) && $ugs['todo_course']['v'] == 1 && ($viewWhat == 'c' || $viewWhat == 's'))){
 	$o_tpl->assign('slUsers', $o_g->getUserNameArr(0,true));
 }else {
 	$o_tpl->assign('slUsers', $o_g->getUserNameArr($staff_id));
 }
 //var_dump($o_g->getUserNameArr(),$o_g->get_course_viewer($user_id) );
-$o_tpl->assign('slCourseViewer', $slCourseViewer);
+$o_tpl->assign('slCourseViewer', $o_g->getUserNameArr(0,true));
 $o_tpl->assign('ugs', $ugs);
 $o_tpl->display('urgent_review.tpl');
 ?>

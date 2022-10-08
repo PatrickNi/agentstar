@@ -16,7 +16,7 @@
 <table border="0" width="100%" cellpadding="3" cellspacing="1">
 	<tr><td colspan="2"><table cellpadding="0" cellspacing="0" width="100%">
 		<tr align="center"  class="greybg">
-			<input type="hidden" name="bt_name" value="">
+			<input type="hidden" name="bt_name" id="bt_name" value="">
 			<td align="left" width="10%">
 				<input type="submit" value="Delete" style="font-weight:bold" onClick="this.form.bt_name.value='delete';this.disable=false;">
 			</td>		
@@ -46,7 +46,14 @@
 	<tr>
 		<td width="20%" align="left" class="rowodd"><strong>End Date:</strong>&nbsp;&nbsp;</td>
 		<td align="left" width="80%" class="roweven"><input type="text" name="t_edate" id="t_edate" value="{$dt_arr.edate}" size="30" autocomplete="off"></td>
-	</tr>					
+	</tr>	
+	<tr>
+		<td width="20%" align="left" class="rowodd"><strong>Transfer to your firend</strong>&nbsp;&nbsp;</td>
+		<td align="left" width="80%" class="roweven">
+			<input type="submit" value="Transfer" style="font-weight:bold" onClick="transfer()">
+			<input type="hidden" id="t_email" name="t_email" value="">
+		</td>
+	</tr>				
 	<tr class="greybg"><td colspan="2">&nbsp;</td></tr>									
 </table>
 </form>	
@@ -55,6 +62,15 @@
 <script type="text/javascript">
 	$('#t_sdate').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });        
 	$('#t_edate').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });
+
+	function transfer() {
+		var email = prompt("Please input your firend's email");
+        if (!email)
+            return false;
+		$('#t_email').val($email);
+		$('#bt_name').val('transfer');
+		return true;
+	}
 </script>
 {/literal}	
 </body>

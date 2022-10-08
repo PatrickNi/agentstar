@@ -116,7 +116,7 @@ class GeicAPI extends MysqlDB {
 	}
 	
 	
-    function getUserNameArr($userid=0,$allmember=false){
+    function getUserNameArr($userid=0,$allmember=false,$specify=array()){
     	$sql = "select ID, UserName, LeaveDate, Department from sys_user WHERE 1 ";
 		if (!$allmember) {
 			$sql .= " AND LeaveDate = '0000-00-00' ";
@@ -125,6 +125,11 @@ class GeicAPI extends MysqlDB {
 		if($userid > 0){
 			$sql .= " AND ID = {$userid} ";
 		}    	
+
+		if ($specify && count($specify) > 0 && is_array($specify)) {
+			$sql .= " AND ID  in (".implode(',', $specify). ") ";
+		}
+
 		$sql .= " Order by Department, DepartmentRank ";
 		$this->query($sql);
 		//echo $sql."\n";

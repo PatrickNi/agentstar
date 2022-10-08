@@ -326,7 +326,7 @@ class CoachAPI extends MysqlDB{
         if (!$fromDay || !$toDay || !$userid)
             return false;
 
-        $sql = "update client_coach cc, client_coach_lessons as ccl SET ccl.isLocked = 1 where cc.id = ccl.coachid and  ccl.StartDate between '{$fromDay}' AND '{$toDay}' AND (cc.staffid = {$userid} OR cc.saleid = {$userid}) AND ccl.Status = 'Completed' and ccl.isLocked = 0";
+        $sql = "update client_coach cc, client_coach_lessons as ccl SET ccl.isLocked = 1 where cc.id = ccl.coachid and  ccl.StartDate between '{$fromDay}' AND '{$toDay}' AND (cc.staffid = {$userid} OR cc.saleid = {$userid}) AND ccl.Status in ('Completed', 'Defer') and ccl.isLocked = 0";
         //die($sql);
         return $this->query($sql);
     }

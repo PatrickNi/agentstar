@@ -240,7 +240,7 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
     }
     elseif (isset($_POST['bt_locked']) && $_POST['bt_locked'] == 'Locked Period') {
         $o_h = new CoachAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
-        if ($user_id == 86 && $o_h->checkLockCode(isset($_POST['token'])? trim($_POST['token']) : '') && $staff_id == 87) {
+        if ($user_id == 50 && $o_h->checkLockCode(isset($_POST['token'])? trim($_POST['token']) : '') && $staff_id == 87) {
             $o_h->lockCompletedLesson($from_day, $to_day, $staff_id);
         }
         else {

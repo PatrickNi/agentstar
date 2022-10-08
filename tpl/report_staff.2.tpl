@@ -67,7 +67,7 @@
           {/if}
         {/if}
 
-        {if $uid eq 86 && $staffid eq 87}
+        {if $uid eq 50 && $staffid eq 87}
           &nbsp;&nbsp;
           <input type="hidden" id="token" name="token" value="">
           <input type="hidden" id="bt_locked" name="bt_locked" value="">
@@ -90,9 +90,8 @@
     <td>Apply Offer</td>
     <td>Received Offer</td>
     <td>Received COE</td>
-    <td>Potential Comm</td>  
-    <td>Received Comm</td>
-    <td colspan="2"></td>
+    <td colspan="2">Potential Comm</td>  
+    <td colspan="2">Received Comm</td>
   </tr>
 
   <tr align="right" class="roweven" >
@@ -195,7 +194,7 @@
         
         <span style="font-weight:bolder; cursor:pointer;" onClick="d4_new_{$week}.style.display='none'">&times;</span> </div>
     </td>  
-    <td>
+    <td  colspan="2">
       {if $ugs.rpt_staff_pc.v eq 1}
       <span onClick="openinSatff('d5_{$week}');" style="cursor:pointer;">
         {$coursepots[$week].rcomm|string_format:"%.2f"}<br/>
@@ -215,7 +214,7 @@
       </div>
       {/if}
     </td>                   
-     <td>
+     <td  colspan="2">
        {if $ugs.rpt_staff_rc.v eq 1}
        <span onClick="openinSatff('d11_{$week}');" style="cursor:pointer;">
         {$coursesems[$week].bonus|string_format:"%.2f"}<br/>
@@ -235,7 +234,6 @@
         </div>
         {/if}
       </td>    
-      <td  colspan="2"></td>       
   </tr>
 
   <tr class="greybg">

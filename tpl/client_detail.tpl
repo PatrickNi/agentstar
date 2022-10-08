@@ -10,7 +10,7 @@
 <script language="javascript" src="../js/audit.js"></script>
 <body {$forbid_sl} {$forbid_cp} {$forbid_rc}>
 <form name="form1" action="" target="_self" method="get" onSubmit="return isDelete()">
-  <input type="hidden" name="cid" value="{$cid}">
+  <input type="hidden" name="cid" id="client_id" value="{$cid}">
   <input type="hidden" name="visaChange" value="0">
   <table align="center" width="100%"  class="graybordertable" cellspacing="1" cellpadding="1" border="0">
     <tr align="left"  class="bordered_2">
@@ -45,10 +45,8 @@
         <input name="button" type="button" style="font-weight:bold;" onClick="javascript:this.form.action='client_legal.php';this.form.submit();" value="Legal Service">
         &nbsp;&nbsp; 
         {/if}  
-        {if $cid eq 10261}
         <input name="button" type="button" style="font-weight:bold;" onClick="javascript:this.form.action='client_coupon.php';this.form.submit();" value="Coupons">
-        &nbsp;&nbsp; 
-        {/if}  
+        &nbsp;&nbsp;
       </td>
     </tr>
     <tr>
@@ -79,6 +77,14 @@
                 <td width="28%"  align="left" class="rowodd"><strong>Password Reset:</strong>&nbsp;&nbsp;</td>
                 <td align="left" width="72%" class="roweven"> <input type="password" size="20" name="t_pass" value=""></td>
               </tr>    
+              <tr>
+                <td width="28%"  align="left" class="rowodd"><strong>Cryption Link:</strong>&nbsp;&nbsp;</td>
+                <td align="left" width="72%" class="roweven">
+                    <span id="cryption_link" style="background-color: yellow;">{$cryption_link}</span>&nbsp;&nbsp;&nbsp;
+                    <button onclick="gen_crypt_link()">Generate</button>
+                    <button onclick="expire_crypt_link()">Expired</button>
+                </td>
+              </tr>   
               <tr>
                 <td colspan="2"><hr></td>
               </tr>    
@@ -120,6 +126,12 @@
                   <input type="hidden" name="t_epdate" value="{$arr.epdate}">
                   {/if}
                   <input id='t_epdate' type="text" name="t_epdate" value="{$arr.epdate}"  size="30" {if $ugs.b_visa.v eq 0} style="visibility:hidden"{/if} {if $ugs.b_visa.v eq 1 && $ugs.b_visa.m eq 0 && ($cid gt 0 || $ugs.b_visa.i eq 0)} disabled {/if}>
+                 </td>
+              </tr> 
+              <tr>
+                <td width="28%"  align="left" class="rowodd"><strong>Consultant Name:</strong>&nbsp;&nbsp;</td>
+                <td align="left" width="72%" class="roweven">
+                  <input id='t_staffname' type="text" name="t_staffname" value="{$arr.staff_name}"  size="30">
                  </td>
               </tr>  
               <tr>
@@ -217,11 +229,11 @@
                 <td width="28%"  align="left" class="rowodd"><strong>Matrial Status:</strong>&nbsp;&nbsp;</td>
                 <td align="left" width="72%" class="roweven">
                         <select name="t_m" class="text">
-                                <option value="married" {if $arr.married == 'married'} selected {/if} >Ѕб»й(Married)</option>
-                                <option value="divorce" {if $arr.married == 'divorce'} selected {/if}>Ал»й(Divorce)</option>
-                                <option value="never_married" {if $arr.married == 'never_married'} selected {/if}>Оґ»й(Never Married)</option>
-                                <option value="separated" {if $arr.married == 'separated'} selected {/if}>·ЦѕУ(Separated)</option>
-                                <option value="defacto" {if $arr.married == 'defacto'} selected {/if}>Н¬ѕУ(Defacto Relationship)</option>
+                                <option value="married" {if $arr.married == 'married'} selected {/if} >пїЅпїЅпїЅ??(Married)</option>
+                                <option value="divorce" {if $arr.married == 'divorce'} selected {/if}>пїЅпїЅпїЅ??(Divorce)</option>
+                                <option value="never_married" {if $arr.married == 'never_married'} selected {/if}>ОґпїЅпїЅ(Never Married)</option>
+                                <option value="separated" {if $arr.married == 'separated'} selected {/if}>пїЅЦѕпїЅ(Separated)</option>
+                                <option value="defacto" {if $arr.married == 'defacto'} selected {/if}>Н¬пїЅпїЅ(Defacto Relationship)</option>
                         </select>
                 </td>
               <tr>    
@@ -314,7 +326,7 @@
                   {if $ugs.b_suba.v eq 1 && $ugs.b_suba.m eq 0 && ($cid gt 0 || $ugs.b_suba.i eq 0)}
                       <input type="hidden" name="t_agent_a" value="{$arr.agent}">
                   {/if}
-                  <select id="t_agent_a" name="t_agent_a"{if $ugs.b_suba.v eq 1 && $ugs.b_suba.m eq 0 && ($cid gt 0 || $ugs.b_suba.i eq 0)} disabled {/if}>
+                  <select id="t_agent_a" name="t_agent_a"{if $ugs.b_suba.v eq 0 || ($ugs.b_suba.m eq 0 && $cid gt 0) || ($ugs.b_suba.i eq 0 && $cid eq 0)} disabled {/if}>
                   <option value="0">choose an Ambassador</option>
                   {foreach key=ag_id item=v from=$agent_ambassador}
                       <option value="{$ag_id}" {if $ag_id eq $arr.agent} selected {/if}>{$v.name}</option>
@@ -355,7 +367,10 @@
       </td>
       <td width="30%" valign="top">
           <strong>Notes:</strong><br/>
-          <textarea style="width:100%; height:800px;" name="t_note">{$arr.note}</textarea>
+          <textarea style="width:100%; height:600px;" name="t_note">{$arr.note}</textarea>
+          <p></p>
+          <strong>Customer Notes:</strong><br/>
+          <textarea style="width:100%; height:200px;" name="t_cus_note">{$arr.cus_note}</textarea>
       </td>
     </tr>    
      
@@ -395,6 +410,30 @@
 	$('#t_epdate').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });
 	$('#t_dob').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });	
   $('#t_d_actm').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });
+
+  function gen_crypt_link() {
+    $.post('/scripts/client_detail.php', 'crypt_link=gen&cid='+$('#client_id').val(), function(data){
+            rtn = $.parseJSON(data);
+            if (rtn.succ != 0) {
+                $('#cryption_link').html(rtn.link);
+            }
+            else {
+                alert("Generate cryption link failed!");
+            }
+        });
+  }
+
+  function expire_crypt_link() {
+    $.post('/scripts/client_detail.php', 'crypt_link=expire&cid='+$('#client_id').val(), function(data){
+            rtn = $.parseJSON(data);
+            if (rtn.succ != 0) {
+                $('#cryption_link').html('');
+            }
+            else {
+                alert("Expired cryption link failed!");
+            }
+        });
+  }
 </script>
 {/literal}	
 </body>

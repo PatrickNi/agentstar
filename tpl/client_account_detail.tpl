@@ -91,7 +91,7 @@
 <tr>
 					<td width="25%" align="left" class="rowodd"><strong>Deduction Amount:</strong>&nbsp;&nbsp;</td>
 					<td align="left" width="75%" class="roweven">	
-						<input type="text" name="t_dueamt_3rd" value="{$dt_arr.dueamt_3rd}" size="30" onChange="audit_money(this)">
+						<input type="text" name="t_dueamt_3rd" value="{$dt_arr.dueamt_3rd}" size="30">
 					</td>
 				</tr>																
 				<tr>

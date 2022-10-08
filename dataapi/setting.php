@@ -36,6 +36,17 @@ try {
 				$arr[$db->ITEM]['zh'] = $db->ITEM_ZH;
 			}		
 			break;
+		case 'dob':
+			$md_dob = isset($_REQUEST['md'])? $_REQUEST['md'] : false;
+			if (!$md_dob)
+				die('no data');
+			$sql = "SELECT EMAIL, FNAME from client_info where email like '%@%' and email not like '%@geic.com.au' and date_format(Dob, '%m-%d') = '{$md_dob}' and dob != '0000-00-00' ";
+			$db->query($sql);
+			while ($db->fetch()) {
+				echo $db->EMAIL."\t".$db->FNAME;
+			}			
+			exit;
+			break;
 		default:
 			throw new Exception ("No action");
 			break;		
