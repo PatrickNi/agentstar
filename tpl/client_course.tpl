@@ -140,7 +140,7 @@ function ShowComm() {
 				<tr align="center" class="roweven" {if $arr.active eq 2} style="background-color:#E9E8DA; font-style: italic "{/if}>
 					<td class="border_1">
 
-							<span style="{if $arr.active neq 2}font-weight:bold; color:#0066FF; {/if}cursor:pointer;"  onClick="{if $show_detail eq 1}window.open('client_course_detail.php?cid={$cid}&courseid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,width='+ screen.width*4/5 +',height=' + screen.height*4/5){else}alert('Permission denied'){/if}">{if $arr.school eq ''}N/A{else}{$arr.school}{/if}</span>
+							<span style="{if $arr.active eq 0}color:#0066FF; {/if}{if $arr.active neq 2}font-weight:bold;{/if}cursor:pointer;"  onClick="{if $show_detail eq 1}window.open('client_course_detail.php?cid={$cid}&courseid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,width='+ screen.width*4/5 +',height=' + screen.height*4/5){else}alert('Permission denied'){/if}">{if $arr.school eq ''}N/A{else}{$arr.school}{/if}</span>
 							{if $arr.active eq 1}
 								<br>
 								<img src="../images/arr_down.gif" alt  style="cursor:hand" width="8" height="4" border="0" onClick="open_fold('{$id}')">

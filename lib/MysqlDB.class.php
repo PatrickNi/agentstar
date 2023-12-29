@@ -11,8 +11,8 @@ class MysqlDB {
     public $m_linkID		= ""; 
     public $m_res			= ""; 
 		
-     
-    function MysqlDB($r_host, $r_user, $r_pswd, $r_database, $_debug = 0) {
+    
+    function __construct($r_host, $r_user, $r_pswd, $r_database, $_debug = 0) {
 		$this->m_host 			= $r_host;	
     	$this->m_user 			= $r_user;
     	$this->m_pswd 			= $r_pswd;
@@ -22,6 +22,16 @@ class MysqlDB {
 //    	$this->connect();
     }
     
+    function setDBconf($r_host, $r_user, $r_pswd, $r_database, $_debug = 0) {
+		$this->m_host 			= $r_host;	
+    	$this->m_user 			= $r_user;
+    	$this->m_pswd 			= $r_pswd;
+    	$this->m_debug		= $_debug;
+    	$this->m_database 	= $r_database;
+    	$this->m_classVar		= get_class_vars(get_class($this));
+//    	$this->connect();
+    }
+
     function setDebug($debug = 0){
     	if ($debug == 0 || $debug == 1){
     		$this->m_debug = $debug;

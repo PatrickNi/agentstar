@@ -187,6 +187,7 @@ $o_tpl->assign('isOther', $isOther);
 $o_tpl->assign('isNew', $isNew);
 $o_tpl->assign('errormsg', $error);
 $o_tpl->assign('visa_rs', $visa_rs_arr);
+$o_tpl->assign('staff_id', $user_id);
 $o_tpl->display('client_visa_process.tpl');
 ?>
 

@@ -57,6 +57,8 @@
           </select>
       </td>
     </tr>
+    {elseif $form == 'sub'}
+      <input type="hidden" name="t_cate" value="education">
     {/if}
     <p/>
     <tr align="left" class="greybg">
@@ -65,9 +67,10 @@
     <tr class="totalrowodd">
       <td width="2%"  align="center" class="border_1"><input type="checkbox" name="toggleAll" onClick="rowToggleAll(this);"></td>
       <td align="left" class="border_1" width="15%" nowrap="nowrap">Name</td>
+      <td align="left" class="border_1" width="5%" nowrap="nowrap">Register</td>
       <td align="left" class="border_1" width="7%" nowrap="nowrap">City</td>
       <td align="left" class="border_1" width="10%" nowrap="nowrap">Country</td>
-      <td align="left" class="border_1" width="10%" nowrap="nowrap">Status</td>
+      <td align="left" class="border_1" width="5%" nowrap="nowrap">Status</td>
       <td align="left" class="border_1" width="5%" nowrap="nowrap">Studnets</td>
       <td align="right" class="border_1" width="5%" nowrap="nowrap">Offer Get</td>
       <td align="right"class="border_1" width="5%" nowrap="nowrap">COE</td>
@@ -81,7 +84,7 @@
     </tr>
     {foreach key=catid item=v from=$totals}
     <tr class="border_1" style="background-color:{cycle values="#80FF80,#FFFF99,#CA95FF,#6C6CFF,#C78D8D,#7ABCBC"}" colspan="2">
-      <td align="center" class="border_1" colspan="5" style="font-size:14px; font-weight:bolder; font-style:italic">{$v.n}</td>
+      <td align="center" class="border_1" colspan="6" style="font-size:14px; font-weight:bolder; font-style:italic">{$v.n}</td>
       <td align="left" class="border_1"nowrap="nowrap" style="font-size:14px; font-weight:bolder; font-style:italic">{$v.s}</td>
       <td align="right" class="border_1" nowrap="nowrap" style="font-size:14px; font-weight:bolder; font-style:italic">{$v.o}</td>
       <td align="right"class="border_1"nowrap="nowrap" style="font-size:14px; font-weight:bolder; font-style:italic">{$v.c}</td>
@@ -100,6 +103,7 @@
       </td>
       <!--<td align="center" class="border_1" nowrap="nowrap">{if $agent_arr[$id].verify eq 1}<span style="font-size:18px;font-weight: bolder; color: #FF0000">&radic;</span>{else}&nbsp;&nbsp;{/if}</td>-->
       <td align="left" class="border_1" nowrap="nowrap"><a href="agent_add.php?aid={$id}" target="_self">{$agent_arr[$id].name}</a></td>
+      <td align="left"class="border_1" nowrap="nowrap">{$agent_arr[$id].reg_d}</td>
       <td align="left"class="border_1" nowrap="nowrap">{$agent_arr[$id].city|truncate:15}</td>
       <td align="left"class="border_1" nowrap="nowrap">{$agent_arr[$id].cn}</td>
       <td align="left"class="border_1" nowrap="nowrap">{$agent_arr[$id].sn}</td>

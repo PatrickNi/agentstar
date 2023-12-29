@@ -53,12 +53,19 @@
           <tr>
             <td width="28%" align="left" class="rowodd"><strong>Consultant:</strong>&nbsp;&nbsp;</td>
             <td align="left" width="72%" class="roweven">
+             {if $ugs.c_user.m eq 1 || ($dt_arr.consultant eq 0 && $ugs.c_user.i eq 1)}
                 <select name="t_consultant">      
                   <option value="0" selected>choose a consultant</option>
                   {foreach key=uid item=user_name from=$user_arr}
                     <option value="{$uid}" {if $dt_arr.consultant eq $uid || ($dt_arr.consultant eq 0 && $user_id eq $uid)} selected {/if}>{$user_name}</option>
                   {/foreach}
                 </select>
+              {else}
+                {if $ugs.c_user.v eq 1}
+                  {$user_arr[$dt_arr.consultant]}
+                {/if}
+                <input type="hidden" name="t_consultant" value="{$dt_arr.consultant}">
+              {/if}
             </td>
           </tr>    
           <tr>
@@ -75,7 +82,15 @@
           <tr>
             <td width="28%" align="left" class="rowodd"><strong>Consultant Date:</strong>&nbsp;&nbsp;</td>
             <td align="left" width="72%" class="roweven">
-              <input type="text" name="t_consultant_date" id="t_consultant_date" onchange="audit_date(this)"  value="{$dt_arr.consultant_date}">
+
+              {if $ugs.c_user.m eq 1 || (($dt_arr.consultant_date eq '' ||  $dt_arr.consultant_date eq '0000-00-00') && $ugs.c_user.i eq 1)}
+                <input type="text" name="t_consultant_date" id="t_consultant_date" onchange="audit_date(this)"  value="{$dt_arr.consultant_date}">
+              {else}
+                {if $ugs.c_user.v eq 1}
+                  {$dt_arr.consultant_date}
+                {/if}
+                <input type="hidden" name="t_consultant_date" value="{$dt_arr.consultant_date}">
+              {/if}
             </td>
           </tr>                
           <tr>
@@ -189,7 +204,7 @@
                 </select>
               {else}
                 <input type="hidden" name="t_vms" value="{$dt_arr.vms}">
-                {$dt_arr.vms|ucwords}
+                {$dt_arr.vms|ucfirst}
               {/if}
             </td>
           </tr>

@@ -3,8 +3,8 @@ require_once('MysqlDB.class.php');
 
 class ClientAPI extends MysqlDB {
 
-    function ClientAPI($host, $user, $pswd, $database, $debug) {
-    	 $this->MysqlDB($host, $user, $pswd, $database, $debug);
+    function __construct($host, $user, $pswd, $database, $debug) {
+		$this->setDBconf($host, $user, $pswd, $database, $debug);
     }
 
 	function _login ($email, $pass) {
@@ -36,7 +36,7 @@ class ClientAPI extends MysqlDB {
 		return 0;
 	}
 	
-	function _register ($email,$lname='',$fname='',$phone='',$wechat_id='',$client_type='',$version=1,$about='') {
+	function _register ($email,$lname='',$fname='',$phone='',$wechat_id='',$client_type='',$version=1,$about='',$agent=0) {
 		$email = addslashes($email);
 		$pass  = md5('12345');
 		$lname = addslashes(iconv('utf-8', 'GBK', (string)trim($lname)));
@@ -45,6 +45,7 @@ class ClientAPI extends MysqlDB {
 		$wechat_id = addslashes($wechat_id);
 		$client_type = addslashes($client_type);
 		$about = addslashes($this->_figeroutPortal($about));
+		$agent = addslashes($agent);
 
 		if ($email == '')
 			return 0;
@@ -55,7 +56,7 @@ class ClientAPI extends MysqlDB {
 		if ($this->CID > 0)
 			return 0;
 
-		$sql = "INSERT INTO client_info (EMAIL, STATUS,TOKEN, VisaClassTxt, LName,FName,Mobile,Wechat_ID, ClientType,CreateTime,About) VALUES ('{$email}', 'new', '{$pass}', '', '{$lname}', '{$fname}', '{$phone}', '{$wechat_id}', '{$client_type}', NOW(), '{$about}')";
+		$sql = "INSERT INTO client_info (EMAIL, STATUS,TOKEN, VisaClassTxt, LName,FName,Mobile,Wechat_ID, ClientType,CreateTime,About,AgentID) VALUES ('{$email}', 'new', '{$pass}', '', '{$lname}', '{$fname}', '{$phone}', '{$wechat_id}', '{$client_type}', NOW(), '{$about}', '{$agent}')";
 		$this->query($sql);
 		if ($version == 2) {
 			$client_id = $this->getLastInsertID();
@@ -249,7 +250,7 @@ class ClientAPI extends MysqlDB {
 		if (isset($set_arr['c_name']) && $set_arr['c_name'] != ""){
 			$sql .= ", CNCT_PName = '{$set_arr['c_name']}', CNCT_HTel = '{$set_arr['c_tel']}', CNCT_Mobile = '{$set_arr['c_mobile']}', CNCT_ADD = '{$set_arr['c_add']}', CNCT_Email = '{$set_arr['c_email']}', CNCT_RTU = '{$set_arr['c_rtu']}' ";
 		}
-		if (isset($set_arr['note']) && $set_arr['note'] != ""){
+		if (isset($set_arr['note'])){
 			$sql .= ", Note = '{$set_arr['note']}' ";
 		}
 		if (isset($set_arr['cus_note']) && $set_arr['cus_note'] != ""){
@@ -738,7 +739,7 @@ class ClientAPI extends MysqlDB {
 			$sql .= " And a.CID = {$client_id}";
 		}
 		
-		$sql .= " Order by IF(IsActive in (0,1), 1, IsActive) asc, StartDate asc";
+		$sql .= " Order by IsActive asc, StartDate asc";
 		$this->query($sql);
 		$_arr = array();
 		while ($this->fetch()){
@@ -1188,7 +1189,7 @@ class ClientAPI extends MysqlDB {
 		foreach ($sets as &$v){
 			$v = addslashes($v);
 		}
-		$sql = "insert into client_visa (CateID, SubClassID, CID, ClientNo, FileNum, CaseDetail, Fax, Name, Tel, Email, AUserID, VUserID, Note, ABody, State, KeyPoint, ADate, AFee, VisitDate, r_Status, OnShore, AscoID, CFee, OFee, AgentFee, ReviewerID) values ('{$sets['cateid']}', '{$sets['subid']}', '{$cid}', '{$sets['clientno']}', '{$sets['file']}', '{$sets['offdt']}', '{$sets['fax']}', '{$sets['name']}', '{$sets['tel']}', '{$sets['email']}', '{$sets['auser']}', '{$sets['vuser']}', '{$sets['note']}', '{$sets['body']}', '{$sets['state']}', '{$sets['key']}', '{$sets['adate']}', '{$sets['fee']}', '{$sets['vdate']}', '{$sets['status']}', '{$sets['shore']}', '{$sets['asco']}', '{$sets['cfee']}', '{$sets['ofee']}', '{$sets['sfee']}', '{$sets['reviewer']}')";
+		$sql = "insert into client_visa (CateID, SubClassID, CID, ClientNo, FileNum, CaseDetail, Fax, Name, Tel, Email, AUserID, VUserID, Note, ABody, State, KeyPoint, ADate, AFee, VisitDate, r_Status, OnShore, AscoID, CFee, OFee, AgentFee, ReviewerID, Company) values ('{$sets['cateid']}', '{$sets['subid']}', '{$cid}', '{$sets['clientno']}', '{$sets['file']}', '{$sets['offdt']}', '{$sets['fax']}', '{$sets['name']}', '{$sets['tel']}', '{$sets['email']}', '{$sets['auser']}', '{$sets['vuser']}', '{$sets['note']}', '{$sets['body']}', '{$sets['state']}', '{$sets['key']}', '{$sets['adate']}', '{$sets['fee']}', '{$sets['vdate']}', '{$sets['status']}', '{$sets['shore']}', '{$sets['asco']}', '{$sets['cfee']}', '{$sets['ofee']}', '{$sets['sfee']}', '{$sets['reviewer']}', '{$sets['company']}')";
 		$this->query($sql);
 		return $this->getLastInsertID();
 	}
@@ -1198,7 +1199,7 @@ class ClientAPI extends MysqlDB {
 			$v = addslashes($v);
 		}
 		//LodgeDate = '{$sets['fdate']}', GrantDate = '{$sets['tdate']}', 
-		$sql = "Update client_visa SET CateID = '{$sets['cateid']}', SubClassID = '{$sets['subid']}', ClientNo = '{$sets['clientno']}', FileNum = '{$sets['file']}', CaseDetail = '{$sets['offdt']}', Fax = '{$sets['fax']}', Name = '{$sets['name']}', Tel = '{$sets['tel']}', Note = '{$sets['note']}', AUserID = '{$sets['auser']}', VUserID = '{$sets['vuser']}', OnShore = '{$sets['shore']}' , Email = '{$sets['email']}' , ABody = '{$sets['body']}' , State = '{$sets['state']}' , KeyPoint = '{$sets['key']}' , ADate = '{$sets['adate']}' , AFee = '{$sets['fee']}' , VisitDate = '{$sets['vdate']}', r_Status = '{$sets['status']}', AscoID = '{$sets['asco']}', CFee = '{$sets['cfee']}', OFee = '{$sets['ofee']}' , AgentFee = '{$sets['sfee']}' , ReviewerID = '{$sets['reviewer']}'  where ID = {$vid}";
+		$sql = "Update client_visa SET CateID = '{$sets['cateid']}', SubClassID = '{$sets['subid']}', ClientNo = '{$sets['clientno']}', FileNum = '{$sets['file']}', CaseDetail = '{$sets['offdt']}', Fax = '{$sets['fax']}', Name = '{$sets['name']}', Tel = '{$sets['tel']}', Note = '{$sets['note']}', AUserID = '{$sets['auser']}', VUserID = '{$sets['vuser']}', OnShore = '{$sets['shore']}' , Email = '{$sets['email']}' , ABody = '{$sets['body']}' , State = '{$sets['state']}' , KeyPoint = '{$sets['key']}' , ADate = '{$sets['adate']}' , AFee = '{$sets['fee']}' , VisitDate = '{$sets['vdate']}', r_Status = '{$sets['status']}', AscoID = '{$sets['asco']}', CFee = '{$sets['cfee']}', OFee = '{$sets['ofee']}' , AgentFee = '{$sets['sfee']}' , ReviewerID = '{$sets['reviewer']}' , Company = '{$sets['company']}' where ID = {$vid}";
 		//var_dump($sql);
 		return $this->query($sql);		
 	}
@@ -1209,7 +1210,7 @@ class ClientAPI extends MysqlDB {
 	}
 	
 	function getApplyVisa($client_id = 0, $id = 0, $userid = 0){
-		$sql = "select ID, VisaName, a.CateID, ClassName, a.SubClassID, ClientNo, FileNum, CaseDetail, Fax, a.Name, Email, Tel, AUserID, VUserID, a.OnShore, Note, Note2, ABody, State, KeyPoint, AFee, ADate, ATag, a.ExpireDate, a.VisitDate, a.r_Status, a.AscoID, CFee, OFee, AgentFee, ReviewerID, a.CID from client_visa a left join visa_category b on(a.CateID = b.CateID) left join visa_subclass c on(a.SubClassID = c.SubClassID) Where 1 ";
+		$sql = "select ID, VisaName, a.CateID, ClassName, a.SubClassID, ClientNo, FileNum, CaseDetail, Fax, a.Name, Email, Tel, AUserID, VUserID, a.OnShore, Note, Note2, ABody, State, KeyPoint, AFee, ADate, ATag, a.ExpireDate, a.VisitDate, a.r_Status, a.AscoID, CFee, OFee, AgentFee, ReviewerID, a.CID, a.Company from client_visa a left join visa_category b on(a.CateID = b.CateID) left join visa_subclass c on(a.SubClassID = c.SubClassID) Where 1 ";
 		if ($id > 0){
 			$sql .= " AND ID = '{$id}'";
 		}else{
@@ -1254,7 +1255,8 @@ class ClientAPI extends MysqlDB {
 			$_arr[$this->ID]['ofee']    = $this->OFee;
 			$_arr[$this->ID]['sfee']    = $this->AgentFee;
 			$_arr[$this->ID]['reviewer'] = $this->ReviewerID;
-			$_arr[$this->ID]['cid']     = $this->CID;			
+			$_arr[$this->ID]['cid']     = $this->CID;
+			$_arr[$this->ID]['company']     = $this->Company;			
 		}
 		return $_arr;
 	}		
@@ -2627,13 +2629,18 @@ class ClientAPI extends MysqlDB {
 
 	function genCryptionLink($client_id) {
 		$code = uniqid();
-		$sql = "insert into client_login (CID, CODE, EXPIRED) values ({$client_id}, '{$code}', NOW()+INTERVAL 2 DAY)";
+		$sql = "insert into client_login (CID, CODE, EXPIRED) values ({$client_id}, '{$code}', NOW()+INTERVAL 1 DAY)";
 		$this->query($sql);
 		if ($this->getLastInsertID() > 0){
 			//return 'https://as.geic.com.au/welcome/?sig='.$code;
 			return $code;
 		}
 		return false;
+	}
+
+	function setCourseTopAgent($course_id, $agent_id=0){
+		$sql = "Update client_course SET AgentID = {$agent_id} where ID = {$course_id}";
+		return $this->query($sql);	
 	}
 
 }

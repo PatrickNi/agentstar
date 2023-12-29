@@ -38,8 +38,9 @@ coupons_client
 class CouponAPI extends MysqlDB{
 
     function __construct($host, $user, $pswd, $database, $debug) {
-         $this->MysqlDB($host, $user, $pswd, $database, $debug);
+		$this->setDBconf($host, $user, $pswd, $database, $debug);
     }
+
 
     function add($sets) {
         if (!$sets)

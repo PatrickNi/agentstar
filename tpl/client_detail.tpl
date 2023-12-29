@@ -179,7 +179,8 @@
                               {/if}
                           
                   
-                </select>        &nbsp;&nbsp;&nbsp; <span style="cursor:pointer; font-weight:bolder; text-decoration:underline; color:#0066FF" onClick="openModel('country.php',300,300,'NO','form1')">add new country</span></td>
+                </select>        &nbsp;&nbsp;&nbsp; <span style="cursor:pointer; font-weight:bolder; text-decoration:underline; color:#0066FF" onClick="window.open('/scripts/country.php','_blank', 'alwaysRaised=yes,height=300,width=300,location=no,scrollbars=yes')">add new country</span>
+                </td>
               </tr>
               <tr>
                 <td width="28%"  align="left" class="rowodd"><strong>Input Date:</strong>&nbsp;&nbsp;</td>
@@ -242,17 +243,7 @@
               </tr>
               <tr>
                 <td width="28%"  align="left" class="rowodd"><strong>Client Type:</strong>&nbsp;&nbsp;</td>
-                <td align="left" width="72%" class="roweven"> 
-                  <!--
-                  {if $ugs.b_ctype.v eq 1 && $ugs.b_ctype.m eq 0 && ($cid gt 0 || $ugs.b_ctype.i eq 0)}
-                  <input type="hidden" name="t_type" value="{$arr.type}">
-                  {/if}
-                  <select name="t_type" onChange="this.form.t_note.focus();" {if $ugs.b_ctype.v eq 0} style="visibility:hidden"{/if} {if $ugs.b_ctype.v eq 1 && $ugs.b_ctype.m eq 0 && ($cid gt 0 || $ugs.b_ctype.i eq 0)} disabled {/if}>
-                  {foreach key=id item=type from=$type}
-                  <option value="{$type}" {if $type eq $arr.type} selected {/if} >{$id}</option>
-                  {/foreach}
-                  </select>
-                  -->
+                <td align="left" width="72%" class="roweven">
                   {foreach key=id item=t from=$all_types}
                       <input type="checkbox" name="t_type[]" value="{$t}" {if in_array($t, $arr.type)} checked {/if}>{$id}&nbsp;&nbsp;
                   {/foreach}

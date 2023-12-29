@@ -2,9 +2,12 @@
 require_once('MysqlDB.class.php');
 class VisaAPI extends MysqlDB {
 
-    function VisaAPI($host, $user, $pswd, $database, $debug) {
-    	 $this->MysqlDB($host, $user, $pswd, $database, $debug);
+	
+    function __construct($host, $user, $pswd, $database, $debug) {
+		$this->setDBconf($host, $user, $pswd, $database, $debug);
     }
+	
+
     
     function getVisaNameArr(){
     	$sql = "select CateID, VisaName from visa_category order by (VisaName+0) asc";
@@ -451,7 +454,7 @@ class VisaAPI extends MysqlDB {
         return true;
     }
 
-    function getApplyVisa($userid = 0, $abodyid = 0, $ascoid = 0, $page=0, $page_size=0){
+    function getApplyVisa($userid = 0, $abodyid = 0, $ascoid = 0, $page=0, $page_size=0, $company=''){
         $sql = "SELECT ID, VisaName, ClassName, a.ExpireDate, concat(LName, ' ', FName) as ClientName, a.CID
                 FROM client_visa a left join visa_category b on(a.CateID = b.CateID) 
                                    left join visa_subclass c on(a.SubClassID = c.SubClassID),
@@ -466,12 +469,16 @@ class VisaAPI extends MysqlDB {
         if ($ascoid > 0) {
                $sql .= " AND AscoID = {$ascoid} ";
         }
-        
+        if ($company != '') {
+			$sql .= " AND Company = '{$company}' ";
+		}
+
         $sql .= " Order by ClientName, ExpireDate ";
         
         if ($page > 0 && $page_size > 0) {
             $sql .= " Limit ".($page-1)*$page_size.", ".$page_size;
         }
+		//echo $sql."\n";
            
         $this->query($sql);
         $_arr = array();
@@ -484,7 +491,7 @@ class VisaAPI extends MysqlDB {
         return $_arr;    	
     }
     
-    function getNumOfApplyVisa($userid = 0, $abodyid = 0, $ascoid = 0){
+    function getNumOfApplyVisa($userid = 0, $abodyid = 0, $ascoid = 0, $company=''){
         $sql = "SELECT count(*) as cnt
                 FROM client_visa a left join visa_category b on(a.CateID = b.CateID) 
                                    left join visa_subclass c on(a.SubClassID = c.SubClassID),
@@ -500,6 +507,9 @@ class VisaAPI extends MysqlDB {
         if ($ascoid > 0) {
                $sql .= " AND AscoID = {$ascoid} ";
         }
+        if ($company != '') {
+			$sql .= " AND Company = '{$company}' ";
+		}
         
         $this->query($sql);
         while ($this->fetch()){

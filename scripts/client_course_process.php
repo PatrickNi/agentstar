@@ -4,6 +4,8 @@ require_once(__LIB_PATH.'Template.class.php');
 require_once(__LIB_PATH.'ClientAPI.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
 require_once(__LIB_PATH.'TodoAPI.class.php');
+require_once(__LIB_PATH.'SchoolAPI.class.php');
+require_once(__LIB_PATH.'AgentAPI.class.php');
 
 
 # check valid user
@@ -15,7 +17,7 @@ if (!($user_id > 0)) {
 //user grants
 $o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 $o_t = new TodoAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
-
+$o_a = new AgentAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
 $ugs = array();
 $user_grants = $o_g->get_user_grants($user_id);
@@ -35,6 +37,7 @@ $isOther    = isset($_REQUEST['isOther'])? trim($_REQUEST['isOther']) : 0;
 $item_id    = isset($_REQUEST['itemid'])? trim($_REQUEST['itemid']) : 0;
 
 $o_c = new ClientAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
+$course = $o_c->getCourseByUserV2($course_id);
 
 # get process
 $process_arr = array();
@@ -62,6 +65,22 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 	}
 	else {
 
+		//None agent institue should set top-agent on current course once Apple Offer has done
+		if ($sets['subject'] == 2 && $sets['done'] == 1) {
+			$o_s = new SchoolAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
+			$school = $o_s->getSchoolList($course[$course_id]['iid'],"","");
+			$top_agent  = isset($_REQUEST['t_agent'])? (string)trim($_REQUEST['t_agent']) : 0;
+			if ($school && $school[$course[$course_id]['iid']]['status'] != 'Agent') {
+				if ($top_agent > 0) {
+					$o_c->setCourseTopAgent($course_id, $top_agent);
+				}
+				else {
+					echo "<script language='javascript'>alert('Empty Top Agent, Save Failed!');if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
+					exit;
+				}
+			} 
+		}
+
 		if($isOther == 1){
 			$sets['order'] = $o_c->getCourseProcessOrder($process_id, $course_id);
 			$o_c->resetCourseProcessOrder($course_id, $sets['order']);
@@ -70,6 +89,7 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 			$o_c->addCourseProcess($course_id, $sets);
 
 		}else{
+			
 			$o_c->setCourseProcess($process_id, $sets, $course_id);
 
 			if($sets['done'] == 1 && $process_id > 0){		
@@ -112,6 +132,11 @@ $o_tpl->assign('process_arr', $process_arr);
 if($isOther == 0 && $process_id > 0 && array_key_exists($process_id, $show_arr)){
 	$o_tpl->assign('dt_arr', $show_arr[$process_id]);
 	$o_tpl->assign('forward_btn', $o_c->getForwardProcess($show_arr[$process_id]['subject']));
+	
+	if ($show_arr[$process_id]['subject'] == 2) {
+		$o_tpl->assign('agent_arr', $o_a->getAgent('top'));
+		$o_tpl->assign('agent_id', $course[$course_id]['agent']);
+	}
 }
 $o_tpl->assign('cid', $client_id);
 $o_tpl->assign('course_id', $course_id);
@@ -119,5 +144,6 @@ $o_tpl->assign('pid', $process_id);
 $o_tpl->assign('isOther', $isOther);
 $o_tpl->assign('isapprove', $o_c->getCourseConsult($course_id) == $user_id || (isset($ugs['c_track']['v']) && $ugs['c_track']['v'] == 1)? 1 :  0);
 $o_tpl->assign('msg', $msg);
+$o_tpl->assign("ugs", $ugs);
 $o_tpl->display('client_course_process.tpl');
 ?>

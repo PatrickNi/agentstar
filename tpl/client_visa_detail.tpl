@@ -147,12 +147,12 @@
 				<td align="left" width="64%" class="roweven"> 
 					{if $ugs.v_agsf.v eq 1 && $ugs.v_agsf.m eq 0 && ($vid gt 0 || $ugs.v_agsf.i eq 0)}<input type="hidden" name="t_auser" value="{$dt_arr.auser}"> {/if}
 					<select name="t_auser" {if $ugs.v_agsf.v eq 0} style="visibility:hidden"{/if} {if $ugs.v_agsf.v eq 1 && $ugs.v_agsf.m eq 0 && ($vid gt 0 || $ugs.v_agsf.i eq 0)} disabled {/if}>
+										{if $dt_arr.auser lt 1 || !isset($user_arr[$dt_arr.auser])}
+						<option  value="0" selected >select a user</option>
+					{/if}
 					{foreach key=id item=name from=$user_arr}
 					<option  value="{$id}" {if $dt_arr.auser eq $id} selected {/if}>{$name}</option>
 					{/foreach}
-					{if $dt_arr.auser lt 1 || !isset($user_arr[$dt_arr.auser])}
-						<option  value="0" selected >select a user</option>
-					{/if}
 					</select>			
 				</td> 
 			</tr> 
@@ -160,27 +160,32 @@
 				<td width="36%" align="left" class="rowodd"><strong>Visa Paperwork:</strong>&nbsp;&nbsp;</td> 
 				<td align="left" width="64%" class="roweven"> 
 					{if $ugs.v_vpwk.v eq 1 && $ugs.v_vpwk.m eq 0 && ($vid gt 0 || $ugs.v_vpwk.i eq 0)}<input type="hidden" name="t_vuser" value="{$dt_arr.vuser}"> {/if}
-					<select name="t_vuser" {if $ugs.v_vpwk.v eq 0} style="visibility:hidden"{/if} {if $ugs.v_vpwk.v eq 1 && $ugs.v_vpwk.m eq 0 && ($vid gt 0 || $ugs.v_vpwk.i eq 0)} disabled {/if}>                 
+					<select name="t_vuser" {if $ugs.v_vpwk.v eq 0} style="visibility:hidden"{/if} {if $ugs.v_vpwk.v eq 1 && $ugs.v_vpwk.m eq 0 && ($vid gt 0 || $ugs.v_vpwk.i eq 0)} disabled {/if}>         
+										{if $dt_arr.vuser lt 1 || !isset($user_arr[$dt_arr.vuser])}
+						<option  value="0" selected >select a user</option>
+					{/if}        
 					{foreach key=id item=name from=$user_arr}
 						<option  value="{$id}" {if $dt_arr.vuser eq $id} selected {/if}>{$name}</option> 
 					{/foreach}
-					{if $dt_arr.vuser lt 1 || !isset($user_arr[$dt_arr.vuser])}
-						<option  value="0" selected >select a user</option>
-					{/if}
 					</select>			
 				</td> 
 			</tr>
 			<tr> 
 				<td width="36%" align="left" class="rowodd"><strong>Reviewer:</strong>&nbsp;&nbsp;</td> 
 				<td align="left" width="64%" class="roweven"> 
-					<select name="t_reviewer">                 
-					{foreach key=id item=name from=$user_arr}
-						<option  value="{$id}" {if $dt_arr.reviewer eq $id} selected {/if}>{$name}</option> 
-					{/foreach}
-					{if $dt_arr.reviewer lt 1 || !isset($user_arr[$dt_arr.reviewer])}
-						<option  value="0" selected >select a reviwer</option>
-					{/if}
-					</select>			
+					{if $ugs.v_reviewer.m eq 0 && $dt_arr.reviewer > 0}
+						<input type="hidden" name="t_reviewer" value="{$dt_arr.reviewer}">
+						{$user_arr[$dt_arr.reviewer]}
+					{else}
+						<select name="t_reviewer">      
+						{if $dt_arr.reviewer lt 1 || !isset($user_arr[$dt_arr.reviewer])}
+							<option  value="0" selected >select a reviwer</option>
+						{/if}           
+						{foreach key=id item=name from=$user_arr}
+							<option  value="{$id}" {if $dt_arr.reviewer eq $id} selected {/if}>{$name}</option> 
+						{/foreach}
+						</select>	
+					{/if}		
 				</td> 
 			</tr>
 			<tr> 
@@ -214,6 +219,16 @@
 						<input type="hidden" name="t_adate" value="{$dt_arr.adate}"> 
 					{/if}
 					<input autocomplete="off" type="text" id="t_adate" name="t_adate" value="{$dt_arr.adate}" size="30" {if $ugs.v_agd.v eq 0} style="visibility:hidden"{/if} {if $ugs.v_agd.v eq 1 && $ugs.v_agd.m eq 0 && (($dt_arr.adate neq '' && $dt_arr.adate neq '0000-00-00') || $ugs.v_agd.i eq 0)} disabled {/if}> 
+				</td> 
+			</tr> 
+			<tr> 
+				<td width="36%" align="left" class="rowodd"><strong>Company:</strong>&nbsp;&nbsp;</td> 
+				<td align="left" width="64%" class="roweven">
+					<select name="t_company">
+						<option  value="" {if $dt_arr.company == ""}selected{/if}>n/a</option>
+						<option  value="geic" {if $dt_arr.company == "geic"}selected{/if}>GEIC</option>
+						<option  value="global_law_center" {if $dt_arr.company == "global_law_center"}selected{/if}>Global Law Center</option>      
+					</select>						
 				</td> 
 			</tr> 
           	<tr><td colspan="2"><hr/></td></tr>                    
@@ -314,7 +329,9 @@
 						<tr align="center" class="roweven">
 							<td colspan="11" align="center">
 								{if $vid > 0}        
-								<input type="button" value="Add new" onclick="window.open('client_account_detail.php?cid={$cid}&vid={$vid}&typ=visa','_blank', 'alwaysRaised=yes,height=500,width=800,location=no,scrollbars=yes')" />
+									<input type="button" value="Add new" onclick="window.open('client_account_detail.php?cid={$cid}&vid={$vid}&typ=visa','_blank', 'alwaysRaised=yes,height=500,width=800,location=no,scrollbars=yes')" />
+								{else}
+									<span id='btn_payment'></span>
 								{/if}
 							</td>
 						</tr>				          	
@@ -341,8 +358,10 @@
 	            <tr class="greybg"> 
 	              <td colspan="4" class="whitetext" align="center">Process &nbsp; 
                     {if $vid > 0}
-	                <input type="button" value="add new" style="font-weight:bold" onClick="window.open('client_visa_process.php?vid={$vid}&cid={$cid}&isNew=1','_blank','alwaysRaised=yes,height=500,width=800, location=no')"></td> 
-	                {/if}
+	                	<input type="button" value="add new" style="font-weight:bold" onClick="window.open('client_visa_process.php?vid={$vid}&cid={$cid}&isNew=1','_blank','alwaysRaised=yes,height=500,width=800, location=no')"></td> 
+	                {else}
+						<span id='btn_process'></span>
+					{/if}
                 </tr> 
 	            <tr align="center" class="totalrowodd"> 
 	              <td class="border_1" width="15%">Date</td> 
@@ -392,8 +411,13 @@
             rtn = $.parseJSON(data);
             
             $(obj).val(btn_n);
-            if (rtn.id > 0)
+            if (rtn.id > 0) {
                 $('#vid').val(rtn.id);
+				$('#cl_appid').val(rtn.id);
+			    $('#btn_payment').html('<input type="button" value="Add new" onclick="window.open(\''+rtn.btn_payment+'\',\'_blank\', \'alwaysRaised=yes,height=500,width=800,location=no,scrollbars=yes\')">');
+				$('#btn_process').html('<input type="button" value="add new" style="font-weight:bold" onClick="window.open(\''+rtn.btn_process+'\',\'_blank\',\'alwaysRaised=yes,height=500,width=800, location=no\')">');
+				do_checklist('');
+			}
             else {
                 alert(rtn.msg);
                 return false;
@@ -410,10 +434,13 @@
             }
             else{
                 alert(rtn.msg);
+				return false;
+				/*
                 if (rtn.id > 0) 
                   window.location.href = window.location.href + '&vid=' + rtn.id;    
                 else
-                  window.location.reload();    
+                  window.location.reload(); 
+				  */   
             }
         });
     }
@@ -429,8 +456,14 @@
 		$('#cl_act').val(act);
 		$('#cl_msg').html('loading...');
 		$.post($('#form_checklists').attr('action'), $('#form_checklists').serialize(), function(data){
-			$('#form_checklists').html(data);
-			$('#cl_msg').html('');
+			if (data == 'Incorrect parameters') {
+				$('#cl_msg').html(data);	
+			}
+			else {
+				$('#form_checklists').html(data);
+				$('#cl_msg').html('');
+			}
+
 		});	
 	}
     do_checklist('');

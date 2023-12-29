@@ -48,6 +48,8 @@
           </select>
       </td>
     </tr>
+    {else}
+      <input type="hidden" name="t_cate" value="student">
     {/if}
     <p/>    
     <tr class="totalrowodd">

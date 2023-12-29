@@ -38,15 +38,14 @@
 				<tr>
 					<td width="12%" height="30" align="left" class="rowodd" style=" color:#FF0000"><strong>Category:</strong>&nbsp;&nbsp;</td>
 					<td align="left" width="88%" class="roweven">
-                    	<select name="t_cate"{if $ugs.a_delambassador.v eq 0 && $dt_arr.type eq 'sub'}disabled{/if}>
+                    	<select name="t_cate"{if $ugs.a_gpeditcate.v eq 0 && $dt_arr.type eq 'sub'}disabled{/if}>
                     		{if $exType eq 'top'}
                         		<option value="education" {if $dt_arr.cate eq "education"} selected {/if}>Education agent</option>
                         		<option value="inactive" {if $dt_arr.cate eq "inactive"} selected {/if}>Inactive agent</option>    
                         	{elseif $exType eq 'sub'}
-                        		{if $dt_arr.cate eq "education"}
-							    	<option value="education" selected>Global Partner</option>
-							    {elseif $dt_arr.cate eq "student"}
-                        			<option value="student" selected >Ambassador</option>  
+                        		{if $dt_arr.cate eq "education" || $dt_arr.cate eq "student"}
+									<option value="student" {if $dt_arr.cate eq "student"}selected{/if} >Global Partner</option>
+							    	<option value="education" {if $dt_arr.cate eq "education"} selected {/if}>Global Agent</option>
                         		{else}
                         			<option value="inactive" selected >Inactive agent</option> 
                         		{/if}   
@@ -58,7 +57,7 @@
                         	{/if}                          
                                                                                   
                         </select>
-                        {if $ugs.a_delambassador.v eq 0 && $dt_arr.type eq 'sub'}
+                        {if $ugs.a_gpeditcate.v eq 0 && $dt_arr.type eq 'sub'}
 							<input type="hidden" name="t_cate" value="{$dt_arr.cate}">
                         {/if}
 					</td>
@@ -72,9 +71,10 @@
 				<tr>
 					<td width="12%" height="30" align="left" class="rowodd" style=" color:#FF0000"><strong>REFCODE:</strong>&nbsp;&nbsp;</td>
 					<td align="left" width="88%" class="roweven">
-						<input type="text"  name="t_code" value="{$dt_arr.code}">
-						{if $aid > 0}
+						{if $aid > 0 && $dt_arr.code == ''}
 							<input type="submit" value="Generate Code" name="bt_code" style="font-weight:bold ">
+						{else}
+							<strong>{$dt_arr.code}</strong>
 						{/if}
 					</td>
 				</tr>
@@ -133,7 +133,7 @@
 						  <option value="0" selected>select a country</option>
 						{/if}
 						</select>			
-						<span style="text-decoration:underline; color:#0000CC; cursor:pointer; font-weight:bold" onClick="openModel('country.php',300,300,'NO', 'form1')">Add new country</span>
+						<span style="text-decoration:underline; color:#0000CC; cursor:pointer; font-weight:bold" onClick="window.open('/scripts/country.php','_blank', 'alwaysRaised=yes,height=300,width=300,location=no,scrollbars=yes')">Add new country</span>
 					</td>
 				</tr>
 				<tr>

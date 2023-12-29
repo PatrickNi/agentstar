@@ -31,6 +31,7 @@ $o_v = new VisaAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 //user grants
 $ugs = array();
 $user_grants = $o_g->get_user_grants($user_id);
+include_once dirname(__FILE__).'/init_grants.php';
 foreach ($g_user_grants as $item){
 	if (array_key_exists($item, $user_grants)) {
 		foreach ($g_user_ops as $key=>$op){
@@ -38,6 +39,12 @@ foreach ($g_user_grants as $item){
 		}		
 	}
 }
+
+//If agreement staff is Grace :uid = 3 or Angela : uid = 88, set the reivewer to them
+if ($sets['reviewer'] == 0 && ($sets['auser'] == 3 || $sets['auser'] == 88) ) {
+	$sets['reviewer'] = $sets['auser'];
+}
+
 
 $msg = "";
 #get visa dependants
@@ -73,9 +80,19 @@ if (isset($_POST['bt_name']) && stripos($_POST['bt_name'], "SAVE") !== false){
     $sets['fee']   = isset($_REQUEST['t_fee'])? (int)trim($_REQUEST['t_fee']) : 0;
 	$sets['cfee']   = isset($_REQUEST['t_cfee'])? (int)trim($_REQUEST['t_cfee']) : 0;
 	$sets['ofee']   = isset($_REQUEST['t_ofee'])? (int)trim($_REQUEST['t_ofee']) : 0;
-    $sets['sfee']   = isset($_REQUEST['t_sfee'])? (int)trim($_REQUEST['t_sfee']) : 0;	
+    $sets['sfee']   = isset($_REQUEST['t_sfee'])? (int)trim($_REQUEST['t_sfee']) : 0;
+	$sets['company']   = isset($_REQUEST['t_company'])? (string)trim($_REQUEST['t_company']) : "";	
 
-    if($visa_id > 0){
+    if ($sets['company'] == '' && ($user_id == 29 || $user_id == 88)) {
+		$msg = 'Company cannot be empty!';
+	}
+
+	if ($sets['reviewer'] == 0) {
+		$msg = 'No reviewer is selected';
+	}
+
+
+	if($visa_id > 0){
 		//check payment
         if (strtolower($sets['status']) == 'grant') {
 			if(!$o_c->checkVisaAmont($visa_id)){
@@ -84,39 +101,51 @@ if (isset($_POST['bt_name']) && stripos($_POST['bt_name'], "SAVE") !== false){
 		}
 		
 		if($msg == ''){
+			$sets['company'] = $sets['company'] == ''? 'geic' : $sets['company'];
 			$o_c->setApplyVisa($visa_id, $sets);
 		}		
 
-    }else{
-        $visa_id =  $o_c->addApplyVisa($user_id, $client_id, $sets);
+    }
+	else{
+		if ($msg == '') {
+			$sets['company'] = $sets['company'] == ''? 'geic' : $sets['company'];
+			$visa_id =  $o_c->addApplyVisa($user_id, $client_id, $sets);
+		}
 	}
 	
-	#get depantent expire date
-	$arr = array();
-	foreach ($dependants as $depid => $date){
-		$_id = "dep_" . $depid;
-		if (array_key_exists($_id, $_REQUEST) && $_REQUEST[$_id] != "" ) { //&& $_REQUEST[$_id] != "0000-00-00" 
-			$arr[$depid] = $_REQUEST[$_id];	
-		}	
-	}
-	$o_c->setDependantExpireDate($visa_id, $arr);
-	
-	
-	#set client user related
-	if($sets['auser'] > 0){
-		$o_c->addClientUserRs($client_id, $sets['auser'], __AGREEMENT_STAFF);
-	}
-	
-	if ($sets['vuser']) {
-		$o_c->addClientUserRs($client_id, $sets['vuser'], __VISA_PAPERWORK);
+	if ($visa_id > 0) {
+		#get depantent expire date
+		$arr = array();
+		foreach ($dependants as $depid => $date){
+			$_id = "dep_" . $depid;
+			if (array_key_exists($_id, $_REQUEST) && $_REQUEST[$_id] != "" ) { //&& $_REQUEST[$_id] != "0000-00-00" 
+				$arr[$depid] = $_REQUEST[$_id];	
+			}	
+		}
+		$o_c->setDependantExpireDate($visa_id, $arr);
+		
+		
+		#set client user related
+		if($sets['auser'] > 0){
+			$o_c->addClientUserRs($client_id, $sets['auser'], __AGREEMENT_STAFF);
+		}
+		
+		if ($sets['vuser']) {
+			$o_c->addClientUserRs($client_id, $sets['vuser'], __VISA_PAPERWORK);
+		}
+
+		//auto new steps
+		if ($visa_id > 0 && $sets['adate'] > '0000-00-00') {
+			$o_c->autoVisaProcess($visa_id, 0, $o_v->getVisaItemArr($sets['cateid'], $sets['subid']));
+    	}
 	}
 
-    //auto new steps
-    if ($visa_id > 0 && $sets['adate'] > '0000-00-00') {
-        $o_c->autoVisaProcess($visa_id, 0, $o_v->getVisaItemArr($sets['cateid'], $sets['subid']));
-    }
 	
-    echo json_encode(array('msg'=>$msg == ""? "Save OK" : $msg, 'id'=>$visa_id));
+    echo json_encode(array('msg'=>$msg == ""? "Save OK" : $msg, 
+						   'id'=>$visa_id,
+						   'btn_payment' =>"/scripts/client_account_detail.php?cid={$client_id}&vid={$visa_id}&typ=visa",
+						   'btn_process' => "/scripts/client_visa_process.php?cid={$client_id}&vid={$visa_id}&isNew=1"
+							));
     exit;
 }elseif (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "DELETE"){
 	$o_c->delApplyVisaByID($visa_id);

@@ -4,6 +4,7 @@ require_once(__LIB_PATH.'Template.class.php');
 require_once(__LIB_PATH.'MysqlDB.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
 require_once(__LIB_PATH.'ClientAPI.class.php');
+require_once(__LIB_PATH.'Report.class.php');
 
 $user_id = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
 
@@ -12,7 +13,7 @@ if (!($user_id > 0)) {
 }
 
 $o_func = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, true);
-
+$o_r = new ReportAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
 $ugs = array();
 array_push($g_user_grants, 'todo_alert');
@@ -49,6 +50,7 @@ if ($func_id == 0 || $group_id == 0) {
 
 # set smarty tpl
 $oTpl = new Template;
+$oTpl->assign('hasReviews', $o_r->countReviewVisa($user_id));
 $oTpl->assign('func_name', $func_name);
 $oTpl->assign('group_name', $group_name);
 $oTpl->assign('gid', $group_id);

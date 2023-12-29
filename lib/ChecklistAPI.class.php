@@ -4,8 +4,8 @@ require_once('MysqlDB.class.php');
 class ChecklistAPI extends MysqlDB{
   
     function __construct($host, $user, $pswd, $database, $debug) {
-         $this->MysqlDB($host, $user, $pswd, $database, $debug);
-    }
+        $this->setDBconf($host, $user, $pswd, $database, $debug);
+   }
 
     function addMeta($name, $desc='') {
         if ($name == '')

@@ -286,7 +286,13 @@ if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" |
 	}
 }
 else {
-	$o_tpl->assign('arr', $client_arr);
+	if (isset($_REQUEST['bt_name'])) {
+		$o_tpl->assign('arr', $sets);
+	}
+	else {
+		$o_tpl->assign('arr', $client_arr);
+	}
+	//
 }
 
 $o_tpl->assign('visa_arr', $visa_arr);

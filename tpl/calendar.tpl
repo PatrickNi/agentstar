@@ -44,8 +44,8 @@
 				</tr>
 				{foreach key=hour item=arr from=$calendar_arr}
 				<tr align="center" bgcolor="#FFFFD9" style="cursor:pointer; font-weight:bolder; " {if $arr.over neq 1}onClick="window.open('{if $arr.coach != ''}{$arr.coach}{else}calendar_add.php?id={if $arr.done eq 1 || $arr.title neq '' || $arr.over eq 1}{$arr.id}{else}0{/if}&t_date={$t_date}&t_user={$user}&t_hour={$hour}{/if}','_blank','alwaysRaised=yes,scrollbars=yes,ocation=no,width='+screen.width*1/2+',height='+screen.height*1/2)"{/if} >
-					<td class="border_1" {if eregi("[0-9][0-9]:00", $hour)}style=" border-top-style: groove; border-top-width:thin"{/if}>{if eregi("[0-9][0-9]:00", $hour)}{$hour}{else}&nbsp;{/if}</td>
-					<td class="border_1"style="{if eregi('[0-9][0-9]:00', $hour)} border-top-style: groove; border-top-width:thin;{/if}" bgcolor = "{if $arr.done eq 1}#999999{elseif $arr.title neq '' || $arr.over eq 1}#3A87AD{else}#FFFFD9{/if}">{if $arr.title}{$arr.title}{else}&nbsp;{/if}</td>
+					<td class="border_1" {if stristr("[0-9][0-9]:00", $hour)}style=" border-top-style: groove; border-top-width:thin"{/if}>{if stristr("[0-9][0-9]:00", $hour)}{$hour}{else}&nbsp;{/if}</td>
+					<td class="border_1"style="{if stristr('[0-9][0-9]:00', $hour)} border-top-style: groove; border-top-width:thin;{/if}" bgcolor = "{if $arr.done eq 1}#999999{elseif $arr.title neq '' || $arr.over eq 1}#3A87AD{else}#FFFFD9{/if}">{if $arr.title}{$arr.title}{else}&nbsp;{/if}</td>
 				</tr>
 				{/foreach}
 			</table>
@@ -55,6 +55,6 @@
 </form>	
 {literal}
 <script type="text/javascript">
-	$('#t_date').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });        
+	$('#t_date').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true, firstDay: 1 });        
 </script>
-{/literal}	
+{/literal}

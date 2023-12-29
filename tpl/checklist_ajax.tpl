@@ -22,7 +22,11 @@
     <table border="0" cellpadding="0" cellspacing="0" width="100%"> 
         <tr class="greybg"> 
             <td class="whitetext" align="center">
-                Check List
+                {if $cl_typ == 'course'}
+                    Offer checklist
+                {else}
+                    Check List
+                {/if}
             </td>
         </tr>
         <tr align="left" class="totalrowodd"> 
@@ -47,7 +51,11 @@
     <table border="0" cellpadding="1" cellspacing="1" width="100%"> 
         <tr class="greybg"> 
             <td colspan="3" class="whitetext" align="center">
-                Check list   
+                {if $cl_typ == 'course'}
+                    Offer checklist
+                {else}
+                    Check List
+                {/if}
             </td> 
         </tr>
         <tr align="left" class="totalrowodd"> 
@@ -92,7 +100,12 @@
     <input type="hidden" name="cl_appid" id="cl_appid" value="{$cl_appid}">
     <table border="0" cellpadding="1" cellspacing="1" width="100%" id="tbl_checklist"> 
         <tr class="greybg"> 
-            <td colspan="5" class="whitetext" align="center">Check List
+            <td colspan="5" class="whitetext" align="center">
+                {if $cl_typ == 'course'}
+                    Offer checklist
+                {else}
+                    Check List
+                {/if}
             {if count($app_arr) > 0}
                 <a href="/scripts/checklist_pdf.php?cl_typ={$cl_typ}&cl_appid={$cl_appid}", target="_blank">PDF Download</a>
             {/if}

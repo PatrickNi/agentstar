@@ -2,9 +2,10 @@
 require_once('MysqlDB.class.php');
 class SchoolAPI extends MysqlDB{
 
-    function SchoolAPI($host, $user, $pswd, $database, $debug) {
-    	 $this->MysqlDB($host, $user, $pswd, $database, $debug);
+    function __construct($host, $user, $pswd, $database, $debug) {
+		$this->setDBconf($host, $user, $pswd, $database, $debug);
     }
+
     
     function delSchoold($scid){
     	if ($scid > 0){
@@ -42,7 +43,7 @@ class SchoolAPI extends MysqlDB{
     
     
 	function getSchoolList($sc_id, $column, $value, $page = 1, $page_size = 50, $cateid = 0){
-		$sql = "select a.ID, Name, Note, b.AgentStatus, StatusID, WebSite, CateID, SubCateID, TopAgentID from Institute a left join institute_status b on(a.StatusID = b.ID)";
+		$sql = "select a.ID, Name, Note, b.AgentStatus, StatusID, WebSite, CateID, SubCateID, TopAgentID from institute a left join institute_status b on(a.StatusID = b.ID)";
 
 		if ($sc_id > 0){
 			$sql .= "where a.ID = {$sc_id}";	

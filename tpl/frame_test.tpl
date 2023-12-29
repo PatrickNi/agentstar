@@ -3,6 +3,19 @@
 <style>
 {literal}
 body {margin-left: 0px;margin-top: 0px;margin-right: 0px;margin-bottom: 0px;overflow: hidden;}
+.dotbadge {
+  display: inline-block;
+  padding: 0.3em 0.3em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: text-top;
+  color: #212529;
+  background-color: red;
+  border-radius: 0.3rem;
+}
 {/literal}
 </style>
 <title>Agent Star -Immigration System</title>
@@ -50,7 +63,7 @@ body {margin-left: 0px;margin-top: 0px;margin-right: 0px;margin-bottom: 0px;over
 			 	<span id="{$groupId}" class="menuClick" {if $groupId neq $gid}style="display:none;"{/if}>
 				<ul class="menuSub">
 			   	{foreach key=funcId item=func from=$arr.func}
- 					<li><a href="{$func.url}">{$func.name}{if $func.name|lower == 'task'&& $task_num > 0}&nbsp;&nbsp;<strong style="color:#FF0000 ">Undo: {$task_num}</strong>{/if}</a></li>
+ 					<li><a href="{$func.url}">{$func.name}{if $func.name|lower == 'visa review list' && $hasReviews}<span class="dotbadge"></span>{/if}</a></li>
 				{/foreach}
 				</ul>
 			   </span>

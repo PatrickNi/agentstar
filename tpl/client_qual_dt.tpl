@@ -52,7 +52,7 @@
 			  <option value="0" selected>select a country</option>
   			{/if}
 			</select>			
-			<span style="text-decoration:underline; color:#0000CC; cursor:pointer; font-weight:bold" onClick="openModel('country.php',300,300,'NO', 'form1')">Add new country</span>
+			<span style="text-decoration:underline; color:#0000CC; cursor:pointer; font-weight:bold" onClick="window.open('/scripts/country.php','_blank', 'alwaysRaised=yes,height=300,width=300,location=no,scrollbars=yes')">Add new country</span>
 		</td>
 	</tr>				
 	<tr>

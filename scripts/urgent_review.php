@@ -92,6 +92,7 @@ if ($ugs['seeall']['v'] == 0){
 $staff_id = $user_id;
 
 $reports = array();
+$monitors = array();
 $sort_ord_arr = array(0=>'ASC', 1=>'DESC');
 switch ($viewWhat){
 	case "v":
@@ -106,7 +107,21 @@ switch ($viewWhat){
 		}
 		$sort_col_arr = array(1=>'ClientName',2=>'VisaName',3=>'ClassName',4=>'Item',5=>'SortDue');
 		//var_dump(getSortList($sort_list, $sort_col_arr, $sort_ord_arr));
-		$reports = $o_r->getUrgentVisa($staff_id,getSortList($sort_list, $sort_col_arr, $sort_ord_arr), $vdu);	
+		$reports = $o_r->getUrgentVisa($staff_id,getSortList($sort_list, $sort_col_arr, $sort_ord_arr), $vdu);
+		break;
+	case "vreview":
+		//		$staff_id = $user_id;
+		if (isset($ugs['todo_visa']) && $ugs['todo_visa']['v'] == 1){
+			if(isset($_REQUEST['vUid'])) {
+				$staff_id = $_REQUEST['vUid'];
+			}
+			else {
+				$staff_id = 0;
+			}
+		}
+		$sort_col_arr = array(1=>'ClientName',2=>'VisaName',3=>'ClassName',4=>'Item',5=>'SortDue');
+		//var_dump(getSortList($sort_list, $sort_col_arr, $sort_ord_arr));
+		$reports = $o_r->getReviewVisa($staff_id,getSortList($sort_list, $sort_col_arr, $sort_ord_arr));
 		break;
 	case "c":
 		
@@ -191,6 +206,7 @@ switch ($viewWhat){
 # set smarty tpl
 $o_tpl = new Template;
 $o_tpl->assign('urgent_arr', $reports);
+$o_tpl->assign('monitor_arr', $monitors);
 $o_tpl->assign('viewWhat', $viewWhat);
 $o_tpl->assign('view_show', $viewWhat == ""? 0 : $viewWhat);
 $o_tpl->assign('ugs', $ugs);
@@ -203,7 +219,8 @@ $o_tpl->assign('cdu', $cdu);
 $o_tpl->assign('sdu', $sdu);
 $o_tpl->assign('atopdu', $atopdu);
 $o_tpl->assign('asubdu', $asubdu);
-if ((isset($ugs['todo_visa']) && $ugs['todo_visa']['v'] == 1 && ($viewWhat == 'v' || $viewWhat == 'vexp')) || (isset($ugs['todo_course']) && $ugs['todo_course']['v'] == 1 && ($viewWhat == 'c' || $viewWhat == 's'))){
+$o_tpl->assign('hasReviews', $o_r->countReviewVisa($staff_id));
+if ((isset($ugs['todo_visa']) && $ugs['todo_visa']['v'] == 1 && ($viewWhat == 'v' || $viewWhat == 'vexp'|| $viewWhat == 'vreview')) || (isset($ugs['todo_course']) && $ugs['todo_course']['v'] == 1 && ($viewWhat == 'c' || $viewWhat == 's'))){
 	$o_tpl->assign('slUsers', $o_g->getUserNameArr(0,true));
 }else {
 	$o_tpl->assign('slUsers', $o_g->getUserNameArr($staff_id));

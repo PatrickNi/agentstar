@@ -67,7 +67,7 @@
 				<td><input type="text" name="new_{$id}" value="" disabled>&nbsp;
 					<input type="submit" id="ch_{$id}" name="Change" value="Change" style="font-weight:bold;" disabled="disabled">&nbsp;
 					<input type="submit" id="del_{$id}" name="Delete" value="Delete" style="font-weight:bold;" disabled="disabled">				</td>
-				<td><a href="../download/{$arr.url}" target="_blank">{$arr.file}</a></td>				
+				<td><a href="{if $arr.his}http://110.143.32.230:8080/download/{else}/download/{/if}{$arr.url}" target="_blank">{$arr.file}</a></td>				
 				<td>{$arr.time}</td>
 			</tr>
 			{/foreach}

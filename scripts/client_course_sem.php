@@ -5,8 +5,8 @@ require_once(__LIB_PATH.'ClientAPI.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
 require_once(__LIB_PATH.'SchoolAPI.class.php');
 require_once(__LIB_PATH.'FinanceAPI.class.php');
-ini_set("display_errors", 1);
-error_reporting(E_ALL);
+//ini_set("display_errors", 1);
+//error_reporting(E_ALL);
 # check valid user
 $user_id = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
 

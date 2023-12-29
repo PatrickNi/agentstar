@@ -7,8 +7,9 @@ class CoachAPI extends MysqlDB{
     public $GRADE_LIST = array(1=>'Year1',2=>'Year2',3=>'Year3',4=>'Year4',5=>'Year5',6=>'Year6',7=>'Year7',8=>'Year8',9=>'Year9',10=>'Year10',11=>'Year11',12=>'Year12');
 
     function __construct($host, $user, $pswd, $database, $debug) {
-         $this->MysqlDB($host, $user, $pswd, $database, $debug);
+		$this->setDBconf($host, $user, $pswd, $database, $debug);
     }
+
 
     function addItem($title, $root_id=0) {
         if (!$title)

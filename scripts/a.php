@@ -4,11 +4,20 @@ require_once('../etc/const.php');
 require_once(__LIB_PATH.'MysqlDB.class.php');
 require_once(__LIB_PATH.'Report.class.php');
 
-var_dump(mkdir(dirname(__LIB_PATH).'/scripts/font/unifont'));
-exit;
+/*
+$d = dir(__DOWNLOAD_PATH.'reportstaff/');
+echo "Handle: " . $d->handle . "\n";
+echo "Path: " . $d->path . "\n";
+while (false !== ($entry = $d->read())) {
+   echo $entry."\n";
+}
+$d->close();
+*/
+//var_dump(mkdir(dirname(__LIB_PATH).'/scripts/font/unifont'));
+//exit;
 
 $o_a = new ReportAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
-$staff_id = 104;
+$staff_id = 112;
 $rpt_type = 's'; 
 $file = __DOWNLOAD_PATH.'reportstaff/'.$rpt_type.$staff_id.'.dat';
 if (file_exists($file)) {

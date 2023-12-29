@@ -11,7 +11,7 @@
 <script language="javascript" src="../js/audit.js"></script>
 
 <body>
-<form name="form1" target="_self" method="get" onkeydown="{literal}if(event.keyCode==13){form1.submit();}{/literal}">
+<form name="form1" target="_self" method="get">
   <table align="center" width="100%"  class="graybordertable" cellpadding="0" cellspacing="0">
     <tr >
       <td colspan="9" align="center"  class="bordered_2"><table width="100%" cellpadding="1" cellspacing="1">
@@ -20,7 +20,7 @@
               &nbsp;
               <!--<input type="submit" value="Delete" name="qSubmit" style="font-weight:bold;">	-->
               {if $ugs.export.v eq 1}
-              <input type="submit" value="Export Client Emails" name="bt_export" style="font-weight:bold;" onClick="javascrtipt:this.form.submit();">
+              <input type="button" value="Export Client Emails" name="bt_export" style="font-weight:bold;" onClick="javascrtipt:this.form.submit();">
               {/if} </td>
             <td width="69%" colspan="4" align="right">
               {if $ugs.b_fromto.v eq 1}
@@ -49,7 +49,7 @@
               <input type='checkbox' name="is_geic" value="new" {if $is_geic eq "new"} checked {/if}>From GEIC
               
               &nbsp;&nbsp;
-              <input type="submit" value="Search" name="bt_name" style="font-weight:bold;" tabindex="-1"></td>
+              <input type="submit" value="Search" name="bt_name" id="bt_name" style="font-weight:bold;"></td>
           </tr>
         </table></td>
     </tr>
@@ -69,7 +69,7 @@
     {foreach key=cid item=arr from=$client_arr}
     <tr class="{if $arr.status == 'new'}yellowbg{else}{cycle values='rowodd,roweven'}{/if}">
       <td align="center" class="border_1" nowrap="nowrap">{$arr.sign}</td>
-      <td align="center" class="border_1"><a href="{$redir_url|cat:$cid}" target="_self">{if $arr.lname != ''}{$arr.lname|wordwrap:1}{else}n/a{/if}</a></td>
+      <td align="center" class="border_1"><a href="{$redir_url|cat:$cid}" target="_self">{if $arr.lname != ''}{$arr.lname}{else}n/a{/if}</a></td>
       <td align="center" class="border_1">{$arr.fname}</td>
       <td align="center" class="border_1">{$arr.ename}</td>
       <td align="center" class="border_1">{$arr.gender}</td>
@@ -96,7 +96,7 @@
 	                {counter start=1 assign='no'}
     	            {foreach key=id2 item=num2 from=$abouts.other}
                	        {counter assign='no'}
-        	    	    {$id2}:({$num2/$num*100|string_format:"%.2f"}%)&nbsp;&nbsp;
+        	    	    {$id2}:({($num2/$num*100)|string_format:"%.2f"}%)&nbsp;&nbsp;
                         {if $no%7 eq 0}<br/>{/if} 
             	    {/foreach}
                     </ul>
@@ -113,6 +113,7 @@
 <script type="text/javascript">
 	$('#t_fdate').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true});        
 	$('#t_tdate').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });
+  $('#bt_name').focus();
 </script>
 {/literal}	
 </body>

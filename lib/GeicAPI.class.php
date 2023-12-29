@@ -5,9 +5,10 @@ class GeicAPI extends MysqlDB {
 
     private $user_orders = array(29,3,86,37,79,80,58,67,57,81,84,82,50);
 
-    function GeicAPI ($host, $user, $pswd, $database, $debug) {
-    	 $this->MysqlDB($host, $user, $pswd, $database, $debug);
+    function __construct($host, $user, $pswd, $database, $debug) {
+		$this->setDBconf($host, $user, $pswd, $database, $debug);
     }
+
     
     function getUserActive($user_id=0){
     	if ($user_id > 0){
@@ -173,11 +174,17 @@ class GeicAPI extends MysqlDB {
 	}
 
 
-	function getUserList($rUserID=0){
-		$sql = "Select ID, UserName, UserPassword, Position, Email, Mobile, Telephone, Address, Mark, Advance, StartDate, LeaveDate, Department, DepartmentRank from sys_user";
+	function getUserList($rUserID=0, $leave=false){
+		$sql = "Select ID, UserName, UserPassword, Position, Email, Mobile, Telephone, Address, Mark, Advance, StartDate, LeaveDate, Department, DepartmentRank from sys_user WHere 1 ";
 		if($rUserID > 0){
-			$sql .= " Where ID = {$rUserID}";
+			$sql .= " And ID = {$rUserID}";
 		}
+
+		if ($leave) {
+			$sql .= " And LeaveDate > '0000-00-00' ";
+		}
+
+		$sql .= " order by if(LeaveDate > '0000-00-00', '2038-01-01', LeaveDate) asc, StartDate desc ";
 		$_arr = array();
 		$this->query($sql);
 		while($this->fetch()){
@@ -702,6 +709,7 @@ class GeicAPI extends MysqlDB {
 				$_arr[$this->ID]['file'] = basename($this->File);
 				$_arr[$this->ID]['time'] = $this->UploadTime;
 				$_arr[$this->ID]['url'] = $this->File;
+				$_arr[$this->ID]['his'] = $this->UploadTime < '2023-09-09 00:00:00'? true : false;
 			}
 			return $_arr;
 		}
@@ -902,10 +910,29 @@ class GeicAPI extends MysqlDB {
 	}	
 	
 	function getMemberByStaffId($user_id) {
-		$sql = "select UserName, u.ID from sys_user u, sys_user_management um where u.ID = um.StaffID and um.ManagerID = {$user_id}";
+		//Get Position
+		$sql = "select Position from sys_user where id = {$user_id}";
+		$this->query($sql);
+		$pos = '';
+		while ($this->fetch()) {
+			$pos = $this->Position;
+		}
+
+		$rtn = array();
+		if ($pos == 'PE') {
+			$department = '2-Study';
+		}
+		elseif ($pos == 'PC') {
+			$department = '5-Coach';
+		}
+		else {
+			return $rtn;
+		}
+
+		$sql = "select UserName, u.ID from sys_user u where department = '{$department}' and LeaveDate = '0000-00-00' order by u.id asc";
 		//var_dump($sql);
 		$this->query($sql);
-		$rtn = array();
+		
 		while($this->fetch()){
 			$rtn[$this->ID] = $this->UserName;
 		}

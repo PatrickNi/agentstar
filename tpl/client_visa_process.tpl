@@ -29,14 +29,23 @@
 				</table></td></tr>
 				<tr>
 					<td width="19%" align="left" class="rowodd"><strong>Date:</strong>&nbsp;&nbsp;</td>
-					<td align="left" width="81%" class="roweven"><input type="text" name="t_date" id="t_date" value="{$dt_arr.date}" autocomplete="off">                 
+					<td align="left" width="81%" class="roweven">
+							{if stripos($subject_arr[$dt_arr.itemid], 'apply') === 0 && $dt_arr.date != "" && $dt_arr.date != '0000-00-00' && $staff_id != 3 && $dt_arr.done eq 1}
+								{$dt_arr.date}
+								<input type="hidden" name="t_date" value="{$dt_arr.date}">
+							{else}
+								<input type="text" name="t_date" id="t_date" value="{$dt_arr.date}" autocomplete="off">    
+							{/if}             
                     </td>
 				</tr>
 				{if $isOther eq 1 || ($dt_arr.itemid eq '0' && $isNew neq 1)}
 					<tr>
 						<td width="19%" align="left" class="rowodd">
-							<strong>Additional Step:</strong>&nbsp;&nbsp;
-							<button type="button" onclick="add_dha()" style="font-size:smaller;">DHA request</button>
+							<strong>Additional Step:</strong>
+							<br/>
+							<button type="button" onclick="add_dha('DHA request')" style="font-size:smaller;">DHA request</button>
+							&nbsp;
+							<button type="button" onclick="add_dha('Review application')" style="font-size:smaller;">Review application</button>
 						</td>
 						<td align="left" width="81%" class="roweven">
 							<input type="text" name="t_add" id="t_add" value="{$dt_arr.add}" style="width:600px;">
@@ -108,8 +117,8 @@
 		 }
 	}
 
-	function add_dha(){
-		$("#t_add").val("DHA request ");
+	function add_dha(str){
+		$("#t_add").val(str);
 	}
 </script>
 {/literal}

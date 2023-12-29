@@ -54,12 +54,13 @@
 				<tr align="center" class="totalrowodd">
 					<td width="10%" >Start date</td>
 					<td width="10%">Complete date</td>
-					<td width="25%" >School Name </td>
+					<td width="15%" >School Name </td>
 					<td width="15%">School Country</td>
 					<td width="*" >Qualification</td>
 					<td width="12%" >Major</td>
                     <td width="5%" >Completed</td>
-					<td width="5%" >Full/Part(time)</td>                    
+					<td width="5%" >Full/Part(time)</td>   
+					<td width="10%" >Note</td>   
 					<td width="5%">Insert</td>
 				</tr>
 				{foreach key=id item=arr from=$show_arr}
@@ -71,7 +72,8 @@
 					<td>{$arr.qual}</td>
 					<td >{$arr.major}</td>
 					<td >{$arr.status}</td>
-                    <td >{if $arr.fulltime == 1}Fulltime{else}Parttime{/if}</td>                     
+                    <td >{if $arr.fulltime == 1}Fulltime{else}Parttime{/if}</td>  
+					<td >{$arr.note}</td>                   
 					<td><img src="../images/arr_down.gif" style="cursor:pointer" onClick="window.open('client_qual_dt.php?qid={$id}&cid={$cid}&isNew=1','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,height=380,width=500')"></td>
 				</tr>
 				{/foreach}

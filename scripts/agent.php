@@ -13,9 +13,9 @@ require_once(__LIB_PATH.'ExportAPI.class.php');
 $user_id = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
  
 
+$cates['student'  ] = array('n'=>'Student ambassador', 's'=>0, 'o'=>0, 'c'=>0, 'rc'=>0, 'pc'=>0, 'aid'=>array());
 $cates['education'] = array('n'=>'Education agent', 's'=>0, 'o'=>0, 'c'=>0, 'rc'=>0, 'pc'=>0, 'aid'=>array());
 $cates['company'  ] = array('n'=>'Company agent', 's'=>0, 'o'=>0, 'c'=>0, 'rc'=>0, 'pc'=>0, 'aid'=>array());
-$cates['student'  ] = array('n'=>'Student ambassador', 's'=>0, 'o'=>0, 'c'=>0, 'rc'=>0, 'pc'=>0, 'aid'=>array());
 $cates['inactive' ] = array('n'=>'Inactive agent', 's'=>0, 'o'=>0, 'c'=>0, 'rc'=>0, 'pc'=>0, 'aid'=>array());
 //$cates['other'    ] = array('n'=>'Other', 's'=>0, 'o'=>0, 'c'=>0, 'rc'=>0, 'pc'=>0, 'aid'=>array());
 
@@ -58,9 +58,8 @@ if ($form == 'top') {
 }
 elseif ($form == 'sub') {
 	unset($cates['company']);
-	unset($cates['student']);
-	$cates['education']['n'] = 'Global Partner';
-	//$cates['student'  ]['n'] = 'Global Ambassador';
+	$cates['education']['n'] = 'Global Agent';
+	$cates['student'  ]['n'] = 'Global Partner';
 }
 
 # get user position
@@ -113,7 +112,7 @@ if($form != ""){
 			
 			array_push($mailArr, $v['email']);
 		}
-		$o_ept->exportAgentEmail($mailArr, $form);
+		$o_ept->exportAgentEmail($mailArr, $form == 'sub'? ($t_cate == 'student'? 'global_partner' : 'global_agent') : $form);
 	}
 	//print_r($cates);
 }

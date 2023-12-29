@@ -30,10 +30,10 @@ function getIpAddress()
 $ACCESS_TOKES = array('a74613df87c11d04519fb0ee4225c800' => 'v1', '92ec7cb202aa392b94bc88c575096f29'=>'v2');
 
 //Token required
+
 if (getIpAddress() != '47.52.119.83' || !isset($_REQUEST['token']) || !isset($ACCESS_TOKES[$_REQUEST['token']])) {
 	die('Acess denied');
 }
-
 $API_VERSION = $ACCESS_TOKES[$_REQUEST['token']];
 
 
@@ -86,7 +86,14 @@ elseif (isset($_REQUEST['reg']) && $_REQUEST['reg'] == 1) {
 	exit;
 }
 elseif (isset($_REQUEST['reg']) && $_REQUEST['reg'] == 2) {	
-	echo serialize($o_c->_register($_REQUEST['t_email'],$_REQUEST['t_lname'],$_REQUEST['t_fname'],$_REQUEST['t_phone'],$_REQUEST['t_wechatid'],$_REQUEST['t_ctype'],2,$_REQUEST['t_about']));
+	if (isset($_REQUEST['t_code']) && $_REQUEST['t_code'] != '') {
+		$agent_id = $o_a->getAgentIDByCode($_REQUEST['t_code']);
+	}
+	else {
+		$agent_id = 0;
+	}
+
+	echo serialize($o_c->_register($_REQUEST['t_email'],$_REQUEST['t_lname'],$_REQUEST['t_fname'],$_REQUEST['t_phone'],$_REQUEST['t_wechatid'],$_REQUEST['t_ctype'],2,$_REQUEST['t_about'], $agent_id));
 	exit;
 }
 elseif (isset($_REQUEST['cfm']) && $_REQUEST['cfm'] == 1) {	
@@ -101,8 +108,12 @@ elseif (isset($_REQUEST['reg']) && $_REQUEST['reg'] == 'uploadall') {
 	$data = json_decode(base64_decode($_POST['data']), true);
 
 	if (isset($data['profile'])) {
+		foreach ($data['profile'] as $k => $v) {
+			$data['profile'][$k] = iconv('utf-8', 'GBK', (string)trim($v));
+		}
+
 		$sets['visa']  = isset($data['profile']['t_visa'])? (string)trim($data['profile']['t_visa']) : 0;
-		$sets['class'] = isset($_REQUEST['t_class'])? (string)trim($data['profile']['t_class']) : 0; 
+		$sets['class'] = isset($data['profile']['t_class'])? (string)trim($data['profile']['t_class']) : 0; 
 		$sets['classtxt']  = isset($data['profile']['t_classtxt'])? (string)trim($data['profile']['t_classtxt']) : "";
 		
 		# get client info
@@ -165,7 +176,13 @@ elseif (isset($_REQUEST['reg']) && $_REQUEST['reg'] == 'uploadall') {
 	}
 
 	if (isset($data['edu'])) {
+
 		foreach ($data['edu'] as $edu) {
+
+			foreach ($edu as $k => $v) {
+				$edu[$k] = iconv('utf-8', 'GBK', (string)trim($v));
+			}
+			
 			$sets = array();
 			$sets['country']= isset($edu['t_country'])? (string)trim($edu['t_country']) : 0;
 			$sets['fdate']  = isset($edu['t_fdate'])? (string)trim($edu['t_fdate']) : "0000-00-00";
@@ -198,6 +215,10 @@ elseif (isset($_REQUEST['reg']) && $_REQUEST['reg'] == 'uploadall') {
 	
 	if (isset($data['exp'])) {
 		foreach ($data['exp'] as $exp) {
+			foreach ($exp as $k => $v) {
+				$exp[$k] = iconv('utf-8', 'GBK', (string)trim($v));
+			}
+
 			# get work experience
 			$set_arr = array();
 

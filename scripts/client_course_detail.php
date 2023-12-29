@@ -7,6 +7,8 @@ require_once(__LIB_PATH.'GeicAPI.class.php');
 require_once(__LIB_PATH.'SchoolAPI.class.php');
 require_once(__LIB_PATH.'AgentAPI.class.php');
 
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 
 # check valid user
@@ -220,7 +222,7 @@ if ($isChange == 0 && $course_id > 0 ){
 	}
 }
 
-if ($course_id > 0 && $ugs['c_track']['v'] == 0 && $course_arr[$cateid][$course_id]['consultant'] != $user_id) {
+if ($course_id > 0 && $ugs['c_track']['v'] == 0 && $course_arr[$cateid][$course_id]['consultant'] != $user_id && $course_arr[$cateid][$course_id]['paperwork'] != $user_id) {
 	echo "<script language='javascript'>alert('Access denied!');window.close();</script>";
 	exit;
 }
@@ -294,7 +296,7 @@ $o_tpl->assign("ugs", $ugs);
 $o_tpl->assign('client', $o_c->getOneClientInfo($client_id));
 $o_tpl->assign('apodue', $apodue);
 $o_tpl->assign('agent_users', $o_g->get_migration_agents());
-$o_tpl->assign('paperwork_arr',$o_g->getUserNameArr(0, $course_id ==0?false:true, array(58,114)));
+$o_tpl->assign('paperwork_arr',$o_g->getUserNameArr(0, $course_id ==0?false:true, array(58,114,87)));
 $o_tpl->assign('show_checklist', 1);
 $o_tpl->display('client_course_detail.tpl');
 ?>

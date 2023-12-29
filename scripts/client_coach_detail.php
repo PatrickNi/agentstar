@@ -57,8 +57,8 @@ if (isset($_POST['bt_name']) && stripos($_POST['bt_name'], "SAVE") !== false){
     
     //check primary information
     try {
-        if ($sets['staff'] == '0') {
-            throw new Exception ("Staff id be empty");
+        if (!preg_match('/^[0-9]+$/',$sets['staff']) || $sets['staff'] == '0' ) {
+            throw new Exception ("Teacher cannot be empty");
         }
 
         if ($sets['itemid'] == '0') {

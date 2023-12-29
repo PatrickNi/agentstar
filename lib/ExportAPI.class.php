@@ -4,9 +4,10 @@ class ExportAPI extends MysqlDB {
 	
 	const EMAIL_TPL = '/([a-zA-Z0-9_.-]+@[a-zA-Z0-9]+\.[a-zA-Z0-9_.-]+)/';
 	
-	public function __construct($host, $user, $pswd, $database, $debug) {
-		$this->MysqlDB($host, $user, $pswd, $database, $debug);
-	}
+    function __construct($host, $user, $pswd, $database, $debug) {
+		$this->setDBconf($host, $user, $pswd, $database, $debug);
+    }
+
 	
 //	public function generateMailList($file, $mailArr){
 //		$fp = fopen($this->dlpath.$file, 'w');

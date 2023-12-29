@@ -19,14 +19,14 @@ class TodoAPI {
     function upload($data, $has_remind=false) {
         if ($has_remind) {
             foreach ($data as $v){
-                $sql = "INSERT IGNORE INTO ".self::TBL." (user_id, source, source_id, begin_date, due_date, raw_data, remind_time, created) VALUES ('{$v['user_id']}','{$v['source']}','{$v['source_id']}','{$v['begin_date']}','{$v['due_date']}','".json_encode($v['raw_data'])."','{$v['remind_time']}', NOW()) ON DUPLICATE KEY UPDATE remind_time = if(values(remind_time) > remind_time, values(remind_time), remind_time), raw_data = if(values(raw_data) <> raw_data, values(raw_data), raw_data), due_date = if(values(due_date) <> due_date, values(due_date), due_date) ";
+                $sql = "INSERT IGNORE INTO ".self::TBL." (user_id, source, source_id, begin_date, due_date, raw_data, remind_time, created) VALUES ('{$v['user_id']}','{$v['source']}','{$v['source_id']}','{$v['begin_date']}','{$v['due_date']}','".addslashes(json_encode($v['raw_data']))."','{$v['remind_time']}', NOW()) ON DUPLICATE KEY UPDATE remind_time = if(values(remind_time) > remind_time, values(remind_time), remind_time), raw_data = if(values(raw_data) <> raw_data, values(raw_data), raw_data), due_date = if(values(due_date) <> due_date, values(due_date), due_date) ";
                 //echo $sql."\n";
                 $this->db->query($sql);
             }
         }
         else {
             foreach ($data as $v){
-                $sql = "INSERT IGNORE INTO ".self::TBL." (user_id, source, source_id, begin_date, due_date, raw_data, created) VALUES ('{$v['user_id']}','{$v['source']}','{$v['source_id']}','{$v['begin_date']}','{$v['due_date']}','".json_encode($v['raw_data'])."', NOW())";
+                $sql = "INSERT IGNORE INTO ".self::TBL." (user_id, source, source_id, begin_date, due_date, raw_data, created) VALUES ('{$v['user_id']}','{$v['source']}','{$v['source_id']}','{$v['begin_date']}','{$v['due_date']}','".addslashes(json_encode($v['raw_data']))."', NOW())";
                 $this->db->query($sql);
             }
         }

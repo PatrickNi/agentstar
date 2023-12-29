@@ -34,7 +34,9 @@ foreach ($g_user_grants as $item){
 
 # get work experience
 $work_arr = array();
-$work_arr = $o_c->getWorkExpByClient($client_id);
+if ($client_id > 0) {
+	$work_arr = $o_c->getWorkExpByClient($client_id);
+}
 
 # set smarty tpl
 $o_tpl = new Template;

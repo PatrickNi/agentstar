@@ -2,9 +2,10 @@
 require_once('MysqlDB.class.php');
 class LendingAPI extends MysqlDB{
 
-    function LendingAPI($host, $user, $pswd, $database, $debug) {
-    	 $this->MysqlDB($host, $user, $pswd, $database, $debug);
+    function __construct($host, $user, $pswd, $database, $debug) {
+		$this->setDBconf($host, $user, $pswd, $database, $debug);
     }
+
     
     function getCategory(){
     	return array('bank', 'loan broker');

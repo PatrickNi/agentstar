@@ -3,29 +3,48 @@ require_once('MysqlDB.class.php');
 
 class AgentAPI extends MysqlDB {
 
-	function AgentAPI($host, $user, $pswd, $database, $debug) {
-    	 $this->MysqlDB($host, $user, $pswd, $database, $debug);
+	function __construct($host, $user, $pswd, $database, $debug) {
+    	 $this->setDBconf($host, $user, $pswd, $database, $debug);
     }
     
     function _register() {
         $sets['name']    = isset($_REQUEST['name'])? trim($_REQUEST['name']) : '';
+		$sets['name'] = addslashes(iconv('utf-8', 'GBK', (string)trim($sets['name'])));
+
         $sets['web']     = isset($_REQUEST['web'])? trim($_REQUEST['web']) : '';
         $sets['tel']     = isset($_POST['tel'])? trim($_POST['tel']) : "";
         //$sets['fax']     = isset($_POST['t_fax'])? trim($_POST['t_fax']) : "";
         $sets['email']   = isset($_POST['email'])? trim($_POST['email']) : "";
+
         $sets['add']     = isset($_POST['add'])? trim($_POST['add']) : "";
-        $sets['country'] = isset($_POST['country'])? trim($_POST['country']) : 0;
+        $sets['add'] = addslashes(iconv('utf-8', 'GBK', (string)trim($sets['add'])));
+
+		$sets['country'] = isset($_POST['country'])? trim($_POST['country']) : 0;
         $sets['contact'] = isset($_POST['contact'])? trim($_POST['contact']) : "";
+		$sets['contact'] = addslashes(iconv('utf-8', 'GBK', (string)trim($sets['contact'])));
+
         $sets['type']    = isset($_POST['type'])? trim($_POST['type']) : "sub";
-        $sets['note']    = isset($_POST['note'])? trim($_POST['note']) : "";
+        
+		$sets['note']    = isset($_POST['note'])? trim($_POST['note']) : "";
+		$sets['note'] = addslashes(iconv('utf-8', 'GBK', (string)trim($sets['note'])));
+
         $sets['status']  = isset($_POST['status'])? trim($_POST['status']) : 0;
         $sets['city']    = isset($_POST['city'])? trim($_POST['city']) : "";
+		$sets['city'] = addslashes(iconv('utf-8', 'GBK', (string)trim($sets['city'])));
+
         $sets['verify']  = isset($_POST['verify'])? trim($_POST['verify']) : 0;
         $sets['cate']    = isset($_POST['cate'])? trim($_POST['cate']) : '';    
         $sets['uid']  = isset($_POST['uid'])? trim($_POST['uid']) : 0;
+
+
         $sets['wechatid']  = isset($_POST['wechatid'])? trim($_POST['wechatid']) : '';
+		$sets['wechatid'] = addslashes(iconv('utf-8', 'GBK', (string)trim($sets['wechatid'])));
+
         $sets['pos']  = isset($_POST['pos'])? trim($_POST['pos']) : '';
-        $sets['state']  = isset($_POST['state'])? trim($_POST['state']) : '';
+        $sets['pos'] = addslashes(iconv('utf-8', 'GBK', (string)trim($sets['pos'])));
+
+		$sets['state']  = isset($_POST['state'])? trim($_POST['state']) : '';
+		$sets['state'] = addslashes(iconv('utf-8', 'GBK', (string)trim($sets['state'])));
 
         if ($sets['name'] == '' || $sets['email'] == '')
             return array('err'=>1, 'msg'=>'no company name or no email');
@@ -68,7 +87,7 @@ class AgentAPI extends MysqlDB {
     }
     
     function getAgentList($rAgentID=0, $type="", $cate="", $staff_id=0){
-        $sql = "select ID, Name, Country, Contact, Phone, Fax, Email, Address, Note, Form, StatusID, City, Web, isVerify, CATE_NAME, REFCODE, USER_ID, WECHAT_ID, STATE, POSITION from agent ";
+        $sql = "select ID, Name, Country, Contact, Phone, Fax, Email, Address, Note, Form, StatusID, City, Web, isVerify, CATE_NAME, REFCODE, USER_ID, WECHAT_ID, STATE, POSITION,AddDate from agent ";
         if($rAgentID > 0){
             $sql .= "Where ID = {$rAgentID}";
         }elseif($type != ""){
@@ -81,6 +100,9 @@ class AgentAPI extends MysqlDB {
             else
                 $sql .= " AND CATE_NAME = '{$cate}' ";
         }
+		elseif ($type == 'sub'){
+			$sql .= " AND CATE_NAME in ('education','student') ";
+		}
 /*
         if ($staff_id > 0 && $type == 'sub') {
             $sql .= " AND USER_ID = {$staff_id} ";
@@ -111,6 +133,7 @@ class AgentAPI extends MysqlDB {
             $_arr[$this->ID]['wechatid']= $this->WECHAT_ID;
             $_arr[$this->ID]['pos']     = $this->POSITION;
             $_arr[$this->ID]['state']   = $this->STATE;
+			$_arr[$this->ID]['reg_d']   = $this->AddDate;
         }
         return $_arr;
     }
@@ -194,8 +217,8 @@ class AgentAPI extends MysqlDB {
 		foreach ($sets as &$v){
 			$v = addslashes($v);
 		}   
-        $sql = "insert into `geic`.`agent` (Name, Country, Contact, Phone, Email, Address, Note, Form, StatusID, City, Web, isVerify, CATE_NAME, user_id, WECHAT_ID, POSITION, STATE) values " .
-                    "('{$sets['name']}', '{$sets['country']}', '{$sets['contact']}', '{$sets['tel']}', '{$sets['email']}', '{$sets['add']}', '{$sets['note']}', '{$sets['type']}', '{$sets['status']}', '{$sets['city']}', '{$sets['web']}', '{$sets['verify']}', '{$sets['cate']}', '{$sets['uid']}', '{$sets['wechatid']}', '{$sets['pos']}', '{$sets['state']}') ";
+        $sql = "insert into `geic`.`agent` (Name, Country, Contact, Phone, Email, Address, Note, Form, StatusID, City, Web, isVerify, CATE_NAME, user_id, WECHAT_ID, POSITION, STATE, AddDate) values " .
+                    "('{$sets['name']}', '{$sets['country']}', '{$sets['contact']}', '{$sets['tel']}', '{$sets['email']}', '{$sets['add']}', '{$sets['note']}', '{$sets['type']}', '{$sets['status']}', '{$sets['city']}', '{$sets['web']}', '{$sets['verify']}', '{$sets['cate']}', '{$sets['uid']}', '{$sets['wechatid']}', '{$sets['pos']}', '{$sets['state']}', NOW()) ";
         $this->query($sql);
         return $this->getLastInsertID();
     }    
@@ -382,8 +405,10 @@ class AgentAPI extends MysqlDB {
 	
 		$sql = "SELECT ID FROM agent WHERE REFCODE = '{$code}'";
 		$this->query($sql);
-		$this->fetch();
-		return $this->ID;
+		if ($this->fetch() && $this->ID) {
+			return $this->ID;
+		}
+		return 0;
 	}
 
 	function countVisa($agent_id) {

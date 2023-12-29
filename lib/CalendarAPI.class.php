@@ -3,8 +3,8 @@ require_once('MysqlDB.class.php');
 
 class CalendarAPI extends MysqlDB{
     
-    function CalendarAPI($host, $user, $pswd, $database, $debug) {
-         $this->MysqlDB($host, $user, $pswd, $database, $debug);
+    function __construct($host, $user, $pswd, $database, $debug) {
+         $this->setDBconf($host, $user, $pswd, $database, $debug);
     }
     
     function getUserCalendar($rDate, $rUserID){
@@ -53,7 +53,7 @@ class CalendarAPI extends MysqlDB{
 		foreach ($sets as &$v){
 			$v = addslashes($v);
 		}
-        $sql = "insert into calendar (Date, UserID, Time, Title, Duration, Description, FromUserID) values ('{$sets['date']}', {$sets['user']}, '{$sets['hour']}', '{$sets['title']}',  '{$sets['due']}', '{$sets['desc']}', {$user_id})";
+        $sql = "insert into calendar (Date, UserID, Time, Title, Duration, Description, FromUserID, Done) values ('{$sets['date']}', {$sets['user']}, '{$sets['hour']}', '{$sets['title']}',  '{$sets['due']}', '{$sets['desc']}', {$user_id}, '{$sets['done']}')";
         $this->query($sql);
         return $this->getLastInsertID();
     } 

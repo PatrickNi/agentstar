@@ -73,8 +73,8 @@ $pdf->Cell(20, 10, 'Received', 1, 'C');
 $pdf->MultiCell(0, 10, 'Item', 1,'C');
 
 foreach ($o_check->getApp($cl_typ, $cl_appid, false) as  $row) {
-    $title = preg_replace("/(\n){2,}/", "\n", $row['tit']);
-    $title_lines = explode("\n", trim($title));
+    $title = trim(preg_replace("/(\n){2,}/", "\n", $row['tit']));
+    $title_lines = explode("\n", $title);
     $count = count($title_lines);
     foreach ($title_lines as $l) {
         if (round($pdf->GetStringWidth($l)) >= $ln_break)

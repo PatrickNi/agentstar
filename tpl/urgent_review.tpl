@@ -2,12 +2,34 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=gb2312">
 <title>Agent Star -Client Management</title>
-</head>
 <link rel="stylesheet" href="../css/sam.css">
+</head>
+
 <script language="javascript" src="../js/RolloverTable.js"></script>
 <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
 <script language="javascript" src="../js/audit.js"></script>
 {literal}
+<style>
+.dotbadge {
+  display: inline-block;
+  padding: 0.3em 0.3em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: text-top;
+  color: #212529;
+  background-color: red;
+  border-radius: 0.3rem;
+
+  // Empty badges collapse automatically
+  &:empty {
+    display: none;
+  }
+}
+
+</style>
 <script language="javascript">
 	function setSortOrd(col, ord){
 	     var cols = document.getElementById('sort_list').value;
@@ -67,7 +89,7 @@
 
 <table align="center" width="100%"  class="graybordertable" cellpadding="1" cellspacing="1" border="0">
 	<tr><td align="center" class="title" style="font-size:14px; padding:3">
-		Urgent List&nbsp;&nbsp;&nbsp;&nbsp;
+		Todo List&nbsp;&nbsp;&nbsp;&nbsp;
 	   <!--<input type="button" style="font-weight:bold" onClick="printPage();"value="Print">-->
 	</td></tr>
 	{if $ugs.v_service.v eq 1}
@@ -109,22 +131,82 @@
 						<input type="checkbox" name="vdu" value="1" {if $vdu eq 1} checked {/if} onChange="t_view.value='v';form1.submit()"/> ex(0000-00-00)
 					</td>
 				</tr>
+				{assign var="rank" value="0"}
 				{foreach key=id item=arr from=$urgent_arr}
+				{assign var="rank" value=$rank+1}
 				 <tr align="center" class="{cycle values='rowodd,roweven'}">
-					<td width="2%">{$arr.rank}</td>
+					<td width="2%">{$rank}</td>
 				 	<td align="left" nowrap="nowrap">{$arr.name}</td>
 					<td align="left" nowrap="nowrap">{$arr.cate}</td>
 					<td align="left">{$arr.class}</td>
 					<!-- onClick="openModel('client_visa_process.php?pid={$id}&cid={$arr.clientid}&vid={$arr.visaid}',800,560,'NO', 'form1')"-->
-					<td align="left" style="{if $arr.islodge eq 1}color:#FF3300;{elseif stripos($arr.item, 'DHA request') === 0 || stripos($arr.item, 'apply onshore') === 0}color:red;{elseif $arr.isApply eq 1}color:blue;{/if}cursor:pointer; text-decoration:underline" onClick="window.open('client_visa_detail.php?cid={$arr.clientid}&vid={$arr.visaid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$arr.item}</td>
+					<td align="left" style="{if $arr.islodge eq 1}color:#FF3300;{elseif stripos($arr.item, 'DHA request') === 0 || stripos($arr.item, 'apply') === 0}color:red;{elseif $arr.isApply eq 1}color:blue;{/if}cursor:pointer; text-decoration:underline" onClick="window.open('client_visa_detail.php?cid={$arr.clientid}&vid={$arr.visaid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$arr.item}</td>
 					<td nowrap="nowrap">{$slUsers[$arr.auid]}</td>
-					<td nowrap="nowrap">{$slUsers[$arr.vuid]}</td>
-					<td nowrap="nowrap">{$slUsers[$arr.reviewer]}</td>
+					<td nowrap="nowrap">
+						<span {if $arr.is_review eq 2 && $arr.status != 'grant' && $arr.status != 'refused' && stripos($arr.item, 'apply') === 0}style="color:red;"{/if}>{$slUsers[$arr.vuid]}</span>
+					</td>
+					<td nowrap="nowrap" align="left">
+						<span>{$slUsers[$arr.reviewer]}</span>
+					</td>
 					<td nowrap="nowrap" {if $arr.isTodo neq 1}style="color:#660000; font-weight:bold"{/if}>{$arr.due}</td>
 				 </tr>
 				{/foreach}	
 			</table>
-	</td></tr>{/if}
+	</td></tr>
+	{/if}
+	<tr><td class="menu"  align="left" style="cursor:pointer" onClick="trigger_list('vreview',form1,'view_vreview');">
+    		Visa Review List
+			{if $hasReviews}
+				&nbsp;
+				<span class="dotbadge"></span>
+			{/if}
+      </td>
+	</tr>
+	{if $viewWhat eq 'vreview'}
+	<tr id="view_vreview">
+		<td>
+			<table width="100%" cellpadding="1" cellspacing="1" border="0">
+				<tr align="center" class="title">
+					<td width="5%">
+              	        <select name="vUid" onChange="sort_list.value='';t_view.value='vreview';form1.submit();">
+                        {foreach key=user_id item=user_name from=$slUsers}		
+                          <option value="{$user_id}" {if $staffid eq $user_id} selected {/if}>{$user_name}</option>  
+                        {/foreach}
+                        {if $ugs.todo_visa.v eq 1}				
+                          <option value="0" {if $staffid eq '0'} selected {/if}>choose a staff</option>  
+                        {/if}		
+                    </select>
+                    </td>
+					<td align="left" nowrap="nowrap">Client Name</td>		
+					<td align="left" nowrap="nowrap">Category</td>
+					<td align="left">SubClass</td>
+					<td align="left" width="40%">Process</td>
+					<td nowrap="nowrap">Agreement Staff</td>
+					<td nowrap="nowrap">Paperwork</td>
+					<td nowrap="nowrap">Reviewer</td>
+					<td nowrap="nowrap">Due Date</td>
+				</tr>
+				{assign var="rank" value="0"}
+				{foreach key=id item=arr from=$urgent_arr}
+				{assign var="rank" value=$rank+1}
+				 <tr align="center" class="{cycle values='rowodd,roweven'}">
+					<td width="2%">{$rank}</td>
+				 	<td align="left" nowrap="nowrap">{$arr.name}</td>
+					<td align="left" nowrap="nowrap">{$arr.cate}</td>
+					<td align="left">{$arr.class}</td>
+					<td align="left" style="{if $arr.islodge eq 1}color:#FF3300;{elseif stripos($arr.item, 'DHA request') === 0 || stripos($arr.item, 'apply') === 0}color:red;{elseif $arr.isApply eq 1}color:blue;{/if}cursor:pointer; text-decoration:underline" onClick="window.open('client_visa_detail.php?cid={$arr.clientid}&vid={$arr.visaid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$arr.item}</td>
+					<td nowrap="nowrap">{$slUsers[$arr.auid]}</td>
+					<td nowrap="nowrap">{$slUsers[$arr.vuid]}</td>
+					<td nowrap="nowrap" align="left">
+						<span {if $arr.is_review eq 1  && stripos($arr.item, 'review application') === 0}style="color:red;"{/if}>{$slUsers[$arr.reviewer]}</span>
+					</td>
+					<td nowrap="nowrap" {if $arr.isTodo neq 1}style="color:#660000; font-weight:bold"{/if}>{$arr.due}</td>
+				 </tr>
+				{/foreach}	
+			</table>
+		</td>	
+	</tr>
+	{/if}
 	<tr><td class="menu"  align="left" style="cursor:pointer" onClick="trigger_list('vexp',form1,'view_vexp');">
     		Visa Expire List
       </td>
@@ -231,7 +313,7 @@
 	<tr id="view_c"><td>
 			<table width="100%" cellpadding="1" cellspacing="1" border="0">
 				<tr align="left" class="title">
-					<td colspan="8">
+					<td colspan="9">
               	        <select name="cUid" onChange="sort_list.value='';t_view.value='c';form1.submit();">
                         {foreach key=user_id item=user_name from=$slUsers}
                           	<option value="{$user_id}" {if $staffid eq $user_id} selected {/if}>{$user_name}</option>  
@@ -243,6 +325,7 @@
                     </td>
                  </tr>
    				<tr align="center" class="title">
+					<td align="center" width="3%">No.</td>
 					<td align="left" width="100px">Client Name &nbsp;&nbsp;
 						<img src="../images/sort_up.gif" style="cursor:pointer" onClick="t_view.value='c';setSortOrd(1,0);form1.submit();"/>&nbsp;&nbsp;
 						<img src="../images/sort_down.gif" style="cursor:pointer" onClick="t_view.value='c';setSortOrd(1,1);form1.submit();"/>					
@@ -271,13 +354,18 @@
 						<br/><input type="checkbox" name="cdu" value="1" {if $cdu eq 1} checked {/if} onChange="t_view.value='c';form1.submit()"/> ex(0000-00-00)							
 					</td>
 				</tr>
+				{assign var="rank" value="0"}
 				 {foreach key=id item=arr from=$urgent_arr}
 				 <tr align="center" class="{cycle values='rowodd,roweven'}">
+				 	<td align="center">
+						 {assign var="rank" value=$rank+1}
+						 {$rank}
+					</td>
 					<td align="left">{$arr.name}</td>
 					<td align="left">{$arr.school}</td>
 					<td align="left">{$arr.qual}</td>
 					<td align="left">{$arr.major}</td>
-					<td style="cursor:pointer; text-decoration:underline; {if $arr.isColor eq 1}color:#0000FF {elseif $arr.item == 'Add new semester'} color:blue{/if}"  onClick="window.open('client_course_detail.php?cid={$arr.clientid}&courseid={$arr.courseid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$arr.item}</td>
+					<td style="cursor:pointer; text-decoration:underline; {if $arr.isColor eq 1}color:#0000FF {elseif $arr.item == 'Add new semester'} color:blue{elseif $arr.item == 'Pay tuition fee'} color:red{/if}"  onClick="window.open('client_course_detail.php?cid={$arr.clientid}&courseid={$arr.courseid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$arr.item}</td>
 					<td align="center">{$slCourseViewer[$arr.consultant]}</td>
 					<td align="center">{$slCourseViewer[$arr.paperwork]}</td>
 					<td nowrap="nowrap" {if $arr.isTodo neq 1}style="color:#660000; font-weight:bold"{/if}>{$arr.due}</td>

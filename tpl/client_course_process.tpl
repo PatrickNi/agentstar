@@ -62,7 +62,29 @@
 						</select>
 					</td>					
 				</tr>
-			{/if}					
+			{/if}	
+
+          {if $ugs.i_tta.v eq 1 && count($agent_arr) > 0}
+          <tr>
+            <td width="28%" align="left" class="rowodd"><strong>To top-agent :</strong>&nbsp;&nbsp;</td>
+            <td align="left" width="72%" class="roweven">
+              {if $ugs.i_tta.i eq 1 || $ugs.i_tta.m eq 1}
+               <select name="t_agent">
+                	<option value="0" {if $agent_id eq 0 || $agent_id eq ""}selected{/if}>N/A</option>
+					{foreach key=ag_id item=ag_name from=$agent_arr}                        
+                  		<option value="{$ag_id}" {if $ag_id eq $agent_id} selected {/if}>{$ag_name}</option>
+					{/foreach}
+              </select>
+              {else}
+                <input type="hidden" name="t_agent" value="{$agent_id}">
+                {$agent_arr[$agent_id]}
+              {/if}
+            </td>
+          </tr>
+          {else}
+            <input type="hidden" name="t_agent" value="{$agent_id}">
+          {/if}
+
 			<tr>
 				<td width="24%" align="left" class="rowodd"><strong>Detail:</strong>&nbsp;&nbsp;</td>
 				<td align="left" width="76%" class="roweven"><textarea name="t_detail" style="width:300px; height:100px ">{$dt_arr.detail}</textarea></td>

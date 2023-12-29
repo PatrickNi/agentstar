@@ -69,7 +69,7 @@ if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
         if($account_id > 0){
             if (($account_typ == 'visa' && $ugs['v_agf']['m'] == 1) || $account_typ != 'visa') {
                 $o_c->setAccount($account_id, $sets);
-                echo "<script language='javascript'>alert('Updated successfully');if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
+                echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
                 exit;  
             }
             else {
@@ -79,7 +79,7 @@ if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "SAVE"){
         else{
             if (($account_typ == 'visa' && $ugs['v_agf']['i'] == 1) || $account_typ != 'visa') {
                 $o_c->addAccount($user_id, $visa_id, $sets, $account_typ);
-                echo "<script language='javascript'>alert('Added successfully');if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
+                echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
                 exit;  
             }
             else {
