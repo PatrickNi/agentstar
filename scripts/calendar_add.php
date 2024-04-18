@@ -90,12 +90,23 @@ $due_arr = array('30' => "0.5hr" , '60' => "1hr", '90' => "1.5hrs", '120' => "2h
 $hour_arr = array();
 $min_hour = 9;
 $max_hour = 18;
+/*
 $minute   = 30;
 for($i=0; $i<=($max_hour - $min_hour) * 2; $i++){
 	$ht = date("H:i", mktime($min_hour, $minute, 0,0,0,0));
 	$hour_arr[$ht] = $ht;
 	$minute += 30;   
 }
+
+$minute = 0;
+*/
+$time = strtotime("2010-01-01 {$min_hour}:00:00");
+for($i=0; $i<=($max_hour - $min_hour) * 2; $i++){
+	$ht = date("H:i", $time);
+	$hour_arr[$ht] = $ht;
+	$time  += 30*60;   
+}
+
 
 $username = "";
 $date = "";

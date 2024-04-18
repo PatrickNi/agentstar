@@ -122,7 +122,15 @@
         </td>
    </tr>      
    <tr class="roweven">
-		<td align="left" ><ul>Receivable and Paid commission</ul></td>
+		<td align="left" ><ul>Potential commission</ul></td>
+		<td align="left">
+			view&nbsp;<input type="checkbox" name="g_c_pot[]" value="{$grant.c_pot.v}" {if $ugs.c_pot.v eq 1} checked="checked" {/if}>&nbsp;&nbsp;
+			insert&nbsp;<input type="checkbox" name="g_c_pot[]" value="{$grant.c_pot.i}" {if $ugs.c_pot.i eq 1} checked="checked" {/if}>&nbsp;&nbsp;
+			modify&nbsp;<input type="checkbox" name="g_c_pot[]" value="{$grant.c_pot.m}" {if $ugs.c_pot.m eq 1} checked="checked" {/if}>&nbsp;&nbsp;
+		</td>
+   </tr>    
+   <tr class="roweven">
+		<td align="left" ><ul>Received and Paid commission</ul></td>
 		<td align="left">
 			view&nbsp;<input type="checkbox" name="g_c_rev[]" value="{$grant.c_rev.v}" {if $ugs.c_rev.v eq 1} checked="checked" {/if}>&nbsp;&nbsp;
 			modify&nbsp;<input type="checkbox" name="g_c_rev[]" value="{$grant.c_rev.m}" {if $ugs.c_rev.m eq 1} checked="checked" {/if}>&nbsp;&nbsp;
@@ -281,6 +289,12 @@
 			view&nbsp;<input type="checkbox" name="g_i_st[]" value="{$grant.i_st.v}" {if $ugs.i_st.v eq 1} checked="checked" {/if}>&nbsp;&nbsp;
 		</td>
    </tr>  
+   <tr class="roweven">
+		<td align="left" ><ul>Potential commission</ul></td>
+		<td align="left">
+			view&nbsp;<input type="checkbox" name="g_i_rev[]" value="{$grant.i_rev.v}" {if $ugs.i_rev.v eq 1} checked="checked" {/if}>&nbsp;&nbsp;
+		</td>
+   </tr>
    <tr class="roweven">
 		<td align="left" ><ul>Receivable and Paid commission</ul></td>
 		<td align="left">

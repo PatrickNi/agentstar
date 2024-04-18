@@ -16,6 +16,7 @@ if (isset($g_user_grants) && is_array($g_user_grants)) {
     array_push($g_user_grants, 'visa_expire');
     array_push($g_user_grants, 'v_reviewer');
     array_push($g_user_grants, 'a_gpeditcate');
+    array_push($g_user_grants, 'c_pot');
 }
 
 ?>

@@ -3,10 +3,11 @@ require_once('MysqlDB.class.php');
 
 class ReportAPI extends MysqlDB {
 
-    /*function __construct($host, $user, $pswd, $database, $debug) {
+    
+    function __construct($host, $user, $pswd, $database, $debug) {
 		$this->setDBconf($host, $user, $pswd, $database, $debug);
     }
-    */
+    
     function getUrgentVisa($userid, $sort_list, $null_du=1, $page=1, $page_size=50){
 		$_arr = array();
         if ($sort_list != '') {
@@ -110,7 +111,7 @@ class ReportAPI extends MysqlDB {
 			$sql .= " AND a.DueDate <> '0000-00-00' ";	
 
 		if ($userid > 0){
-			$sql .= " AND b.ReviewerID = {$userid}  and b.VUserID <> {$userid}  "; //(b.AUserID = {$userid} or 
+			$sql .= " AND b.ReviewerID = {$userid}  "; //(b.AUserID = {$userid} or 
         }
 		$this->query($sql);
         if ($this->fetch() && $this->cnt > 0) {
@@ -142,7 +143,7 @@ class ReportAPI extends MysqlDB {
 			$sql .= " AND a.DueDate <> '0000-00-00' ";	
 
 		if ($userid > 0){
-			$sql .= " AND b.ReviewerID = {$userid} and b.VUserID <> {$userid} and ExItem is not null "; //(b.AUserID = {$userid} or 
+			$sql .= " AND b.ReviewerID = {$userid} and ExItem is not null "; //(b.AUserID = {$userid} or 
         }
 
 		$sql .= "order by  {$sql_sort}";
@@ -1970,7 +1971,7 @@ class ReportAPI extends MysqlDB {
 		$_arr = array();
         $visa = array();
         while ($this->fetch()) {
-            if (!isset($_arr[$this->Week])){
+            if (!isest($_arr[$this->Week])){
                 $_arr[$this->Week]['cnt'] = 0;
                 $_arr[$this->Week]['total_profit'] = 0;
                 $_arr[$this->Week]['cnt_notpaperwork'] = 0;
@@ -2069,7 +2070,6 @@ class ReportAPI extends MysqlDB {
 				$_arr[$this->Week]['lcnt']++;
 
 				$_arr[$this->Week]['lname'][$_arr[$this->Week]['lcnt']] = $this->Name;
-                $_arr[$this->Week]['lstatus'][$_arr[$this->Week]['lcnt']] = $this->r_Status;
 				$_arr[$this->Week]['lc'   ][$_arr[$this->Week]['lcnt']] = $this->CID;
 				$_arr[$this->Week]['lv'   ][$_arr[$this->Week]['lcnt']] = $this->ID;
                 $visa[$this->ID]['apply'][$this->Week][] = $_arr[$this->Week]['lcnt'];
@@ -2262,8 +2262,7 @@ class ReportAPI extends MysqlDB {
                                 if ($v['profit'] <= 0)
                                     $_arr[$w]['lc_free_0']++;
 
-                                $_arr[$w]['lname_free'][$i] = $_arr[$w]['lname'][$i] .' $'.($v['profit'] - $v['referral']);   
-                                $_arr[$w]['lstatus_free'][$i] = $_arr[$w]['lstatus'][$i];                             
+                                $_arr[$w]['lname_free'][$i] = $_arr[$w]['lname'][$i] .' $'.($v['profit'] - $v['referral']);                                
                             }
                             else { // $v['has_agreement_fee'] > 0
                                 $_arr[$w]['lfee_paid'] += ($v['profit'] - $v['referral']);
@@ -2272,7 +2271,6 @@ class ReportAPI extends MysqlDB {
                                     $_arr[$w]['lc_paid_0']++;
 
                                 $_arr[$w]['lname_paid'][$i] = $_arr[$w]['lname'][$i] .' $'.($v['profit'] - $v['referral']);
-                                $_arr[$w]['lstatus_paid'][$i] = $_arr[$w]['lstatus'][$i]; 
                             }
 
                             //$_arr[$w]['lname'][$i] .= ' $'.$v['profit'];
@@ -2502,7 +2500,6 @@ class ReportAPI extends MysqlDB {
 
 			if (preg_match('/^apply/i', $this->Item)) {
 				$_arr['all']['lname' ][$lodge] = $this->Name;
-                $_arr['all']['lstatus' ][$lodge] = $this->r_Status;
 				$_arr['all']['lc'    ][$lodge] = $this->CID;
 				$_arr['all']['lv'    ][$lodge] = $this->ID; 
                 $visa[$this->ID]['apply'][] = $lodge;
@@ -2621,7 +2618,6 @@ class ReportAPI extends MysqlDB {
                         if ($v['cate'] == 5 && $v['subclass'] != 168 && $v['subclass'] != 53 && $v['subclass'] != 84  && $v['subclass'] != 167  && $v['subclass'] != 31  && $v['subclass'] != 30  && $v['subclass'] != 33  && $v['subclass'] != 210 && $v['subclass'] != 174){
                             $lrev_free += ($v['profit'] - $v['referral']);
                             $_arr['all']['lname_free'][$i] = $_arr['all']['lname'][$i] .' $'.($v['profit'] - $v['referral']);
-                            $_arr['all']['lstatus_free'][$i] = $_arr['all']['lstatus'][$i];
                             $lc_free++;
                             if ($v['profit'] <= 0)
                                 $lc_free_0++;
@@ -2629,7 +2625,6 @@ class ReportAPI extends MysqlDB {
                         else {
                             $lrev_paid += ($v['profit'] - $v['referral']);
                             $_arr['all']['lname_paid'][$i] = $_arr['all']['lname'][$i] .' $'.($v['profit'] - $v['referral']);
-                            $_arr['all']['lstatus_paid'][$i] = $_arr['all']['lstatus'][$i];
                             $lc_paid++;
                             if ($v['profit'] <= 0)
                                 $lc_paid_0++; 

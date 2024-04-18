@@ -222,7 +222,7 @@ if ($isChange == 0 && $course_id > 0 ){
 	}
 }
 
-if ($course_id > 0 && $ugs['c_track']['v'] == 0 && $course_arr[$cateid][$course_id]['consultant'] != $user_id && $course_arr[$cateid][$course_id]['paperwork'] != $user_id) {
+if ($course_id > 0 && $ugs['c_track']['v'] == 0 && $course_arr[$cateid][$course_id]['consultant'] != $user_id) {
 	echo "<script language='javascript'>alert('Access denied!');window.close();</script>";
 	exit;
 }
@@ -250,8 +250,9 @@ $agent_arr = array();
 $agent_arr = $o_a->getAgent('top');
 
 # set smarty tpl
-$o_tpl = new Template;
 
+
+$o_tpl = new Template;
 $o_tpl->assign('process_arr', $process_arr);
 
 $o_tpl->assign('agent_arr', $agent_arr);

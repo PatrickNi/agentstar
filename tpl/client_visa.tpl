@@ -64,6 +64,7 @@
 		<td class="border_1">Grant Date</td>
 		<td class="border_1">Agreement Staff</td>
 		<td class="border_1">Visa Paperwork</td>
+		<td class="border_1">Biz invoice issued </td>
 	</tr>
 	{foreach key=id item=arr from=$visa_arr}
 	<tr align="center" class="roweven" >
@@ -76,7 +77,10 @@
 		<td class="border_1">{if array_key_exists($id, $procs)}{$procs[$id].lodge}{/if}</td>
 		<td class="border_1">{if array_key_exists($id, $procs) && $procs[$id].grant != ""}{$procs[$id].grant}{else}{$arr.status}{/if}</td>
 		<td class="border_1">{$user_arr[$arr.auser]}</td>
-		<td class="border_1">{$user_arr[$arr.vuser]}</td>						
+		<td class="border_1">{$user_arr[$arr.vuser]}</td>
+		<td class="border_1">
+			{if array_key_exists($id, $procs) && $procs[$id].issue != "" && ($user_pos == 'M' || $user_pos == 'C')}{$procs[$id].issue}{/if}
+		</td>						
 	</tr>
 	{/foreach}
 </table>

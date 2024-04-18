@@ -26,7 +26,6 @@ foreach ($g_user_grants as $item){
 	}
 }
 
-
 $taskArr = $o_func->getReceiveTask(0, $user_id);
 
 

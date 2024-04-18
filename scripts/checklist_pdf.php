@@ -86,5 +86,6 @@ foreach ($o_check->getApp($cl_typ, $cl_appid, false) as  $row) {
     $pdf->MultiCell(0,10, $title,1,'L');
 }
 
-$pdf->Output();
+$file_name = $client['fname'].'-'. $client['lname'].'-'.$cl_typ.'-'.$cl_appid.'-'.date('Ymd').'.pdf';
+$pdf->Output($file_name, 'I');
 ?>

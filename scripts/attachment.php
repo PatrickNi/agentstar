@@ -1,6 +1,4 @@
 <?php
-ini_set("display_errors", 1);
-error_reporting(2047);
 require_once('../etc/const.php');
 require_once(__LIB_PATH.'Template.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
@@ -37,7 +35,6 @@ if ($itemtype != "") {
 		}	
 	}
 }
-
 
 if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "UPLOAD"){
 	if($filetmp == ""){
@@ -102,7 +99,6 @@ if (isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "UPLOAD"){
 }
 
 $files = $o_g->getAttachment($itemid, $itemtype);
-
 # set smarty tpl
 $o_tpl = new Template;
 $o_tpl->assign('files', $files);

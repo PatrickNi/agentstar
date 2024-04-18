@@ -204,7 +204,7 @@
                 </select>
               {else}
                 <input type="hidden" name="t_vms" value="{$dt_arr.vms}">
-                {$dt_arr.vms|ucfirst}
+                {$dt_arr.vms|capitalize}
               {/if}
             </td>
           </tr>

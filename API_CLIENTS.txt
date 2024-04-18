@@ -34,6 +34,9 @@ t_email: 为必填字段
 更新：2021-07-21
 
 
-curl -X POST -d "t_email=pani1234@test.com&t_lname=Pani222&t_fname=Pani222&t_phone=1341513415&t_ctype=study&t_about=Web%20Popup" "http://110.143.32.230:8080/dataapi/reg.php?token=a74613df87c11d04519fb0ee4225c800&reg=2"
+curl -X POST -d "t_email=pani1234@test.com&t_lname=Pani222&t_fname=Pani222&t_phone=1341513415&t_ctype=study&t_about=Web%20Popup" "https://agentstar.geic.com.au/dataapi/reg.php?token=a74613df87c11d04519fb0ee4225c800&reg=2"
 
 &
+
+
+curl -X POST -d "t_email=pani1234@test.com&t_lname=Pani222&t_fname=Pani222&t_phone=1341513415&t_ctype=study&t_about=Web%20Popup" "https://agentstar.geic.com.au/dataapi/reg.php?token=a74613df87c11d04519fb0ee4225c800&reg=2"

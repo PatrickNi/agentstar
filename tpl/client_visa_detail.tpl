@@ -280,7 +280,7 @@
 							<td align="right">{$arr.gst_3rd|string_format:"%.2f"}</td>
 							<td align="right"><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_spand.php?aid={$id}','_blank', 'alwaysRaised=yes,height=500,width=800,location=no,scrollbars=yes')">{$arr.spand|string_format:"%.2f"}</span></td>
 							<td align="right">
-								{$arr.paid-$arr.spand|string_format:"%.2f"}	
+								{($arr.paid-$arr.spand)|string_format:"%.2f"}	
 							</td>
 							<td align="right">
 								{if $arr.gst > 0}
@@ -299,7 +299,7 @@
 							<!--
 							<td align="right">
 								{if $arr.step != 'app'}
-									{$arr.dueamt-$arr.gst-dueamt_3rd+$arr.gst_3rd|string_format:"%.2f"}
+									{($arr.dueamt-$arr.gst-dueamt_3rd+$arr.gst_3rd)|string_format:"%.2f"}
 									{assign var="agreement_profit" value=$agreement_profit+$arr.dueamt-$arr.gst-dueamt_3rd+$arr.gst_3rd}
 								{else}
 									0.00
@@ -307,7 +307,7 @@
 							</td>
 							<td align="right">
 								{if $arr.step != 'app'}
-									{$arr.paid-$arr.gst-$arr.spand+$arr.gst_3rd|string_format:"%.2f"}
+									{($arr.paid-$arr.gst-$arr.spand+$arr.gst_3rd)|string_format:"%.2f"}
 									{assign var="paperwork_profit" value=$paperwork_profit+$arr.paid-$arr.gst-$arr.spand+$arr.gst_3rd}
 								{else}
 									0.00
@@ -318,7 +318,7 @@
 						{/foreach}
 						<tr align="center" class="roweven">
 							<td align="right"><strong>Total Due:</strong></td>
-							<td align="right"><strong>{$total_dueamt-$total_received|string_format:"%.2f"}</strong></td>
+							<td align="right"><strong>{($total_dueamt-$total_received)|string_format:"%.2f"}</strong></td>
 							<td align="right" colspan="7"><strong>Total:</strong></td>
 							<td align="right"><strong>{$total_profit|string_format:"%.2f"}</strong></td>
 						</tr>	
@@ -328,7 +328,7 @@
 						</tr>						
 						<tr align="center" class="roweven">
 							<td colspan="11" align="center">
-								{if $vid > 0}        
+								{if $vid > 0 && ($dt_arr.adate neq '' && $dt_arr.adate neq '0000-00-00')}        
 									<input type="button" value="Add new" onclick="window.open('client_account_detail.php?cid={$cid}&vid={$vid}&typ=visa','_blank', 'alwaysRaised=yes,height=500,width=800,location=no,scrollbars=yes')" />
 								{else}
 									<span id='btn_payment'></span>
@@ -401,6 +401,7 @@
 	$('#t_first').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });
 	$('#t_adate').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });
 
+	init_href = window.location.href;
     function save_visa(obj,close_w){
         $('#bt_name').val('save');
         btn_n = $(obj).val();
@@ -411,7 +412,8 @@
             rtn = $.parseJSON(data);
             
             $(obj).val(btn_n);
-            if (rtn.id > 0) {
+/*
+			if (rtn.id > 0) {
                 $('#vid').val(rtn.id);
 				$('#cl_appid').val(rtn.id);
 			    $('#btn_payment').html('<input type="button" value="Add new" onclick="window.open(\''+rtn.btn_payment+'\',\'_blank\', \'alwaysRaised=yes,height=500,width=800,location=no,scrollbars=yes\')">');
@@ -419,13 +421,13 @@
 				do_checklist('');
 			}
             else {
-                alert(rtn.msg);
-                return false;
+                
             }
-
-            if (rtn.msg != 'Save OK')
-                close_w = false
-            
+*/
+			if (rtn.id == 0) {
+				alert(rtn.msg);
+                return false;
+			}
             if (close_w) {
                 if(window.opener && !window.opener.closed){
                     window.opener.location.reload(true);
@@ -433,14 +435,13 @@
                 window.close();
             }
             else{
-                alert(rtn.msg);
-				return false;
-				/*
-                if (rtn.id > 0) 
-                  window.location.href = window.location.href + '&vid=' + rtn.id;    
-                else
-                  window.location.reload(); 
-				  */   
+                if (init_href.indexOf('&vid=' + rtn.id) == -1){
+			window.location.href = init_href + '&vid=' + rtn.id;  
+		}
+		else {
+			window.location.href = init_href;
+		}  
+
             }
         });
     }
@@ -468,4 +469,4 @@
 	}
     do_checklist('');
 </script>
-{/literal}	
+{/literal}

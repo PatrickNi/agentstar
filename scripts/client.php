@@ -6,8 +6,8 @@ require_once(__LIB_PATH.'GeicAPI.class.php');
 require_once(__LIB_PATH.'pagedivide.class.php');
 require_once(__LIB_PATH.'ExportAPI.class.php');
 
-ini_set("display_errors", 1);
-error_reporting(2047);
+//ini_set("display_errors", 1);
+//error_reporting(2047);
 $user_id = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
 if (!($user_id > 0)) {
 	echo "<script language='javascript'>parent.location.href='index.php';</script>";

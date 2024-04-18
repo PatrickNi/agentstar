@@ -71,6 +71,7 @@ $o_tpl->assign('cid', $client_id);
 $o_tpl->assign('vid', $visa_id);
 $o_tpl->assign('client', $client_arr);
 $o_tpl->assign('client_type', $o_c->getClientType($client_id));
+$o_tpl->assign('user_pos', $o_g->getUserPosition($user_id));
 $o_tpl->assign('ugs', $ugs);
 
 # get user position

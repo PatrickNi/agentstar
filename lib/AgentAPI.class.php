@@ -217,7 +217,7 @@ class AgentAPI extends MysqlDB {
 		foreach ($sets as &$v){
 			$v = addslashes($v);
 		}   
-        $sql = "insert into `geic`.`agent` (Name, Country, Contact, Phone, Email, Address, Note, Form, StatusID, City, Web, isVerify, CATE_NAME, user_id, WECHAT_ID, POSITION, STATE, AddDate) values " .
+        $sql = "insert into `agent` (Name, Country, Contact, Phone, Email, Address, Note, Form, StatusID, City, Web, isVerify, CATE_NAME, user_id, WECHAT_ID, POSITION, STATE, AddDate) values " .
                     "('{$sets['name']}', '{$sets['country']}', '{$sets['contact']}', '{$sets['tel']}', '{$sets['email']}', '{$sets['add']}', '{$sets['note']}', '{$sets['type']}', '{$sets['status']}', '{$sets['city']}', '{$sets['web']}', '{$sets['verify']}', '{$sets['cate']}', '{$sets['uid']}', '{$sets['wechatid']}', '{$sets['pos']}', '{$sets['state']}', NOW()) ";
         $this->query($sql);
         return $this->getLastInsertID();

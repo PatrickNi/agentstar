@@ -109,7 +109,7 @@
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:300px" id="d1_{$week}">
         <ul>
           {foreach key=id item=name from=$courses[$week].name_new}
-          <li><span style="text-decoration:underline; cursor:pointer; {if $courses[$week].apo.$id eq 0}color:#0000FF{elseif $courses[$week].num.$id eq $courses[$week].refuse.$id}color:red;{/if}" onClick="window.open('client_course.php?cid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
+          <li><span style="text-decoration:underline; cursor:pointer; {if $courses[$week].apo.$id eq 0}color:#0000FF{elseif $courses[$week].num.$id eq $courses[$week].refuse.$id}color:#999999;{/if}" onClick="window.open('client_course.php?cid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
             {/foreach}
         </ul>
         <span style="font-size:16px; font-weight:bolder; cursor:pointer;" onClick="d1_{$week}.style.display='none'">&times;</span> 
@@ -118,7 +118,7 @@
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:300px" id="d1_all_{$week}">
         <ul>
           {foreach key=id item=name from=$courses[$week].name}
-          <li><span style="text-decoration:underline; cursor:pointer; {if $courses[$week].apo.$id eq 0}color:#0000FF{elseif $courses[$week].num.$id eq $courses[$week].refuse.$id}color:red;{/if}" onClick="window.open('client_course.php?cid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
+          <li><span style="text-decoration:underline; cursor:pointer; {if $courses[$week].apo.$id eq 0}color:#0000FF{elseif $courses[$week].num.$id eq $courses[$week].refuse.$id}color:#999999;{/if}" onClick="window.open('client_course.php?cid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
             {/foreach}
         </ul>
         <span style="font-size:16px; font-weight:bolder; cursor:pointer;" onClick="d1_all_{$week}.style.display='none'">&times;</span> 
@@ -136,7 +136,7 @@
               <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:500px" id="d2_{$week}_{$cateidx}">
                 <ul>
                   {foreach key=id item=name from=$courseprocs[$week].aponame.$catename}
-                  <li><span style="text-decoration:underline; cursor:pointer; {if $courseprocs[$week].reo.$catename.$id eq 0}color:#0000FF{elseif $courseprocs[$week].reo_st.$catename.$id eq -1}color:red;{/if}" onClick="window.open('client_course_detail.php?cid={$courseprocs.$week.apocid.$catename.$id}&courseid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
+                  <li><span style="text-decoration:underline; cursor:pointer; {if $courseprocs[$week].reo.$catename.$id eq 0}color:#0000FF{elseif $courseprocs[$week].reo_st.$catename.$id eq -1}color:#999999;{/if}" onClick="window.open('client_course_detail.php?cid={$courseprocs.$week.apocid.$catename.$id}&courseid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
                     {/foreach}
                 </ul>
                 <span style="font-weight:bolder; cursor:pointer;" onClick="d2_{$week}_{$cateidx}.style.display='none'">&times;</span> 
@@ -154,7 +154,7 @@
               <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:500px" id="d3_{$week}_{$cateidx}">
               <ul>
                 {foreach key=id item=name from=$courseprocs[$week].reoname.$catename}
-                <li><span style="text-decoration:underline; cursor:pointer; {if $courseprocs[$week].reo_st.$catename.$id eq 0}color:#0000FF{elseif $courseprocs[$week].reo_st.$catename.$id eq -1}color:red;{/if}" onClick="window.open('client_course_detail.php?cid={$courseprocs[$week].reocid.$catename.$id}&courseid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
+                <li><span style="text-decoration:underline; cursor:pointer; {if $courseprocs[$week].reo_st.$catename.$id eq 0}color:#0000FF{elseif $courseprocs[$week].reo_st.$catename.$id eq -1}color:#999999;{/if}" onClick="window.open('client_course_detail.php?cid={$courseprocs[$week].reocid.$catename.$id}&courseid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
                   {/foreach}
               </ul>
               <span style="font-weight:bolder; cursor:pointer;" onClick="d3_{$week}_{$cateidx}.style.display='none'">&times;</span> 
@@ -332,14 +332,14 @@
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d8_free_{$week}">
         <ul>
           {foreach key=id item=name from=$visaprocs[$week].lname_free}
-          <li><span style="text-decoration:underline; cursor:pointer;{if $visaprocs.$week.lstatus_paid.$id != "grant" && $visaprocs.$week.lstatus_paid.$id != "refused"}color:#0000CC;{elseif $visaprocs.$week.lstatus_paid.$id == "refused"}color:red;{/if}" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.lc.$id}&vid={$visaprocs.$week.lv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name} - {$visaprocs.$week.lstatus_free.$id}</span> {/foreach}
+          <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.lc.$id}&vid={$visaprocs.$week.lv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="d8_free_{$week}.style.display='none'">&times;</span> </div>
 
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d8_paid_{$week}">
         <ul>
           {foreach key=id item=name from=$visaprocs[$week].lname_paid}
-          <li><span style="text-decoration:underline; cursor:pointer; {if $visaprocs.$week.lstatus_paid.$id != "grant" && $visaprocs.$week.lstatus_paid.$id != "refused"}color:#0000CC;{elseif $visaprocs.$week.lstatus_paid.$id == "refused"}color:red;{/if}" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.lc.$id}&vid={$visaprocs.$week.lv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
+          <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.lc.$id}&vid={$visaprocs.$week.lv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="d8_paid_{$week}.style.display='none'">&times;</span> </div>
     </td>  

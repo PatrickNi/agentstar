@@ -4,6 +4,7 @@ error_reporting(2047);
 
 require_once '../etc/const.php';
 require_once '../lib/MysqlDB.class.php';
+header('Content-Type: text/html');
 
 try {
 

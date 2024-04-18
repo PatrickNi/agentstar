@@ -14,7 +14,7 @@ if (!($user_id > 0)) {
 
 
 # get date and uid
-$date    = isset($_REQUEST['t_date'])? trim($_REQUEST['t_date']) : date("Y-m-d", mktime());
+$date    = isset($_REQUEST['t_date'])? trim($_REQUEST['t_date']) : date("Y-m-d", gmmktime());
 $uid     = isset($_REQUEST['t_user'])? trim($_REQUEST['t_user']) : 0;
 $hour    = isset($_REQUEST['t_hour'])? trim($_REQUEST['t_hour']) : 0;
 $cal_id  = isset($_REQUEST['id'])? trim($_REQUEST['id']) : 0;
@@ -33,11 +33,28 @@ if (count($calendar_arr) > 0){
 	$is_date = 1;
 }
 
+/*
 
 $show_arr = array();
 $minute = 0;
 for($i=0; $i<=($max_hour - $min_hour) * 2; $i++){
-	$ht = date("H:i", mktime($min_hour, $minute, 0,0,0,0));
+        $ht = date("H:i", gmmktime($min_hour, $minute, 0,0,0,0));
+        $show_arr[$ht]['id']    = "";
+        $show_arr[$ht]['title'] = "";
+        $show_arr[$ht]['desc']  = "";
+        $show_arr[$ht]['due']   = "";
+        $show_arr[$ht]['done']  = "";
+        $show_arr[$ht]['over']  = 0;
+        $show_arr[$ht]['coach'] = 0;
+        $minute += 30;   
+}
+*/
+
+$show_arr = array();
+$minute = 0;
+$time = strtotime("2010-01-01 {$min_hour}:00:00");
+for($i=0; $i<=($max_hour - $min_hour) * 2; $i++){
+	$ht = date("H:i", $time);
 	$show_arr[$ht]['id']    = "";
 	$show_arr[$ht]['title'] = "";
 	$show_arr[$ht]['desc']  = "";
@@ -45,7 +62,7 @@ for($i=0; $i<=($max_hour - $min_hour) * 2; $i++){
 	$show_arr[$ht]['done']  = "";
 	$show_arr[$ht]['over']  = 0;
 	$show_arr[$ht]['coach'] = 0;
-	$minute += 30;   
+	$time  += 30*60;   
 }
 
 foreach($calendar_arr as $id => $v){
@@ -59,7 +76,9 @@ foreach($calendar_arr as $id => $v){
 			$tmp_arr = explode(":", $v['hour']);
 			$mode = round($v['due'] / 30) - 1;
 			for ($i=1;$i <= $mode; $i++){
-				$ht = date("H:i", mktime($tmp_arr[0], $tmp_arr[1]+ ($i*30), 0,0,0,0));
+				$time = strtotime("2010-01-01 {$tmp_arr[0]}:{$tmp_arr[1]}:00")+($i*30*60);
+				$ht = date("H:i", $time);
+				//$ht = date("H:i", gmmktime($tmp_arr[0], $tmp_arr[1]+ ($i*30), 0,0,0,0));
 				if (array_key_exists($ht, $show_arr)){
 					$show_arr[$ht]['over']  = 1;
 					$show_arr[$ht]['done']  = $v['done'];
@@ -86,7 +105,9 @@ foreach ($coaches as $id => $v) {
 			$tmp_arr = explode(":", $v['starttime']);
 			$mode = round($v['duehour'] / 30) - 1;
 			for ($i=1;$i <= $mode; $i++){
-				$ht = date("H:i", mktime($tmp_arr[0], $tmp_arr[1]+ ($i*30), 0,0,0,0));
+				$time = strtotime("2010-01-01 {$tmp_arr[0]}:{$tmp_arr[1]}:00")+($i*30*60);
+				$ht = date("H:i", $time);
+				//$ht = date("H:i", mktime($tmp_arr[0], $tmp_arr[1]+ ($i*30), 0,0,0,0));
 				if (array_key_exists($ht, $show_arr)){
 					$show_arr[$ht]['over']  = 1;
 					$show_arr[$ht]['coach']  = '/scripts/client_coach_detail.php?cid='.$v['cid'].'&coachid='.$id;

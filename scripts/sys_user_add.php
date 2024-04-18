@@ -34,6 +34,8 @@ $user_startdate  = isset($_POST['u_startdate'])? trim($_POST['u_startdate']) : "
 $user_leavedate  = isset($_POST['u_leavedate'])? trim($_POST['u_leavedate']) : "0000-00-00";
 $user_department  = isset($_POST['u_department'])? trim($_POST['u_department']) : "";
 $user_department_rank = isset($_POST['u_department_rank'])? trim($_POST['u_department_rank']) : 0;
+$user_remote_access = isset($_POST['u_remote_access'])? trim($_POST['u_remote_access']) : 0;
+
 
 if(isset($_POST['qflag']) && strtoupper($_POST['qflag']) == "NEW"){	
 	$o_f->addUser($user_name, $user_pswd, $user_email, $user_mobile, $user_phone, $user_add, $user_pos, $user_mark, $user_adv, $user_startdate,$user_leavedate, $user_department, $user_department_rank);
@@ -43,7 +45,7 @@ if(isset($_POST['qflag']) && strtoupper($_POST['qflag']) == "NEW"){
 
 
 if($user_id > 0 && isset($_POST['qflag']) && strtoupper($_POST['qflag']) == "EDIT"){
-	$o_f->setUser($user_id, $user_name, $user_pswd, $user_email, $user_mobile, $user_phone, $user_add, $user_pos, $user_mark, $user_adv, $user_startdate, $user_leavedate, $user_department, $user_department_rank);
+	$o_f->setUser($user_id, $user_name, $user_pswd, $user_email, $user_mobile, $user_phone, $user_add, $user_pos, $user_mark, $user_adv, $user_startdate, $user_leavedate, $user_department, $user_department_rank,$user_remote_access);
 	echo "<script language='javascript'>self.location.href='sys_user.php';</script>";
 	exit;
 }
@@ -67,6 +69,7 @@ if($user_id > 0){
 		$user_leavedate = $user_arr[$user_id]['leavedate'];
 		$user_department = $user_arr[$user_id]['department'];
 		$user_department_rank = $user_arr[$user_id]['department_rank'];
+		$user_remote_access = $user_arr[$user_id]['remote_access'];
 	}
 	$_tag = "Edit";
 }else{
@@ -186,7 +189,11 @@ if($user_id > 0){
 	<tr>
 		<td align="left"><strong>Division in Department: </strong>&nbsp;&nbsp;</td>
 		<td align="left" width="86%"><input type="text" size="30" name="u_department_rank" value="<?php echo $user_department_rank;?>"></td>
-	</tr>					
+	</tr>	
+	<tr>
+		<td align="left"><strong>Remote Access </strong>&nbsp;&nbsp;</td>
+		<td align="left" width="86%"><input type="text" size="30" name="u_remote_access" value="<?php echo $user_remote_access;?>"></td>
+	</tr>				
 	<tr>
 		<td class="title" colspan="2" align="center">			
 			<input type="submit" style="font-weight:bold;" value="<?php echo $_tag;?>">&nbsp;&nbsp;

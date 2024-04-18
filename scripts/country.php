@@ -17,15 +17,13 @@ $group_arr = array();
 switch($button){
 	case "SAVE":
 		$o_c->addCountry($en_co, $zh_co, $coid);
-		echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
-		exit;	
+		echo "<script language='javascript'>window.returnValue=1;self.close();</script>";
 		break;
 	case "DELETE":
 		if ($stid > 0){
 			$o_c->delCountry($id);
 		}
-		echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
-		exit;
+		echo "<script language='javascript'>window.returnValue=1;self.close();</script>";
 		break;
 	default:
 		break;

@@ -47,7 +47,7 @@ elseif(isset($_POST['bt_name']) && strtoupper($_POST['bt_name']) == "TRANSFER"){
 		echo "<script language='javascript'>alert('".$rtn['msg']."');</script>";
 	}
 	else {
-		echo "<script language='javascript'>alert('".$rtn."');window.returnValue=1;self.close();</script>";
+		echo "<script language='javascript'>alert('".$rtn['msg']."');window.returnValue=1;self.close();</script>";
 		
 	}	
 }

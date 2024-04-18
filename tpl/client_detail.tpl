@@ -16,36 +16,37 @@
     <tr align="left"  class="bordered_2">
       <td colspan="2"> {if $ugs.b_service.v eq 1}
         <input name="button" type="button" disabled style="font-weight:bold;" onClick="javascript:this.form.action='client_detail.php';this.form.submit();" value="Client Detail">
-        <input name="button2" type="button" style="font-weight:bold;" onClick="javascript:this.form.action='client_qual.php';this.form.submit();" value="EDU Background">
+        <input name="button" type="button" style="font-weight:bold;" onClick="window.location.href='/scripts/client_qual.php?cid={$cid}'" value="EDU Background">
         &nbsp;&nbsp;
-        <input name="button" type="button" style="font-weight:bold;" onClick="javascript:this.form.action='client_ielts.php';this.form.submit();" value="IETLS">
+        <input name="button" type="button" style="font-weight:bold;" onClick="window.location.href='/scripts/client_ielts.php?cid={$cid}'" value="IETLS">
         &nbsp;&nbsp;&nbsp;&nbsp;
-        <input name="button" type="button" style="font-weight:bold;" onClick="javascript:this.form.action='client_workexp.php';this.form.submit();" value="Working experience">
+        <input name="button" type="button" style="font-weight:bold;" onClick="window.location.href='/scripts/client_workexp.php?cid={$cid}'" value="Working experience">
         &nbsp;&nbsp;
         <input style="font-weight:bold;" type="button" value="Service" onClick="javascript:this.form.action='client_service.php';this.form.submit();">
         &nbsp;&nbsp;
         {/if}
         {if in_array('study', $client_type) && $ugs.c_service.v eq 1}
-        <input name="button" type="button" style="font-weight:bold;" onClick="javascript:this.form.action='client_course.php';this.form.submit();" value="Apply course">
+
+        <input name="button" type="button" style="font-weight:bold;" onClick="window.location.href='/scripts/client_course.php?cid={$cid}'" value="Apply course">
         &nbsp;&nbsp; 
         {/if} 
         {if in_array('immi', $client_type) && $ugs.v_service.v eq 1}
-        <input name="button" type="button" style="font-weight:bold;" onClick="javascript:this.form.action='client_visa.php';this.form.submit();" value="Visa service">
+        <input name="button" type="button" style="font-weight:bold;" onClick="window.location.href='/scripts/client_visa.php?cid={$cid}'" value="Visa service">
         &nbsp;&nbsp; 
         {/if} 
         {if in_array('coach', $client_type)}
-        <input name="button" type="button" style="font-weight:bold;" onClick="javascript:this.form.action='client_coach.php';this.form.submit();" value="Coach Service">
+        <input name="button" type="button" style="font-weight:bold;" onClick="window.location.href='/scripts/client_coach.php?cid={$cid}'" value="Coach Service">
         &nbsp;
         {/if}
         {if in_array('homeloan', $client_type)}
-        <input name="button" type="button" style="font-weight:bold;" onClick="javascript:this.form.action='client_homeloan.php';this.form.submit();" value="Home Loan">
+        <input name="button" type="button" style="font-weight:bold;" onClick="window.location.href='/scripts/client_homeloan.php?cid={$cid}'" value="Home Loan">
         &nbsp;&nbsp; 
         {/if}
         {if in_array('legal', $client_type)}
-        <input name="button" type="button" style="font-weight:bold;" onClick="javascript:this.form.action='client_legal.php';this.form.submit();" value="Legal Service">
+        <input name="button" type="button" style="font-weight:bold;" onClick="window.location.href='/scripts/client_legal.php?cid={$cid}'" value="Legal Service">
         &nbsp;&nbsp; 
         {/if}  
-        <input name="button" type="button" style="font-weight:bold;" onClick="javascript:this.form.action='client_coupon.php';this.form.submit();" value="Coupons">
+        <input name="button" type="button" style="font-weight:bold;" onClick="window.location.href='/scripts/client_coupon.php?cid={$cid}'" value="Coupons">
         &nbsp;&nbsp;
       </td>
     </tr>
@@ -179,8 +180,7 @@
                               {/if}
                           
                   
-                </select>        &nbsp;&nbsp;&nbsp; <span style="cursor:pointer; font-weight:bolder; text-decoration:underline; color:#0066FF" onClick="window.open('/scripts/country.php','_blank', 'alwaysRaised=yes,height=300,width=300,location=no,scrollbars=yes')">add new country</span>
-                </td>
+                </select>        &nbsp;&nbsp;&nbsp; <span style="cursor:pointer; font-weight:bolder; text-decoration:underline; color:#0066FF" onClick="window.open('/scripts/country.php','_blank', 'alwaysRaised=yes,height=300,width=300,location=no,scrollbars=yes')">add new country</span></td>
               </tr>
               <tr>
                 <td width="28%"  align="left" class="rowodd"><strong>Input Date:</strong>&nbsp;&nbsp;</td>
@@ -243,7 +243,7 @@
               </tr>
               <tr>
                 <td width="28%"  align="left" class="rowodd"><strong>Client Type:</strong>&nbsp;&nbsp;</td>
-                <td align="left" width="72%" class="roweven">
+                <td align="left" width="72%" class="roweven"> 
                   {foreach key=id item=t from=$all_types}
                       <input type="checkbox" name="t_type[]" value="{$t}" {if in_array($t, $arr.type)} checked {/if}>{$id}&nbsp;&nbsp;
                   {/foreach}

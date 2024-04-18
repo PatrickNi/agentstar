@@ -41,8 +41,8 @@ foreach ($g_user_grants as $item){
 }
 
 //If agreement staff is Grace :uid = 3 or Angela : uid = 88, set the reivewer to them
-if ($sets['reviewer'] == 0 && ($sets['auser'] == 3 || $sets['auser'] == 88) ) {
-	$sets['reviewer'] = $sets['auser'];
+if ($sets['reviewer'] == 0 && ($sets['auser'] == 3 || $sets['auser'] == 88 || $sets['auser'] == 112) ) {
+	$sets['reviewer'] = $sets['auser'] == 112? 3 : $sets['auser'];
 }
 
 
@@ -145,7 +145,7 @@ if (isset($_POST['bt_name']) && stripos($_POST['bt_name'], "SAVE") !== false){
 						   'id'=>$visa_id,
 						   'btn_payment' =>"/scripts/client_account_detail.php?cid={$client_id}&vid={$visa_id}&typ=visa",
 						   'btn_process' => "/scripts/client_visa_process.php?cid={$client_id}&vid={$visa_id}&isNew=1"
-							));
+						));
     exit;
 }elseif (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "DELETE"){
 	$o_c->delApplyVisaByID($visa_id);
@@ -279,3 +279,4 @@ $o_tpl->assign('show_checklist', 1);
 $o_tpl->display('client_visa_detail.tpl'); 
 
 ?>
+

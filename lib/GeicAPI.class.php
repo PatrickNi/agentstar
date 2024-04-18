@@ -5,9 +5,9 @@ class GeicAPI extends MysqlDB {
 
     private $user_orders = array(29,3,86,37,79,80,58,67,57,81,84,82,50);
 
-    function __construct($host, $user, $pswd, $database, $debug) {
-		$this->setDBconf($host, $user, $pswd, $database, $debug);
-    }
+  //  function __construct($host, $user, $pswd, $database, $debug) {
+//		$this->setDBconf($host, $user, $pswd, $database, $debug);
+ //   }
 
     
     function getUserActive($user_id=0){
@@ -175,7 +175,7 @@ class GeicAPI extends MysqlDB {
 
 
 	function getUserList($rUserID=0, $leave=false){
-		$sql = "Select ID, UserName, UserPassword, Position, Email, Mobile, Telephone, Address, Mark, Advance, StartDate, LeaveDate, Department, DepartmentRank from sys_user WHere 1 ";
+		$sql = "Select ID, UserName, UserPassword, Position, Email, Mobile, Telephone, Address, Mark, Advance, StartDate, LeaveDate, Department, DepartmentRank, RemoteAccess from sys_user WHere 1 ";
 		if($rUserID > 0){
 			$sql .= " And ID = {$rUserID}";
 		}
@@ -201,6 +201,7 @@ class GeicAPI extends MysqlDB {
             $_arr[$this->ID]['leavedate']    = $this->LeaveDate;
 			$_arr[$this->ID]['department']    = $this->Department;
 			$_arr[$this->ID]['department_rank']    = $this->DepartmentRank;
+			$_arr[$this->ID]['remote_access']    = $this->RemoteAccess;
 
 		}
 		return $_arr;
@@ -278,7 +279,7 @@ class GeicAPI extends MysqlDB {
  	}
  	
 
-	function setUser($rUserID, $rName, $rPassword, $rEmail, $rMobile, $rPhone, $rAddress, $rPosition, $rMark, $rAdv, $rStartDate, $rLeaveDate, $rDepartment="", $rDepartmentRank=0){
+	function setUser($rUserID, $rName, $rPassword, $rEmail, $rMobile, $rPhone, $rAddress, $rPosition, $rMark, $rAdv, $rStartDate, $rLeaveDate, $rDepartment="", $rDepartmentRank=0,$rRemoteAccess=0){
     	$rName 		= addslashes($rName);
     	$rPassword 	= addslashes($rPassword);
     	$rEmail 	= addslashes($rEmail);
@@ -290,8 +291,9 @@ class GeicAPI extends MysqlDB {
         $rLeaveDate = addslashes($rLeaveDate);	
 		$rDepartment = addslashes($rDepartment);
 		$rDepartmentRank = addslashes($rDepartmentRank);
+		$rRemoteAccess = addslashes($rRemoteAccess);
 
-		$sql = "Update sys_user SET UserName = '{$rName}', UserPassword = '{$rPassword}', Position = '{$rPosition}', Email = '{$rEmail}', Mobile = '{$rMobile}', Telephone = '{$rPhone}', Address = '{$rAddress}', Mark = '{$rMark}', Advance = {$rAdv}, StartDate = '{$rStartDate}', LeaveDate = '{$rLeaveDate}', Department = '{$rDepartment}', DepartmentRank = '{$rDepartmentRank}'  where ID = {$rUserID} ";
+		$sql = "Update sys_user SET UserName = '{$rName}', UserPassword = '{$rPassword}', Position = '{$rPosition}', Email = '{$rEmail}', Mobile = '{$rMobile}', Telephone = '{$rPhone}', Address = '{$rAddress}', Mark = '{$rMark}', Advance = {$rAdv}, StartDate = '{$rStartDate}', LeaveDate = '{$rLeaveDate}', Department = '{$rDepartment}', DepartmentRank = '{$rDepartmentRank}' , RemoteAccess = '{$rRemoteAccess}'  where ID = {$rUserID} ";
 		return $this->query($sql);
 	}
 	
@@ -615,7 +617,7 @@ class GeicAPI extends MysqlDB {
 		foreach ($sets as &$v){
 			$v = addslashes($v);
 		}
-		$sql = "insert into `geic`.`task_process` (SignDate, FromUser, ToUser, DueDate, Task, Detail, Done, DueHour) values ('{$sets['date']}', '{$userid}', '{$sets['to']}', '{$sets['due']}', '{$sets['task']}', '{$sets['detail']}', '{$sets['done']}', '{$sets['duehour']}')";
+		$sql = "insert into `task_process` (SignDate, FromUser, ToUser, DueDate, Task, Detail, Done, DueHour) values ('{$sets['date']}', '{$userid}', '{$sets['to']}', '{$sets['due']}', '{$sets['task']}', '{$sets['detail']}', '{$sets['done']}', '{$sets['duehour']}')";
 		return $this->query($sql);
 	}	
 	
@@ -700,7 +702,9 @@ class GeicAPI extends MysqlDB {
 	function getAttachment($itemid, $itemtype){
 		if ($itemid > 0 && $itemtype != "" ){
 			$itemtype = addslashes($itemtype);
+
 			$sql = "select ItemID, ItemType, ID, File, UploadTime from attachment where ItemID = '{$itemid}' and ItemType = '{$itemtype}' order by UploadTime desc ";
+		    //    			$sql = "select ItemID, ItemType, a.ID, File, UploadTime, IF(h.ID > 0, 1, 0) as his from attachment a left join attachment_his h on (a.ID = h.ID) where ItemID = '{$itemid}' and ItemType = '{$itemtype}' order by UploadTime desc ";
 			$this->query($sql);
 			$_arr = array();
 			while ($this->fetch()){
@@ -708,8 +712,14 @@ class GeicAPI extends MysqlDB {
 				$_arr[$this->ID]['type'] = $this->ItemType;
 				$_arr[$this->ID]['file'] = basename($this->File);
 				$_arr[$this->ID]['time'] = $this->UploadTime;
-				$_arr[$this->ID]['url'] = $this->File;
+				if (preg_match('/(.*)\/([^\/]+)$/', $this->File, $m)) {
+					$_arr[$this->ID]['url'] = $m[1].'/'.rawurlencode($m[2]);
+				}
+				else {
+					$_arr[$this->ID]['url'] = $this->File;
+				}				
 				$_arr[$this->ID]['his'] = $this->UploadTime < '2023-09-09 00:00:00'? true : false;
+//			$_arr[$this->ID]['his'] = $this->his == 1? false : true;
 			}
 			return $_arr;
 		}

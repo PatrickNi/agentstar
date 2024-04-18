@@ -23,6 +23,7 @@ $o_f = new FinanceAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 //user grants
 $ugs = array();
 $user_grants = $o_g->get_user_grants($user_id);
+include_once dirname(__FILE__).'/init_grants.php';
 foreach ($g_user_grants as $item){
 	if (array_key_exists($item, $user_grants)) {
 		foreach ($g_user_ops as $key=>$op){
@@ -82,10 +83,12 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 	    $sems['refuse']  = isset($_REQUEST['t_rf'])? (string)trim($_REQUEST['t_rf']) : "";
 		$sems['refuse']  = $sems['refuse'] != ""? $sems['refuse'] : "";	
 	    
-	    if ($ugs['i_rev']['v'] == 1){
-		    $sems['rcomm'] = isset($_REQUEST['t_rcomm'])? trim($_REQUEST['t_rcomm']) : "";
+		if ($ugs['c_pot']['v'] == 1){
+			$sems['rcomm'] = isset($_REQUEST['t_rcomm'])? trim($_REQUEST['t_rcomm']) : "";
 		    $sems['rcomm'] = $sems['rcomm'] == ""? "0" : $sems['rcomm'];
-		    
+		}
+
+	    if ($ugs['c_rev']['v'] == 1){  
 		    $sems['ivdate'] = isset($_REQUEST['t_ivdate'])? trim($_REQUEST['t_ivdate']) : "";
 		    $sems['ivdate'] = $sems['ivdate'] == ""? "0000-00-00" : $sems['ivdate'];
 		    
@@ -190,7 +193,7 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE"){
 	        	$sems['redcomm'] = 0;
 	        	$sems['fee'] = 0;
 	        }
-	        $o_c->setCourseSem($sem_id, $ugs['i_rev']['v'], $sems);
+	        $o_c->setCourseSem($sem_id, $ugs['c_rev']['v'] && $ugs['c_rev']['m'], $sems, $ugs['c_pot']['v'] && ($ugs['c_pot']['m'] || $ugs['c_pot']['i']));
 	        if ($o_c->getCourseSemOrder($sem_id) == 1) {
 	        	$o_c->setSem1Date($course_id,  $sems['fdate']);
 	        }

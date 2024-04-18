@@ -11,7 +11,7 @@ class MysqlDB {
     public $m_linkID		= ""; 
     public $m_res			= ""; 
 		
-    
+     
     function __construct($r_host, $r_user, $r_pswd, $r_database, $_debug = 0) {
 		$this->m_host 			= $r_host;	
     	$this->m_user 			= $r_user;
@@ -61,8 +61,11 @@ class MysqlDB {
      		}else{
      			$this->m_linkID = @mysqli_connect($this->m_host, $this->m_user, $this->m_pswd);
      		}
-    		
-     		# check connection
+		
+    	//	var_dump(mysqli_character_set_name($this->m_linkID));		
+     		mysqli_set_charset($this->m_linkID, "latin1");
+	//        var_dump(mysqli_character_set_name($this->m_linkID));  
+		# check connection
      		if (!$this->m_linkID){	
 				$this->errorProcess("Error code" . mysqli_errno($this->m_LinkID) . ", Error info: ". mysqli_error($this->m_LinkID));
 				return false;

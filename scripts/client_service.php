@@ -38,7 +38,6 @@ $services = array();
 if ($client_id > 0) {
 	$services = $o_c->getServiceByClient($client_id);
 }
-
 # set smarty tpl
 $o_tpl = new Template;
 $o_tpl->assign('services', $services);

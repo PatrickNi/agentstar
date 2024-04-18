@@ -141,11 +141,23 @@
                     <tr align="center" class="roweven">
                         <td style="text-decoration:underline; cursor:pointer" onClick="window.open('client_account_detail.php?vid={$vid}&aid={$id}&cid={$cid}&typ=legal','_blank', 'alwaysRaised=yes,height=500, width=800,location=no,scrollbars=yes')" >{$arr.step|ucwords}</td>
                         <td align="right">{$arr.dueamt|string_format:"%.2f"}</td>
-                        <td align="right">{$arr.gst|string_format:"%.2f"}</td>
+                        <td align="right">
+                            {if $arr.gst eq 1}
+                                {$arr.dueamt/11|string_format:"%.2f"}
+                            {else}
+                                -
+                            {/if}
+                        </td>
                         <td align="right"><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_payment.php?aid={$id}','_blank', 'alwaysRaised=yes,height=500,width=800,location=no,scrollbars=yes')">{$arr.paid|string_format:"%.2f"}</span></td>
                         <td>{$arr.party|ucwords}</td>
                         <td align="right">{$arr.dueamt_3rd|string_format:"%.2f"}</td>
-                        <td>{$arr.gst_3rd|string_format:"%.2f"}</td>
+                        <td>
+                            {if $arr.gst_3rd eq 1}
+                                {$arr.dueamt_3rd/11|string_format:"%.2f"}
+                            {else}
+                                -
+                            {/if}
+                        </td>
                         <td align="right"><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_spand.php?aid={$id}','_blank', 'alwaysRaised=yes,height=500,width=800,location=no,scrollbars=yes')">{$arr.spand|string_format:"%.2f"}</span></td>
                         <td align="right">
                             {$arr.paid-$arr.dueamt_3rd|string_format:"%.2f"}

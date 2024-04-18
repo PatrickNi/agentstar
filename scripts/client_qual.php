@@ -38,7 +38,6 @@ $qual_arr = array();
 if ($client_id > 0) {
 	$qual_arr = $o_c->getQualificationByClient($client_id);
 }
-
 # set smarty tpl
 $o_tpl = new Template;
 $o_tpl->assign('show_arr', $qual_arr);

@@ -101,11 +101,20 @@
 								<td align="left" width="72%"><input type="text" name="t_due" value="{$sem_arr.due}" size="30" onChange="audit_money(this)" ></td>
 							</tr>-->
 							
-							{if $ugs.c_rev.m eq 1}
+							{if $ugs.c_pot.v eq 1}
 								<tr>
 									<td width="28%" align="left" style="color:#CC3300" class="rowodd"> <strong>Receivable commission:</strong>&nbsp;&nbsp;</td>
-									<td align="left" width="72%" class="roweven"><input type="text" name="t_rcomm" value="{$sem_arr.rcomm}" size="30" onChange="audit_money(this)" ></td>
+									<td align="left" width="72%" class="roweven">
+										{if $ugs.c_pot.m eq 1 || ($ugs.c_pot.i eq 1 && $sem_arr.rcomm eq 0)}
+										<input type="text" name="t_rcomm" value="{$sem_arr.rcomm}" size="30" onChange="audit_money(this)" >
+										{else}
+											<span>{$sem_arr.rcomm}</span>
+											<input type="hidden" name="t_rcomm" value="{$sem_arr.rcomm}" >	
+										{/if}
+									</td>
 								</tr>
+							{/if}
+							{if $ugs.c_rev.m eq 1}
 								<tr>
 									<td width="28%" align="left"class="rowodd"  style="color:#CC3300"><strong>Issue Invoice Date:</strong>&nbsp;&nbsp;</td>
 									<td align="left" width="72%" class="roweven"><input type="text" name="t_ivdate" id="t_ivdate" value="{$sem_arr.ivdate}" size="30" ></td>                                

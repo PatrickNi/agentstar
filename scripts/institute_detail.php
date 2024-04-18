@@ -42,6 +42,7 @@ $set_arr['subcate']= isset($_REQUEST['t_subcate'])? trim($_REQUEST['t_subcate'])
 $set_arr['topagent'] = isset($_REQUEST['t_agent_top'])? trim($_REQUEST['t_agent_top']) : 0;
 
 if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE") {
+
 	if ($school_id > 0){
 		$o_s->setSchoolInfo($school_id, $set_arr);
 	} else{

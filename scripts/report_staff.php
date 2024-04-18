@@ -1,8 +1,7 @@
 <?php
 require_once('../etc/const.php');
-
-//ini_set("display_errors", 1);
-//error_reporting(E_ALL);
+ini_set("display_errors", 1);
+error_reporting(4096);
 
 
 require_once(__LIB_PATH.'Template.class.php');

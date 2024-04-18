@@ -57,4 +57,4 @@
 <script type="text/javascript">
 	$('#t_date').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true, firstDay: 1 });        
 </script>
-{/literal}
+{/literal}	
