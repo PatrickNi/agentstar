@@ -43,9 +43,9 @@ function ShowComm() {
 </script>
 {/literal}
 <body>
-<form method="get" name="form1" action="" target="_self" onSubmit="return form_audit('form1')">
-<input type="hidden" name="cid" value="{$cid}">
-<input type="hidden" name="courseid" value="{$course_id}">
+<form method="get" name="form1" id="formCourseList" action="/scripts/client_course.php" target="_self" onSubmit="return form_audit('form1')">
+<input type="hidden" name="cid" id="cid" value="{$cid}">
+<input type="hidden" name="courseid" id="courseid" value="{$course_id}">
 <input type="hidden" name="hCancel" value="0">
 <table align="center" class="graybordertable" width="100%">
 	<tr align="left"  class="bordered_2">
@@ -111,6 +111,11 @@ function ShowComm() {
         &nbsp;&nbsp;&nbsp;
         <input type="button" name="bt_name" value="Show comm" style="font-weight:bold" onClick="ShowComm()">
         {/if}
+
+		{if $has_case_study eq 1} 
+			&nbsp;&nbsp;&nbsp;
+			<input type="button" name="bt_name" id="bt_case_study" value="Case Studied" style="font-weight:bold" onClick="closeCaseStudy()">
+		{/if}
 	   </td>
 	</tr>		
 	<tr>
@@ -124,6 +129,7 @@ function ShowComm() {
 					<td class="border_1" width="5%">Qualification</td>
 					<td class="border_1" width="5%">Major</td>
 					<td class="border_1" width="5%">Consultant</td>
+					<td class="border_1" width="5%">Paperwork</td>
 					<td class="border_1" width="3%">Completed</td>
 					<td class="border_1" width="5%">Verify<br>Migration</td>
 					<td class="border_1" width="5%">Consultant Date</td>							
@@ -148,6 +154,7 @@ function ShowComm() {
 					<td class="border_1">{$arr.qualname}</td>
 					<td class="border_1">{$arr.majorname}</td>
 					<td class="border_1">{$user_arr[$arr.consultant]}</td>
+					<td class="border_1">{$user_arr[$arr.paperwork]}</td>
 					<td class="border_1">{$arr.completed}</td>
 					<td class="border_1">{$user_arr[$arr.vma]},{$arr.vms|ucwords}</td>
 					<td class="border_1">{$arr.consultant_date}</td>
@@ -214,6 +221,21 @@ function ShowComm() {
 </form>	
 {literal}
 <script type="text/javascript">
-	$('#t_first').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });        
+	$('#t_first').datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });   
+	
+	function closeCaseStudy() {
+		//alert($('#formCourseList').attr('action')+'?'+'bt_name=casestudy&cid='+$('#cid').val());
+		$.post($('#formCourseList').attr('action'), 'bt_name=casestudy&cid='+$('#cid').val(), function(data){
+		   rtn = $.parseJSON(data);
+		   if (rtn.succ == 1) {
+			    $('#bt_case_study').remove();
+		   }
+		   else {
+				alert('Cannot close case studies');
+		   }
+		});
+
+		
+	}
 </script>
-{/literal}	
+{/literal}

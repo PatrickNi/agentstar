@@ -40,6 +40,15 @@ if (isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "SAVE" &&
 		$o_c->addClientUserRs($client_id, $sets['cuser'], __COURSE_CONSULTANT);
 	}
 }
+elseif(isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "CASESTUDY" && $client_id > 0) {
+	$rtn['succ'] = 0;
+	if ($o_c->closeCaseStudy($user_id, 'course', $client_id)){
+		$rtn['succ'] =1;
+	}
+
+	echo json_encode($rtn);
+	exit;
+}
 
 # get user position
 /*$view_all = 0;
@@ -58,7 +67,7 @@ $client_arr = $o_c->getOneClientInfo($client_id);
 $course_arr = array();
 $course_sem = array();
 $course_process = array();
-
+$has_case_study = 0;
 //if ($view_all == 0 || ($client_id > 0 && $view_all > 0 && $client_arr['cuser'] == $view_all) || ($o_c->getVisaPaperWorker($client_id) == $view_all && $view_all > 0)) {
 if ($client_id > 0) {
 	# get cource
@@ -69,6 +78,10 @@ if ($client_id > 0) {
 	
 	# get course process
 	$course_process = $o_c->getProcessDateOfCourse($client_id, 0);
+
+	if (count($o_c->getPendingCaseStudy($user_id, 'course', $client_id)) > 0){
+		$has_case_study = 1;
+	}
 }
 
 
@@ -92,6 +105,7 @@ $o_tpl->assign('client_type', $o_c->getClientType($client_id));
 $o_tpl->assign('ugs', $ugs);
 $o_tpl->assign('coursecount', count($course_arr));
 $o_tpl->assign('show_detail', 1);// ($client_arr['cuser'] == $user_id || $ugs['c_track']['v'] == 1)? 1 : 0);
+$o_tpl->assign('has_case_study', $has_case_study);
 
 # check has sub agents
 if (is_array($client_arr) && isset($client_arr['agent']) && $client_arr['agent'] > 0){

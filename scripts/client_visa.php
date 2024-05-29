@@ -33,6 +33,16 @@ foreach ($g_user_grants as $item){
 }
 
 
+if(isset($_REQUEST['bt_name']) && strtoupper($_REQUEST['bt_name']) == "CASESTUDY" && $client_id > 0) {
+	$rtn['succ'] = 0;
+	if ($o_c->closeCaseStudy($user_id, 'visa', $client_id)){
+		$rtn['succ'] =1;
+	}
+
+	echo json_encode($rtn);
+	exit;
+}
+
 # get user
 $user_arr = $o_g->getUserNameArr(0,true);
 
@@ -47,6 +57,8 @@ $visa_arr = $o_c->getApplyVisa($client_id, 0, 0);
 // get lodge and grant process
 $lgprocs = array();
 $lgprocs = $o_c->getVisaLodgeGrandProc($client_id, 0);
+
+$has_case_study = count($o_c->getPendingCaseStudy($user_id, 'visa', $client_id)) > 0? 1 : 0;
 
 # set smarty tpl
 $o_tpl = new Template;
@@ -73,6 +85,8 @@ $o_tpl->assign('client', $client_arr);
 $o_tpl->assign('client_type', $o_c->getClientType($client_id));
 $o_tpl->assign('user_pos', $o_g->getUserPosition($user_id));
 $o_tpl->assign('ugs', $ugs);
+$o_tpl->assign('has_case_study', $has_case_study);
+
 
 # get user position
 if ($ugs['v_track']['v'] == 1){

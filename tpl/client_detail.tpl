@@ -59,7 +59,7 @@
               {/if}</td>
             <td class="whitetext" align="center">Client Detail</td>
             <td align="right" width="10%">
-            	<input type="submit" value="Save" style="font-weight:bold" onClick="this.form.bt_name.value='save';this.disable=false;" >
+            	<input type="submit" value="Save" style="font-weight:bold" onClick="this.form.method='POST';this.form.bt_name.value='save';this.disable=false;" >
             </td>
           </tr>
         </table></td>
@@ -296,14 +296,14 @@
                 <input type="text" name="t_aboutTxt"value="{$arr.about}" {if $aboutinput eq 1} disabled  style="visibility:hidden"{/if}>        </td>
               </tr>
 
-              <tr id="tr_gp" {if $arr.about ne 'Global Partner'}style="visibility:collapse"{/if}>
-                <td width="28%" align="left" class="rowodd"><strong>Global Partner:</strong>&nbsp;&nbsp;</td>
+              <tr id="tr_gp" {if $arr.about ne 'Global Agent'}style="visibility:collapse"{/if}>
+                <td width="28%" align="left" class="rowodd"><strong>Global Agent:</strong>&nbsp;&nbsp;</td>
                 <td align="left" width="72%" class="roweven"> 
                   {if $ugs.b_suba.v eq 1 && $ugs.b_suba.m eq 0 && ($cid gt 0 || $ugs.b_suba.i eq 0)}
                       <input type="hidden" name="t_agent_p" value="{$arr.agent}">
                   {/if}
                   <select id="t_agent_p" name="t_agent_p" {if $ugs.b_suba.v eq 1 && $ugs.b_suba.m eq 0 && ($cid gt 0 || $ugs.b_suba.i eq 0)} disabled {/if}>
-                    <option value="0">choose a Global Partner</option>
+                    <option value="0">choose a Global Agent</option>
                     {foreach key=ag_id item=v from=$agent_partner}
                         <option value="{$ag_id}" {if $ag_id eq $arr.agent} selected {/if}>{$v.name}</option>
                     {/foreach}
@@ -311,14 +311,14 @@
                   </select>
                 </td>
               </tr>    
-              <tr  id="tr_ab" {if $arr.about ne 'Ambassador' }style="visibility:collapse"{/if}>
-                <td width="28%" align="left" class="rowodd"><strong>Ambassador:</strong>&nbsp;&nbsp;</td>
+              <tr  id="tr_ab" {if $arr.about ne 'Global Partner' }style="visibility:collapse"{/if}>
+                <td width="28%" align="left" class="rowodd"><strong>Global Partner:</strong>&nbsp;&nbsp;</td>
                 <td align="left" width="72%" class="roweven"> 
                   {if $ugs.b_suba.v eq 1 && $ugs.b_suba.m eq 0 && ($cid gt 0 || $ugs.b_suba.i eq 0)}
                       <input type="hidden" name="t_agent_a" value="{$arr.agent}">
                   {/if}
                   <select id="t_agent_a" name="t_agent_a"{if $ugs.b_suba.v eq 0 || ($ugs.b_suba.m eq 0 && $cid gt 0) || ($ugs.b_suba.i eq 0 && $cid eq 0)} disabled {/if}>
-                  <option value="0">choose an Ambassador</option>
+                  <option value="0">choose an Global Partner</option>
                   {foreach key=ag_id item=v from=$agent_ambassador}
                       <option value="{$ag_id}" {if $ag_id eq $arr.agent} selected {/if}>{$v.name}</option>
                   {/foreach}

@@ -110,6 +110,8 @@ $g_user_ops = array('v'=>0x1, 'i'=>0x2, 'm'=>0x4, 'd'=>0x8);
 define('FORBID_RIGHTCLK', 'oncontextmenu="window.event.returnvalue=false"');
 define('FORBID_SELECT', 'onselectstart="return false"');
 define('FORBID_PASTE', 'onpaste="return false"');
-define('FORBID_COPY', 'oncopy="return false;" oncut="return false;"')
+define('FORBID_COPY', 'oncopy="return false;" oncut="return false;"');
+
+
 						
 ?>

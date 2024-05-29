@@ -1199,7 +1199,13 @@ class ClientAPI extends MysqlDB {
 			$v = addslashes($v);
 		}
 		//LodgeDate = '{$sets['fdate']}', GrantDate = '{$sets['tdate']}', 
-		$sql = "Update client_visa SET CateID = '{$sets['cateid']}', SubClassID = '{$sets['subid']}', ClientNo = '{$sets['clientno']}', FileNum = '{$sets['file']}', CaseDetail = '{$sets['offdt']}', Fax = '{$sets['fax']}', Name = '{$sets['name']}', Tel = '{$sets['tel']}', Note = '{$sets['note']}', AUserID = '{$sets['auser']}', VUserID = '{$sets['vuser']}', OnShore = '{$sets['shore']}' , Email = '{$sets['email']}' , ABody = '{$sets['body']}' , State = '{$sets['state']}' , KeyPoint = '{$sets['key']}' , ADate = '{$sets['adate']}' , AFee = '{$sets['fee']}' , VisitDate = '{$sets['vdate']}', r_Status = '{$sets['status']}', AscoID = '{$sets['asco']}', CFee = '{$sets['cfee']}', OFee = '{$sets['ofee']}' , AgentFee = '{$sets['sfee']}' , ReviewerID = '{$sets['reviewer']}' , Company = '{$sets['company']}' where ID = {$vid}";
+		$sql = "Update client_visa SET CateID = '{$sets['cateid']}', SubClassID = '{$sets['subid']}', ClientNo = '{$sets['clientno']}', FileNum = '{$sets['file']}', CaseDetail = '{$sets['offdt']}', Fax = '{$sets['fax']}', Name = '{$sets['name']}', Tel = '{$sets['tel']}', Note = '{$sets['note']}', AUserID = '{$sets['auser']}', VUserID = '{$sets['vuser']}', OnShore = '{$sets['shore']}' , Email = '{$sets['email']}' , ABody = '{$sets['body']}' , State = '{$sets['state']}', ADate = '{$sets['adate']}' , AFee = '{$sets['fee']}' , VisitDate = '{$sets['vdate']}', r_Status = '{$sets['status']}', AscoID = '{$sets['asco']}', CFee = '{$sets['cfee']}', OFee = '{$sets['ofee']}' , AgentFee = '{$sets['sfee']}' , ReviewerID = '{$sets['reviewer']}' , Company = '{$sets['company']}' ";
+		
+		if (isset($sets['key']) && $sets['key'] != "")  {
+			$sql .= ", KeyPoint = '{$sets['key']}' ";
+		}
+		
+		$sql .= " where ID = {$vid} ";
 		//var_dump($sql);
 		return $this->query($sql);		
 	}
@@ -2577,8 +2583,10 @@ class ClientAPI extends MysqlDB {
     	$sql = "update client_course cc SET cc.ConsultantID = {$to_staff_id} where cc.ConsultantID = {$from_staff_id}  and exists (select 'x' from client_course_process ccp where cc.id = ccp.ccid and done = 0) ";
     	$this->query($sql);
 
+		$this->batchAddCaseStudy('course', $to_staff_id, $from_staff_id);
     	return true;
     } 
+
 
     function countVisaAgreementByStaff($staff_id=0) {
     	if (!$staff_id)
@@ -2594,9 +2602,15 @@ class ClientAPI extends MysqlDB {
     	if (!$from_staff_id || !$to_staff_id)
     		return false;
 
-    	$sql = "update client_visa v SET v.VUSERID = {$to_staff_id} where v.VUSERID = {$from_staff_id} and (r_status = '' or r_status = 'active')";
+		$sql = "update client_visa SET MergeFromVUSERID = {$from_staff_id} where VUSERID = {$from_staff_id} and MergeFromVUSERID = 0 and (r_status = '' or r_status = 'active')";
+		$this->query($sql);
+
+    	$sql = "update client_visa v SET v.VUSERID = {$to_staff_id} where v.MergeFromVUSERID = {$from_staff_id} and (r_status = '' or r_status = 'active')";
     	$this->query($sql);
-    	return $this->getAffectNum();
+    	$num = $this->getAffectNum();
+
+		$this->batchAddCaseStudy('visa', $to_staff_id, $from_staff_id);
+		return $num;
     } 
 
     function getClientIDbyAccount($account) {
@@ -2647,6 +2661,47 @@ class ClientAPI extends MysqlDB {
 	function setCourseTopAgent($course_id, $agent_id=0){
 		$sql = "Update client_course SET AgentID = {$agent_id} where ID = {$course_id}";
 		return $this->query($sql);	
+	}
+
+	function batchAddCaseStudy($case_type, $staff_id, $from_staff_id) {
+		if (!$case_type || !$staff_id || !$from_staff_id)
+			return false;
+
+		$sql = '';
+		if ($case_type == 'course') {
+			$sql = "insert into case_studies (CaseType, CaseID, StaffID, ClientID) select 'course', id, ConsultantID , CIDfrom client_course where ConsultantID = {$staff_id} and MergeFromCoulstantID = {$from_staff_id}";
+		}
+		elseif ($case_type == 'visa') {
+			$sql = "insert into case_studies (CaseType, CaseID, StaffID, ClientID) select 'visa', id, VUSERID, CID from client_visa where VUSERID = {$staff_id} and MergeFromVUSERID = {$from_staff_id}";
+		}
+
+		if ($sql) {
+			$this->query($sql);
+		}
+		return true;
+	}
+
+	function getPendingCaseStudy($staff_id, $case_type, $client_id = 0) {
+		if (!$case_type || !$staff_id)
+			return [];
+		$sql = "select ID, CaseType, CaseID, StaffID, AddTime from case_studies where StaffID = {$staff_id} and CaseTYpe = '{$case_type}' and Done = 0 ";
+		if ($client_id > 0) {
+			$sql .= " and ClientID = {$client_id} ";
+		}
+		$this->query($sql);
+        $arr = array();
+        while ($this->fetch()){
+            $arr[$this->CaseID] = $this->ID;
+        }
+        return $arr;
+	}
+
+	function closeCaseStudy($staff_id, $case_type, $client_id = 0) {
+		if (!$case_type || !$staff_id || !$client_id)
+			return false;
+		$sql = "update case_studies SET DONE = 1 where CaseType = '{$case_type}' and StaffID = {$staff_id} and ClientID = {$client_id} and Done = 0 ";
+		$this->query($sql);		
+		return true;
 	}
 
 }

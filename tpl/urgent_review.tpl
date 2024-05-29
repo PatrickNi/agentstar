@@ -140,7 +140,11 @@
 					<td align="left" nowrap="nowrap">{$arr.cate}</td>
 					<td align="left">{$arr.class}</td>
 					<!-- onClick="openModel('client_visa_process.php?pid={$id}&cid={$arr.clientid}&vid={$arr.visaid}',800,560,'NO', 'form1')"-->
-					<td align="left" style="{if $arr.islodge eq 1}color:#FF3300;{elseif stripos($arr.item, 'DHA request') === 0 || stripos($arr.item, 'apply onshore') === 0}color:red;{elseif $arr.isApply eq 1}color:blue;{/if}cursor:pointer; text-decoration:underline" onClick="window.open('client_visa_detail.php?cid={$arr.clientid}&vid={$arr.visaid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$arr.item}</td>
+					<td align="left" style="{if $arr.islodge eq 1}color:#FF3300;{elseif stripos($arr.item, 'DHA request') === 0 || stripos($arr.item, 'apply onshore') === 0}color:red;{elseif $arr.isApply eq 1}color:blue;{/if}cursor:pointer; text-decoration:underline" onClick="window.open('client_visa_detail.php?cid={$arr.clientid}&vid={$arr.visaid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$arr.item}
+						{if $studies[$arr.visaid] gt 0}
+							<span class="dotbadge"></span>
+						{/if}
+						</td>
 					<td nowrap="nowrap">{$slUsers[$arr.auid]}</td>
 					<td nowrap="nowrap">
 						<span {if $arr.is_review eq 2 && $arr.status != 'grant' && $arr.status != 'refused' && stripos($arr.item, 'apply onshore') === 0}style="color:red;"{/if}>{$slUsers[$arr.vuid]}</span>
@@ -365,7 +369,12 @@
 					<td align="left">{$arr.school}</td>
 					<td align="left">{$arr.qual}</td>
 					<td align="left">{$arr.major}</td>
-					<td style="cursor:pointer; text-decoration:underline; {if $arr.isColor eq 1}color:#0000FF {elseif $arr.item == 'Add new semester'} color:blue{elseif $arr.item == 'Pay tuition fee'} color:red{/if}"  onClick="window.open('client_course_detail.php?cid={$arr.clientid}&courseid={$arr.courseid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$arr.item}</td>
+					<td style="cursor:pointer; text-decoration:underline; {if $arr.isColor eq 1}color:#0000FF {elseif $arr.item == 'Add new semester'} color:blue{elseif $arr.item == 'Pay tuition fee'} color:red{/if}"  onClick="window.open('client_course_detail.php?cid={$arr.clientid}&courseid={$arr.courseid}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">
+						{$arr.item}
+						{if $studies[$arr.courseid] gt 0}
+							<span class="dotbadge"></span>
+						{/if}
+						</td>
 					<td align="center">{$slCourseViewer[$arr.consultant]}</td>
 					<td align="center">{$slCourseViewer[$arr.paperwork]}</td>
 					<td nowrap="nowrap" {if $arr.isTodo neq 1}style="color:#660000; font-weight:bold"{/if}>{$arr.due}</td>

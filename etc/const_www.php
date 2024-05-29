@@ -1,19 +1,22 @@
 <?php
-define("__ROOT_PATH", "d:/immi/");//e:/inetpub/wwwroot/
+//die('denied');
+ini_set('default_charset', '');
+
+define("__ROOT_PATH", "/data/wwwroot/agentstar.geic.com.au/");//e:/inetpub/wwwroot/
 
 define("__LIB_PATH", __ROOT_PATH."lib/");
 define("__DOWNLOAD_PATH", __ROOT_PATH."download/");
-define("__SMARTY_LIB_PATH", __LIB_PATH."Smarty/");
+define("__SMARTY_LIB_PATH", __LIB_PATH."SmartyV4/");
 define("__SMARTY_TPL_PATH", __ROOT_PATH."/tpl/");
 define("__SMARTY_CPL_PATH", __SMARTY_TPL_PATH."tpl_c/");
 define("__SMARTY_CFG_PATH", __SMARTY_TPL_PATH."config/");
 define("__SMARTY_CAH_PATH", __SMARTY_TPL_PATH."cache/");
 
 # database configuration
-define("__DB_HOST", "127.0.0.1");
-define("__DB_USER", "root");
-define("__DB_PASSWORD", "root"); //
-define("__DB_DATABASE", "geic");
+define("__DB_HOST", "localhost");
+define("__DB_USER", "geic");
+define("__DB_PASSWORD", "Welcome2015"); //
+define("__DB_DATABASE", "geic_new");
 
 define("__REDIR_PHP", "redir.php");
 define("__SCRIPT_URL", "http://192.168.1.8/scripts/");
@@ -46,9 +49,7 @@ define("__C_PASS_OFFER", 3);
 define("__C_PAY_TUITION_FEE", 4);
 define("__C_GET_COE", 5);
 define("__C_PASS_COE", 6);
-define("__C_BIRTHDAY", 7);
-
-$course_process_arr = array(__C_APPLY_OFFER=>"Collect Document", __C_RECEIVE_OFFER=>"Apply Offer", __C_PASS_OFFER=>"Receive Offer", __C_PAY_TUITION_FEE=>"Pay tuition fee", __C_GET_COE=>"Get COE", __C_PASS_COE=>"Student Visa Extension", __C_BIRTHDAY=>"Birthday");
+$course_process_arr = array(__C_APPLY_OFFER=>"Collect Document", __C_RECEIVE_OFFER=>"Apply Offer", __C_PASS_OFFER=>"Receive Offer", __C_PAY_TUITION_FEE=>"Pay tuition fee", __C_GET_COE=>"Get COE", __C_PASS_COE=>"Student Visa Extension");
 
 # user right configuration
 $position_arr = array('E'=>'Employee', 'M'=>'Manager', 'C'=>'CEO');
@@ -106,4 +107,19 @@ $g_user_grants = array('b_service', 'b_visa', 'b_ctype', 'b_suba','b_epd', 'b_ab
                        
 $g_user_ops = array('v'=>0x1, 'i'=>0x2, 'm'=>0x4, 'd'=>0x8);        
 
+//Check user retired
+if (stripos($_SERVER['REQUEST_URI'], '/scripts/login.php') === false && stripos($_SERVER['REQUEST_URI'], '/scripts/checklist_ajax.php') === false && stripos($_SERVER['REQUEST_URI'], '/scripts/todo_v2.php') === false && stripos($_SERVER['REQUEST_URI'], '/scripts/') !== false) {
+	if (isset($_COOKIE['userid']) && $_COOKIE['userid'] > 0) {
+		include_once(__LIB_PATH.'GeicAPI.class.php');
+		$o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
+		$user = $o_g->getUserList($_COOKIE['userid'],true);
+		if (count($user) > 0) {
+			setcookie("userid", 0, time()+60*60*24,"/");
+			header("Location: /scripts/login.php?redirect=".urlencode($_SERVER['REQUEST_URI']));
+		}
+	}
+	else {
+		header("Location: /scripts/login.php?redirect=".urlencode($_SERVER['REQUEST_URI']));
+	}	
+}
 ?>

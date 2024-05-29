@@ -1971,7 +1971,7 @@ class ReportAPI extends MysqlDB {
 		$_arr = array();
         $visa = array();
         while ($this->fetch()) {
-            if (!isest($_arr[$this->Week])){
+            if (!isset($_arr[$this->Week])){
                 $_arr[$this->Week]['cnt'] = 0;
                 $_arr[$this->Week]['total_profit'] = 0;
                 $_arr[$this->Week]['cnt_notpaperwork'] = 0;

@@ -11,7 +11,7 @@
 <form action=""  target="_self" method="POST" name="form1">
 	<input type="hidden" name="qflag" value="">
 	<tr  class="title" >
-		<td colspan="8">
+		<td colspan="9">
 			<input type="button" style="font-weight:bold;" value="Add New" onClick="javascript:this.form.action='sys_user_add.php';this.form.submit();">&nbsp;&nbsp;
 			<input type="button" style="font-weight:bold;" value="Remove" onClick="javascript:this.form.qflag.value='remove';this.form.submit();">	
 		</td>
@@ -24,7 +24,8 @@
 		<td width="10%" >Email</td>
 		<td width="10%" >Mobile</td>
 		<td width="10%" >Telephone</td>
-		<td>Address</td>		
+		<td>Address</td>
+		<td>Remote Access</td>		
    </tr>
    {foreach key=id item=arr from=$user_arr}
 	<tr id="tr_{$id}" onmouseout="roff({$id});" onmouseover="ron({$id});" align="center">
@@ -35,7 +36,8 @@
 		<td class="border_1">{if $arr.email }{$arr.email}{else}&nbsp;{/if}</td>
 		<td class="border_1">{if $arr.mobile }{$arr.mobile}{else}&nbsp;{/if}</td>
 		<td class="border_1">{if $arr.phone }{$arr.phone}{else}&nbsp;{/if}</td>
-		<td class="border_1">{if $arr.add }{$arr.add}{else}&nbsp;{/if}</td>		
+		<td class="border_1">{if $arr.add }{$arr.add}{else}&nbsp;{/if}</td>
+		<td class="border_1">{if $arr.remote_access eq 1}YES{else}NO{/if}</td>
    </tr>   
    {/foreach}
   </form> 

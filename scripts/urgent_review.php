@@ -3,6 +3,8 @@ require_once('../etc/const.php');
 require_once(__LIB_PATH.'Template.class.php');
 require_once(__LIB_PATH.'Report.class.php');
 require_once(__LIB_PATH.'GeicAPI.class.php');
+require_once(__LIB_PATH.'ClientAPI.class.php');
+
 function getSortList($sort_list, &$sort_col, &$sort_ord){
 	if ($sort_list == ''){
 		return $sort_list;
@@ -51,6 +53,7 @@ if (!($user_id > 0)) {
 }
 $o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 $o_r = new ReportAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
+$o_c = new ClientAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 
 
 //user grants
@@ -92,6 +95,7 @@ if ($ugs['seeall']['v'] == 0){
 $staff_id = $user_id;
 
 $reports = array();
+$studies = array();
 $monitors = array();
 $sort_ord_arr = array(0=>'ASC', 1=>'DESC');
 switch ($viewWhat){
@@ -108,6 +112,7 @@ switch ($viewWhat){
 		$sort_col_arr = array(1=>'ClientName',2=>'VisaName',3=>'ClassName',4=>'Item',5=>'SortDue');
 		//var_dump(getSortList($sort_list, $sort_col_arr, $sort_ord_arr));
 		$reports = $o_r->getUrgentVisa($staff_id,getSortList($sort_list, $sort_col_arr, $sort_ord_arr), $vdu);
+		$studies = $o_c->getPendingCaseStudy($staff_id, 'visa');
 		break;
 	case "vreview":
 		//		$staff_id = $user_id;
@@ -136,6 +141,7 @@ switch ($viewWhat){
         $sort_col_arr = array(1=>'ClientName',2=>'Name',3=>'Qual',4=>'Major',5=>'ProcessName', 6=>'SortDue');
         
         $reports = $o_r->getUrgentCourse($staff_id,getSortList($sort_list, $sort_col_arr, $sort_ord_arr), $only_course, $cdu);
+		$studies = $o_c->getPendingCaseStudy($staff_id, 'course');
         break;
     case "vm":
         if (isset($ugs['todo_visa']) && $ugs['todo_visa']['v'] == 1){
@@ -206,6 +212,7 @@ switch ($viewWhat){
 # set smarty tpl
 $o_tpl = new Template;
 $o_tpl->assign('urgent_arr', $reports);
+$o_tpl->assign('studies', $studies);
 $o_tpl->assign('monitor_arr', $monitors);
 $o_tpl->assign('viewWhat', $viewWhat);
 $o_tpl->assign('view_show', $viewWhat == ""? 0 : $viewWhat);

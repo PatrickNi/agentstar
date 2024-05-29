@@ -7,7 +7,7 @@
 <script language="javascript" src="../js/calendar.js"></script>
 <script language="javascript" src="../js/audit.js"></script>
 <body>
-<form name="form1" action="" target="_self" method="get">
+<form name="form1" id='formVisaList' action="/scripts/client_visa.php" target="_self" method="get">
 <input type="hidden" name="cid" value="{$cid}">
 <input type="hidden" name="vid" value="{$vid}">
 <input type="hidden" name="hCancel" value="0">
@@ -52,7 +52,17 @@
 	</tr>
 	<tr align="center"  class="greybg" >
 		<td align="left" style="font-size:16px " colspan="8"> <span class="highyellow">Client: {$client.lname} {$client.fname}</span>&nbsp;&nbsp; <span class="highyellow">DoB: {$client.dob}</span>&nbsp;&nbsp; <span class="highyellow">Main Visa: {$client.visa_n}-{$client.class_n}, expr: {$client.epdate}</span>&nbsp;&nbsp; </td>
-	</tr>		
+	</tr>	
+	
+	{if $has_case_study eq 1} 
+	<tr class="greybg" align="center">
+		<td align="left" colspan="2">
+			<input type="button" name="bt_name" id="bt_case_study" value="Case Studied" style="font-weight:bold" onClick="closeCaseStudy()">
+		</td>
+	</tr>
+	{/if}
+
+
 	<tr align="center" class="totalrowodd">
 		<td class="border_1">Visa</td>
 		<td class="border_1">Visa Subclass</td>
@@ -85,3 +95,21 @@
 	{/foreach}
 </table>
 </form>	
+{literal}
+	<script type="text/javascript">
+		
+		function closeCaseStudy() {
+			$.post($('#formVisaList').attr('action'), 'bt_name=casestudy&cid='+$('#cid').val(), function(data){
+			   rtn = $.parseJSON(data);
+			   if (rtn.succ == 1) {
+					$('#bt_case_study').remove();
+			   }
+			   else {
+					alert('Cannot close case studies');
+			   }
+			});
+	
+			
+		}
+	</script>
+	{/literal}
