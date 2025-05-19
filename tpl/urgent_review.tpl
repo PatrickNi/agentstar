@@ -145,12 +145,12 @@
 							<span class="dotbadge"></span>
 						{/if}
 						</td>
-					<td nowrap="nowrap">{$slUsers[$arr.auid]}</td>
+					<td nowrap="nowrap">{$slCourseViewer[$arr.auid]}</td>
 					<td nowrap="nowrap">
 						<span {if $arr.is_review eq 2 && $arr.status != 'grant' && $arr.status != 'refused' && stripos($arr.item, 'apply onshore') === 0}style="color:red;"{/if}>{$slUsers[$arr.vuid]}</span>
 					</td>
 					<td nowrap="nowrap" align="left">
-						<span>{$slUsers[$arr.reviewer]}</span>
+						<span>{$slCourseViewer[$arr.reviewer]}</span>
 					</td>
 					<td nowrap="nowrap" {if $arr.isTodo neq 1}style="color:#660000; font-weight:bold"{/if}>{$arr.due}</td>
 				 </tr>

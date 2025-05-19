@@ -541,5 +541,107 @@ class VisaAPI extends MysqlDB {
         return $this->query($sql);
     }
 
+	function addProcessTpl($tpl, $cateid='', $subclassid='', $processid='', $subclass_prefix='', $process_prefix='') {
+		if (!$cateid && !$subclassid && !$subclass_prefix && !$process_prefix && !$processid)
+			return false;
+
+		if (!$tpl)
+			return false;
+
+		if ($this->getProcessTpl($cateid, $subclassid, $processid, $subclass_prefix, $process_prefix))
+			return false;
+
+		$columns = ['CateID' => 0, 'SubclassID' => 0, 'ProcessID' => 0, 'Template' => "''", 'SubclassPrefix' => "''", 'ProcessPrefix' => "''"];
+		$columns['Template'] = "'".addslashes($tpl)."'";
+
+		if ($processid) {
+			$columns['ProcessID'] = $processid;
+		}
+		elseif ($process_prefix && $subclassid && $cateid) {
+			$columns['ProcessPrefix'] = "'".addslashes($process_prefix)."'";
+			$columns['SubclassID'] = $subclassid;
+			$columns['CateID'] = $cateid;
+		}
+		elseif ($process_prefix && $subclass_prefix && $cateid) {
+			$columns['ProcessPrefix'] = "'".addslashes($process_prefix)."'";
+			$columns['SubclassPrefix'] = "'".addslashes($subclass_prefix)."'";
+			$columns['CateID'] = $cateid;		
+		}
+		elseif ($process_prefix && $cateid) {
+			$columns['ProcessPrefix'] = "'".addslashes($process_prefix)."'";
+			$columns['CateID'] = $cateid;		
+		}
+		elseif ($process_prefix) {
+			$columns['ProcessPrefix'] = "'".addslashes($process_prefix)."'";
+		}
+		else {
+			return false;
+		}
+
+		$sql = "insert into visa_process_tpl (".implode(',', array_keys($columns)).") values (".implode(',', $columns).")";
+		return $this->query($sql);
+	}
+
+
+	function setProcessTpl($id, $tpl) {
+		if (!$id)
+			return false;
+		$tpl = addslashes($tpl);
+		$sql = "UPDATE visa_process_tpl SET Template = '{$tpl}' WHERE ID = {$id}";
+		return $this->query($sql);
+	}
+
+	function delProcessTpl($id) {
+		if (!$id)
+			return false;
+
+		$sql = "DELETE visa_process_tpl WHERE ID = {$id}";
+		return $this->query($sql);		
+	}
+
+	function getUnqiqueProcessTpl($cateid='', $subclassid='', $processid='', $subclass_prefix='', $process_prefix='') {
+		if ($processid) {
+			$sql = "SELECT ID, Tempalte FROM visa_process_tpl WHERE ProcessID = {$processid}";
+			$this->query($sql);
+			if ($this->fetch()){
+				return array('id'=>$this->ID, 'tpl'=>$this->Template);          
+			}
+		}
+		
+		if ($process_prefix && $subclassid && $cateid) {
+			$sql = "SELECT ID, Tempalte FROM visa_process_tpl WHERE ProcessPrefix = '{$process_prefix}' AND CateID = {$cateid} AND SubclassID = {$subclassid} AND SubclassPrefix ''";
+			$this->query($sql);
+			if ($this->fetch()){
+				return array('id'=>$this->ID, 'tpl'=>$this->Template);          
+			}
+		}
+		
+		if ($process_prefix && $subclass_prefix && $cateid) {
+			$sql = "SELECT ID, Tempalte FROM visa_process_tpl WHERE ProcessPrefix = '{$process_prefix}' AND CateID = {$cateid} AND SubclassPrefix = {$subclass_prefix}  AND SubclassID = 0 and ProcessID = 0 ";
+			$this->query($sql);
+			if ($this->fetch()){
+				return array('id'=>$this->ID, 'tpl'=>$this->Template);          
+			}
+		}
+		
+		if ($process_prefix && $cateid) {
+			$sql = "SELECT ID, Tempalte FROM visa_process_tpl WHERE ProcessPrefix = '{$process_prefix}' AND CateID = {$cateid} AND SubclassID = 0 and ProcessID = 0 and SubclassPrefix = ''";
+			$this->query($sql);
+			if ($this->fetch()){
+				return array('id'=>$this->ID, 'tpl'=>$this->Template);          
+			}
+		}
+		
+		if ($process_prefix) {
+			$sql = "SELECT ID, Tempalte FROM visa_process_tpl WHERE ProcessPrefix = '{$process_prefix}' AND CateID = 0 AND SubclassID = 0 and ProcessID = 0 and SubclassPrefix = ''";
+			$this->query($sql);
+			if ($this->fetch()){
+				return array('id'=>$this->ID, 'tpl'=>$this->Template);          
+			}
+		}
+		
+        return false;
+	}
+
 }
 ?>

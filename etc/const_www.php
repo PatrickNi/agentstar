@@ -110,6 +110,7 @@ $g_user_ops = array('v'=>0x1, 'i'=>0x2, 'm'=>0x4, 'd'=>0x8);
 //Check user retired
 if (stripos($_SERVER['REQUEST_URI'], '/scripts/login.php') === false && stripos($_SERVER['REQUEST_URI'], '/scripts/checklist_ajax.php') === false && stripos($_SERVER['REQUEST_URI'], '/scripts/todo_v2.php') === false && stripos($_SERVER['REQUEST_URI'], '/scripts/') !== false) {
 	if (isset($_COOKIE['userid']) && $_COOKIE['userid'] > 0) {
+		/* Do not check left employees Add by Grace
 		include_once(__LIB_PATH.'GeicAPI.class.php');
 		$o_g = new GeicAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 		$user = $o_g->getUserList($_COOKIE['userid'],true);
@@ -117,6 +118,7 @@ if (stripos($_SERVER['REQUEST_URI'], '/scripts/login.php') === false && stripos(
 			setcookie("userid", 0, time()+60*60*24,"/");
 			header("Location: /scripts/login.php?redirect=".urlencode($_SERVER['REQUEST_URI']));
 		}
+		*/
 	}
 	else {
 		header("Location: /scripts/login.php?redirect=".urlencode($_SERVER['REQUEST_URI']));

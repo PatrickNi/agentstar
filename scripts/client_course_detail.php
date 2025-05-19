@@ -88,7 +88,9 @@ $set_course['studentid']  = isset($_REQUEST['t_studentid'])? (string)trim($_REQU
 $set_course['paperwork'] = isset($_REQUEST['t_paperwork'])? (string)trim($_REQUEST['t_paperwork']) : 0;
 
 $msg = '';
-if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" || strtoupper($_REQUEST['bt_name']) == "COURSEPROCESS")){
+$save_button = false;
+if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" || strtoupper($_REQUEST['bt_name']) == "SAVE-CLOSE")){
+	$save_button = true;
 	if ($ugs['c_service']['i'] !=1 ) {
 		echo "<script language='javascript'>alert('Permission denied!');if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
 		exit;
@@ -193,7 +195,7 @@ if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" |
 		
 		$o_c->autoDobService($client_id, $set_course['consultant']);
 		
-		if(strtoupper($_REQUEST['bt_name']) == "SAVE") {
+		if(strtoupper($_REQUEST['bt_name']) == "SAVE-CLOSE") {
 			echo "<script language='javascript'>if(window.opener && !window.opener.closed){window.opener.location.reload(true);}window.close();</script>";
 			exit;
 		}		
@@ -207,25 +209,22 @@ if (isset($_REQUEST['bt_name']) && (strtoupper($_REQUEST['bt_name']) == "SAVE" |
 
 
 # get cource
-$course_arr = array();
-$course_arr = $o_c->getCourseByUser($course_id);
-$cateid = $o_c->getCateIDbyCourse($course_id);
-$cateid = $cateid > 0? $cateid : "";
-if ($isChange == 0 && $course_id > 0 ){
-	if (array_key_exists($cateid, $course_arr) && array_key_exists($course_id, $course_arr[$cateid])) {
-		$set_course = $course_arr[$cateid][$course_id];
+if (!$save_button && $course_id > 0 && $isChange == 0) {
+	$course_arr = $o_c->getCourseByUser($course_id);
+
+	foreach ($course_arr as $cateid => $v) {
+		$set_course = $v[$course_id];
 		$set_course['catid'] = $cateid;
-	}
-	else {
-		$set_course = $course_arr[null][$course_id];
-		$set_course['catid'] = 0;
+		break;
 	}
 }
 
-if ($course_id > 0 && $ugs['c_track']['v'] == 0 && $course_arr[$cateid][$course_id]['consultant'] != $user_id) {
+if ($course_id > 0 && $ugs['c_track']['v'] == 0 && $set_course['consultant'] != $user_id) {
 	echo "<script language='javascript'>alert('Access denied!');window.close();</script>";
 	exit;
 }
+
+
 
 //$msg = "";
 if ($o_c->isGetCOEByCourse($course_id) != 0 && $o_c->getSemNumByCourse($course_id) == 0){

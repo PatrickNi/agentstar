@@ -69,6 +69,7 @@ $sets['class']  = $sets['class'] == ""? 0 : $sets['class'];
 	$sets['tel']    = isset($_REQUEST['t_tel'])? (string)trim($_REQUEST['t_tel']) : "";
 	$sets['mobile'] = isset($_REQUEST['t_mobile'])? (string)trim($_REQUEST['t_mobile']) : "";
 	$sets['add']    = isset($_REQUEST['t_add'])? (string)trim($_REQUEST['t_add']) : "";
+	$sets['add_au']    = isset($_REQUEST['t_add_au'])? (string)trim($_REQUEST['t_add_au']) : "";
 	$sets['country']= isset($_REQUEST['t_country'])? (string)trim($_REQUEST['t_country']) : "";
 	$sets['type']   = isset($_REQUEST['t_type'])? $_REQUEST['t_type'] : array();
 	
@@ -244,11 +245,12 @@ $client_arr = array();
 $client_arr = $o_c->getOneClientInfo($client_id);
 if ($client_id > 0) {
 	$sets['visa']  = $sets['visa'] == 0? $client_arr['visa'] : $sets['visa'];
-}
-
-
-if ($client_id > 0) {
 	$sets['class'] =  $sets['class'] == 0? $client_arr['class'] : $sets['class'];
+
+	// 展示界面是GB2312， 如果原始存储编码是其他编码，展示会有问题
+	$client_arr['cus_note'] = mb_convert_encoding($client_arr['cus_note'], 'GB2312',  mb_detect_encoding($client_arr['cus_note'], ['GB2312', 'EUC-TW','GBK','UTF-8', 'ASCII'
+]));
+	$sets['cus_note'] = $client_arr['cus_note'];
 }
 
 	

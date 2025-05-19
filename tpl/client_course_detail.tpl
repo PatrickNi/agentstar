@@ -11,7 +11,7 @@
 
 <script language="javascript">{$msg_alert}</script>
 <body>
-<form method="get" name="form1" action="" target="_self" onSubmit="return isDelete()">
+<form method="post" name="form1" action="" target="_self" onSubmit="return isDelete()">
   <input type="hidden" name="cid" value="{$cid}">
   <input type="hidden" name="courseid" value="{$courseid}">
   <input type="hidden" name="isChange" value="0">
@@ -25,7 +25,10 @@
               <input name="button" type="button" style="font-weight:bold" onClick="window.open('attachment.php?item={$courseid}&type={$itemtype}','_blank', 'alwaysRaised=yes,resizable=yes,scrollbars=yes,width=' + screen.width*6/7 +',height='+screen.height*4/7)" value="Attachment">
             </td>
             <td width="49%" align="center" class="whitetext">Apply Course Detail</td>
-            <td align="right"  width="20%"><input type="submit" value="Save" style="font-weight:bold" onClick="this.form.bt_name.value='save';this.disable=false;"  {if $isapprove eq 0} disabled {/if}>
+            <td align="right"  width="20%">
+              <input type="submit" value="Save" style="font-weight:bold" onClick="this.form.bt_name.value='save';this.disable=false;"  {if $isapprove eq 0} disabled {/if}>
+                &nbsp;&nbsp;&nbsp;
+              <input type="submit" value="Save & Close" style="font-weight:bold" onClick="this.form.bt_name.value='save-close';this.disable=false;"  {if $isapprove eq 0} disabled {/if}>
             </td>
           </tr>
         </table></td>

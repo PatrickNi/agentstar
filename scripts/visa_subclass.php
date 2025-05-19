@@ -60,6 +60,18 @@ $action_arr = array(__ACT_EDIT => "Edit",  __ACT_RElATION => "Steps", 'Inactive'
 
 # format array
 $sub_arr = $o_v->getVisaClassArr($cat_id,'',true);
+$sub_order  = $sub_inactive = array();
+foreach ($sub_arr as $k => $v) {
+	if ($v['status'] == 'Inactive') {
+		$sub_inactive[$k] = $v;
+	}
+	else {
+		$sub_order[$k] = $v;
+	}
+}
+foreach ($sub_inactive as $k => $v) {
+	$sub_order[$k] = $v;
+}
 
 # get category name
 $cat_name = $o_v->getVisaName($cat_id);
@@ -68,11 +80,11 @@ $cat_name = $o_v->getVisaName($cat_id);
 # set smarty tpl
 $o_tpl = new Template;
 $o_tpl->assign('act_arr', $action_arr);
-$o_tpl->assign('subclass_arr', $sub_arr);
+$o_tpl->assign('subclass_arr', $sub_order);
 
 
-if($sub_id > 0 && array_key_exists($sub_id, $sub_arr)){
-	$o_tpl->assign('dt_name', $sub_arr[$sub_id]['name']);
+if($sub_id > 0 && array_key_exists($sub_id, $sub_order)){
+	$o_tpl->assign('dt_name', $sub_order[$sub_id]['name']);
 }
 
 $o_tpl->assign('catid', $cat_id);

@@ -55,7 +55,7 @@
           <tr align="center"  class="greybg" >
             <input type="hidden" name="bt_name" value="">
             <td align="left" width="10%">{if $ugs.b_service.d eq 1}
-              <input type="submit" value="Delete" style="font-weight:bold" onClick="this.form.bt_name.value='delete';this.disable=false;">
+              <input type="submit" value="Delete" style="font-weight:bold" onClick="this.form.method='POST';this.form.bt_name.value='delete';this.disable=false;">
               {/if}</td>
             <td class="whitetext" align="center">Client Detail</td>
             <td align="right" width="10%">
@@ -67,7 +67,7 @@
     <tr align="center"  class="greybg" >
       <td align="left" colspan="2" style="font-size:16px "><span class="highyellow">Client: {$arr.lname} {$arr.fname}</span>&nbsp;&nbsp; <span class="highyellow">DoB: {$arr.dob}</span>&nbsp;&nbsp; <span class="highyellow">Main Visa: {$arr.visa_n}-{$arr.class_n}, expr: {$arr.epdate}</span>&nbsp;&nbsp;             	
       {if $arr.status == 'new'}
-	      <input type="submit" value="Approve From GEIC" style="font-weight:bold; color:#FF0000" onClick="this.form.bt_name.value='approved';this.disable=false;" >
+	      <input type="submit" value="Approve From GEIC" style="font-weight:bold; color:#FF0000" onClick="this.form.method='POST';this.form.bt_name.value='approved';this.disable=false;" >
       {/if}
       </td>
     </tr>
@@ -230,16 +230,20 @@
                 <td width="28%"  align="left" class="rowodd"><strong>Matrial Status:</strong>&nbsp;&nbsp;</td>
                 <td align="left" width="72%" class="roweven">
                         <select name="t_m" class="text">
-                                <option value="married" {if $arr.married == 'married'} selected {/if} >ï¿½ï¿½ï¿½??(Married)</option>
-                                <option value="divorce" {if $arr.married == 'divorce'} selected {/if}>ï¿½ï¿½ï¿½??(Divorce)</option>
-                                <option value="never_married" {if $arr.married == 'never_married'} selected {/if}>Î´ï¿½ï¿½(Never Married)</option>
-                                <option value="separated" {if $arr.married == 'separated'} selected {/if}>ï¿½Ö¾ï¿½(Separated)</option>
-                                <option value="defacto" {if $arr.married == 'defacto'} selected {/if}>Í¬ï¿½ï¿½(Defacto Relationship)</option>
+                                <option value="married" {if $arr.married == 'married'} selected {/if} >ÒÑ»é(Married)</option>
+                                <option value="divorce" {if $arr.married == 'divorce'} selected {/if}>Àë»é(Divorce)</option>
+                                <option value="never_married" {if $arr.married == 'never_married'} selected {/if}>Î´»é(Never Married)</option>
+                                <option value="separated" {if $arr.married == 'separated'} selected {/if}>·Ö¾Ó(Separated)</option>
+                                <option value="defacto" {if $arr.married == 'defacto'} selected {/if}>Í¬¾Ó(Defacto Relationship)</option>
                         </select>
                 </td>
               <tr>    
                 <td height="30" align="left" class="rowodd"><strong>Current residential addres:</strong>&nbsp;&nbsp;</td>
                 <td align="left" width="72%" class="roweven"><input type="text" size="100" name="t_add" value="{$arr.add}"></td>
+              </tr>
+              <tr>    
+                <td height="30" align="left" class="rowodd"><strong>Austrialia Address:</strong>&nbsp;&nbsp;</td>
+                <td align="left" width="72%" class="roweven"><input type="text" size="100" name="t_add_au" value="{$arr.add_au}"></td>
               </tr>
               <tr>
                 <td width="28%"  align="left" class="rowodd"><strong>Client Type:</strong>&nbsp;&nbsp;</td>
@@ -385,12 +389,12 @@
 			obj1.style.visibility="visible";
 		}
     else if(str == 'Global Partner') {
-      $('#tr_gp').css('visibility','visible');
-      $('#tr_ab').css('visibility','collapse');
-    }
-    else if(str == "Ambassador") {
       $('#tr_ab').css('visibility','visible');
       $('#tr_gp').css('visibility','collapse');
+    }
+    else if(str == "Global Agent") {
+      $('#tr_gp').css('visibility','visible');
+      $('#tr_ab').css('visibility','collapse');
     }
 		else{
 			obj1.disabled = true;

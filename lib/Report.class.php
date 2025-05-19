@@ -3068,7 +3068,7 @@ class ReportAPI extends MysqlDB {
 	}
 	
 	function getCommissionByUser($userid, $page=0, $page_size=0){
-		$sql = "select concat(LName, ' ', FName) as Name, a.CID, b.ID as CourseID, c.ID as SemID, d.Detail, d.KeyPoint, d.BeginDate from client_info a 
+		$sql = "select concat(LName, ' ', FName) as Name, a.CID, b.ID as CourseID, c.ID as SemID, d.Detail, d.KeyPoint, d.BeginDate, c.G_Invoice from client_info a 
 				left join client_course b on(a.CID = b.CID) 
 				left join client_course_sem c on(b.ID = c.CCID) 
 				left join client_course_sem_process d on(c.ID = d.SemID and d.KeyPoint <> '' and Done = 0) 
@@ -3090,6 +3090,7 @@ class ReportAPI extends MysqlDB {
 			$_arr[$this->CID]['course'][$this->CourseID][$this->SemID]['key'] = $this->KeyPoint;
             $_arr[$this->CID]['course'][$this->CourseID][$this->SemID]['cid'] = $this->CID;
             $_arr[$this->CID]['course'][$this->CourseID][$this->SemID]['date'] = $this->BeginDate;
+            $_arr[$this->CID]['course'][$this->CourseID][$this->SemID]['invoice'] = $this->G_Invoice;
 		}
 		return $_arr;
 	}
@@ -3114,7 +3115,7 @@ class ReportAPI extends MysqlDB {
 
 
     function getCommissionByTopAgent($userid, $page=0, $page_size=0){
-        $sql = "select concat(LName, ' ', FName) as Name, if(ag.Name is null, '*n/a', ag.Name) as NameAgent, b.AgentID, a.CID, b.ID as CourseID, c.ID as SemID, d.Detail, d.KeyPoint, d.BeginDate from client_info a 
+        $sql = "select concat(LName, ' ', FName) as Name, if(ag.Name is null, '*n/a', ag.Name) as NameAgent, b.AgentID, a.CID, b.ID as CourseID, c.ID as SemID, d.Detail, d.KeyPoint, d.BeginDate c.G_Invoice from client_info a 
                 left join client_course b on(a.CID = b.CID) 
                 left join client_course_sem c on(b.ID = c.CCID) 
                 left join client_course_sem_process d on(c.ID = d.SemID and d.KeyPoint <> '' and Done = 0) 
@@ -3138,6 +3139,7 @@ class ReportAPI extends MysqlDB {
             $_arr[$this->AgentID]['course'][$this->CourseID][$this->SemID]['cid'] = $this->CID;
             $_arr[$this->AgentID]['course'][$this->CourseID][$this->SemID]['client'] = $this->Name;
             $_arr[$this->AgentID]['course'][$this->CourseID][$this->SemID]['date'] = $this->BeginDate;
+            $_arr[$this->AgentID]['course'][$this->CourseID][$this->SemID]['invoice'] = $this->G_Invoice;
         }
         return $_arr;
     }
@@ -3163,7 +3165,7 @@ class ReportAPI extends MysqlDB {
 
 
     function getCommissionBySchool($userid, $page=0, $page_size=0){
-        $sql = "select concat(LName, ' ', FName) as Name, if(i.Name is null, '*n/a', i.Name) as NameSchool, b.IID, a.CID, b.ID as CourseID, c.ID as SemID, d.Detail, d.KeyPoint, d.BeginDate from client_info a 
+        $sql = "select concat(LName, ' ', FName) as Name, if(i.Name is null, '*n/a', i.Name) as NameSchool, b.IID, a.CID, b.ID as CourseID, c.ID as SemID, d.Detail, d.KeyPoint, d.BeginDate, c.G_Invoice from client_info a 
                 left join client_course b on(a.CID = b.CID)
                 left join client_course_sem c on(b.ID = c.CCID) 
                 left join client_course_sem_process d on(c.ID = d.SemID and d.KeyPoint <> '' and Done = 0) 
@@ -3187,6 +3189,7 @@ class ReportAPI extends MysqlDB {
             $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['cid'] = $this->CID;
             $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['client'] = $this->Name;
             $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['date'] = $this->BeginDate; 
+            $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['invoice'] = $this->G_Invoice; 
         }
         return $_arr;
     }
@@ -3211,7 +3214,7 @@ class ReportAPI extends MysqlDB {
 
 
     function getCommissionByAccount($userid, $page=0, $page_size=0){
-        $sql = "select concat(LName, ' ', FName) as Name, if(i.Name is null, '*n/a', i.Name) as NameSchool, b.IID, a.CID, b.ID as CourseID, c.ID as SemID, d.Subject, d.KeyPoint, d.BeginDate from client_info a 
+        $sql = "select concat(LName, ' ', FName) as Name, if(i.Name is null, '*n/a', i.Name) as NameSchool, b.IID, a.CID, b.ID as CourseID, c.ID as SemID, d.Subject, d.KeyPoint, d.BeginDate, c.G_Invoice from client_info a 
                 left join client_course b on(a.CID = b.CID)
                 left join client_course_sem c on(b.ID = c.CCID) 
                 left join client_course_sem_process d on(c.ID = d.SemID and d.KeyPoint = '' and Done = 0) 
@@ -3235,6 +3238,7 @@ class ReportAPI extends MysqlDB {
             $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['cid'] = $this->CID;
             $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['client'] = $this->Name;
             $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['date'] = $this->BeginDate;
+            $_arr[$this->IID]['course'][$this->CourseID][$this->SemID]['invoice'] = $this->G_Invoice;
         }
         return $_arr;
     }
@@ -3996,6 +4000,361 @@ class ReportAPI extends MysqlDB {
             return false;
         }
         return true;
+    }
+
+
+    function getAllOfVisaApply($fromDay, $toDay, $userid, $aboutus="") 
+    {
+        //and (b.Item not like '%assessment' or b.Item is null) 
+        $sql  = "select if(b.Item is null, a.ExItem, b.Item) AS Item, c.AFee, concat(LName, ' ', FName) as Name, d.CID, c.ID, c.r_Status, c.CateID, c.SubClassID, s.ClassName from client_visa_process a left join visa_rs_item b on (a.ItemID = b.ITEMID), client_visa c, client_info d, visa_subclass s
+        where a.CVID  = c.ID and c.CID = d.CID and s.CateId = c.CateId and s.SubClassID = c.SubClassID and b.Item is not null and a.Done = 1 ";
+        if ($userid > 0) {
+            $sql .= " AND c.AUserID = {$userid} ";
+        }
+        if ($fromDay != "" && $toDay  != "") {
+            $sql .= " AND a.BeginDate >= '{$fromDay}' and a.BeginDate <= '{$toDay}' ";
+        }		
+
+        if ($aboutus != "") {
+            if ($aboutus == 'Others') {
+                $sql .= " AND d.about = '' ";
+            }
+            else {
+                $sql .= " AND d.about = '{$aboutus}' ";
+            }
+        }
+        //echo $sql."\n";
+        $this->query($sql);
+        $i = 0;
+        $visa   = array();
+        while ($this->fetch()) {
+
+            $static = false;
+            //20 visa complaince / onshore ART
+            if ($this->CateID == 9 && $this->SubClassID == 29) {
+
+                if (preg_match('/^apply/i', $this->Item)){
+                    $visa[$this->ID]['art_apply'] = $i;
+                    $static = true;
+                }          
+                
+                if (preg_match('/^provide information/i', $this->Item)){
+                    $visa[$this->ID]['art_provide'] = $i;
+                    $static = true;
+                }   
+                
+                if (preg_match('/^hearing date/i', $this->Item)){
+                    $visa[$this->ID]['art_hearing'] = $i;
+                    $static = true;
+                }         
+            }
+            else {
+                if (preg_match('/^apply/i', $this->Item)){
+                    $static = true;
+
+                    //4 Student Visa
+                    if ($this->CateID == 5) {
+                        $visa[$this->ID]['student_apply'] = $i;
+                        $visa[$this->ID]['subclass_name'] = $this->ClassName;
+                    }
+                    else {
+                        $visa[$this->ID]['other_apply'] = $i;
+                    }
+                }
+            }
+
+            if ($static) {
+                $visa[$this->ID]['cname'] = $this->Name;
+                $visa[$this->ID]['cid'] = $this->CID;
+                $visa[$this->ID]['profit'] = 0;
+                $visa[$this->ID]['has_agreement_fee'] = 0;
+                $visa[$this->ID]['agreement_fee'] = 0;
+                $visa[$this->ID]['receive_fee'] = 0; 
+                $visa[$this->ID]['spand_fee'] = 0; 
+                $visa[$this->ID]['referral'] = 0;
+                $visa[$this->ID]['gst'] = 0;   
+                $visa[$this->ID]['cate'] = $this->CateID;
+                $visa[$this->ID]['subclass'] = $this->SubClassID;
+                $i++;
+            }
+        }
+
+        //calc payment
+        $_arr['all'] = ['student' => ['clients'=>0, 'paid'=>0, 'catelog'=>[]], 
+                        'art_apply'=>['clients'=>0, 'paid'=>0, 'idx'=>[]], 
+                        'art_provide'=>['clients'=>0, 'paid'=>0, 'idx'=>[]], 
+                        'art_hearing'=>['clients'=>0, 'paid'=>0, 'idx'=>[]],
+                        'other' => ['clients'=>0, 'paid'=>0, 'idx'=>[]], 
+                        'total'=>['clients'=>0, 'paid'=>0, 'idx'=>[]],
+                        'cases'=>[],
+                        ];
+
+        if (count($visa) > 0) {
+            $sql = "select a.ID, VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD, count(*) as batch , SUM(IF(STEP = 'agreement' AND DueAmount > 0, 1, 0)) AS HAS_AGREEMENT_FEE, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a left join client_payment b on(a.ID = b.AccountID) Where VisaID IN (".implode(',', array_keys($visa)).") AND ACC_TYPE = 'visa' and Step in ('agreement', 'extra-agreement') Group by a.ID";
+            $this->query($sql);
+            //echo $sql."\n";
+            while ($this->fetch()){
+                //paperwork profit
+                //$visa[$this->VisaID]['profit'] += $this->paid - ($this->GST == 1? $this->DueAmount/11 : 0) - $this->AMOUNT_3RD + ($this->GST_3RD == 1? $this->AMOUNT_3RD/11 : 0);
+                $visa[$this->VisaID]['agreement_fee'] += round(($this->GST == 1? $this->DueAmount/1.1 : $this->DueAmount),2);
+                $visa[$this->VisaID]['profit'] += round(($this->GST == 1? $this->paid/1.1 : $this->paid),2);
+                $visa[$this->VisaID]['has_agreement_fee'] += $this->HAS_AGREEMENT_FEE;
+                $visa[$this->VisaID]['receive_fee'] += $this->paid;
+                $visa[$this->VisaID]['gst'] = $this->GST;
+                $visa[$this->VisaID]['gst_3rd'] = $this->GST_3RD;
+                $visa[$this->VisaID]['referral'] += round(($this->GST_3RD == 1? $this->AMOUNT_3RD/1.1 : $this->AMOUNT_3RD),2);
+
+            }
+
+            $art_policies = ['art_apply'=>0.03, 'art_provide'=>0.3, 'art_hearing'=>0.67];
+            $student_catelog = [];
+
+            foreach ($visa as $vid => $v) {
+
+                if (isset($v['student_apply']) || isset($v['other_apply'])){
+                    $rev = ($v['profit'] - $v['referral']);
+
+                    if ($rev <= 0)
+                        continue;
+
+                    $idx = 'no';
+                    if (isset($v['other_apply'])) {
+                        $_arr['all']['other']['clients']++;
+                        $_arr['all']['other']['paid'] += $rev;
+                        array_push($_arr['all']['other']['idx'], $v['other_apply']);
+
+                        $idx =  $v['other_apply'];
+                    }
+                    elseif(isset($v['student_apply'])) {
+                        $_arr['all']['student']['clients']++;
+                        $_arr['all']['student']['paid'] += $rev;
+                        
+                        $subclass_normalize = str_replace(' ', '_', $v['subclass_name']);
+                        if (!isset($student_catelog[$subclass_normalize])) {
+                            $student_catelog[$subclass_normalize] = ['clients'=>0, 'paid'=>0, 'idx'=>[], 'name'=>$v['subclass_name']];
+                        }
+                        $student_catelog[$subclass_normalize]['clients']++;
+                        $student_catelog[$subclass_normalize]['paid'] += $rev;
+                        array_push($student_catelog[$subclass_normalize]['idx'], $v['student_apply']);
+
+                        $idx =  $v['student_apply'];
+                        
+                    }
+
+                    if ($idx !== 'no') {
+                        $_arr['all']['total']['clients']++;
+                        $_arr['all']['total']['paid'] += $rev;
+                        array_push($_arr['all']['total']['idx'], $idx);
+                        $_arr['all']['cases'][$idx] = ['cname'=>$v['cname'], 'cid'=>$v['cid'], 'vid'=>$vid, 'rev'=>$rev];
+                    }
+                }
+                else {
+                    foreach ($art_policies as $step => $percent) {
+                        if (!isset($v[$step]))
+                            continue;
+
+                        $rev = $v['agreement_fee'] * $percent;
+                        $_arr['all'][$step]['clients']++;
+                        $_arr['all'][$step]['paid'] += $rev;  
+                        array_push($_arr['all'][$step]['idx'], $v[$step]);
+
+                        if (!isset($_arr['all']['cases'][$v[$step]])) {
+                            $_arr['all']['cases'][$v[$step]] = ['cname'=>$v['cname'], 'cid'=>$v['cid'], 'vid'=>$vid, 'rev'=>$v['agreement_fee']];
+                        }
+                        $_arr['all']['cases'][$v[$step]][$step] = $rev;
+                       
+                    }
+                }
+            }
+
+            $_arr['all']['student']['catelog'] = $student_catelog;
+        }
+
+        return $_arr;	
+    }
+
+    function getNumOfVisaApply($fromDay, $toDay, $userid, $aboutus="")
+    {
+        //and (b.Item not like '%assessment' or b.Item is null) 
+        $sql  = "select date_format(BeginDate, '%Y%u') as Week, if(b.Item is null, a.ExItem, b.Item) AS Item, c.AFee, concat(LName, ' ', FName) as Name, d.CID, c.ID, c.r_Status, c.CateID, c.SubClassID, s.ClassName from client_visa_process a left join visa_rs_item b on (a.ItemID = b.ITEMID), client_visa c, client_info d, visa_subclass s
+        where a.CVID  = c.ID and c.CID = d.CID and s.CateId = c.CateId and s.SubClassID = c.SubClassID and b.Item is not null and a.Done = 1 ";
+        if ($userid > 0) {
+            $sql .= " AND c.AUserID = {$userid} ";
+        }
+        if ($fromDay != "" && $toDay  != "") {
+            $sql .= " AND a.BeginDate >= '{$fromDay}' and a.BeginDate <= '{$toDay}' ";
+        }		
+
+        if ($aboutus != "") {
+            if ($aboutus == 'Others') {
+                $sql .= " AND d.about = '' ";
+            }
+            else {
+                $sql .= " AND d.about = '{$aboutus}' ";
+            }
+        }
+        //echo $sql."\n";
+        $this->query($sql);
+        $i = 0;
+        $visa   = array();
+        while ($this->fetch()) {
+
+            $static = false;
+            //20 visa complaince / onshore ART
+            if ($this->CateID == 9 && $this->SubClassID == 29) {
+
+                if (preg_match('/^apply/i', $this->Item)){
+                    $visa[$this->ID]['art_apply'] = $i;
+                    $static = true;
+                }          
+                
+                if (preg_match('/^provide information/i', $this->Item)){
+                    $visa[$this->ID]['art_provide'] = $i;
+                    $static = true;
+                }   
+                
+                if (preg_match('/^hearing date/i', $this->Item)){
+                    $visa[$this->ID]['art_hearing'] = $i;
+                    $static = true;
+                }         
+            }
+            else {
+                if (preg_match('/^apply/i', $this->Item)){
+                    $static = true;
+
+                    //4 Student Visa
+                    if ($this->CateID == 5) {
+                        $visa[$this->ID]['student_apply'] = $i;
+                        $visa[$this->ID]['subclass_name'] = $this->ClassName;
+                    }
+                    else {
+                        $visa[$this->ID]['other_apply'] = $i;
+                    }
+                }
+            }
+
+            if ($static) {
+                $visa[$this->ID]['cname'] = $this->Name;
+                $visa[$this->ID]['cid'] = $this->CID;
+                $visa[$this->ID]['profit'] = 0;
+                $visa[$this->ID]['has_agreement_fee'] = 0;
+                $visa[$this->ID]['agreement_fee'] = 0;
+                $visa[$this->ID]['receive_fee'] = 0; 
+                $visa[$this->ID]['spand_fee'] = 0; 
+                $visa[$this->ID]['referral'] = 0;
+                $visa[$this->ID]['gst'] = 0;   
+                $visa[$this->ID]['cate'] = $this->CateID;
+                $visa[$this->ID]['subclass'] = $this->SubClassID;
+                $visa[$this->ID]['week'] = $this->Week;
+                $i++;
+            }
+        }
+
+        //calc payment
+        $_arr['all'] = ['student' => ['clients'=>0, 'paid'=>0, 'catelog'=>[]], 
+                        'art_apply'=>['clients'=>0, 'paid'=>0, 'idx'=>[]], 
+                        'art_provide'=>['clients'=>0, 'paid'=>0, 'idx'=>[]], 
+                        'art_hearing'=>['clients'=>0, 'paid'=>0, 'idx'=>[]],
+                        'other' => ['clients'=>0, 'paid'=>0, 'idx'=>[]], 
+                        'total'=>['clients'=>0, 'paid'=>0, 'idx'=>[]],
+                        'cases'=>[],
+                        ];
+
+        if (count($visa) > 0) {
+            $sql = "select a.ID, VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD, count(*) as batch , SUM(IF(STEP = 'agreement' AND DueAmount > 0, 1, 0)) AS HAS_AGREEMENT_FEE, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a left join client_payment b on(a.ID = b.AccountID) Where VisaID IN (".implode(',', array_keys($visa)).") AND ACC_TYPE = 'visa' and Step in ('agreement', 'extra-agreement') Group by a.ID";
+            $this->query($sql);
+            //echo $sql."\n";
+            while ($this->fetch()){
+                //paperwork profit
+                //$visa[$this->VisaID]['profit'] += $this->paid - ($this->GST == 1? $this->DueAmount/11 : 0) - $this->AMOUNT_3RD + ($this->GST_3RD == 1? $this->AMOUNT_3RD/11 : 0);
+                $visa[$this->VisaID]['agreement_fee'] += round(($this->GST == 1? $this->DueAmount/1.1 : $this->DueAmount),2);
+                $visa[$this->VisaID]['profit'] += round(($this->GST == 1? $this->paid/1.1 : $this->paid),2);
+                $visa[$this->VisaID]['has_agreement_fee'] += $this->HAS_AGREEMENT_FEE;
+                $visa[$this->VisaID]['receive_fee'] += $this->paid;
+                $visa[$this->VisaID]['gst'] = $this->GST;
+                $visa[$this->VisaID]['gst_3rd'] = $this->GST_3RD;
+                $visa[$this->VisaID]['referral'] += round(($this->GST_3RD == 1? $this->AMOUNT_3RD/1.1 : $this->AMOUNT_3RD),2);
+
+            }
+
+            $art_policies = ['art_apply'=>0.03, 'art_provide'=>0.3, 'art_hearing'=>0.67];
+            $student_catelog = [];
+
+            foreach ($visa as $vid => $v) {
+                if (!isset($_arr[$v['week']])) {
+                    $_arr[$v['week']] = ['student' => ['clients'=>0, 'paid'=>0, 'catelog'=>[]], 
+                                    'art_apply'=>['clients'=>0, 'paid'=>0, 'idx'=>[]], 
+                                    'art_provide'=>['clients'=>0, 'paid'=>0, 'idx'=>[]], 
+                                    'art_hearing'=>['clients'=>0, 'paid'=>0, 'idx'=>[]],
+                                    'other' => ['clients'=>0, 'paid'=>0, 'idx'=>[]], 
+                                    'total'=>['clients'=>0, 'paid'=>0, 'idx'=>[]],
+                                    'cases'=>[],
+                                    ];
+                }
+
+                if (isset($v['student_apply']) || isset($v['other_apply'])){
+                    $rev = ($v['profit'] - $v['referral']);
+
+                    if ($rev <= 0)
+                        continue;
+
+                    $idx = 'no';
+                    if (isset($v['other_apply'])) {
+                        $_arr[$v['week']]['other']['clients']++;
+                        $_arr[$v['week']]['other']['paid'] += $rev;
+                        array_push($_arr[$v['week']]['other']['idx'], $v['other_apply']);
+
+                        $idx =  $v['other_apply'];
+                    }
+                    elseif(isset($v['student_apply'])) {
+                        $_arr[$v['week']]['student']['clients']++;
+                        $_arr[$v['week']]['student']['paid'] += $rev;
+                        
+                        $subclass_normalize = str_replace(' ', '_', $v['subclass_name']);
+                        if (!isset($student_catelog[$v['week']])&&!isset($student_catelog[$v['week']][$subclass_normalize])) {
+                            $student_catelog[$v['week']][$subclass_normalize] = ['clients'=>0, 'paid'=>0, 'idx'=>[], 'name'=>$v['subclass_name']];
+                        }
+                        $student_catelog[$v['week']][$subclass_normalize]['clients']++;
+                        $student_catelog[$v['week']][$subclass_normalize]['paid'] += $rev;
+                        array_push($student_catelog[$v['week']][$subclass_normalize]['idx'], $v['student_apply']);
+
+                        $idx =  $v['student_apply'];
+                        
+                    }
+
+                    if ($idx !== 'no') {
+                        $_arr[$v['week']]['total']['clients']++;
+                        $_arr[$v['week']]['total']['paid'] += $rev;
+                        array_push($_arr[$v['week']]['total']['idx'], $idx);
+                        $_arr[$v['week']]['cases'][$idx] = ['cname'=>$v['cname'], 'cid'=>$v['cid'], 'vid'=>$vid, 'rev'=>$rev];
+                    }
+                }
+                else {
+                    foreach ($art_policies as $step => $percent) {
+                        if (!isset($v[$step]))
+                            continue;
+
+                        $rev = $v['agreement_fee'] * $percent;
+                        $_arr[$v['week']][$step]['clients']++;
+                        $_arr[$v['week']][$step]['paid'] += $rev;  
+                        array_push($_arr[$v['week']][$step]['idx'], $v[$step]);
+
+                        if (!isset($_arr[$v['week']]['cases'][$v[$step]])) {
+                            $_arr[$v['week']]['cases'][$v[$step]] = ['cname'=>$v['cname'], 'cid'=>$v['cid'], 'vid'=>$vid, 'rev'=>$v['agreement_fee']];
+                        }
+                        $_arr[$v['week']]['cases'][$v[$step]][$step] = $rev;
+                       
+                    }
+                }
+            }
+
+            foreach ($student_catelog as $week => $detail) {
+                $_arr[$week]['student']['catelog'] = $detail;
+            }
+            
+        }
+
+        return $_arr;	
     }
 }
 ?>

@@ -34,7 +34,19 @@
   	<tr align="center" class="{cycle values='rowodd, roweven'}">
     	<td align="center" style="text-decoration:underline; cursor:pointer" onClick="window.open('redir.php?t=vs&cid={$arr.client}&vid={$vid}','','height='+screen.width*4/5+','+'width='+screen.width*4/5)">{$arr.name}</td>
     	{foreach key=id item=title from=$title_arr}
-    		<td >{if array_key_exists($vid, $procs) && array_key_exists($id, $procs[$vid])}{$procs[$vid].$id}{else} &nbsp;{/if}</td>
+    		<td >
+          {if array_key_exists($vid, $procs)}
+              {if array_key_exists($id, $procs[$vid])}
+                {$procs[$vid].$id}
+              {elseif stripos("grant", $title) !== false}
+                {$arr.status}
+              {else}
+                &nbsp;
+              {/if}
+          {else} 
+              &nbsp;
+          {/if}
+        </td>
     	{/foreach}
 		<td align="right">{if array_key_exists($vid, $amounts)}{$amounts[$vid].balance|string_format:"%.2f"}{/if}</td>
     </tr>

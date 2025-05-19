@@ -66,7 +66,7 @@
                     {foreach key=id item=v from=$tpl_arr}
                         <option value="{$id}" {if $cl_tplid eq $id} selected {/if}>
                         {if $v.catename != "" && $v.classname != ""}
-                            {$v.catename} - {$v.classname}
+                            {$v.name} / {$v.catename} - {$v.classname}
                         {else}
                             {$v.name}
                         {/if}

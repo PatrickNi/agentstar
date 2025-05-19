@@ -201,6 +201,9 @@ class ChecklistAPI extends MysqlDB{
         if (!$to_tpl_id || !$from_tpl_id)
             return false;
 
+        $from_tpl = $this->getTpls($from_tpl_id);
+        $this->setTpl($to_tpl_id, '','', $from_tpl[$from_tpl_id]['visacate'], $from_tpl[$from_tpl_id]['visaclass']);
+
         $sql = "insert into checklist_item (TplID, ItemCode, ItemRank) select {$to_tpl_id} as TplID, ItemCode, ItemRank from checklist_item where tplid = {$from_tpl_id}";
         return $this->query($sql);
     }

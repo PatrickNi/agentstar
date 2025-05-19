@@ -235,7 +235,12 @@ $o_tpl->assign('class_arr', $class_arr);
 $o_tpl->assign('user_arr', $user_arr);
 
 if ($visa_id > 0){
-	$o_tpl->assign('process_arr', $o_c->getVisaProcess($visa_id));
+	$process_arr =  $o_c->getVisaProcess($visa_id);
+	foreach ($process_arr as $k => $v) {
+		$process_arr[$k]['subject'] = iconv('utf-8', 'gb2312', $v['subject']);
+	}
+	$o_tpl->assign('process_arr', $process_arr);
+
 }
 
 //show course

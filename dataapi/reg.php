@@ -128,6 +128,7 @@ elseif (isset($_REQUEST['reg']) && $_REQUEST['reg'] == 'uploadall') {
 		$sets['tel']    = isset($data['profile']['t_tel'])? (string)trim($data['profile']['t_tel']) : "";
 		$sets['mobile'] = isset($data['profile']['t_mobile'])? (string)trim($data['profile']['t_mobile']) : "";
 		$sets['add']    = isset($data['profile']['t_add'])? (string)trim($data['profile']['t_add']) : "";
+		$sets['add_au']    = isset($data['profile']['t_add_au'])? (string)trim($data['profile']['t_add_au']) : "";
 		$sets['country']= isset($data['profile']['t_country'])? (string)trim($data['profile']['t_country']) : "";
 		//$sets['type']   = isset($data['profile']['t_type'])? (string)trim($data['profile']['t_type']) : "";
 		$sets['type']   = isset($data['profile']['t_type'])? $data['profile']['t_type'] : array();
@@ -135,8 +136,7 @@ elseif (isset($_REQUEST['reg']) && $_REQUEST['reg'] == 'uploadall') {
 		$sets['agent']  = isset($data['profile']['t_agent'])? (string)trim($data['profile']['t_agent']) : 0;
 		$sets['cus_note']   = isset($data['profile']['t_cus_note'])? (string)trim($data['profile']['t_cus_note']) : "";
 		//	$sets['cuser']    = isset($data['profile']['t_cuser'])? (string)trim($data['profile']['t_cuser']) : 0;
-		$sets['sign']  = isset($data['profile']['t_sign'])  && $data['profile']['t_sign'] != '' ? (string)trim($data['profile']['t_sign']) : date('Y-m-d');
-		//	$sets['sign']  = $sets['sign'] == ""? date("Y-m-d"): $sets['sign'];
+		$sets['sign']  = isset($data['profile']['t_sign'])  && $data['profile']['t_sign'] != '' ? (string)trim($data['profile']['t_sign']) : '';
 		
 		$sets['about']  = isset($data['profile']['t_about'])? (string)trim($data['profile']['t_about']) : "";
 		@$sets['about']  = $sets['about'] == "" ? (string)$data['profile']['t_aboutTxt'] : $sets['about'];
@@ -290,8 +290,7 @@ $sets['type']   = isset($_REQUEST['t_type'])? explode(',', $_REQUEST['t_type']) 
 $sets['agent']  = isset($_REQUEST['t_agent'])? (string)trim($_REQUEST['t_agent']) : 0;
 $sets['cus_note']   = isset($_REQUEST['t_cus_note'])? (string)trim($_REQUEST['t_cus_note']) : "";
 //	$sets['cuser']    = isset($_REQUEST['t_cuser'])? (string)trim($_REQUEST['t_cuser']) : 0;
-$sets['sign']  = isset($_REQUEST['t_sign'])  && $_REQUEST['t_sign'] != '' ? (string)trim($_REQUEST['t_sign']) : date('Y-m-d');
-//	$sets['sign']  = $sets['sign'] == ""? date("Y-m-d"): $sets['sign'];
+$sets['sign']  = isset($_REQUEST['t_sign'])  && $_REQUEST['t_sign'] != '' ? (string)trim($_REQUEST['t_sign']) : '';
 
 $sets['about']  = isset($_REQUEST['t_about'])? (string)trim($_REQUEST['t_about']) : "";
 @$sets['about']  = $sets['about'] == "" ? (string)$_REQUEST['t_aboutTxt'] : $sets['about'];

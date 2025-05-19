@@ -1,7 +1,7 @@
 <?php
 require_once('../etc/const.php');
-ini_set("display_errors", 1);
-error_reporting(4096);
+//ini_set("display_errors", 1);
+//error_reporting(E_ALL);
 
 
 require_once(__LIB_PATH.'Template.class.php');
@@ -56,6 +56,7 @@ $homeloan  = array();
 $homeloan_fee  = array();
 $coaches  = array();
 $coaches_fee = array();
+$visaapplies = array();
 
 $from_archive = false;
 
@@ -110,6 +111,7 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
                 $visaprocs  = $archive['visaprocs'];
                 $visavisits = $archive['visavisits'];
                 $visareviews = isset($archive['visareviews'])? $archive['visareviews'] : array();
+                $visaapplies = isset($archive['visaapplies'])? $archive['visaapplies'] : array();
                 $homeloan   = $archive['homeloan'];
                 $homeloan_fee   = $archive['homeloan_fee']; 
                 
@@ -148,6 +150,7 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
                 $visareviews= $o_r->getNumOfVisaReviewByUser($from_day, $to_day, $staff_id, $query_about);
                 $homeloan   = $o_r->getNumOfHomeLoan($from_day, $to_day, $staff_id, $query_about);
                 $homeloan_fee   = $o_r->getNumOfHomeLoanFee($from_day, $to_day, $staff_id, $query_about);
+                $visaapplies = $o_r->getNumOfVisaApply($from_day, $to_day, $staff_id, $query_about);
             }
 
             if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C' || $user_pos == 'M'){
@@ -197,6 +200,7 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
                 $visaprocs  = $archive['visaprocs'];
                 $visapaids  = $archive['visapaids'];
                 $visareviews  = isset($archive['visareviews'])? $archive['visareviews'] : array();
+                $visaapplies = isset($archive['visaapplies'])? $archive['visaapplies'] : array();
                 $visavisits = $archive['visavisits'];
                 $homeloan   = $archive['homeloan'];
                 $homeloan_fee   = $archive['homeloan_fee']; 
@@ -232,6 +236,7 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
                 $visareviews= $o_r->getAllOfVisaReviewByUser($from_day, $to_day, $staff_id, $query_about);
                 $homeloan   = $o_r->getAllOfHomeLoan($from_day, $to_day, $staff_id, $query_about);        
                 $homeloan_fee   = $o_r->getAllOfHomeLoanFee($from_day, $to_day, $staff_id, $query_about); 
+		        $visaapplies = $o_r->getAllOfVisaApply($from_day, $to_day, $staff_id, $query_about);
             }
 
             if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C' || $user_pos == 'M') {
@@ -297,6 +302,8 @@ $o_tpl->assign('uid', $user_id);
 $o_tpl->assign('user_pos', $user_pos);
 $o_tpl->assign('clientfroms', $o_c->getClientFrom());
 $o_tpl->assign('query_about', $query_about);
+$o_tpl->assign('visaapplies',$visaapplies);
+
 
 
 
@@ -323,8 +330,18 @@ $o_tpl->assign('leave_staffs', " var leave_staffs=".json_encode($leave_staffs)."
 $o_tpl->assign('ugs', $ugs);
 
 
-$o_tpl->display($from_archive && $o_r->getStaffArchiveTime($staff_id, $is_all) <= '2023-03-08'? 'report_staff.2.tpl' : 'report_staff.3.tpl');
-
+//$o_tpl->display($from_archive && $o_r->getStaffArchiveTime($staff_id, $is_all) <= '2023-03-08'? 'report_staff.2.tpl' : 'report_staff.3.tpl');
+$tpl_version = 'report_staff.4.tpl';
+if ($from_archive) {
+    $archive_date = $o_r->getStaffArchiveTime($staff_id, $is_all);
+    if ($archive_date <= '2023-03-08') {
+        $tpl_version = 'report_staff.2.tpl';
+    }
+    else {
+        $tpl_version = 'report_staff.3.tpl';
+    }
+}
+$o_tpl->display($tpl_version);
 
 
 ?>

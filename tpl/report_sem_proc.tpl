@@ -34,7 +34,7 @@
 	<tr class="roweven">
 		<td align="right">{$darr.date}</td>
 		<td align="left"><span  style="padding-left:40; cursor:pointer;{if $darr.key eq $step2}color:#33FF00;{/if}" onClick="window.open('client_course_sem.php?courseid={$ccid}&cid={$darr.cid}&semid={$procid}','','height='+screen.width*4/5+','+'width='+screen.width*4/5)">
-		{if $is_agent eq 1}{$darr.client}&nbsp;&nbsp;{/if}{$darr.desc}
+		{if $is_agent eq 1}{$darr.client}&nbsp;&nbsp;{/if}{$darr.desc}&nbsp;&nbsp;(Invoice: {$darr.invoice})
 
 
 		</span></td>

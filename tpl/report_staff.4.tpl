@@ -109,8 +109,10 @@
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:300px" id="d1_{$week}">
         <ul>
           {foreach key=id item=name from=$courses[$week].name_new}
-          <li><span style="text-decoration:underline; cursor:pointer; {if $courses[$week].apo.$id eq 0}color:#0000FF{elseif $courses[$week].num.$id eq $courses[$week].refuse.$id}color:#999999;{/if}" onClick="window.open('client_course.php?cid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
-            {/foreach}
+            <li>
+              <span style="text-decoration:underline; cursor:pointer; {if $courses[$week].apo.$id eq 0}color:#0000FF{elseif $courses[$week].num.$id eq $courses[$week].refuse.$id}color:#999999;{/if}" onClick="window.open('client_course.php?cid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
+            </li>
+          {/foreach}
         </ul>
         <span style="font-size:16px; font-weight:bolder; cursor:pointer;" onClick="d1_{$week}.style.display='none'">&times;</span> 
       </div>
@@ -118,8 +120,10 @@
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:300px" id="d1_all_{$week}">
         <ul>
           {foreach key=id item=name from=$courses[$week].name}
-          <li><span style="text-decoration:underline; cursor:pointer; {if $courses[$week].apo.$id eq 0}color:#0000FF{elseif $courses[$week].num.$id eq $courses[$week].refuse.$id}color:#999999;{/if}" onClick="window.open('client_course.php?cid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
-            {/foreach}
+            <li>
+              <span style="text-decoration:underline; cursor:pointer; {if $courses[$week].apo.$id eq 0}color:#0000FF{elseif $courses[$week].num.$id eq $courses[$week].refuse.$id}color:#999999;{/if}" onClick="window.open('client_course.php?cid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
+            </li>
+          {/foreach}
         </ul>
         <span style="font-size:16px; font-weight:bolder; cursor:pointer;" onClick="d1_all_{$week}.style.display='none'">&times;</span> 
       </div>
@@ -136,8 +140,10 @@
               <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:500px" id="d2_{$week}_{$cateidx}">
                 <ul>
                   {foreach key=id item=name from=$courseprocs[$week].aponame.$catename}
-                  <li><span style="text-decoration:underline; cursor:pointer; {if $courseprocs[$week].reo.$catename.$id eq 0}color:#0000FF{elseif $courseprocs[$week].reo_st.$catename.$id eq -1}color:#999999;{/if}" onClick="window.open('client_course_detail.php?cid={$courseprocs.$week.apocid.$catename.$id}&courseid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
-                    {/foreach}
+                    <li>
+                      <span style="text-decoration:underline; cursor:pointer; {if $courseprocs[$week].reo.$catename.$id eq 0}color:#0000FF{elseif $courseprocs[$week].reo_st.$catename.$id eq -1}color:#999999;{/if}" onClick="window.open('client_course_detail.php?cid={$courseprocs.$week.apocid.$catename.$id}&courseid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
+                    </li>
+                  {/foreach}
                 </ul>
                 <span style="font-weight:bolder; cursor:pointer;" onClick="d2_{$week}_{$cateidx}.style.display='none'">&times;</span> 
               </div>
@@ -154,8 +160,10 @@
               <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:500px" id="d3_{$week}_{$cateidx}">
               <ul>
                 {foreach key=id item=name from=$courseprocs[$week].reoname.$catename}
-                <li><span style="text-decoration:underline; cursor:pointer; {if $courseprocs[$week].reo_st.$catename.$id eq 0}color:#0000FF{elseif $courseprocs[$week].reo_st.$catename.$id eq -1}color:#999999;{/if}" onClick="window.open('client_course_detail.php?cid={$courseprocs[$week].reocid.$catename.$id}&courseid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
-                  {/foreach}
+                  <li>
+                    <span style="text-decoration:underline; cursor:pointer; {if $courseprocs[$week].reo_st.$catename.$id eq 0}color:#0000FF{elseif $courseprocs[$week].reo_st.$catename.$id eq -1}color:#999999;{/if}" onClick="window.open('client_course_detail.php?cid={$courseprocs[$week].reocid.$catename.$id}&courseid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
+                  </li>
+                {/foreach}
               </ul>
               <span style="font-weight:bolder; cursor:pointer;" onClick="d3_{$week}_{$cateidx}.style.display='none'">&times;</span> 
             </div>
@@ -171,8 +179,10 @@
             <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:500px" id="d4_{$week}_{$cateidx}">
             <ul>
               {foreach key=id item=name from=$courseprocs[$week].recname.$catename}
-              <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_course_detail.php?cid={$courseprocs.$week.reccid.$catename.$id}&courseid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
-                {/foreach}
+                <li>
+                  <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_course_detail.php?cid={$courseprocs.$week.reccid.$catename.$id}&courseid={$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span>
+                </li>
+              {/foreach}
             </ul>
             <span style="font-weight:bolder; cursor:pointer;" onClick="d4_{$week}_{$cateidx}.style.display='none'">&times;</span> </div>
         {/foreach}
@@ -241,7 +251,10 @@
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:400px" id="d6_{$week}">
         <ul>
           {foreach key=id item=name from=$visavisits[$week].pname}
-          <li><span style="text-decoration:underline; cursor:pointer; {if $visavisits.$week.decline.$id > 0}color:#999999;{elseif $visavisits.$week.sign.$id eq 0}color:#0000FF;{/if}" onClick="window.open('client_visa_detail.php?cid={$visavisits.$week.client.$id}&vid={$visavisits.$week.visa.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span> {/foreach}
+            <li>
+              <span style="text-decoration:underline; cursor:pointer; {if $visavisits.$week.decline.$id > 0}color:#999999;{elseif $visavisits.$week.sign.$id eq 0}color:#0000FF;{/if}" onClick="window.open('client_visa_detail.php?cid={$visavisits.$week.client.$id}&vid={$visavisits.$week.visa.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name}</span> 
+            </li>
+          {/foreach}
         </ul>
 
         <span style="font-weight:bolder; cursor:pointer;" onClick="d6_{$week}.style.display='none'">&times;</span> </div>
@@ -254,9 +267,11 @@
         <ul>
           {foreach key=id item=name from=$visavisits[$week].pname}
            {if $visavisits.$week.cfee.$id > 0}
-            <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visavisits.$week.client.$id}&vid={$visavisits.$week.visa.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name} </span></li>
+              <li>
+                <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visavisits.$week.client.$id}&vid={$visavisits.$week.visa.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*4/5 +',width='+screen.width*4/5);">{$name} </span>
+              </li>
             {/if}
-            {/foreach}
+          {/foreach}
             
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="d66_{$week}.style.display='none'">&times;</span> </div>
@@ -268,7 +283,10 @@
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d7_{$week}">
         <ul>
           {foreach key=id item=name from=$visaagrees[$week].fname}
-          <li><span style="text-decoration:underline; cursor:pointer; {if $visaagrees.$week.done.$id eq 1}color:gray;{elseif $visaagrees.$week.done.$id eq 2}color:blue;{/if}" onClick="window.open('client_visa_detail.php?cid={$visaagrees.$week.client.$id}&vid={$visaagrees.$week.visa.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
+            <li>
+              <span style="text-decoration:underline; cursor:pointer; {if $visaagrees.$week.done.$id eq 1}color:gray;{elseif $visaagrees.$week.done.$id eq 2}color:blue;{/if}" onClick="window.open('client_visa_detail.php?cid={$visaagrees.$week.client.$id}&vid={$visaagrees.$week.visa.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> 
+            </li>
+          {/foreach}
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="d7_{$week}.style.display='none'">&times;</span> </div> 
     </td>
@@ -292,14 +310,20 @@
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d8g_free_{$week}">
         <ul>
           {foreach key=id item=name from=$visagrants[$week].gname_free}
-          <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visagrants.$week.gc.$id}&vid={$visagrants.$week.gv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
+            <li>
+              <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visagrants.$week.gc.$id}&vid={$visagrants.$week.gv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> 
+            </li>
+          {/foreach}
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="d8g_free_{$week}.style.display='none'">&times;</span> </div>
 
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d8g_paid_{$week}">
         <ul>
           {foreach key=id item=name from=$visagrants[$week].gname_paid}
-          <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visagrants.$week.gc.$id}&vid={$visagrants.$week.gv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
+            <li>
+              <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visagrants.$week.gc.$id}&vid={$visagrants.$week.gv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> 
+            </li>
+          {/foreach}
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="d8g_paid_{$week}.style.display='none'">&times;</span> </div>
     </td> 
@@ -312,7 +336,10 @@
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d71_{$week}">
         <ul>
           {foreach key=id item=name from=$visapaids[$week].show}
-          <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visapaids.$week.client.$id}&vid={$visapaids.$week.vid.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
+            <li>
+              <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visapaids.$week.client.$id}&vid={$visapaids.$week.vid.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> 
+            </li>
+          {/foreach}
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="d71_{$week}.style.display='none'">&times;</span> 
       </div>
@@ -320,37 +347,120 @@
 
     <!-- Apply Visa -->
     <td>
-      {if $visaprocs[$week].lc_free > 0}
-        <span onClick="openinSatff('d8_free_{$week}');" style="text-decoration:underline; cursor:pointer;">({$visaprocs[$week].lc_free})</span>&nbsp;
+      {if $visaapplies.$week.student.clients > 0}
+        <span onClick="openinSatff('d8_student_catelog_{$week}');" style="text-decoration:underline; cursor:pointer;">({$visaapplies.$week.student.clients})</span>&nbsp;
       {/if}
-      Student:&nbsp;${$visaprocs[$week].lfee_free|string_format:"%.2f"}<br/>
-      {if $visaprocs[$week].lc_paid > 0}
-        <span onClick="openinSatff('d8_paid_{$week}');" style="text-decoration:underline; cursor:pointer;">({$visaprocs[$week].lc_paid})</span>&nbsp;
-      {/if}
-      Other:&nbsp;${$visaprocs[$week].lfee_paid|string_format:"%.2f"}<br/>
-      <hr/>
-      <!--
-      <span onClick="openinSatff('d8_{$week}');" style="text-decoration:underline; cursor:pointer;">[{$visaprocs[$week].lcnt0}/{$visaprocs[$week].lcnt1}]
-      </span>&nbsp;&nbsp;
-      -->
-      {if $visaprocs[$week].lcnt1 > 0}
-        ({$visaprocs[$week].lcnt1})&nbsp;
-      {/if}
-      Total:&nbsp;${$visaprocs[$week].lfee|string_format:"%.2f"}<br/>
-      
-      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d8_free_{$week}">
+      Student:&nbsp;${$visaapplies.$week.student.paid|string_format:"%.2f"}<br/>
+      <div style="display:none; float:inherit; position:absolute; background-color:#fbc38f;width::400px" id="d8_student_catelog_{$week}">
         <ul>
-          {foreach key=id item=name from=$visaprocs[$week].lname_free}
-          <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.lc.$id}&vid={$visaprocs.$week.lv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
-        </ul>
-        <span style="font-weight:bolder; cursor:pointer;" onClick="d8_free_{$week}.style.display='none'">&times;</span> </div>
+          {foreach key=subclass item=state from=$visaapplies.$week.student.catelog}
+            <li><span onClick="openinSatff('d8_{$subclass}_{$week}');" style="text-decoration:underline; cursor:pointer;">({$state.clients})</span>&nbsp;{$state.name}:&nbsp;${$state.paid|string_format:"%.2f"}</li>
+            <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d8_{$subclass}_{$week}">
+              <ul>
+                {foreach item=no from=$state.idx}
+                <li>
+                  <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('/scripts/client_visa_detail.php?cid={$visaapplies.$week.cases.$no.cid}&vid={$visaapplies.$week.cases.$no.vid}', '_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">
+                    {$visaapplies.$week.cases.$no.cname}&nbsp;${$visaapplies.$week.cases.$no.rev}
+                  </span> 
+                </li>
+                {/foreach}
+              </ul>
+              <span style="font-weight:bolder; cursor:pointer;" onclick="$('#d8_{$subclass}_{$week}').css('display', 'none')">&times;</span> 
+            </div>            
 
-      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d8_paid_{$week}">
-        <ul>
-          {foreach key=id item=name from=$visaprocs[$week].lname_paid}
-          <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.lc.$id}&vid={$visaprocs.$week.lv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
+          {/foreach}
         </ul>
-        <span style="font-weight:bolder; cursor:pointer;" onClick="d8_paid_{$week}.style.display='none'">&times;</span> </div>
+        <span style="font-weight:bolder; cursor:pointer;" onClick="d8_student_catelog_{$week}.style.display='none'">&times;</span> 
+      </div>
+
+
+      {if $visaapplies.$week.other.clients > 0}
+        <span onClick="openinSatff('d8_other_{$week}');" style="text-decoration:underline; cursor:pointer;">({$visaapplies.$week.other.clients})</span>&nbsp;
+      {/if}      
+      Other:&nbsp;${$visaapplies.$week.other.paid|string_format:"%.2f"}<br/>
+      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d8_other_{$week}">
+        <ul>
+          {foreach item=no from=$visaapplies.$week.other.idx}
+          <li>
+            <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('/scripts/client_visa_detail.php?cid={$visaapplies.$week.cases.$no.cid}&vid={$visaapplies.$week.cases.$no.vid}', '_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">
+              {$visaapplies.$week.cases.$no.cname}&nbsp;${$visaapplies.$week.cases.$no.rev}
+            </span> 
+          </li>
+          {/foreach}
+        </ul>
+        <span style="font-weight:bolder; cursor:pointer;" onClick="d8_other_{$week}.style.display='none'">&times;</span> 
+      </div>
+
+      {if $visaapplies.$week.total.clients > 0}
+        <span onClick="openinSatff('d8_total_{$week}');" style="text-decoration:underline; cursor:pointer;">({$visaapplies.$week.total.clients})</span>&nbsp;
+      {/if}         
+      Total:&nbsp;${$visaapplies.$week.total.paid|string_format:"%.2f"} <br/>
+      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d8_total_{$week}">
+        <ul>
+          {foreach item=no from=$visaapplies.$week.total.idx}
+          <li>
+            <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('/scripts/client_visa_detail.php?cid={$visaapplies.$week.cases.$no.cid}&vid={$visaapplies.$week.cases.$no.vid}', '_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">
+              {$visaapplies.$week.cases.$no.cname}&nbsp;${$visaapplies.$week.cases.$no.rev}
+            </span> 
+          </li>
+          {/foreach}
+        </ul>
+        <span style="font-weight:bolder; cursor:pointer;" onClick="d8_total_{$week}.style.display='none'">&times;</span> 
+      </div>
+      <hr/>
+
+      {if $visaapplies.$week.art_apply.clients > 0}
+        <span onClick="openinSatff('d8_art_apply_{$week}');" style="text-decoration:underline; cursor:pointer;">({$visaapplies.$week.art_apply.clients})</span>&nbsp;
+      {/if}
+      ART - Apply:&nbsp;${$visaapplies.$week.art_apply.paid|string_format:"%.2f"} <br/>
+      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d8_art_apply_{$week}">
+        <ul>
+          {foreach item=no from=$visaapplies.$week.art_apply.idx}
+          <li>
+            <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('/scripts/client_visa_detail.php?cid={$visaapplies.$week.cases.$no.cid}&vid={$visaapplies.$week.cases.$no.vid}', '_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">
+              {$visaapplies.$week.cases.$no.cname}&nbsp;${$visaapplies.$week.cases.$no.art_apply}
+            </span> 
+          </li>
+          {/foreach}
+        </ul>
+        <span style="font-weight:bolder; cursor:pointer;" onClick="d8_art_apply_{$week}.style.display='none'">&times;</span> 
+      </div>
+
+      {if $visaapplies.$week.art_provide.clients > 0}
+        <span onClick="openinSatff('d8_art_provide_{$week}');" style="text-decoration:underline; cursor:pointer;">({$visaapplies.$week.art_provide.clients})</span>&nbsp;
+      {/if}
+      ART - Provide information:&nbsp;${$visaapplies.$week.art_provide.paid|string_format:"%.2f"} <br/>
+      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d8_art_provide_{$week}">
+        <ul>
+          {foreach item=no from=$visaapplies.$week.art_provide.idx}
+          <li>
+            <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('/scripts/client_visa_detail.php?cid={$visaapplies.$week.cases.$no.cid}&vid={$visaapplies.$week.cases.$no.vid}', '_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">
+              {$visaapplies.$week.cases.$no.cname}&nbsp;${$visaapplies.$week.cases.$no.art_provide}
+            </span> 
+          </li>
+          {/foreach}
+        </ul>
+        <span style="font-weight:bolder; cursor:pointer;" onClick="d8_art_provide_{$week}.style.display='none'">&times;</span> 
+      </div>
+
+
+      {if $visaapplies.$week.art_hearing.clients > 0}
+        <span onClick="openinSatff('d8_art_hearing_{$week}');" style="text-decoration:underline; cursor:pointer;">({$visaapplies.$week.art_hearing.clients})</span>&nbsp;
+      {/if}      
+      ART - Hearing date:&nbsp;${$visaapplies.$week.art_hearing.paid|string_format:"%.2f"} <br/>
+      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d8_art_hearing_{$week}">
+        <ul>
+          {foreach item=no from=$visaapplies.$week.art_hearing.idx}
+          <li>
+            <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('/scripts/client_visa_detail.php?cid={$visaapplies.$week.cases.$no.cid}&vid={$visaapplies.$week.cases.$no.vid}', '_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">
+              {$visaapplies.$week.cases.$no.cname}&nbsp;${$visaapplies.$week.cases.$no.art_hearing}
+            </span> 
+          </li>
+          {/foreach}
+        </ul>
+        <span style="font-weight:bolder; cursor:pointer;" onClick="d8_art_hearing_{$week}.style.display='none'">&times;</span> 
+      </div>
+
     </td>  
   
     <!--Finalized Cases (Free)-->
@@ -388,31 +498,46 @@
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="gc_free_{$week}">
         <ul>
           {foreach key=id item=name from=$visaprocs[$week].gname_free}
-          <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.gc.$id}&vid={$visaprocs.$week.gv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
+            <li>
+              <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.gc.$id}&vid={$visaprocs.$week.gv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> 
+            </li>
+          {/foreach}
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="gc_free_{$week}.style.display='none'">&times;</span> </div>
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="wc_free_{$week}">
         <ul>
           {foreach key=id item=name from=$visaprocs[$week].wname_free}
-          <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.wc.$id}&vid={$visaprocs.$week.wv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
+            <li>
+              <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.wc.$id}&vid={$visaprocs.$week.wv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> 
+            </li>
+          {/foreach}
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="wc_free_{$week}.style.display='none'">&times;</span> </div>
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="rc_free_{$week}">
         <ul>
           {foreach key=id item=name from=$visaprocs[$week].rname_free}
-          <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.rc.$id}&vid={$visaprocs.$week.rv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
+            <li>
+              <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.rc.$id}&vid={$visaprocs.$week.rv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> 
+            </li>
+          {/foreach}
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="rc_free_{$week}.style.display='none'">&times;</span> </div>  
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="cc_free_{$week}">
         <ul>
           {foreach key=id item=name from=$visaprocs[$week].cname_free}
-          <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.cc.$id}&vid={$visaprocs.$week.cv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
+            <li>
+              <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.cc.$id}&vid={$visaprocs.$week.cv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> 
+            </li>
+          {/foreach}
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="cc_free_{$week}.style.display='none'">&times;</span> </div>   
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="sc_free_{$week}">
         <ul>
           {foreach key=id item=name from=$visaprocs[$week].sname_free}
-          <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.sc.$id}&vid={$visaprocs.$week.sv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
+            <li>
+              <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.sc.$id}&vid={$visaprocs.$week.sv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> 
+            </li>
+          {/foreach}
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="sc_free_{$week}.style.display='none'">&times;</span> </div>                   
     </td>
@@ -453,31 +578,46 @@
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="gc_paid_{$week}">
         <ul>
           {foreach key=id item=name from=$visaprocs[$week].gname_paid}
-          <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.gc.$id}&vid={$visaprocs.$week.gv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
+            <li>
+              <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.gc.$id}&vid={$visaprocs.$week.gv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> 
+            </li>
+          {/foreach}
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="gc_paid_{$week}.style.display='none'">&times;</span> </div>
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="wc_paid_{$week}">
         <ul>
           {foreach key=id item=name from=$visaprocs[$week].wname_paid}
-          <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.wc.$id}&vid={$visaprocs.$week.wv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
+            <li>
+              <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.wc.$id}&vid={$visaprocs.$week.wv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> 
+            </li>
+          {/foreach}
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="wc_paid_{$week}.style.display='none'">&times;</span> </div>
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="rc_paid_{$week}">
         <ul>
           {foreach key=id item=name from=$visaprocs[$week].rname_paid}
-          <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.rc.$id}&vid={$visaprocs.$week.rv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
+            <li>
+              <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.rc.$id}&vid={$visaprocs.$week.rv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span>
+            </li> 
+          {/foreach}
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="rc_paid_{$week}.style.display='none'">&times;</span> </div>  
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="cc_paid_{$week}">
         <ul>
           {foreach key=id item=name from=$visaprocs[$week].cname_paid}
-          <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.cc.$id}&vid={$visaprocs.$week.cv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
+            <li>
+              <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.cc.$id}&vid={$visaprocs.$week.cv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span>
+            </li> 
+          {/foreach}
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="cc_paid_{$week}.style.display='none'">&times;</span> </div>   
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="sc_paid_{$week}">
         <ul>
           {foreach key=id item=name from=$visaprocs[$week].sname_paid}
-          <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.sc.$id}&vid={$visaprocs.$week.sv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> {/foreach}
+            <li>
+              <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visaprocs.$week.sc.$id}&vid={$visaprocs.$week.sv.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> 
+            </li>
+          {/foreach}
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="sc_paid_{$week}.style.display='none'">&times;</span> </div> 
 
@@ -499,7 +639,9 @@
           <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d99_{$week}">
             <ul>
               {foreach key=id item=name from=$visareviews[$week].pname}
-              <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visareviews.$week.client.$id}&vid={$visareviews.$week.visa.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span></li> 
+                <li>
+                  <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visareviews.$week.client.$id}&vid={$visareviews.$week.visa.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span>
+                </li> 
               {/foreach}
             </ul>
             <span style="font-weight:bolder; cursor:pointer;" onClick="d99_{$week}.style.display='none'">&times;</span> 
@@ -517,7 +659,9 @@
               <ul>
                 {foreach key=id item=name from=$visareviews[$week].pname}
                   {if $visareviews.$week.notpaperwork.$id eq 1}
-                    <li><span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visareviews.$week.client.$id}&vid={$visareviews.$week.visa.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> 
+                    <li>
+                      <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visareviews.$week.client.$id}&vid={$visareviews.$week.visa.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span>
+                    </li> 
                   {/if}
                 {/foreach}
               </ul>
@@ -655,8 +799,10 @@
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:300px" id="d12_{$week}">
         <ul>
           {foreach key=id item=name from=$homeloan[$week].pname}
-          <li><span style="text-decoration:underline; cursor:pointer;" onclick="window.open('client_homeloan_detail.php?cid={$homeloan[$week].client.$id}&hid={$homeloan[$week].loan.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span>
-            {/foreach}
+            <li>
+              <span style="text-decoration:underline; cursor:pointer;" onclick="window.open('client_homeloan_detail.php?cid={$homeloan[$week].client.$id}&hid={$homeloan[$week].loan.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span>
+            </li>
+          {/foreach}
         </ul>
         <span style="font-size:16px; font-weight:bolder; cursor:pointer;" onclick="$('#d12_{$week}').css('display', 'none')">&times;</span> </div>
     </td>
@@ -665,8 +811,10 @@
       <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width:300px" id="d13_{$week}">
         <ul>
           {foreach key=id item=name from=$homeloan_fee[$week].pname}
-          <li><span style="text-decoration:underline; cursor:pointer;" onclick="window.open('client_homeloan_detail.php?cid={$homeloan_fee[$week].client.$id}&hid={$homeloan_fee[$week].loan.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span>
-            {/foreach}
+            <li>
+              <span style="text-decoration:underline; cursor:pointer;" onclick="window.open('client_homeloan_detail.php?cid={$homeloan_fee[$week].client.$id}&hid={$homeloan_fee[$week].loan.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span>
+            </li>
+          {/foreach}
         </ul>
         <span style="font-size:16px; font-weight:bolder; cursor:pointer;" onclick="$('#d13_{$week}').css('display', 'none')">&times;</span> </div>
     </td>

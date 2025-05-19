@@ -271,7 +271,7 @@
 							</td>
 							<td align="right">{$arr.gst|string_format:"%.2f"}</td>
 							<td align="right">
-									<span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_payment.php?aid={$id}','_blank', 'alwaysRaised=yes,height=500,width=800,location=no,scrollbars=yes')">{$arr.paid|string_format:"%.2f"}</span>
+						<span style="text-decoration:underline; cursor:pointer; {if ($arr.dueamt-$arr.paid) > 0}color:red{/if}" onClick="window.open('client_payment.php?aid={$id}','_blank', 'alwaysRaised=yes,height=500,width=800,location=no,scrollbars=yes')">{$arr.paid|string_format:"%.2f"}</span>
 									{assign var="total_received" value=$total_received+$arr.paid}	
 							</td>
 							<td>{$arr.party|ucwords}

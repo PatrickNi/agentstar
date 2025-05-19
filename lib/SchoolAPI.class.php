@@ -72,7 +72,7 @@ class SchoolAPI extends MysqlDB{
 	function getSchoolRsh(){
 		$sql = "select a.ID, CateID, SubCateID, Name, AgentStatus 
 		        from institute a left join institute_status b on (a.StatusID = b.ID) 
-		        order by b.Rank, a.Name asc";
+		        order by b.Rank, replace(a.Name, 'NSW - 1', 'NSW -  1') asc";
 		$this->query($sql);
 		$_arr = array();
 		while($this->fetch()){
