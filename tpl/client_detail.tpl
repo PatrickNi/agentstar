@@ -230,11 +230,11 @@
                 <td width="28%"  align="left" class="rowodd"><strong>Matrial Status:</strong>&nbsp;&nbsp;</td>
                 <td align="left" width="72%" class="roweven">
                         <select name="t_m" class="text">
-                                <option value="married" {if $arr.married == 'married'} selected {/if} >ÒÑ»é(Married)</option>
-                                <option value="divorce" {if $arr.married == 'divorce'} selected {/if}>Àë»é(Divorce)</option>
-                                <option value="never_married" {if $arr.married == 'never_married'} selected {/if}>Î´»é(Never Married)</option>
-                                <option value="separated" {if $arr.married == 'separated'} selected {/if}>·Ö¾Ó(Separated)</option>
-                                <option value="defacto" {if $arr.married == 'defacto'} selected {/if}>Í¬¾Ó(Defacto Relationship)</option>
+                                <option value="married" {if $arr.married == 'married'} selected {/if} >ï¿½Ñ»ï¿½(Married)</option>
+                                <option value="divorce" {if $arr.married == 'divorce'} selected {/if}>ï¿½ï¿½ï¿½(Divorce)</option>
+                                <option value="never_married" {if $arr.married == 'never_married'} selected {/if}>Î´ï¿½ï¿½(Never Married)</option>
+                                <option value="separated" {if $arr.married == 'separated'} selected {/if}>ï¿½Ö¾ï¿½(Separated)</option>
+                                <option value="defacto" {if $arr.married == 'defacto'} selected {/if}>Í¬ï¿½ï¿½(Defacto Relationship)</option>
                         </select>
                 </td>
               <tr>    
@@ -339,7 +339,9 @@
                       <option value="" {if $arr.actm == ""} selected {/if}>--</option>
                       <option value="ct" {if $arr.actm == "ct"} selected {/if}> Client testimonoial</option>
                       <option value="fb" {if $arr.actm == "fb"} selected {/if}> Facebook</option>
-                      <option value="gr" {if $arr.actm == "gr"} selected {/if}> Google review</option>      
+                      <option value="gr" {if $arr.actm == "gr"} selected {/if}> Google review</option>     
+                      <option value="rn" {if $arr.actm == "rn"} selected {/if}> Rednote</option> 
+                      <option value="wc" {if $arr.actm == "wc"} selected {/if}> Wechat</option>  
                     </select>
                     <input type="text" id='t_d_actm' name="t_d_actm" value="{$arr.d_actm}" size="30">
                 </td>

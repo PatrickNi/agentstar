@@ -330,54 +330,118 @@
 
     <!-- (Net received/Net deduction)<br/>Net profit -->
     <td>
-        ${$visapaids[$week].paid|string_format:"%.2f"} {if $visapaids[$week].spand > 0}&nbsp;/ -${$visapaids[$week].spand|string_format:"%.2f"}{/if}<br/>
-        <hr/>
-        Total: <span onClick="openinSatff('d71_{$week}');" style="text-decoration:underline; cursor:pointer;">${$visapaids[$week].paid-$visapaids[$week].spand|string_format:"%.2f"}</span><br/>
-        <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d71_{$week}">
-          <ul>
-            {foreach key=id item=name from=$visapaids[$week].show}
-              <li>
-                <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visapaids.$week.client.$id}&vid={$visapaids.$week.vid.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> 
-              </li>
-            {/foreach}
-          </ul>
-          <span style="font-weight:bolder; cursor:pointer;" onClick="d71_{$week}.style.display='none'">&times;</span> 
-        </div>
-        GLC Total: ${$visapaids[$week].glc_paid-$visapaids[$week].glc_spand|string_format:"%.2f"}
+          ${$visapaids[$week].paid|string_format:"%.2f"} {if $visapaids[$week].spand > 0}&nbsp;/ -${$visapaids[$week].spand|string_format:"%.2f"}{/if}<br/>
+          <hr/>
+          Total: <span onClick="openinSatff('d71_{$week}');" style="text-decoration:underline; cursor:pointer;">${$visapaids[$week].paid-$visapaids[$week].spand|string_format:"%.2f"}</span>
+      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d71_{$week}">
+        <ul>
+          {foreach key=id item=name from=$visapaids[$week].show}
+            <li>
+              <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('client_visa_detail.php?cid={$visapaids.$week.client.$id}&vid={$visapaids.$week.vid.$id}','_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">{$name}</span> 
+            </li>
+          {/foreach}
+        </ul>
+        <span style="font-weight:bolder; cursor:pointer;" onClick="d71_{$week}.style.display='none'">&times;</span> 
+      </div>
     </td>
 
     <!-- Apply Visa -->
     <td>
-      {if $visaapplies.$week.student_onshore.clients > 0}
-        <span>({$visaapplies.$week.student_onshore.clients})</span>&nbsp;
+      {if $visaapplies.$week.student.clients > 0}
+        <span onClick="openinSatff('d8_student_catelog_{$week}');" style="text-decoration:underline; cursor:pointer;">({$visaapplies.$week.student.clients})</span>&nbsp;
       {/if}
-      Onshore Student:&nbsp;${$visaapplies.$week.student_onshore.paid|string_format:"%.2f"}<br/>      
+      Student:&nbsp;${$visaapplies.$week.student.paid|string_format:"%.2f"}<br/>
+      <div style="display:none; float:inherit; position:absolute; background-color:#fbc38f;width::400px" id="d8_student_catelog_{$week}">
+        <ul>
+          {foreach key=subclass item=state from=$visaapplies.$week.student.catelog}
+            <li><span onClick="openinSatff('d8_{$subclass}_{$week}');" style="text-decoration:underline; cursor:pointer;">({$state.clients})</span>&nbsp;{$state.name}:&nbsp;${$state.paid|string_format:"%.2f"}</li>
+            <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d8_{$subclass}_{$week}">
+              <ul>
+                {foreach item=no from=$state.idx}
+                <li>
+                  <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('/scripts/client_visa_detail.php?cid={$visaapplies.$week.cases.$no.cid}&vid={$visaapplies.$week.cases.$no.vid}', '_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">
+                    {$visaapplies.$week.cases.$no.cname}&nbsp;${$visaapplies.$week.cases.$no.rev}
+                  </span> 
+                </li>
+                {/foreach}
+              </ul>
+              <span style="font-weight:bolder; cursor:pointer;" onclick="$('#d8_{$subclass}_{$week}').css('display', 'none')">&times;</span> 
+            </div>            
 
-      {if $visaapplies.$week.student_offshore.clients > 0}
-        <span>({$visaapplies.$week.student_offshore.clients})</span>&nbsp;
-      {/if}
-      Offshore Student:&nbsp;${$visaapplies.$week.student_offshore.paid|string_format:"%.2f"}<br/>  
+          {/foreach}
+        </ul>
+        <span style="font-weight:bolder; cursor:pointer;" onClick="d8_student_catelog_{$week}.style.display='none'">&times;</span> 
+      </div>
+
 
       {if $visaapplies.$week.other.clients > 0}
-        <span>({$visaapplies.$week.other.clients})</span>&nbsp;
+        <span onClick="openinSatff('d8_other_{$week}');" style="text-decoration:underline; cursor:pointer;">({$visaapplies.$week.other.clients})</span>&nbsp;
       {/if}      
       Other Visa:&nbsp;${$visaapplies.$week.other.paid|string_format:"%.2f"}<br/>
+      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d8_other_{$week}">
+        <ul>
+          {foreach item=no from=$visaapplies.$week.other.idx}
+          <li>
+            <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('/scripts/client_visa_detail.php?cid={$visaapplies.$week.cases.$no.cid}&vid={$visaapplies.$week.cases.$no.vid}', '_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">
+              {$visaapplies.$week.cases.$no.cname}&nbsp;${$visaapplies.$week.cases.$no.rev}
+            </span> 
+          </li>
+          {/foreach}
+        </ul>
+        <span style="font-weight:bolder; cursor:pointer;" onClick="d8_other_{$week}.style.display='none'">&times;</span> 
+      </div>
 
-      {if $visaapplies.$week.art_apply.clients > 0}
-        <span>({$visaapplies.$week.art_apply.clients})</span>&nbsp;
-        ART - Apply:&nbsp;${$visaapplies.$week.art_apply.paid|string_format:"%.2f"} <br/>
+{if $visaapplies.$week.art_apply.clients > 0}
+        <span onClick="openinSatff('d8_art_apply_{$week}');" style="text-decoration:underline; cursor:pointer;">({$visaapplies.$week.art_apply.clients})</span>&nbsp;
       {/if}
+      ART - Apply:&nbsp;${$visaapplies.$week.art_apply.paid|string_format:"%.2f"} <br/>
+      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d8_art_apply_{$week}">
+        <ul>
+          {foreach item=no from=$visaapplies.$week.art_apply.idx}
+          <li>
+            <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('/scripts/client_visa_detail.php?cid={$visaapplies.$week.cases.$no.cid}&vid={$visaapplies.$week.cases.$no.vid}', '_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">
+              {$visaapplies.$week.cases.$no.cname}&nbsp;${$visaapplies.$week.cases.$no.art_apply}
+            </span> 
+          </li>
+          {/foreach}
+        </ul>
+        <span style="font-weight:bolder; cursor:pointer;" onClick="d8_art_apply_{$week}.style.display='none'">&times;</span> 
+      </div>
 
       {if $visaapplies.$week.art_provide.clients > 0}
-        <span>({$visaapplies.$week.art_provide.clients})</span>&nbsp;
-        ART - Provide information:&nbsp;${$visaapplies.$week.art_provide.paid|string_format:"%.2f"} <br/>
+        <span onClick="openinSatff('d8_art_provide_{$week}');" style="text-decoration:underline; cursor:pointer;">({$visaapplies.$week.art_provide.clients})</span>&nbsp;
       {/if}
+      ART - Provide information:&nbsp;${$visaapplies.$week.art_provide.paid|string_format:"%.2f"} <br/>
+      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d8_art_provide_{$week}">
+        <ul>
+          {foreach item=no from=$visaapplies.$week.art_provide.idx}
+          <li>
+            <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('/scripts/client_visa_detail.php?cid={$visaapplies.$week.cases.$no.cid}&vid={$visaapplies.$week.cases.$no.vid}', '_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">
+              {$visaapplies.$week.cases.$no.cname}&nbsp;${$visaapplies.$week.cases.$no.art_provide}
+            </span> 
+          </li>
+          {/foreach}
+        </ul>
+        <span style="font-weight:bolder; cursor:pointer;" onClick="d8_art_provide_{$week}.style.display='none'">&times;</span> 
+      </div>
+
 
       {if $visaapplies.$week.art_hearing.clients > 0}
-        <span>({$visaapplies.$week.art_hearing.clients})</span>&nbsp;
-        ART - Hearing date:&nbsp;${$visaapplies.$week.art_hearing.paid|string_format:"%.2f"} <br/>
-      {/if}
-
+        <span onClick="openinSatff('d8_art_hearing_{$week}');" style="text-decoration:underline; cursor:pointer;">({$visaapplies.$week.art_hearing.clients})</span>&nbsp;
+      {/if}      
+      ART - Hearing date:&nbsp;${$visaapplies.$week.art_hearing.paid|string_format:"%.2f"} <br/>
+      <div style="display:none; float:inherit; position:absolute; background-color:#FFFFCC;width::400px" id="d8_art_hearing_{$week}">
+        <ul>
+          {foreach item=no from=$visaapplies.$week.art_hearing.idx}
+          <li>
+            <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('/scripts/client_visa_detail.php?cid={$visaapplies.$week.cases.$no.cid}&vid={$visaapplies.$week.cases.$no.vid}', '_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">
+              {$visaapplies.$week.cases.$no.cname}&nbsp;${$visaapplies.$week.cases.$no.art_hearing}
+            </span> 
+          </li>
+          {/foreach}
+        </ul>
+        <span style="font-weight:bolder; cursor:pointer;" onClick="d8_art_hearing_{$week}.style.display='none'">&times;</span> 
+      </div>
       <hr/>
 
       {if $visaapplies.$week.total.clients > 0}
@@ -389,14 +453,13 @@
           {foreach item=no from=$visaapplies.$week.total.idx}
           <li>
             <span style="text-decoration:underline; cursor:pointer;" onClick="window.open('/scripts/client_visa_detail.php?cid={$visaapplies.$week.cases.$no.cid}&vid={$visaapplies.$week.cases.$no.vid}', '_blank','alwaysRaised=yes,resizable=yes,scrollbars=yes,'+'heigth='+screen.height*6/7 +',width='+screen.width*6/7)">
-              {$visaapplies.$week.cases.$no.cname},&nbsp;{$visaapplies.$week.cases.$no.subclass_name},&nbsp;${$visaapplies.$week.cases.$no.rev}
+              {$visaapplies.$week.cases.$no.cname}&nbsp;${$visaapplies.$week.cases.$no.rev}
             </span> 
           </li>
           {/foreach}
         </ul>
         <span style="font-weight:bolder; cursor:pointer;" onClick="d8_total_{$week}.style.display='none'">&times;</span> 
       </div>      
-      GLC Total:&nbsp;${$visaapplies.$week.total.glc_paid|string_format:"%.2f"}
 
     </td>  
   
@@ -604,11 +667,6 @@
               </ul>
               <span style="font-weight:bolder; cursor:pointer;" onClick="d991_{$week}.style.display='none'">&times;</span> 
             </div>  
-          {/if}
-          <br/>
-          GLC Total: 
-          {if $staffid != 105}
-            $ {$visareviews[$week].total_profit_glc}
           {/if}
     </td>
     <td colspan="7"></td>

@@ -1565,7 +1565,7 @@ class ReportAPI extends MysqlDB {
     }
     	
     function getNumOfVisaPaidByUser ($fromDay, $toDay, $userid, $aboutus="") {
-        $sql = "select date_format(p.PaidDate, '%Y%u') as Week, concat(LName, ' ', FName) as Name, v.CID, v.ID, vc.VisaName, vs.ClassName, sum(if(a.GST = 1, p.PaidAmount/1.1, p.PaidAmount)) as paid, a.GST  from client_payment p, client_account a, client_visa v, client_info c, visa_category vc, visa_subclass vs where p.AccountID = a.ID and a.ACC_TYPE = 'visa' and a.VisaID = v.ID and v.CID = c.CID  and v.CateID = vc.CateID and v.SubClassID = vs.SubClassID and a.Step in ('agreement', 'extra-agreement')  ";
+        $sql = "select date_format(p.PaidDate, '%Y%u') as Week, concat(LName, ' ', FName) as Name, v.CID, v.ID, vc.VisaName, vs.ClassName, sum(if(a.GST = 1, p.PaidAmount/1.1, p.PaidAmount)) as paid, a.GST, v.Company  from client_payment p, client_account a, client_visa v, client_info c, visa_category vc, visa_subclass vs where p.AccountID = a.ID and a.ACC_TYPE = 'visa' and a.VisaID = v.ID and v.CID = c.CID  and v.CateID = vc.CateID and v.SubClassID = vs.SubClassID and a.Step in ('agreement', 'extra-agreement')  ";
         if ($userid > 0) {
 			$sql .= " AND v.AUserID = {$userid} ";
 		}
@@ -1592,7 +1592,9 @@ class ReportAPI extends MysqlDB {
             if (!isset($_arr[$this->Week]) || !isset($_arr[$this->Week]['pcnt'])) {
                 $_arr[$this->Week]['pcnt'] = 0;  
                 $_arr[$this->Week]['paid'] = 0; 
-                $_arr[$this->Week]['spand'] = 0;            
+                $_arr[$this->Week]['spand'] = 0; 
+                $_arr[$this->Week]['glc_paid'] = 0; 
+                $_arr[$this->Week]['glc_spand'] = 0;            
             }
 
             $_arr[$this->Week]['pcnt']++;
@@ -1601,11 +1603,17 @@ class ReportAPI extends MysqlDB {
             $_arr[$this->Week]['client'][$_arr[$this->Week]['pcnt']] = $this->CID;
             $_arr[$this->Week]['vid'   ][$_arr[$this->Week]['pcnt']] = $this->ID;
             $_arr[$this->Week]['paid'] += round($this->paid,2);
+
+            if ($this->Compnay == 'global_law_center') {
+                $_arr[$this->Week]['glc_paid'] += round($this->paid,2);
+            }
+
+            
             $visa[$this->ID] = $_arr[$this->Week]['pcnt'];
         }
 
         //Spand
-        $sql = "select date_format(p.PaidDate, '%Y%u') as Week, concat(LName, ' ', FName) as Name, v.CID, v.ID, vc.VisaName, vs.ClassName, sum(if(a.GST_3RD = 1, p.PaidAmount/1.1, p.PaidAmount)) as spand from client_spand p, client_account a, client_visa v, client_info c, visa_category vc, visa_subclass vs where p.AccountID = a.ID and a.ACC_TYPE = 'visa' and a.VisaID = v.ID and v.CID = c.CID  and v.CateID = vc.CateID and v.SubClassID = vs.SubClassID and a.Step in ('agreement', 'extra-agreement')";
+        $sql = "select date_format(p.PaidDate, '%Y%u') as Week, concat(LName, ' ', FName) as Name, v.CID, v.ID, vc.VisaName, vs.ClassName, sum(if(a.GST_3RD = 1, p.PaidAmount/1.1, p.PaidAmount)) as spand, v.Company from client_spand p, client_account a, client_visa v, client_info c, visa_category vc, visa_subclass vs where p.AccountID = a.ID and a.ACC_TYPE = 'visa' and a.VisaID = v.ID and v.CID = c.CID  and v.CateID = vc.CateID and v.SubClassID = vs.SubClassID and a.Step in ('agreement', 'extra-agreement')";
         if ($userid > 0) {
 			$sql .= " AND v.AUserID = {$userid} ";
 		}
@@ -1630,7 +1638,9 @@ class ReportAPI extends MysqlDB {
             if (!isset($_arr[$this->Week]) || !isset($_arr[$this->Week]['pcnt'])) {
                 $_arr[$this->Week]['pcnt'] = 0;  
                 $_arr[$this->Week]['paid'] = 0; 
-                $_arr[$this->Week]['spand'] = 0;            
+                $_arr[$this->Week]['spand'] = 0;
+                $_arr[$this->Week]['glc_paid'] = 0; 
+                $_arr[$this->Week]['glc_spand'] = 0;              
             }
 
             if (isset($visa[$this->ID])) {
@@ -1644,13 +1654,16 @@ class ReportAPI extends MysqlDB {
             }
         
             $_arr[$this->Week]['spand'] += round($this->spand,2);
+            if ($this->Compnay == 'global_law_center') {
+                $_arr[$this->Week]['glc_spand'] += round($this->spand,2);
+            }
         }     
         
         return $_arr;
     }
 
     function getAllOfVisaPaidByUser ($fromDay, $toDay, $userid, $aboutus="") {
-        $sql = "select concat(LName, ' ', FName) as Name, v.CID, v.ID, vc.VisaName, vs.ClassName, sum(if(a.GST = 1, p.PaidAmount/1.1, p.PaidAmount)) as paid, a.GST  from client_payment p, client_account a, client_visa v, client_info c, visa_category vc, visa_subclass vs where p.AccountID = a.ID and a.ACC_TYPE = 'visa' and a.VisaID = v.ID and v.CID = c.CID  and v.CateID = vc.CateID and v.SubClassID = vs.SubClassID and a.Step in ('agreement', 'extra-agreement') ";
+        $sql = "select concat(LName, ' ', FName) as Name, v.CID, v.ID, vc.VisaName, vs.ClassName, sum(if(a.GST = 1, p.PaidAmount/1.1, p.PaidAmount)) as paid, a.GST, v.Company  from client_payment p, client_account a, client_visa v, client_info c, visa_category vc, visa_subclass vs where p.AccountID = a.ID and a.ACC_TYPE = 'visa' and a.VisaID = v.ID and v.CID = c.CID  and v.CateID = vc.CateID and v.SubClassID = vs.SubClassID and a.Step in ('agreement', 'extra-agreement') ";
         if ($userid > 0) {
 			$sql .= " AND v.AUserID = {$userid} ";
 		}
@@ -1672,21 +1685,25 @@ class ReportAPI extends MysqlDB {
         $sql .= " Group by v.ID";
         $this->query($sql);
         $_arr = $visa = array();
-        $i = $paid = 0;
+        $i = $paid = $glc_paid = 0;
         while ($this->fetch()) {
             $_arr['all']['client'][$i] = $this->CID;
             $_arr['all']['vid'][$i] = $this->ID;
             $visa[$this->ID] = $i;
             $_arr['all']['show'][$i] = $this->Name." ( {$this->VisaName} {$this->ClassName} ) ".'$'.round($this->paid,2).' / $0';
             $paid += $this->paid;
+            if ($this->Company == 'global_law_center'){
+                $glc_paid += $this->paid;
+            }
             $i++;   
         }
 
         $_arr['all']['paid'] = round($paid,2);
+        $_arr['all']['glc_paid'] = round($glc_paid,2);
 
 
         //Spand
-        $sql = "select concat(LName, ' ', FName) as Name, v.CID, v.ID, vc.VisaName, vs.ClassName, sum(if(a.GST_3RD = 1, p.PaidAmount/1.1, p.PaidAmount)) as spand from client_spand p, client_account a, client_visa v, client_info c, visa_category vc, visa_subclass vs where p.AccountID = a.ID and a.ACC_TYPE = 'visa' and a.VisaID = v.ID and v.CID = c.CID  and v.CateID = vc.CateID and v.SubClassID = vs.SubClassID and a.Step in ('agreement', 'extra-agreement')";
+        $sql = "select concat(LName, ' ', FName) as Name, v.CID, v.ID, vc.VisaName, vs.ClassName, sum(if(a.GST_3RD = 1, p.PaidAmount/1.1, p.PaidAmount)) as spand, v.Company from client_spand p, client_account a, client_visa v, client_info c, visa_category vc, visa_subclass vs where p.AccountID = a.ID and a.ACC_TYPE = 'visa' and a.VisaID = v.ID and v.CID = c.CID  and v.CateID = vc.CateID and v.SubClassID = vs.SubClassID and a.Step in ('agreement', 'extra-agreement')";
         if ($userid > 0) {
 			$sql .= " AND v.AUserID = {$userid} ";
 		}
@@ -1706,7 +1723,7 @@ class ReportAPI extends MysqlDB {
         }
         $sql .= " Group by v.ID";
         //echo $sql."\n";
-        $spand = 0;
+        $spand = $glc_spand = 0;
         $this->query($sql);
         while ($this->fetch()) {
             
@@ -1720,10 +1737,14 @@ class ReportAPI extends MysqlDB {
             }
         
             $spand += $this->spand;
+            if ($this->Company == 'global_law_center'){
+                $glc_spand += $this->spand;
+            }
             $i++;   
         }     
         
         $_arr['all']['spand'] = round($spand,2);
+        $_arr['all']['glc_spand'] = round($glc_spand,2);
 
         return $_arr;
     }
@@ -1873,7 +1894,7 @@ class ReportAPI extends MysqlDB {
 
     function getAllOfVisaReviewByUser($fromDay, $toDay, $userid,$aboutus="") {
         //and (b.Item not like '%assessment' or b.Item is null) 
-		$sql  = "select if(b.Item is null, a.ExItem, b.Item) AS Item, c.AFee, concat(LName, ' ', FName) as Name, d.CID, c.ID, c.r_Status, c.CateID, c.SubClassID, c.VuserID from client_visa_process a left join visa_rs_item b on (a.ItemID = b.ITEMID), client_visa c, client_info d
+		$sql  = "select if(b.Item is null, a.ExItem, b.Item) AS Item, c.AFee, concat(LName, ' ', FName) as Name, d.CID, c.ID, c.r_Status, c.CateID, c.SubClassID, c.VuserID,c.Company from client_visa_process a left join visa_rs_item b on (a.ItemID = b.ITEMID), client_visa c, client_info d
         where a.CVID  = c.ID and c.CID = d.CID and a.Done = 1 and (a.ExItem like 'apply%' or b.Item like 'apply%')";
         if ($userid > 0) {
             $sql .= " AND c.ReviewerID = {$userid} ";
@@ -1906,9 +1927,12 @@ class ReportAPI extends MysqlDB {
             $visa[$this->ID]['profit'] = 0;
             $visa[$this->ID]['referral'] = 0;
             $visa[$this->ID]['client'][] = $i;
+            $visa[$this->ID]['is_glc'] = $this->Company == 'global_law_center'? true : false;
+
 
             $_arr['all']['total_profit'] = 0;
             $_arr['all']['total_profit_notpaperwork'] = 0;
+            $_arr['all']['total_profit_glc'] = 0;
             $_arr['all']['cnt'] = $i;
 
             if ($this->VuserID != $userid) {
@@ -1938,7 +1962,10 @@ class ReportAPI extends MysqlDB {
                     $_arr['all']['pname'][$i] .= ' $'.$v['profit']. ( $v['referral'] > 0? '/ -$'.$v['referral'] : ''); 
 
                     if ($_arr['all']['notpaperwork'][$i] == 1){
-                        $_arr['all']['total_profit_notpaperwork'] += $v['profit'] - $v['referral'];                     
+                        $_arr['all']['total_profit_notpaperwork'] += $v['profit'] - $v['referral'];     
+                        if ($v['is_glc']){
+                            $_arr['all']['total_profit_glc'] += $v['profit'] - $v['referral'];                     
+                        }                
                     }
                 }
             }
@@ -1947,7 +1974,7 @@ class ReportAPI extends MysqlDB {
     }
 	
     function getNumOfVisaReviewByUser($fromDay, $toDay, $userid,$aboutus="") {
-		$sql  = "select date_format(BeginDate, '%Y%u') as Week, if(b.Item is null, a.ExItem, b.Item) AS Item, c.AFee, concat(LName, ' ', FName) as Name, d.CID, c.ID, c.r_Status, c.CateID, c.SubClassID, c.VUserID from client_visa_process a left join visa_rs_item b on (a.ItemID = b.ITEMID), client_visa c, client_info d
+		$sql  = "select date_format(BeginDate, '%Y%u') as Week, if(b.Item is null, a.ExItem, b.Item) AS Item, c.AFee, concat(LName, ' ', FName) as Name, d.CID, c.ID, c.r_Status, c.CateID, c.SubClassID, c.VUserID,c.Company from client_visa_process a left join visa_rs_item b on (a.ItemID = b.ITEMID), client_visa c, client_info d
         where a.CVID  = c.ID and c.CID = d.CID and a.Done = 1 and (a.ExItem like 'apply%' or b.Item like 'apply%')";
         if ($userid > 0) {
             $sql .= " AND c.ReviewerID = {$userid} ";
@@ -1977,6 +2004,7 @@ class ReportAPI extends MysqlDB {
                 $_arr[$this->Week]['cnt_notpaperwork'] = 0;
                 $_arr[$this->Week]['total_profit'] = 0;
                 $_arr[$this->Week]['total_profit_notpaperwork'] = 0;
+                $_arr[$this->Week]['total_profit_glc'] = 0;
             }
 
             $_arr[$this->Week]['cnt']++;
@@ -1995,6 +2023,7 @@ class ReportAPI extends MysqlDB {
             $visa[$this->ID]['client'][$this->Week][] = $_arr[$this->Week]['cnt'];
             $visa[$this->ID]['profit'] = 0;
             $visa[$this->ID]['referral'] = 0;
+            $visa[$this->ID]['is_glc'] = $this->Company == 'global_law_center'? true : false;
         }
 
         //calc payment
@@ -2015,6 +2044,9 @@ class ReportAPI extends MysqlDB {
                         $_arr[$w]['pname'][$i] .= ' $'.$v['profit']. ( $v['referral'] > 0? '/ -$'.$v['referral'] : ''); 
                         if ($_arr[$w]['notpaperwork'][$i] == 1){
                             $_arr[$w]['total_profit_notpaperwork'] += $v['profit'] - $v['referral'];
+                            if ($v['is_glc']) {
+                                 $_arr[$w]['total_profit_glc'] += $v['profit'] - $v['referral'];
+                            }
                         }
                     }
                 }
@@ -4006,10 +4038,10 @@ class ReportAPI extends MysqlDB {
     function getAllOfVisaApply($fromDay, $toDay, $userid, $aboutus="") 
     {
         //and (b.Item not like '%assessment' or b.Item is null) 
-        $sql  = "select if(b.Item is null, a.ExItem, b.Item) AS Item, c.AFee, concat(LName, ' ', FName) as Name, d.CID, c.ID, c.r_Status, c.CateID, c.SubClassID, s.ClassName from client_visa_process a left join visa_rs_item b on (a.ItemID = b.ITEMID), client_visa c, client_info d, visa_subclass s
+        $sql  = "select if(b.Item is null, a.ExItem, b.Item) AS Item, c.AFee, concat(LName, ' ', FName) as Name, d.CID, c.ID, c.r_Status, c.CateID, c.SubClassID, s.ClassName, c.VUserID, c.AUserID,c.Company from client_visa_process a left join visa_rs_item b on (a.ItemID = b.ITEMID), client_visa c, client_info d, visa_subclass s
         where a.CVID  = c.ID and c.CID = d.CID and s.CateId = c.CateId and s.SubClassID = c.SubClassID and b.Item is not null and a.Done = 1 ";
         if ($userid > 0) {
-            $sql .= " AND c.AUserID = {$userid} ";
+            $sql .= " AND (c.VUserID = {$userid}  OR (c.CateID = 9 AND c.SubClassID = 29 AND c.AUserID = {$userid}) )";
         }
         if ($fromDay != "" && $toDay  != "") {
             $sql .= " AND a.BeginDate >= '{$fromDay}' and a.BeginDate <= '{$toDay}' ";
@@ -4023,6 +4055,8 @@ class ReportAPI extends MysqlDB {
                 $sql .= " AND d.about = '{$aboutus}' ";
             }
         }
+        $sql .= "  Order by c.CateID, s.ClassName ";
+
         //echo $sql."\n";
         $this->query($sql);
         $i = 0;
@@ -4033,17 +4067,17 @@ class ReportAPI extends MysqlDB {
             //20 visa complaince / onshore ART
             if ($this->CateID == 9 && $this->SubClassID == 29) {
 
-                if (preg_match('/^apply/i', $this->Item)){
+                if (preg_match('/^apply/i', $this->Item) && ($userid == 0 || $this->VUserID == $userid)){
                     $visa[$this->ID]['art_apply'] = $i;
                     $static = true;
                 }          
                 
-                if (preg_match('/^provide information/i', $this->Item)){
+                if (preg_match('/^provide information/i', $this->Item) && ($userid == 0 || $this->VUserID == $userid)){
                     $visa[$this->ID]['art_provide'] = $i;
                     $static = true;
                 }   
                 
-                if (preg_match('/^hearing date/i', $this->Item)){
+                if (preg_match('/^hearing date/i', $this->Item) && ($userid == 0 || $this->AUserID == $userid)){
                     $visa[$this->ID]['art_hearing'] = $i;
                     $static = true;
                 }         
@@ -4055,7 +4089,6 @@ class ReportAPI extends MysqlDB {
                     //4 Student Visa
                     if ($this->CateID == 5) {
                         $visa[$this->ID]['student_apply'] = $i;
-                        $visa[$this->ID]['subclass_name'] = $this->ClassName;
                     }
                     else {
                         $visa[$this->ID]['other_apply'] = $i;
@@ -4075,17 +4108,20 @@ class ReportAPI extends MysqlDB {
                 $visa[$this->ID]['gst'] = 0;   
                 $visa[$this->ID]['cate'] = $this->CateID;
                 $visa[$this->ID]['subclass'] = $this->SubClassID;
+                $visa[$this->ID]['subclass_name'] = $this->ClassName;
+                $visa[$this->ID]['is_glc'] = $this->Company == 'global_law_center'? true : false;
                 $i++;
             }
         }
 
         //calc payment
-        $_arr['all'] = ['student' => ['clients'=>0, 'paid'=>0, 'catelog'=>[]], 
+        $_arr['all'] = ['student_onshore' => ['clients'=>0, 'paid'=>0, 'catelog'=>[]], 
+                        'student_offshore' => ['clients'=>0, 'paid'=>0, 'catelog'=>[]], 
                         'art_apply'=>['clients'=>0, 'paid'=>0, 'idx'=>[]], 
                         'art_provide'=>['clients'=>0, 'paid'=>0, 'idx'=>[]], 
                         'art_hearing'=>['clients'=>0, 'paid'=>0, 'idx'=>[]],
                         'other' => ['clients'=>0, 'paid'=>0, 'idx'=>[]], 
-                        'total'=>['clients'=>0, 'paid'=>0, 'idx'=>[]],
+                        'total'=>['clients'=>0, 'paid'=>0, 'glc_paid'=>0 ,'idx'=>[]],
                         'cases'=>[],
                         ];
 
@@ -4113,10 +4149,10 @@ class ReportAPI extends MysqlDB {
 
                 if (isset($v['student_apply']) || isset($v['other_apply'])){
                     $rev = ($v['profit'] - $v['referral']);
-
+                    /*
                     if ($rev <= 0)
                         continue;
-
+                    */
                     $idx = 'no';
                     if (isset($v['other_apply'])) {
                         $_arr['all']['other']['clients']++;
@@ -4126,8 +4162,20 @@ class ReportAPI extends MysqlDB {
                         $idx =  $v['other_apply'];
                     }
                     elseif(isset($v['student_apply'])) {
+
+                        if (stripos($v['subclass_name'], 'offshore') !== false) {
+                            $_arr['all']['student_offshore']['clients']++;
+                            $_arr['all']['student_offshore']['paid'] += $rev;
+                        }
+                        else {
+                            $_arr['all']['student_onshore']['clients']++;
+                            $_arr['all']['student_onshore']['paid'] += $rev;                           
+                        }
+
+                        /*
                         $_arr['all']['student']['clients']++;
                         $_arr['all']['student']['paid'] += $rev;
+                        
                         
                         $subclass_normalize = str_replace(' ', '_', $v['subclass_name']);
                         if (!isset($student_catelog[$subclass_normalize])) {
@@ -4136,7 +4184,7 @@ class ReportAPI extends MysqlDB {
                         $student_catelog[$subclass_normalize]['clients']++;
                         $student_catelog[$subclass_normalize]['paid'] += $rev;
                         array_push($student_catelog[$subclass_normalize]['idx'], $v['student_apply']);
-
+                        */
                         $idx =  $v['student_apply'];
                         
                     }
@@ -4144,11 +4192,17 @@ class ReportAPI extends MysqlDB {
                     if ($idx !== 'no') {
                         $_arr['all']['total']['clients']++;
                         $_arr['all']['total']['paid'] += $rev;
+                        if ($v['is_glc']) {
+                            $_arr['all']['total']['glc_paid'] += $rev;
+                        }
                         array_push($_arr['all']['total']['idx'], $idx);
-                        $_arr['all']['cases'][$idx] = ['cname'=>$v['cname'], 'cid'=>$v['cid'], 'vid'=>$vid, 'rev'=>$rev];
+                        $_arr['all']['cases'][$idx] = ['cname'=>$v['cname'], 'cid'=>$v['cid'], 'vid'=>$vid, 'rev'=>$rev, 'subclass_name'=> $v['subclass_name']];
                     }
                 }
                 else {
+                    $idx = 'no';
+                    $sub_rev = 0;
+
                     foreach ($art_policies as $step => $percent) {
                         if (!isset($v[$step]))
                             continue;
@@ -4159,15 +4213,28 @@ class ReportAPI extends MysqlDB {
                         array_push($_arr['all'][$step]['idx'], $v[$step]);
 
                         if (!isset($_arr['all']['cases'][$v[$step]])) {
-                            $_arr['all']['cases'][$v[$step]] = ['cname'=>$v['cname'], 'cid'=>$v['cid'], 'vid'=>$vid, 'rev'=>$v['agreement_fee']];
+                            $_arr['all']['cases'][$v[$step]] = ['cname'=>$v['cname'], 'cid'=>$v['cid'], 'vid'=>$vid, 'rev'=>$v['agreement_fee'], 'subclass_name'=> $v['subclass_name']];
                         }
                         $_arr['all']['cases'][$v[$step]][$step] = $rev;
-                       
+
+                        $idx = $v[$step];
+                        $sub_rev += $rev;
+                    }
+
+                    if ($idx !== 'no') {
+                        $_arr['all']['total']['clients']++;
+                        $_arr['all']['total']['paid'] += $sub_rev;
+                        if ($v['is_glc']) {
+                            $_arr['all']['total']['glc_paid'] += $sub_rev;
+                        }
+
+                        array_push($_arr['all']['total']['idx'], $idx);
+                        $_arr['all']['cases'][$idx]['rev'] = $sub_rev;
                     }
                 }
             }
 
-            $_arr['all']['student']['catelog'] = $student_catelog;
+            //$_arr['all']['student']['catelog'] = $student_catelog;
         }
 
         return $_arr;	
@@ -4176,10 +4243,10 @@ class ReportAPI extends MysqlDB {
     function getNumOfVisaApply($fromDay, $toDay, $userid, $aboutus="")
     {
         //and (b.Item not like '%assessment' or b.Item is null) 
-        $sql  = "select date_format(BeginDate, '%Y%u') as Week, if(b.Item is null, a.ExItem, b.Item) AS Item, c.AFee, concat(LName, ' ', FName) as Name, d.CID, c.ID, c.r_Status, c.CateID, c.SubClassID, s.ClassName from client_visa_process a left join visa_rs_item b on (a.ItemID = b.ITEMID), client_visa c, client_info d, visa_subclass s
+        $sql  = "select date_format(BeginDate, '%Y%u') as Week, if(b.Item is null, a.ExItem, b.Item) AS Item, c.AFee, concat(LName, ' ', FName) as Name, d.CID, c.ID, c.r_Status, c.CateID, c.SubClassID, s.ClassName, c.VUserID, c.AUserID, c.Company from client_visa_process a left join visa_rs_item b on (a.ItemID = b.ITEMID), client_visa c, client_info d, visa_subclass s
         where a.CVID  = c.ID and c.CID = d.CID and s.CateId = c.CateId and s.SubClassID = c.SubClassID and b.Item is not null and a.Done = 1 ";
         if ($userid > 0) {
-            $sql .= " AND c.AUserID = {$userid} ";
+            $sql .= " AND (c.VUserID = {$userid}  OR (c.CateID = 9 AND c.SubClassID = 29 AND c.AUserID = {$userid}) )";
         }
         if ($fromDay != "" && $toDay  != "") {
             $sql .= " AND a.BeginDate >= '{$fromDay}' and a.BeginDate <= '{$toDay}' ";
@@ -4193,6 +4260,7 @@ class ReportAPI extends MysqlDB {
                 $sql .= " AND d.about = '{$aboutus}' ";
             }
         }
+        $sql .= "  Order by c.CateID, s.ClassName ";
         //echo $sql."\n";
         $this->query($sql);
         $i = 0;
@@ -4203,17 +4271,17 @@ class ReportAPI extends MysqlDB {
             //20 visa complaince / onshore ART
             if ($this->CateID == 9 && $this->SubClassID == 29) {
 
-                if (preg_match('/^apply/i', $this->Item)){
+                if (preg_match('/^apply/i', $this->Item) && ($userid == 0 || $this->VUserID == $userid)){
                     $visa[$this->ID]['art_apply'] = $i;
                     $static = true;
                 }          
                 
-                if (preg_match('/^provide information/i', $this->Item)){
+                if (preg_match('/^provide information/i', $this->Item) && ($userid == 0 || $this->VUserID == $userid)){
                     $visa[$this->ID]['art_provide'] = $i;
                     $static = true;
                 }   
                 
-                if (preg_match('/^hearing date/i', $this->Item)){
+                if (preg_match('/^hearing date/i', $this->Item) && ($userid == 0 || $this->AUserID == $userid)){
                     $visa[$this->ID]['art_hearing'] = $i;
                     $static = true;
                 }         
@@ -4225,7 +4293,6 @@ class ReportAPI extends MysqlDB {
                     //4 Student Visa
                     if ($this->CateID == 5) {
                         $visa[$this->ID]['student_apply'] = $i;
-                        $visa[$this->ID]['subclass_name'] = $this->ClassName;
                     }
                     else {
                         $visa[$this->ID]['other_apply'] = $i;
@@ -4246,20 +4313,13 @@ class ReportAPI extends MysqlDB {
                 $visa[$this->ID]['cate'] = $this->CateID;
                 $visa[$this->ID]['subclass'] = $this->SubClassID;
                 $visa[$this->ID]['week'] = $this->Week;
+                $visa[$this->ID]['subclass_name'] = $this->ClassName;
+                $visa[$this->ID]['is_glc'] = $this->Company == 'global_law_center'? true : false;
                 $i++;
             }
         }
 
         //calc payment
-        $_arr['all'] = ['student' => ['clients'=>0, 'paid'=>0, 'catelog'=>[]], 
-                        'art_apply'=>['clients'=>0, 'paid'=>0, 'idx'=>[]], 
-                        'art_provide'=>['clients'=>0, 'paid'=>0, 'idx'=>[]], 
-                        'art_hearing'=>['clients'=>0, 'paid'=>0, 'idx'=>[]],
-                        'other' => ['clients'=>0, 'paid'=>0, 'idx'=>[]], 
-                        'total'=>['clients'=>0, 'paid'=>0, 'idx'=>[]],
-                        'cases'=>[],
-                        ];
-
         if (count($visa) > 0) {
             $sql = "select a.ID, VisaID, DueAmount, GST, AMOUNT_3RD, GST_3RD, count(*) as batch , SUM(IF(STEP = 'agreement' AND DueAmount > 0, 1, 0)) AS HAS_AGREEMENT_FEE, Sum(if(b.PaidAmount is null, 0, b.PaidAmount)) as paid from client_account a left join client_payment b on(a.ID = b.AccountID) Where VisaID IN (".implode(',', array_keys($visa)).") AND ACC_TYPE = 'visa' and Step in ('agreement', 'extra-agreement') Group by a.ID";
             $this->query($sql);
@@ -4282,22 +4342,23 @@ class ReportAPI extends MysqlDB {
 
             foreach ($visa as $vid => $v) {
                 if (!isset($_arr[$v['week']])) {
-                    $_arr[$v['week']] = ['student' => ['clients'=>0, 'paid'=>0, 'catelog'=>[]], 
-                                    'art_apply'=>['clients'=>0, 'paid'=>0, 'idx'=>[]], 
-                                    'art_provide'=>['clients'=>0, 'paid'=>0, 'idx'=>[]], 
-                                    'art_hearing'=>['clients'=>0, 'paid'=>0, 'idx'=>[]],
-                                    'other' => ['clients'=>0, 'paid'=>0, 'idx'=>[]], 
-                                    'total'=>['clients'=>0, 'paid'=>0, 'idx'=>[]],
-                                    'cases'=>[],
-                                    ];
+                    $_arr[$v['week']] = ['student_offshore' => ['clients'=>0, 'paid'=>0, 'catelog'=>[]], 
+                                         'student_onshore' => ['clients'=>0, 'paid'=>0, 'catelog'=>[]], 
+                                        'art_apply'=>['clients'=>0, 'paid'=>0, 'idx'=>[]], 
+                                        'art_provide'=>['clients'=>0, 'paid'=>0, 'idx'=>[]], 
+                                        'art_hearing'=>['clients'=>0, 'paid'=>0, 'idx'=>[]],
+                                        'other' => ['clients'=>0, 'paid'=>0, 'idx'=>[]], 
+                                        'total'=>['clients'=>0, 'paid'=>0, 'glc_paid'=>0, 'idx'=>[]],
+                                        'cases'=>[],
+                                        ];
                 }
 
                 if (isset($v['student_apply']) || isset($v['other_apply'])){
                     $rev = ($v['profit'] - $v['referral']);
-
+                    /*
                     if ($rev <= 0)
                         continue;
-
+                    */
                     $idx = 'no';
                     if (isset($v['other_apply'])) {
                         $_arr[$v['week']]['other']['clients']++;
@@ -4307,6 +4368,20 @@ class ReportAPI extends MysqlDB {
                         $idx =  $v['other_apply'];
                     }
                     elseif(isset($v['student_apply'])) {
+
+
+                        if (stripos($v['subclass_name'], 'offshore') !== false) {
+                            $_arr[$v['week']]['student_offshore']['clients']++;
+                            $_arr[$v['week']]['student_offshore']['paid'] += $rev;
+                        }
+                        else {
+                            $_arr[$v['week']]['student_onshore']['clients']++;
+                            $_arr[$v['week']]['student_onshore']['paid'] += $rev;                           
+                        }
+
+                      /*
+                        
+
                         $_arr[$v['week']]['student']['clients']++;
                         $_arr[$v['week']]['student']['paid'] += $rev;
                         
@@ -4317,6 +4392,7 @@ class ReportAPI extends MysqlDB {
                         $student_catelog[$v['week']][$subclass_normalize]['clients']++;
                         $student_catelog[$v['week']][$subclass_normalize]['paid'] += $rev;
                         array_push($student_catelog[$v['week']][$subclass_normalize]['idx'], $v['student_apply']);
+                        */
 
                         $idx =  $v['student_apply'];
                         
@@ -4325,11 +4401,16 @@ class ReportAPI extends MysqlDB {
                     if ($idx !== 'no') {
                         $_arr[$v['week']]['total']['clients']++;
                         $_arr[$v['week']]['total']['paid'] += $rev;
+                        if ($v['is_glc']){
+                            $_arr[$v['week']]['total']['glc_paid'] += $rev;
+                        }
                         array_push($_arr[$v['week']]['total']['idx'], $idx);
                         $_arr[$v['week']]['cases'][$idx] = ['cname'=>$v['cname'], 'cid'=>$v['cid'], 'vid'=>$vid, 'rev'=>$rev];
                     }
                 }
                 else {
+                    $idx = 'no';
+                    $sub_rev = 0;
                     foreach ($art_policies as $step => $percent) {
                         if (!isset($v[$step]))
                             continue;
@@ -4343,14 +4424,29 @@ class ReportAPI extends MysqlDB {
                             $_arr[$v['week']]['cases'][$v[$step]] = ['cname'=>$v['cname'], 'cid'=>$v['cid'], 'vid'=>$vid, 'rev'=>$v['agreement_fee']];
                         }
                         $_arr[$v['week']]['cases'][$v[$step]][$step] = $rev;
-                       
+
+                        $sub_rev += $rev;
+                        $idx = $v[$step];  
+                    }
+
+
+                    if ($idx !== 'no') {
+                        $_arr[$v['week']]['total']['clients']++;
+                        $_arr[$v['week']]['total']['paid'] += $sub_rev;
+                        if ($v['is_glc']){
+                            $_arr[$v['week']]['total']['glc_paid'] += $sub_rev;
+                        }
+                        array_push($_arr[$v['week']]['total']['idx'], $idx);
+                        $_arr[$v['week']]['cases'][$idx]['rev'] = $sub_rev;
                     }
                 }
             }
-
+            /*
             foreach ($student_catelog as $week => $detail) {
                 $_arr[$week]['student']['catelog'] = $detail;
             }
+
+            */
             
         }
 

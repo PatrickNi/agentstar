@@ -243,14 +243,19 @@ $is_dependant = $o_c->checkDependant($client_id);
 # get client info
 $client_arr = array();
 $client_arr = $o_c->getOneClientInfo($client_id);
+
+
 if ($client_id > 0) {
 	$sets['visa']  = $sets['visa'] == 0? $client_arr['visa'] : $sets['visa'];
 	$sets['class'] =  $sets['class'] == 0? $client_arr['class'] : $sets['class'];
 
 	// 展示界面是GB2312， 如果原始存储编码是其他编码，展示会有问题
-	$client_arr['cus_note'] = mb_convert_encoding($client_arr['cus_note'], 'GB2312',  mb_detect_encoding($client_arr['cus_note'], ['GB2312', 'EUC-TW','GBK','UTF-8', 'ASCII'
+	foreach (['cus_note', 'add', 'add_au'] as $k) {
+		$client_arr[$k] = mb_convert_encoding($client_arr[$k], 'GB2312',  mb_detect_encoding($client_arr[$k], ['GB2312', 'EUC-TW','GBK','UTF-8', 'ASCII'
 ]));
-	$sets['cus_note'] = $client_arr['cus_note'];
+		$sets[$k] = $client_arr[$k];
+	}
+
 }
 
 	

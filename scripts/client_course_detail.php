@@ -296,7 +296,7 @@ $o_tpl->assign("ugs", $ugs);
 $o_tpl->assign('client', $o_c->getOneClientInfo($client_id));
 $o_tpl->assign('apodue', $apodue);
 $o_tpl->assign('agent_users', $o_g->get_migration_agents());
-$o_tpl->assign('paperwork_arr',$o_g->getUserNameArr(0, $course_id ==0?false:true, array(58,114,87)));
+$o_tpl->assign('paperwork_arr',$o_g->getUserNameArr(0, $course_id ==0?false:true, array(58,114,87,99)));
 $o_tpl->assign('show_checklist', 1);
 $o_tpl->display('client_course_detail.tpl');
 ?>

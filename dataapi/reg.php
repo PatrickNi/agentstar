@@ -289,6 +289,8 @@ $sets['type']   = isset($_REQUEST['t_type'])? explode(',', $_REQUEST['t_type']) 
 
 $sets['agent']  = isset($_REQUEST['t_agent'])? (string)trim($_REQUEST['t_agent']) : 0;
 $sets['cus_note']   = isset($_REQUEST['t_cus_note'])? (string)trim($_REQUEST['t_cus_note']) : "";
+$sets['add_au']   = isset($_REQUEST['t_add_au'])? (string)trim($_REQUEST['t_add_au']) : "";
+$sets['add']   = isset($_REQUEST['t_add'])? (string)trim($_REQUEST['t_add']) : "";
 //	$sets['cuser']    = isset($_REQUEST['t_cuser'])? (string)trim($_REQUEST['t_cuser']) : 0;
 $sets['sign']  = isset($_REQUEST['t_sign'])  && $_REQUEST['t_sign'] != '' ? (string)trim($_REQUEST['t_sign']) : '';
 
