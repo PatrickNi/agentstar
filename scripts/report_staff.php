@@ -4,16 +4,16 @@ require_once('../etc/const.php');
 //error_reporting(E_ALL);
 
 
-require_once(__LIB_PATH.'Template.class.php');
-require_once(__LIB_PATH.'Report.class.php');
-require_once(__LIB_PATH.'GeicAPI.class.php');
-require_once(__LIB_PATH.'CoachAPI.class.php');
-require_once(__LIB_PATH.'ClientAPI.class.php');
+require_once(__LIB_PATH . 'Template.class.php');
+require_once(__LIB_PATH . 'Report.class.php');
+require_once(__LIB_PATH . 'GeicAPI.class.php');
+require_once(__LIB_PATH . 'CoachAPI.class.php');
+require_once(__LIB_PATH . 'ClientAPI.class.php');
 
 set_time_limit(0);
 
 # check valid user
-$user_id = isset($_COOKIE['userid'])? $_COOKIE['userid'] : 0;
+$user_id = isset($_COOKIE['userid']) ? $_COOKIE['userid'] : 0;
 if (!($user_id > 0)) {
     echo "<script language='javascript'>parent.location.href='index.php';</script>";
 }
@@ -24,37 +24,37 @@ $o_c = new ClientAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
 //user grants
 $ugs = array();
 $user_grants = $o_g->get_user_grants($user_id);
-foreach ($g_user_grants as $item){
+foreach ($g_user_grants as $item) {
     if (array_key_exists($item, $user_grants)) {
-        foreach ($g_user_ops as $key=>$op){
-            $ugs[$item][$key] = $o_g->check_user_grant($user_grants[$item], $op);   
-        }       
+        foreach ($g_user_ops as $key => $op) {
+            $ugs[$item][$key] = $o_g->check_user_grant($user_grants[$item], $op);
+        }
     }
 }
 
 $user_pos = $o_g->getUserPosition($user_id);
 
 
-$from_day = isset($_POST['t_fdate'])? trim($_POST['t_fdate']) : "";
-$to_day   = isset($_POST['t_tdate'])? trim($_POST['t_tdate']) : "";
-$staff_id = isset($_POST['t_staff'])? trim($_POST['t_staff']) : $user_id;
-$is_all   = isset($_POST['rp_type'])? trim($_POST['rp_type']) : "d";
-$query_about  = isset($_POST['t_about'])? trim($_POST['t_about']) : "";
+$from_day = isset($_POST['t_fdate']) ? trim($_POST['t_fdate']) : "";
+$to_day = isset($_POST['t_tdate']) ? trim($_POST['t_tdate']) : "";
+$staff_id = isset($_POST['t_staff']) ? trim($_POST['t_staff']) : $user_id;
+$is_all = isset($_POST['rp_type']) ? trim($_POST['rp_type']) : "d";
+$query_about = isset($_POST['t_about']) ? trim($_POST['t_about']) : "";
 
 $weeks = array();
-$tmp_weeks  = array();
-$courses    = array();
-$courseprocs= array();
+$tmp_weeks = array();
+$courses = array();
+$courseprocs = array();
 $coursesems = array();
-$visaprocs  = array();
+$visaprocs = array();
 $visaagrees = array();
 $visavisits = array();
 $visareviews = array();
 $coursepots = array();
 $visapaids = array();
-$homeloan  = array();
-$homeloan_fee  = array();
-$coaches  = array();
+$homeloan = array();
+$homeloan_fee = array();
+$coaches = array();
 $coaches_fee = array();
 $visaapplies = array();
 
@@ -66,62 +66,61 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
     $archive = $o_r->getStaffArchive($staff_id, $is_all);
     if (count($archive) > 0) {
         $from_archive = true;
-        $is_all   = $archive['is_all'];
+        $is_all = $archive['is_all'];
         $from_day = $archive['from_day'];
-        $to_day   = $archive['to_day'];
+        $to_day = $archive['to_day'];
     }
-    
+
     if ($is_all == "d") {
-            
-        $weeks   = array();
-        $_day    = $from_day;
-        $_begin  = $from_day;
-        $_end    = $from_day;
+
+        $weeks = array();
+        $_day = $from_day;
+        $_begin = $from_day;
+        $_end = $from_day;
         $last_wk = date("YW", strtotime($from_day));
-        while ($_day <= $to_day){
+        while ($_day <= $to_day) {
             $wk = date("YW", strtotime($_day));
-            if ($last_wk != $wk){
-                $weeks[$last_wk] = $_begin .'~'. $_end;
-                $_begin  = $_day;
-                $last_wk = $wk; 
+            if ($last_wk != $wk) {
+                $weeks[$last_wk] = $_begin . '~' . $_end;
+                $_begin = $_day;
+                $last_wk = $wk;
             }
             $_end = $_day;
             $_day = date("Y-m-d", strtotime('+1 Day', strtotime($_day)));
         }
-        if (!isset($weeks[$wk])){
-            $weeks[$wk] = $_begin .'~'. $_end;
+        if (!isset($weeks[$wk])) {
+            $weeks[$wk] = $_begin . '~' . $_end;
         }
-        
+
         if (count($archive) > 0) {
             if ($staff_id == $user_id || $user_pos == 'PE' || $user_pos == 'C') {
-                $courses    = $archive['courses'];
-                $courseprocs= $archive['courseprocs'];
+                $courses = $archive['courses'];
+                $courseprocs = $archive['courseprocs'];
                 $coursesems = $archive['coursesems'];
                 $coursepots = $archive['coursepots'];
             }
 
-            if ($staff_id == $user_id || $user_pos == 'C'|| $user_pos == 'PE' ) {
+            if ($staff_id == $user_id || $user_pos == 'C' || $user_pos == 'PE') {
                 $visaagrees = $archive['visaagrees'];
                 $visagrants = $archive['visagrants'];
             }
 
             if ($staff_id == $user_id || $user_pos == 'C') {
-               
+
                 $visapaids = $archive['visapaids'];
-                $visaprocs  = $archive['visaprocs'];
+                $visaprocs = $archive['visaprocs'];
                 $visavisits = $archive['visavisits'];
-                $visareviews = isset($archive['visareviews'])? $archive['visareviews'] : array();
-                $visaapplies = isset($archive['visaapplies'])? $archive['visaapplies'] : array();
-                $homeloan   = $archive['homeloan'];
-                $homeloan_fee   = $archive['homeloan_fee']; 
-                
+                $visareviews = isset($archive['visareviews']) ? $archive['visareviews'] : array();
+                $visaapplies = isset($archive['visaapplies']) ? $archive['visaapplies'] : array();
+                $homeloan = $archive['homeloan'];
+                $homeloan_fee = $archive['homeloan_fee'];
+
             }
 
             if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C' || $user_pos == 'M')
-                $coaches =  $archive['coaches'];
+                $coaches = $archive['coaches'];
 
-        }
-        else {
+        } else {
 
             if ($staff_id == $user_id || $user_pos == 'PE' || $user_pos == 'C') {
                 $offduty = false;
@@ -131,85 +130,84 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
                         $offduty = true;
                     }
                 }
-                $courses    = $o_r->getNumOfCourseClientByUser($from_day, $to_day, $staff_id, $offduty,$query_about);
-                $courseprocs= $o_r->getNumOfCourseProcessByUser($from_day, $to_day, $staff_id, $offduty, $query_about);
-                $coursesems = $o_r->getAmountOfCourseCommByUser($from_day, $to_day, $staff_id, $offduty,$query_about);
-                $coursepots = $o_r->getAmountOfCoursePotCommByUser($from_day, $to_day, $staff_id, $offduty,$query_about);
+                $courses = $o_r->getNumOfCourseClientByUser($from_day, $to_day, $staff_id, $offduty, $query_about);
+                $courseprocs = $o_r->getNumOfCourseProcessByUser($from_day, $to_day, $staff_id, $offduty, $query_about);
+                $coursesems = $o_r->getAmountOfCourseCommByUser($from_day, $to_day, $staff_id, $offduty, $query_about);
+                $coursepots = $o_r->getAmountOfCoursePotCommByUser($from_day, $to_day, $staff_id, $offduty, $query_about);
             }
-            
+
             if ($staff_id == $user_id || $user_pos == 'C' || $user_pos == 'PE') {
-                $visaagrees = $o_r->getNumOfAgreementByUser($from_day, $to_day, $staff_id, $query_about); 
+                $visaagrees = $o_r->getNumOfAgreementByUser($from_day, $to_day, $staff_id, $query_about);
                 $visagrants = $o_r->getNumOfVisaGranted($from_day, $to_day, $staff_id, $query_about);
             }
 
 
             if ($staff_id == $user_id || $user_pos == 'C') {
-                $visapaids = $o_r->getNumOfVisaPaidByUser($from_day, $to_day, $staff_id, $query_about); 
-                $visaprocs  = $o_r->getNumOfVisaProcByUser($from_day, $to_day, $staff_id, $query_about);
+                $visapaids = $o_r->getNumOfVisaPaidByUser($from_day, $to_day, $staff_id, $query_about);
+                $visaprocs = $o_r->getNumOfVisaProcByUser($from_day, $to_day, $staff_id, $query_about);
                 $visavisits = $o_r->getNumOfVisitByUser($from_day, $to_day, $staff_id, $query_about);
-                $visareviews= $o_r->getNumOfVisaReviewByUser($from_day, $to_day, $staff_id, $query_about);
-                $homeloan   = $o_r->getNumOfHomeLoan($from_day, $to_day, $staff_id, $query_about);
-                $homeloan_fee   = $o_r->getNumOfHomeLoanFee($from_day, $to_day, $staff_id, $query_about);
+                $visareviews = $o_r->getNumOfVisaReviewByUser($from_day, $to_day, $staff_id, $query_about);
+                $homeloan = $o_r->getNumOfHomeLoan($from_day, $to_day, $staff_id, $query_about);
+                $homeloan_fee = $o_r->getNumOfHomeLoanFee($from_day, $to_day, $staff_id, $query_about);
                 $visaapplies = $o_r->getNumOfVisaApply($from_day, $to_day, $staff_id, $query_about);
             }
 
-            if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C' || $user_pos == 'M'){
+            if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C' || $user_pos == 'M') {
                 $coaches = $o_r->getNumOfCoach($from_day, $to_day, $staff_id, $query_about);
                 $coaches_fee = $o_r->getNumOfCoachFee($from_day, $to_day, $staff_id, $query_about);
 
                 foreach ($coaches_fee as $week => $v) {
-                    foreach ($v as $itemid=> $vv) {
+                    foreach ($v as $itemid => $vv) {
                         if (!isset($coaches[$week]) || !isset($coaches[$week][$itemid])) {
-                            $coaches[$week][$itemid] = array('title'=>$vv['title'], 'list'=>array(), 'extrahour'=>0, 'lessons'=>array(), 'hour'=>0, 'client'=>0);
+                            $coaches[$week][$itemid] = array('title' => $vv['title'], 'list' => array(), 'extrahour' => 0, 'lessons' => array(), 'hour' => 0, 'client' => 0);
                         }
                     }
                 }
             }
         }
-    }
-    elseif($is_all == "s"){
+    } elseif ($is_all == "s") {
         //cal weeks
         $w = 1;
-        $_day    = $from_day;
+        $_day = $from_day;
         $last_wk = date("YW", strtotime($from_day));
-        while ($_day <= $to_day){
+        while ($_day <= $to_day) {
             $wk = date("YW", strtotime($_day));
-            if ($last_wk != $wk){
+            if ($last_wk != $wk) {
                 $w++;
                 $last_wk = $wk;
             }
             $_day = date("Y-m-d", strtotime('+1 Day', strtotime($_day)));
         }
 
-        $weeks['all'] = $from_day ."~". $to_day ." ({$w} weeks)";
+        $weeks['all'] = $from_day . "~" . $to_day . " ({$w} weeks)";
+        $summary_weeks = $w;
 
         if (count($archive) > 0) {
             if ($staff_id == $user_id || $user_pos == 'PE' || $user_pos == 'C') {
-                $courses    = $archive['courses'];
-                $courseprocs= $archive['courseprocs'];
+                $courses = $archive['courses'];
+                $courseprocs = $archive['courseprocs'];
                 $coursesems = $archive['coursesems'];
                 $coursepots = $archive['coursepots'];
             }
 
-            if ($staff_id == $user_id || $user_pos == 'C'|| $user_pos == 'PE' ) {
+            if ($staff_id == $user_id || $user_pos == 'C' || $user_pos == 'PE') {
                 $visaagrees = $archive['visaagrees'];
                 $visagrants = $archive['visagrants'];
             }
 
             if ($staff_id == $user_id || $user_pos == 'C') {
-                $visaprocs  = $archive['visaprocs'];
-                $visapaids  = $archive['visapaids'];
-                $visareviews  = isset($archive['visareviews'])? $archive['visareviews'] : array();
-                $visaapplies = isset($archive['visaapplies'])? $archive['visaapplies'] : array();
+                $visaprocs = $archive['visaprocs'];
+                $visapaids = $archive['visapaids'];
+                $visareviews = isset($archive['visareviews']) ? $archive['visareviews'] : array();
+                $visaapplies = isset($archive['visaapplies']) ? $archive['visaapplies'] : array();
                 $visavisits = $archive['visavisits'];
-                $homeloan   = $archive['homeloan'];
-                $homeloan_fee   = $archive['homeloan_fee']; 
+                $homeloan = $archive['homeloan'];
+                $homeloan_fee = $archive['homeloan_fee'];
             }
 
             if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C' || $user_pos == 'M')
-                $coaches =  $archive['coaches']; 
-        }
-        else {
+                $coaches = $archive['coaches'];
+        } else {
             if ($staff_id == $user_id || $user_pos == 'PE' || $user_pos == 'C') {
                 $offduty = false;
                 if ($staff_id > 0) {
@@ -218,35 +216,35 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
                         $offduty = true;
                     }
                 }
-                $courses    = $o_r->getAllOfCourseClientByUser($from_day, $to_day, $staff_id, $offduty, $query_about);
-                $courseprocs= $o_r->getAllOfCourseProcessByUser($from_day, $to_day, $staff_id, $offduty, $query_about);
+                $courses = $o_r->getAllOfCourseClientByUser($from_day, $to_day, $staff_id, $offduty, $query_about);
+                $courseprocs = $o_r->getAllOfCourseProcessByUser($from_day, $to_day, $staff_id, $offduty, $query_about);
                 $coursesems = $o_r->getAllOfCourseCommByUser($from_day, $to_day, $staff_id, $offduty, $query_about);
                 $coursepots = $o_r->getAllOfCoursePotCommByUser($from_day, $to_day, $staff_id, $offduty, $query_about);
             }
-            
+
             if ($staff_id == $user_id || $user_pos == 'C' || $user_pos == 'PE') {
-                $visaagrees = $o_r->getAllOfAgreementByUser($from_day, $to_day, $staff_id, $query_about); 
+                $visaagrees = $o_r->getAllOfAgreementByUser($from_day, $to_day, $staff_id, $query_about);
                 $visagrants = $o_r->getAllOfVisaGranted($from_day, $to_day, $staff_id, $query_about);
             }
 
             if ($staff_id == $user_id || $user_pos == 'C') {
-                $visapaids  = $o_r->getAllOfVisaPaidByUser($from_day, $to_day, $staff_id, $query_about);
-                $visaprocs  = $o_r->getAllOfVisaProcByUser($from_day, $to_day, $staff_id, $query_about);
+                $visapaids = $o_r->getAllOfVisaPaidByUser($from_day, $to_day, $staff_id, $query_about);
+                $visaprocs = $o_r->getAllOfVisaProcByUser($from_day, $to_day, $staff_id, $query_about);
                 $visavisits = $o_r->getAllOfVisitByUser($from_day, $to_day, $staff_id, $query_about);
-                $visareviews= $o_r->getAllOfVisaReviewByUser($from_day, $to_day, $staff_id, $query_about);
-                $homeloan   = $o_r->getAllOfHomeLoan($from_day, $to_day, $staff_id, $query_about);        
-                $homeloan_fee   = $o_r->getAllOfHomeLoanFee($from_day, $to_day, $staff_id, $query_about); 
-		        $visaapplies = $o_r->getAllOfVisaApply($from_day, $to_day, $staff_id, $query_about);
+                $visareviews = $o_r->getAllOfVisaReviewByUser($from_day, $to_day, $staff_id, $query_about);
+                $homeloan = $o_r->getAllOfHomeLoan($from_day, $to_day, $staff_id, $query_about);
+                $homeloan_fee = $o_r->getAllOfHomeLoanFee($from_day, $to_day, $staff_id, $query_about);
+                $visaapplies = $o_r->getAllOfVisaApply($from_day, $to_day, $staff_id, $query_about);
             }
 
             if ($staff_id == $user_id || $user_pos == 'PC' || $user_pos == 'C' || $user_pos == 'M') {
-                $coaches = $o_r->getAllOfCoach($from_day, $to_day, $staff_id,$query_about);
+                $coaches = $o_r->getAllOfCoach($from_day, $to_day, $staff_id, $query_about);
                 $coaches_fee = $o_r->getAllOfCoachFee($from_day, $to_day, $staff_id, $query_about);
 
                 foreach ($coaches_fee as $week => $v) {
-                    foreach ($v as $itemid=> $vv) {
+                    foreach ($v as $itemid => $vv) {
                         if (!isset($coaches[$week]) || !isset($coaches[$week][$itemid])) {
-                            $coaches[$week][$itemid] = array('title'=>$vv['title'], 'list'=>array(), 'extrahour'=>0, 'lessons'=>array(), 'hour'=>0, 'client'=>0);
+                            $coaches[$week][$itemid] = array('title' => $vv['title'], 'list' => array(), 'extrahour' => 0, 'lessons' => array(), 'hour' => 0, 'client' => 0);
                         }
                     }
                 }
@@ -257,20 +255,17 @@ if ($from_day != "" && $to_day != "" && $is_all != "") {
     //var_dump(isset($_POST['bt_archive']),$_POST['bt_archive'] == 'archive report',!$from_archive);
     if (isset($_POST['bt_archive']) && $_POST['bt_archive'] == 'archive report' && !$from_archive) {
         if ($user_id == 3) {
-            $filter = array('is_all'=>$is_all, 'from_day'=>$from_day, 'to_day'=>$to_day);
+            $filter = array('is_all' => $is_all, 'from_day' => $from_day, 'to_day' => $to_day);
             $o_r->doStaffArchive($staff_id, $is_all, $filter, $courses, $courseprocs, $coursesems, $coursepots, $visaagrees, $visaprocs, $visavisits, $homeloan, $homeloan_fee, $coaches);
+        } else {
+            echo "<script language='javascript'>alert('Permisson Denied');</script>";
         }
-        else {
-            echo "<script language='javascript'>alert('Permisson Denied');</script>"; 
-        }
-    }
-    elseif (isset($_POST['bt_locked']) && $_POST['bt_locked'] == 'Locked Period') {
+    } elseif (isset($_POST['bt_locked']) && $_POST['bt_locked'] == 'Locked Period') {
         $o_h = new CoachAPI(__DB_HOST, __DB_USER, __DB_PASSWORD, __DB_DATABASE, 1);
-        if ($user_id == 50 && $o_h->checkLockCode(isset($_POST['token'])? trim($_POST['token']) : '') && $staff_id == 87) {
+        if ($user_id == 50 && $o_h->checkLockCode(isset($_POST['token']) ? trim($_POST['token']) : '') && $staff_id == 87) {
             $o_h->lockCompletedLesson($from_day, $to_day, $staff_id);
-        }
-        else {
-            echo "<script language='javascript'>alert('Permisson Denied');</script>"; 
+        } else {
+            echo "<script language='javascript'>alert('Permisson Denied');</script>";
         }
     }
 }
@@ -302,19 +297,19 @@ $o_tpl->assign('uid', $user_id);
 $o_tpl->assign('user_pos', $user_pos);
 $o_tpl->assign('clientfroms', $o_c->getClientFrom());
 $o_tpl->assign('query_about', $query_about);
-$o_tpl->assign('visaapplies',$visaapplies);
+$o_tpl->assign('visaapplies', $visaapplies);
+$o_tpl->assign('summary_weeks', $summary_weeks);
 
 
 
 
-if ($user_pos == 'C' || $user_pos == 'M'){
-    $o_tpl->assign('slUsers', $o_g->getUserNameArr(0,true));
-}
-elseif($user_pos == 'PC' || $user_pos == 'PE'){
+
+if ($user_pos == 'C' || $user_pos == 'M') {
+    $o_tpl->assign('slUsers', $o_g->getUserNameArr(0, true));
+} elseif ($user_pos == 'PC' || $user_pos == 'PE') {
     //var_dump($o_g->getMemberByStaffId($user_id));
     $o_tpl->assign('slUsers', $o_g->getUserNameArr($user_id) + $o_g->getMemberByStaffId($user_id));
-}
-else {
+} else {
     $o_tpl->assign('slUsers', $o_g->getUserNameArr($user_id));
 }
 
@@ -324,7 +319,7 @@ if ($user_id == 3) {
         $leave_staffs[$id] = $v['startdate'];
     }
 }
-$o_tpl->assign('leave_staffs', " var leave_staffs=".json_encode($leave_staffs).";");
+$o_tpl->assign('leave_staffs', " var leave_staffs=" . json_encode($leave_staffs) . ";");
 
 
 $o_tpl->assign('ugs', $ugs);
@@ -336,8 +331,7 @@ if ($from_archive) {
     $archive_date = $o_r->getStaffArchiveTime($staff_id, $is_all);
     if ($archive_date <= '2023-03-08') {
         $tpl_version = 'report_staff.2.tpl';
-    }
-    else {
+    } else {
         $tpl_version = 'report_staff.3.tpl';
     }
 }

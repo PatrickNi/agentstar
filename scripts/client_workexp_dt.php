@@ -63,6 +63,12 @@ $work_arr = $o_c->getWorkExpByClient($client_id);
 # set smarty tpl
 $o_tpl = new Template;
 if($isNew == 0 && $work_id > 0 && array_key_exists($work_id, $work_arr)){
+		// 展示界面是GB2312， 如果原始存储编码是其他编码，展示会有问题
+	foreach (['com', 'pos'] as $k) {
+		$work_arr[$work_id][$k] = mb_convert_encoding($work_arr[$work_id][$k], 'GB2312',  mb_detect_encoding($work_arr[$work_id][$k], ['GB2312', 'EUC-TW','GBK','UTF-8', 'ASCII'
+]));
+	}
+
 	$o_tpl->assign('dt_arr', $work_arr[$work_id]);
 }
 

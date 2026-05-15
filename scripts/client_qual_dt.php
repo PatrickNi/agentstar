@@ -66,7 +66,13 @@ $o_tpl = new Template;
 
 if($isChange == 1){
 	$o_tpl->assign('dt_arr', $sets);
-}elseif($isNew == 0 && $qual_id > 0 && array_key_exists($qual_id, $qual_arr)){
+}
+elseif($isNew == 0 && $qual_id > 0 && array_key_exists($qual_id, $qual_arr)){
+	// 展示界面是GB2312， 如果原始存储编码是其他编码，展示会有问题
+	foreach (['school', 'major'] as $k) {
+		$qual_arr[$qual_id][$k] = mb_convert_encoding($qual_arr[$qual_id][$k], 'GB2312',  mb_detect_encoding($qual_arr[$qual_id][$k], ['GB2312', 'EUC-TW','GBK','UTF-8', 'ASCII'
+]));
+	}
 	$o_tpl->assign('dt_arr', $qual_arr[$qual_id]);
 }
 

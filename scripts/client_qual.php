@@ -37,6 +37,13 @@ foreach ($g_user_grants as $item){
 $qual_arr = array();
 if ($client_id > 0) {
 	$qual_arr = $o_c->getQualificationByClient($client_id);
+	foreach ($qual_arr as $id => $v) {
+		// 展示界面是GB2312， 如果原始存储编码是其他编码，展示会有问题
+		foreach (['school', 'major'] as $k) {
+			$qual_arr[$id][$k] = mb_convert_encoding($qual_arr[$id][$k], 'GB2312',  mb_detect_encoding($qual_arr[$id][$k], ['GB2312', 'EUC-TW','GBK','UTF-8', 'ASCII'
+	]));
+		}
+	}
 }
 # set smarty tpl
 $o_tpl = new Template;

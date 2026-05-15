@@ -261,6 +261,7 @@
               <select name="t_unit" onChange="this.form.t_appfee.focus();">
                 <option value="year" {if $dt_arr.unit eq 'year'} selected {/if}>year</option>
                 <option value="month" {if $dt_arr.unit eq 'month'} selected {/if}>month</option>
+                <option value="week" {if $dt_arr.unit eq 'week'} selected {/if}>week</option>
               </select>
             </td>
           </tr>

@@ -35,7 +35,14 @@ foreach ($g_user_grants as $item){
 # get work experience
 $work_arr = array();
 if ($client_id > 0) {
-     $work_arr = $o_c->getWorkExpByClient($client_id);
+    $work_arr = $o_c->getWorkExpByClient($client_id);
+	foreach ($work_arr as $id => $v) {
+		// 展示界面是GB2312， 如果原始存储编码是其他编码，展示会有问题
+		foreach (['com', 'pos'] as $k) {
+			$work_arr[$id][$k] = mb_convert_encoding($work_arr[$id][$k], 'GB2312',  mb_detect_encoding($work_arr[$id][$k], ['GB2312', 'EUC-TW','GBK','UTF-8', 'ASCII'
+	]));
+		}
+	}
 }
 # set smarty tpl
 $o_tpl = new Template;
